@@ -1,0 +1,142 @@
+import os
+import caffe
+import cv2
+import numpy as np
+from detection import Network
+from xml_read import xmlInfo
+from detect_tool import Iou_cal
+from darknetV3 import detect
+from darknetV3 import load_net
+from darknetV3 import load_meta
+import matplotlib.pyplot as plt
+
+def drawROC(output,labelName):
+	f=open(output+'car'+'.txt', 'r')
+	results=f.readlines()
+
+	acc = []
+	rec = []
+	for result in results:
+		obj = result[:-1].split(">>")
+		acc.append(obj[1].split(":")[1])
+		rec.append(obj[2].split(":")[1])
+
+	color = [0, 255, 0]
+	linewidth = 0.3
+	plt.plot(acc, rec, 'r*-')#, color = color, linewidth = linewidth)
+	plt.plot([0.0,1.1], [0.0,1.1], 'b-')
+	plt.xlim(0.0,1.1)
+	plt.ylim(0.0,1.1)
+	plt.title('ROC for car In YOLOV3')
+	plt.xlabel('ACC')
+	plt.ylabel('REC')
+	plt.show()
+
+def calAccAndRecall(objects,groudTruth,thresh_iou):
+	Num_True_detection = 0
+	Num_False_detection = 0
+	Num_Loss_detection = 0
+
+	True_detection = []
+	Overlap_detection = []
+	False_detection = [ele for ele in objects]   
+	Loss_detection = [ele for ele in groudTruth]
+
+	for i in range(len(groudTruth)):
+		Iou_sameLabel = []
+		for j in range(len(objects)):
+			if False_detection[j] != 0 and groudTruth[i]['label_name'] == objects[j]['label_name'] and Iou_cal(objects[j]['box'], groudTruth[i]['box']) > thresh_iou:
+				Iou_sameLabel.append(Iou_cal(objects[j]['box'], groudTruth[i]['box']))
+			else:
+				Iou_sameLabel.append(0)
+		if sum(Iou_sameLabel) > 0:
+			Loss_detection[i] = 0
+			Num_True_detection+=1
+			for Iou in Iou_sameLabel:
+				if Iou == max(Iou_sameLabel):
+					True_detection.append(objects[Iou_sameLabel.index(Iou)])
+					False_detection[Iou_sameLabel.index(Iou)] = 0
+				elif Iou > 0:
+					#print('max(Iou_sameLabel): {}'.format(max(Iou_sameLabel)))
+					Overlap_detection.append(objects[Iou_sameLabel.index(Iou)])
+					False_detection[Iou_sameLabel.index(Iou)] = 0
+
+    #--------------False_detection--------------
+	while 0 in False_detection:
+	    False_detection.remove(0)
+	Num_False_detection = len(False_detection)
+    #-------------loss_detection----------------
+	while 0 in Loss_detection:
+	    Loss_detection.remove(0)
+	Num_Loss_detection = len(Loss_detection)
+
+	return Num_True_detection
+
+def bouncing_box(net,meta,test_path,xml_path,thresh_conf,thresh_iou,output,labelList):
+	Num_img = 0
+	TPList = np.zeros(len(labelList))
+	groundTruthLabelNum = np.zeros(len(labelList))
+	objectsLabelNum = np.zeros(len(labelList))
+
+	print('--------loading network done!----------------')
+	
+	for img_name in os.listdir(test_path):
+	    name = img_name.split('.')
+	    xml_name = name[0]+'.xml'
+	    if os.path.exists(xml_path+xml_name):
+		Num_img+=1
+		print('Image {}, {} is processing!'.format(Num_img, img_name))
+
+	    #-------------Read groudtruth--------
+		groudTruth = xmlInfo(xml_path+xml_name)
+	    #-------------Achieve prediction--------
+		objects = detect(net, meta, test_path+img_name,thresh_conf)
+
+		for labelName in labelList:
+			groundTruthLabel = [ele for ele in groudTruth if ele['label_name']==labelName]
+			objectsLabel = [ele for ele in objects if ele['label_name']==labelName]
+			groundTruthLabelNum[labelList.index(labelName)] = groundTruthLabelNum[labelList.index(labelName)]+len(groundTruthLabel)
+			objectsLabelNum[labelList.index(labelName)] = objectsLabelNum[labelList.index(labelName)]+len(objectsLabel)
+
+			TP = calAccAndRecall(objectsLabel,groundTruthLabel,thresh_iou)
+			TPList[labelList.index(labelName)] = TPList[labelList.index(labelName)]+TP
+			#print("groundTruthLabelNum: {}".format(groundTruthLabelNum))
+			#print("objectsLabelNum: {}".format(objectsLabelNum))
+			#print("TPList :{}".format(TPList))
+
+	for labelName in labelList:
+		if groundTruthLabelNum[labelList.index(labelName)]==0 or objectsLabelNum[labelList.index(labelName)]==0:
+	    		True_detection_rate = 0
+		else:
+	    		True_detection_rate = float(TPList[labelList.index(labelName)])/float(objectsLabelNum[labelList.index(labelName)])
+	    		True_recall_rate = float(TPList[labelList.index(labelName)])/float(groundTruthLabelNum[labelList.index(labelName)])
+		f = open(output+labelName+'.txt','a')
+		f.write('Thresh: {} >> Accuracy: {} >> Recall: {} \n'.format(thresh_conf,True_detection_rate,True_recall_rate))
+		f.close()
+
+def main():
+	print("start...")
+	cfg="/home/wissen/darknetV3-master/cfg/yolov3_my_test.cfg"
+	model="/home/wissen/darknetV3-master/backup/yolov3_my_197000.weights"
+	meta="/home/wissen/darknetV3-master/cfg/wissen.data"
+	test_path="/home/wissen/Test_results/data/Mhpdata/JPEGImages/"
+	xml_path="/home/wissen/Test_results/data/Mhpdata/Annotations/"
+	labelList = ['bicycle']
+	output="/home/wissen/Test_results/results/"
+	step=0.02
+
+	net = load_net(cfg, model, 0)
+	meta = load_meta(meta)
+	for thresh_conf in np.arange(0.01,1,step):
+		bouncing_box(net,meta,test_path,xml_path,float(thresh_conf),float(0.5),output,labelList)
+    	print("process end!")
+	drawROC(output,labelList[0])
+
+if __name__ == "__main__":
+	main()
+
+
+
+
+
+

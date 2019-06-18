@@ -1,0 +1,32 @@
+------------------------------
+model_name: ./weights/best.pt, img_num: 2
+-----------result-------------
+>> Recall: 100.0% 
+>> Precious: 80.0% 
+>> False_detection_rate: 20.0%
+>> Loss_detection_rate: 0.0%
+>> Loss_detection_per_img: 0.0
+------------------------------
+model_name: ./weights/best.pt, img_num: 11
+-----------result-------------
+>> Recall: 67.64705882352942% 
+>> Precious: 45.09803921568628% 
+>> False_detection_rate: 54.90196078431373%
+>> Loss_detection_rate: 32.35294117647059%
+>> Loss_detection_per_img: 1.0
+------------------------------
+model_name: ./weights/best.pt, img_num: 3400
+-----------result-------------
+>> Recall: 61.20494646358016% 
+>> Precious: 48.93886410225491% 
+>> False_detection_rate: 49.861328831544675%
+>> Loss_detection_rate: 38.79505353641984%
+>> Loss_detection_per_img: 1.513235294117647
+------------------------------
+model_name: ./weights/best.pt, img_num: 3400
+-----------result-------------
+>> Recall: 61.00135726134821% 
+>> Precious: 49.55286046796521% 
+>> False_detection_rate: 49.2711013107926%
+>> Loss_detection_rate: 38.99864273865179%
+>> Loss_detection_per_img: 1.5211764705882354

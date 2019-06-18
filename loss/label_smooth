@@ -1,0 +1,3 @@
+            uniform_distribution = np.full(self.__num_classes, 1.0 / self.__num_classes)
+            deta = 0.01
+smooth_onehot = onehot * (1 - deta) + deta * uniform_distribution

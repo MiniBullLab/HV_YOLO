@@ -1,2 +1,2 @@
-# HV_YOLO
-yolo detection architecture
+# ShuffleYOLO
+shufflenet yolo detection architecture
