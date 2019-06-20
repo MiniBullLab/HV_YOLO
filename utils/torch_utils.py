@@ -1,12 +1,9 @@
 import torch
 
-
 def check_cuda():
     return torch.cuda.is_available()
 
-
 CUDA_AVAILABLE = check_cuda()
-
 
 def init_seeds(seed=0):
     torch.manual_seed(seed)

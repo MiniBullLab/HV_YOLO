@@ -235,7 +235,7 @@ if __name__ == '__main__':
     parser.add_argument('--resume', action='store_true', help='resume training flag')
     parser.add_argument('--report', action='store_true', help='report TP, FP, FN, P and R per batch (slower)')
     parser.add_argument('--freeze', action='store_true', help='freeze darknet53.conv.74 layers for first epoch')
-    parser.add_argument('--var', type=float, default=0, help='optional test variable')
+    
     opt = parser.parse_args()
     print(opt, end='\n\n')
 

@@ -1,0 +1,7 @@
+*.pyc
+*.user
+*.workspace
+*.log
+.idea/
+build/
+devel/
