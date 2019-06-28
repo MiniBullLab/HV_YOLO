@@ -11,9 +11,6 @@ from utils import torch_utils
 # Import test.py to get mAP after each epoch
 import test
 
-DARKNET_WEIGHTS_FILENAME = 'darknet53.conv.74'
-DARKNET_WEIGHTS_URL = 'https://pjreddie.com/media/files/{}'.format(DARKNET_WEIGHTS_FILENAME)
-
 def train(
         net_config_path,
         data_config_path,
@@ -97,15 +94,6 @@ def train(
     else:
         start_epoch = 0
         best_mAP = -1
-
-        # Initialize model with darknet53 weights (optional)
-        # def_weight_file = os.path.join(weights_path, DARKNET_WEIGHTS_FILENAME)
-        # if not os.path.isfile(def_weight_file):
-        #     os.system('wget {} -P {}'.format(
-        #         DARKNET_WEIGHTS_URL,
-        #         weights_path))
-        # assert os.path.isfile(def_weight_file)
-        # load_weights(model, def_weight_file)
 
         if torch.cuda.device_count() > 1:
             print('Using ', torch.cuda.device_count(), ' GPUs')
@@ -235,7 +223,7 @@ if __name__ == '__main__':
     parser.add_argument('--resume', action='store_true', help='resume training flag')
     parser.add_argument('--report', action='store_true', help='report TP, FP, FN, P and R per batch (slower)')
     parser.add_argument('--freeze', action='store_true', help='freeze darknet53.conv.74 layers for first epoch')
-    
+
     opt = parser.parse_args()
     print(opt, end='\n\n')
 
