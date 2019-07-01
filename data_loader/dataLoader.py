@@ -1,5 +1,6 @@
 import glob
 import os
+import sys
 import random
 import math
 from PIL import Image
@@ -104,17 +105,6 @@ class DataLoader():
             return imw, targets, M
         else:
             return imw
-
-    def encode_label(self, labels, volid_label, valid_label):
-        classes = -np.ones([100, 100])
-        for i in range(0, len(valid_label)):
-            classes[i, :len(valid_label[i])] = valid_label[i]
-        for label in volid_label:
-            labels = labels[labels[:, 0] != label]
-        for row in range(0, labels.shape[0]):
-            labels[row, 0] = np.float32(np.where(classes == int(labels[row, 0]))[0])
-
-        return labels
 
     def decode_labels(self, img, labels):
 

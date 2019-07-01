@@ -3,13 +3,13 @@ import time
 
 from models import *
 from modelsShuffleNet import *
-from utils.datasets import *
+from data_loader import *
 from utils.utils import *
 
 from utils import torch_utils
 
 # Import test.py to get mAP after each epoch
-import test
+#import test
 
 def train(
         net_config_path,
@@ -20,7 +20,7 @@ def train(
         batch_size=16,
         accumulated_batches=1,
         weights_path='weights',
-        report=False,
+        report = False,
         multi_scale=False,
         freeze_bn=True,
         var=0,
@@ -40,13 +40,9 @@ def train(
 
     # Configure run
     data_config = parse_data_config(data_config_path)
-    num_classes = int(data_config['classes'])
     train_path = data_config['train']
 
     # Initialize model
-    # Darknet53
-    # model = Darknet(net_config_path, img_size)
-    # ShuffleNetV2_1.0
     model = ShuffleYolo(net_config_path, img_size, freeze_bn=freeze_bn)
 
     # yoloLoss
@@ -57,8 +53,8 @@ def train(
                 yoloLoss.append(layer)
 
     # Get dataloader
-    dataloader = load_images_and_labels(train_path, batch_size=batch_size, img_size=img_size,
-                                        multi_scale=multi_scale, augment=True, balancedSample=False)
+    dataloader = ImageDetectTrainDataLoader(train_path, batch_size, img_size,
+                                        multi_scale=multi_scale, augment=True, balancedSample=True)
 
     avg_loss = -1
     lr0 = 0.0002
@@ -174,6 +170,7 @@ def train(
         torch.save(checkpoint, latest_weights_file)
 
         # Calculate mAP
+        '''
         opt.image_folder = '/home/wfw/data/VOCdevkit/BerkeleyDet/val/' # val
         opt.weights_path = 'weights/latest.pt'
         opt.class_path = 'data/berkeley.names'
@@ -181,6 +178,7 @@ def train(
         opt.img_size = img_size
         opt.cfg = net_config_path
         mAP, aps = test.main(opt)
+        '''
 
         #if mAP >= best_mAP:
         #    best_mAP = mAP
@@ -200,7 +198,7 @@ def train(
                 latest_weights_file,
                 backup_file_path,
             ))
-
+        '''
         # Write epoch results
         classes = load_classes(opt.class_path)
         with open('results.txt', 'a') as file:
@@ -209,6 +207,7 @@ def train(
             for i, ap in enumerate(aps):
                 file.write(classes[i] + ": {:.3f} ".format(ap))
             file.write("\n")
+        '''
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -242,5 +241,4 @@ if __name__ == '__main__':
         report=opt.report,
         multi_scale=opt.multi_scale,
         freeze_bn=opt.freeze,
-        var=opt.var,
     )

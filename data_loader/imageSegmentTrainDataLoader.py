@@ -1,14 +1,13 @@
 from .dataLoader import *
-from sys import platform
 
-class imageSegmentTrainDataLoader(DataLoader):
+class ImageSegmentTrainDataLoader(DataLoader):
     def __init__(self, path, batch_size=1, img_size=[768, 320], augment=False):
         super().__init__(path)
         # self.img_files = sorted(glob.glob('%s/*.*' % path))
         with open(path, 'r') as file:
             self.img_files = file.readlines()
 
-        if platform == 'darwin':  # MacOS (local)
+        if sys.platform == 'darwin':  # MacOS (local)
             self.img_files = [path.replace('\n', '').replace('/images', './data/coco/images')
                               for path in self.img_files]
         else:  # linux (gcp cloud)
