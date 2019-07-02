@@ -1,23 +1,42 @@
-import glob
 import os
 import sys
+sys.path.insert(0, os.getcwd() + "/..")
+import glob
 import random
 import math
 from PIL import Image
 import numpy as np
 import cv2
 import torch
+from helper import DirProcess
 
 class DataLoader():
 
     def __init__(self, path):
         self.dataPath = path
+        self.dirProcess = DirProcess()
 
     def setDataPath(self, path):
         self.dataPath = path
 
     def getDataPath(self):
         return self.dataPath
+
+    def getImageAndAnnotationList(self, trainPath):
+        result = []
+        imagesDir = os.path.join(self.dataPath, "../JPEGImages")
+        annotationDir = os.path.join(self.dataPath, "../Annotations")
+        for fileNameAndPost in self.dirProcess.getFileData(trainPath):
+            fileName, post = os.path.splitext(fileNameAndPost)
+            annotationFileName = fileName + ".xml"
+            fileName, post = os.path.splitext(fileNameAndPost)
+            annotationPath = os.path.join(annotationDir, annotationFileName)
+            imagePath = os.path.join(imagesDir, fileNameAndPost)
+            #print(imagePath)
+            if os.path.exists(annotationPath) and \
+                    os.path.exists(imagePath):
+                result.append((imagePath, annotationPath))
+        return result
 
     def resize_square(self, img, width=416, height=416, color=(0, 0, 0)):  # resize a rectangular image to a padded square
         shape = img.shape[:2]  # shape = [height, width]

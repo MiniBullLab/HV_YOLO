@@ -1,7 +1,7 @@
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
-from helper import DirProcess, XMLProcess
+from helper import XMLProcess
 from .dataLoader import *
 import config.config as config
 from utils.utils import xyxy2xywh
@@ -12,7 +12,6 @@ class ImageDetectTrainDataLoader(DataLoader):
         super().__init__(trainPath)
         path, _ = os.path.split(trainPath)
         self.dataPath = path
-        self.dirProcess = DirProcess()
         self.xmlProcess = XMLProcess()
         self.multi_scale = multi_scale
         self.augment = augment
@@ -140,22 +139,6 @@ class ImageDetectTrainDataLoader(DataLoader):
             blancedFileList[config.className[i]] = self.getImageAndAnnotationList(calssFilePath)
             blancedFileCount[config.className[i]] = len(blancedFileList[config.className[i]])
         return blancedFileList, blancedFileCount
-
-    def getImageAndAnnotationList(self, trainPath):
-        result = []
-        imagesDir = os.path.join(self.dataPath, "../JPEGImages")
-        annotationDir = os.path.join(self.dataPath, "../Annotations")
-        for fileNameAndPost in self.dirProcess.getFileData(trainPath):
-            fileName, post = os.path.splitext(fileNameAndPost)
-            annotationFileName = fileName + ".xml"
-            fileName, post = os.path.splitext(fileNameAndPost)
-            annotationPath = os.path.join(annotationDir, annotationFileName)
-            imagePath = os.path.join(imagesDir, fileNameAndPost)
-            #print(imagePath)
-            if os.path.exists(annotationPath) and \
-                    os.path.exists(imagePath):
-                result.append((imagePath, annotationPath))
-        return result
 
     def getResizeLabels(self, boxes, ratio, pad):
         result = np.array([])

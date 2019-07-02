@@ -3,7 +3,6 @@ import time, cv2
 
 from models import *
 from modelsShuffleNet import *
-from utils.datasets import *
 from utils.utils import *
 
 import config.config as config

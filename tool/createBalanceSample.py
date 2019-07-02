@@ -42,8 +42,8 @@ class CreateBalanceSample():
 def test():
     print("start...")
     test = CreateBalanceSample()
-    test.create("/home/lpj/github/data/VOCdevkit/Berkeley/ImageSets/train.txt",
-                "/home/lpj/github/data/VOCdevkit/Berkeley/ImageSets")
+    test.create("/home/lpj/github/data/Berkeley/ImageSets/train.txt",
+                "/home/lpj/github/data/Berkeley/ImageSets")
     print("End of game, have a nice day!")
 
 if __name__ == "__main__":

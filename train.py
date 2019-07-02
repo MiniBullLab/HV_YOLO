@@ -9,7 +9,7 @@ from utils.utils import *
 from utils import torch_utils
 
 # Import test.py to get mAP after each epoch
-#import test
+import test
 
 def train(
         net_config_path,
@@ -170,7 +170,6 @@ def train(
         torch.save(checkpoint, latest_weights_file)
 
         # Calculate mAP
-        '''
         opt.image_folder = '/home/wfw/data/VOCdevkit/BerkeleyDet/val/' # val
         opt.weights_path = 'weights/latest.pt'
         opt.class_path = 'data/berkeley.names'
@@ -178,7 +177,6 @@ def train(
         opt.img_size = img_size
         opt.cfg = net_config_path
         mAP, aps = test.main(opt)
-        '''
 
         #if mAP >= best_mAP:
         #    best_mAP = mAP
