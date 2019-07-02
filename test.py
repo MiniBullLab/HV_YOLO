@@ -4,6 +4,7 @@ import time, cv2
 from models import *
 from modelsShuffleNet import *
 from utils.utils import *
+from data_loader import *
 
 import config.config as config
 
@@ -41,8 +42,7 @@ def main(opt):
     model.to(device).eval()
 
     # Set Dataloader
-    classes = load_classes(opt.class_path)  # Extracts class labels from file
-    dataloader = load_images(opt.image_folder, batch_size=1, img_size=opt.img_size)
+    dataloader = ImageDetectValDataLoader(opt.image_folder, batch_size=1, img_size=opt.img_size)
 
     prev_time = time.time()
     for i, (img_paths, img) in enumerate(dataloader):
