@@ -9,13 +9,19 @@ class Point2d():
         self.y = y
         return
 
-class Rect2D():
+class DetectObject():
+
+    def __init__(self):
+        self.name = ""
+        self.difficult = 0
+
+class Rect2D(DetectObject):
     """
     class to define Box
     """
 
     def __init__(self):
-        self.name = ""
+        super().__init__()
         self.min_corner = Point2d(0, 0)
         self.max_corner = Point2d(0, 0)
         return
@@ -31,6 +37,10 @@ class Rect2D():
 
     def height(self):
         return self.max_corner.y - self.min_corner.y
+
+    def getVector(self):
+        return [self.min_corner.x, self.min_corner.y,\
+                self.max_corner.x, self.max_corner.y]
 
     def __str__(self):
         return '%s:%d %d %d %d' % (self.name, self.min_corner.x, self.min_corner.y, self.max_corner.x, self.max_corner.y)

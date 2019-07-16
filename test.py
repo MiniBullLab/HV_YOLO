@@ -3,7 +3,8 @@ import time, cv2
 
 from models import *
 from modelsShuffleNet import *
-from utils.utils import *
+from utils.evaluatingOfmAp import *
+#from utils.utils import *
 from data_loader import *
 
 import config.config as config
@@ -24,6 +25,8 @@ def main(opt):
     # ShuffleNetV2_1.0
     model = ShuffleYolo(opt.cfg, opt.img_size)
 
+    evaluator = MeanApEvaluating(opt.imageFile)
+
     # YoloLoss
     yoloLoss = []
     for m in model.module_list:
@@ -42,7 +45,7 @@ def main(opt):
     model.to(device).eval()
 
     # Set Dataloader
-    dataloader = ImageDetectValDataLoader(opt.image_folder, batch_size=1, img_size=opt.img_size)
+    dataloader = ImageDetectValDataLoader(opt.imageFile, batch_size=1, img_size=opt.img_size)
 
     prev_time = time.time()
     for i, (img_paths, img) in enumerate(dataloader):
@@ -64,7 +67,7 @@ def main(opt):
         print('Batch %d... Done. (%.3fs)' % (i, time.time() - prev_time))
         prev_time = time.time()
 
-        img = cv2.imread(img_paths[0])
+        img = cv2.imread(img_paths)
         # The amount of padding that was added
         pad_x = 0 if (opt.img_size[0]/img.shape[1]) < (opt.img_size[1]/img.shape[0]) else opt.img_size[0] - opt.img_size[1] / img.shape[0] * img.shape[1]
         pad_y = 0 if (opt.img_size[0]/img.shape[1]) > (opt.img_size[1]/img.shape[0]) else opt.img_size[1] - opt.img_size[0] / img.shape[1] * img.shape[0]
@@ -98,7 +101,7 @@ def main(opt):
                 "{} {} {} {} {} {}\n".format(img_paths[0].split("/")[-1][:-4], 0, 0, 0, 0, 0))
             lostfile.close()
 
-    mAP, aps = do_python_eval("./results/", "./data/imagelist.txt", "./results/comp4_det_test_", "/home/wfw/data/VOCdevkit/BerkeleyDet/Annotations/")
+    mAP, aps = evaluator.do_python_eval("./results/", "./results/comp4_det_test_")
 
     return mAP, aps
 

@@ -176,7 +176,6 @@ def processYOLOTrainAndTestData(inputPath, outputPath, dataName, probability):
     random.shuffle(imageList)
     for imageIndex, imagePath in enumerate(imageList):
         print(imagePath)
-        print(imagePath)
         image = cv2.imdecode(np.fromfile(imagePath, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
         path, file_name_and_post = os.path.split(imagePath)
         imageName, post = os.path.splitext(file_name_and_post)

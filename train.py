@@ -7,6 +7,7 @@ from data_loader import *
 from utils.utils import *
 
 from utils import torch_utils
+import config.config as config
 
 # Import test.py to get mAP after each epoch
 import test
@@ -41,6 +42,7 @@ def train(
     # Configure run
     data_config = parse_data_config(data_config_path)
     train_path = data_config['train']
+    valPath = data_config["valid"]
 
     # Initialize model
     model = ShuffleYolo(net_config_path, img_size, freeze_bn=freeze_bn)
@@ -71,11 +73,6 @@ def train(
             print('Using ', torch.cuda.device_count(), ' GPUs')
             model = nn.DataParallel(model)
         model.to(device).train()
-
-        # # Transfer learning (train only YOLO layers)
-        # for i, (name, p) in enumerate(model.named_parameters()):
-        #     if p.shape[0] != 650:  # not YOLO layer
-        #         p.requires_grad = False
 
         # Set optimizer
         optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=lr0, momentum=.9, weight_decay=5e-4)
@@ -116,17 +113,6 @@ def train(
 
         for g in optimizer.param_groups:
             g['lr'] = lr
-
-        # Freeze darknet53.conv.74 layers for first epoch
-        # if freeze_backbone:
-        #     if epoch == -1:
-        #         for i, (name, p) in enumerate(model.named_parameters()):
-        #             if int(name.split('.')[1]) < 75:  # if layer < 75
-        #                 p.requires_grad = False
-        #     elif epoch == 1:
-        #         for i, (name, p) in enumerate(model.named_parameters()):
-        #             if int(name.split('.')[1]) < 75:  # if layer < 75
-        #                 p.requires_grad = True
 
         optimizer.zero_grad()
         for i, (imgs, targets) in enumerate(dataloader):
@@ -170,10 +156,8 @@ def train(
         torch.save(checkpoint, latest_weights_file)
 
         # Calculate mAP
-        opt.image_folder = '/home/wfw/data/VOCdevkit/BerkeleyDet/val/' # val
+        opt.imageFile = valPath
         opt.weights_path = 'weights/latest.pt'
-        opt.class_path = 'data/berkeley.names'
-        opt.data_config_path = net_config_path
         opt.img_size = img_size
         opt.cfg = net_config_path
         mAP, aps = test.main(opt)
@@ -196,16 +180,14 @@ def train(
                 latest_weights_file,
                 backup_file_path,
             ))
-        '''
+
         # Write epoch results
-        classes = load_classes(opt.class_path)
         with open('results.txt', 'a') as file:
             #file.write('%11.3g' * 2 % (mAP, aps[0]) + '\n')
             file.write("Epoch: {} | mAP: {:.3f} | ".format(epoch, mAP))
             for i, ap in enumerate(aps):
-                file.write(classes[i] + ": {:.3f} ".format(ap))
+                file.write(config.className[i] + ": {:.3f} ".format(ap))
             file.write("\n")
-        '''
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

@@ -27,21 +27,22 @@ class ImageDetectValDataLoader(DataLoader):
         self.count += 1
         if self.count == self.nB:
             raise StopIteration
-        img_path = self.imageAndLabelList[self.count]
+        img_path, _ = self.imageAndLabelList[self.count]
 
         # Read image
         img = cv2.imread(img_path)  # BGR
-
-        # Padded resize
-        img, _, _, _ = self.resize_square(img, width=self.width, height=self.height, color=(127.5, 127.5, 127.5))
         rgbImage = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        img = np.ascontiguousarray(rgbImage, dtype=np.float32)
+        # Padded resize
+        rgbImage, _, _, _ = self.resize_square(rgbImage, width=self.width, height=self.height,
+                                          color=(127.5, 127.5, 127.5))
+        rgbImage = rgbImage.transpose(2, 0, 1)
+        rgbImage = np.ascontiguousarray(rgbImage, dtype=np.float32)
         # img -= self.rgb_mean
         # img /= self.rgb_std
-        img /= 255.0
+        rgbImage /= 255.0
 
-        return [img_path], img
+        return img_path, rgbImage
 
     def __len__(self):
         return self.nB  # number of batches
