@@ -1,7 +1,0 @@
-truck: 0.19  Accuracy: 0.512 >> Recall: 0.516 
-rider: 0.11  Accuracy: 0.355 >> Recall: 0.344 
-person: 0.21  Accuracy: 0.493 >> Recall: 0.502 
-motor: 0.11  Accuracy: 0.372 >> Recall: 0.373 
-car: 0.31  Accuracy: 0.672 >> Recall: 0.666 
-bus: 0.13 >> Accuracy: 0.463 >> Recall: 0.455 
-bike: 0.19 >> Accuracy: 0.339 >> Recall: 0.347 
