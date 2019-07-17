@@ -48,7 +48,7 @@ def main(opt):
     dataloader = ImageDetectValDataLoader(opt.imageFile, batch_size=1, img_size=opt.img_size)
 
     prev_time = time.time()
-    for i, (img_paths, img) in enumerate(dataloader):
+    for i, (img_path, img) in enumerate(dataloader):
         print('%g/%g' % (i + 1, len(dataloader)), end=' ')
 
         # Get detections
@@ -67,13 +67,16 @@ def main(opt):
         print('Batch %d... Done. (%.3fs)' % (i, time.time() - prev_time))
         prev_time = time.time()
 
-        img = cv2.imread(img_paths)
+        img = cv2.imread(img_path)
         # The amount of padding that was added
         pad_x = 0 if (opt.img_size[0]/img.shape[1]) < (opt.img_size[1]/img.shape[0]) else opt.img_size[0] - opt.img_size[1] / img.shape[0] * img.shape[1]
         pad_y = 0 if (opt.img_size[0]/img.shape[1]) > (opt.img_size[1]/img.shape[0]) else opt.img_size[1] - opt.img_size[0] / img.shape[1] * img.shape[0]
         # Image height and width after padding is removed
         unpad_h = opt.img_size[1] - pad_y
         unpad_w = opt.img_size[0] - pad_x
+
+        path, fileNameAndPost = os.path.split(img_path)
+        fileName, post = os.path.splitext(fileNameAndPost)
 
         if detections is not None:
             for x1, y1, x2, y2, conf, cls_conf, cls_pred in detections[0]:
@@ -91,15 +94,7 @@ def main(opt):
                     if int(cls_pred.cpu().numpy()) == i:
                         with open("./results/comp4_det_test_" + config.className[i] + ".txt", 'a') as file:
                             file.write(
-                                "{} {} {} {} {} {}\n".format(img_paths[0].split("/")[-1][:-4], cls_conf * conf, x1, y1, x2, y2))
-
-    # check file exists
-    for i in range(0, len(config.className)):
-        if not os.path.exists("./results/comp4_det_test_" + config.className[i] + ".txt"):
-            lostfile = open("./results/comp4_det_test_" + config.className[i] + ".txt", 'w')
-            lostfile.write(
-                "{} {} {} {} {} {}\n".format(img_paths[0].split("/")[-1][:-4], 0, 0, 0, 0, 0))
-            lostfile.close()
+                                "{} {} {} {} {} {}\n".format(fileName, cls_conf * conf, x1, y1, x2, y2))
 
     mAP, aps = evaluator.do_python_eval("./results/", "./results/comp4_det_test_")
 

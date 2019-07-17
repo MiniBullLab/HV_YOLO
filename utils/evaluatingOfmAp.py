@@ -25,9 +25,10 @@ class MeanApEvaluating():
         if not os.path.isdir(output_dir):
             os.mkdir(output_dir)
         for i, cls in enumerate(config.className):
-            if cls == '__background__':
-                continue
             filename = detpath + cls + '.txt'
+            if cls == '__background__' and \
+                not os.path.exists(filename):
+                continue
             rec, prec, ap = self.voc_eval(filename, cls, ovthresh=0.5,
                                      use_07_metric=False)  # , avg_iou
 
@@ -73,8 +74,7 @@ class MeanApEvaluating():
                                      'det': det}
 
         # read dets
-        detfile = detpath.format(classname)
-        with open(detfile, 'r') as f:
+        with open(detpath, 'r') as f:
             lines = f.readlines()
 
         splitlines = [x.strip().split(' ') for x in lines]
