@@ -1,6 +1,6 @@
 import argparse
 import time
-
+from optparse import OptionParser
 from models import *
 from modelsShuffleNet import *
 from data_loader import *
@@ -12,19 +12,74 @@ import config.config as config
 # Import test.py to get mAP after each epoch
 import test
 
+def parse_arguments():
+
+    parser = OptionParser()
+    parser.description = "This program train model"
+
+    parser.add_option("-e", "--epochs", dest="epochs",
+                      type="int", default=100,
+                      help="number of epochs")
+
+    parser.add_option("-b", "--batch_size'", dest="batch_size",
+                      type="int", default=16,
+                      help="size of each image batch")
+
+    parser.add_option("-a", "--accumulated_batches", dest="accumulated_batches",
+                      type="int", default=1,
+                      help="number of batches before optimizer step")
+
+    parser.add_option("-c", "--cfg", dest="cfg",
+                      metavar="PATH", type="string", default="cfg/yolov3.cfg",
+                      help="cfg file path")
+
+    parser.add_option("-d", "--data_config", dest="data_config",
+                      metavar="PATH", type="string", default="cfg/coco.data",
+                      help="path to data config file")
+
+    parser.add_option("-m", "--multi_scale",
+                      action="store_true", dest="multi_scale", default=False,
+                      help="random image sizes per batch 320 - 608")
+
+    parser.add_option("-w", "--weights", dest="weights",
+                      metavar="PATH", type="string", default="weights",
+                      help="path to store weights")
+
+    parser.add_option("-r", "--resume",
+                      action="store_true", dest="resume", default=False,
+                      help="resume training flag")
+
+    parser.add_option("-f", "--freeze",
+                      action="store_true", dest="freeze", default=False,
+                      help="freeze darknet53.conv.74 layers for first epoch")
+
+    (options, args) = parser.parse_args()
+
+    return options
+
+def testModel(valPath, img_size, cfg, epoch):
+    # Calculate mAP
+    weights_path = 'weights/latest.pt'
+    mAP, aps = test.main(cfg, weights_path, img_size, valPath)
+
+    # Write epoch results
+    with open('results.txt', 'a') as file:
+        # file.write('%11.3g' * 2 % (mAP, aps[0]) + '\n')
+        file.write("Epoch: {} | mAP: {:.3f} | ".format(epoch, mAP))
+        for i, ap in enumerate(aps):
+            file.write(config.className[i] + ": {:.3f} ".format(ap))
+        file.write("\n")
+
 def train(
         net_config_path,
         data_config_path,
-        img_size=416,
         resume=False,
         epochs=100,
         batch_size=16,
         accumulated_batches=1,
         weights_path='weights',
-        report = False,
         multi_scale=False,
-        freeze_bn=True,
-        var=0,
+        freeze_bn=True
 ):
     device = torch_utils.select_device()
     print("Using device: \"{}\"".format(device))
@@ -155,13 +210,6 @@ def train(
                       'optimizer': optimizer.state_dict()}
         torch.save(checkpoint, latest_weights_file)
 
-        # Calculate mAP
-        opt.imageFile = valPath
-        opt.weights_path = 'weights/latest.pt'
-        opt.img_size = img_size
-        opt.cfg = net_config_path
-        mAP, aps = test.main(opt)
-
         #if mAP >= best_mAP:
         #    best_mAP = mAP
 
@@ -181,44 +229,23 @@ def train(
                 backup_file_path,
             ))
 
-        # Write epoch results
-        with open('results.txt', 'a') as file:
-            #file.write('%11.3g' * 2 % (mAP, aps[0]) + '\n')
-            file.write("Epoch: {} | mAP: {:.3f} | ".format(epoch, mAP))
-            for i, ap in enumerate(aps):
-                file.write(config.className[i] + ": {:.3f} ".format(ap))
-            file.write("\n")
+        testModel(valPath, img_size, net_config_path, epoch)
+
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--epochs', type=int, default=100, help='number of epochs')
-    parser.add_argument('--batch-size', type=int, default=16, help='size of each image batch')
-    parser.add_argument('--accumulated-batches', type=int, default=1, help='number of batches before optimizer step')
-    parser.add_argument('--data-config', type=str, default='cfg/coco.data', help='path to data config file')
-    parser.add_argument('--cfg', type=str, default='cfg/yolov3.cfg', help='cfg file path')
-    parser.add_argument('--multi-scale', action='store_true', help='random image sizes per batch 320 - 608')
-    parser.add_argument('--img-size', type=int, default=32 * 13, help='pixels')
-    parser.add_argument('--weights-path', type=str, default='weights', help='path to store weights')
-    parser.add_argument('--resume', action='store_true', help='resume training flag')
-    parser.add_argument('--report', action='store_true', help='report TP, FP, FN, P and R per batch (slower)')
-    parser.add_argument('--freeze', action='store_true', help='freeze darknet53.conv.74 layers for first epoch')
 
-    opt = parser.parse_args()
-    print(opt, end='\n\n')
-
+    options = parse_arguments()
     init_seeds()
 
     torch.cuda.empty_cache()
     train(
-        opt.cfg,
-        opt.data_config,
-        img_size=opt.img_size,
-        resume=opt.resume,
-        epochs=opt.epochs,
-        batch_size=opt.batch_size,
-        accumulated_batches=opt.accumulated_batches,
-        weights_path=opt.weights_path,
-        report=opt.report,
-        multi_scale=opt.multi_scale,
-        freeze_bn=opt.freeze,
+        options.cfg,
+        options.data_config,
+        resume=options.resume,
+        epochs=options.epochs,
+        batch_size=options.batch_size,
+        accumulated_batches=options.accumulated_batches,
+        weights_path=options.weights,
+        multi_scale=options.multi_scale,
+        freeze_bn=options.freeze,
     )

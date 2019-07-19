@@ -1,6 +1,6 @@
 import argparse
 import time, cv2
-
+from optparse import OptionParser
 from models import *
 from modelsShuffleNet import *
 from utils.evaluatingOfmAp import *
@@ -16,16 +16,41 @@ f_path = os.path.dirname(os.path.realpath(__file__)) + '/'
 cuda = torch.cuda.is_available()
 device = torch.device('cuda:0' if cuda else 'cpu')
 
-def main(opt):
+def parse_arguments():
+
+    parser = OptionParser()
+    parser.description = "This program test model"
+
+    parser.add_option("-b", "--batch_size'", dest="batch_size",
+                      type="int", default=16,
+                      help="size of each image batch")
+
+    parser.add_option("-c", "--cfg", dest="cfg",
+                      metavar="PATH", type="string", default="cfg/yolov3.cfg",
+                      help="cfg file path")
+
+    parser.add_option("-i", "--valPath", dest="valPath",
+                      metavar="PATH", type="string", default="./val.txt",
+                      help="path to data config file")
+
+    parser.add_option("-w", "--weights", dest="weights",
+                      metavar="PATH", type="string", default="weights/latest.pt",
+                      help="path to store weights")
+
+    (options, args) = parser.parse_args()
+
+    return options
+
+def main(cfg, weights_path, img_size, imageFile):
     os.system('rm -rf ' + 'results')
     os.makedirs('results', exist_ok=True)
     # Load model
     # Darknet53
     # model = Darknet(opt.cfg, opt.img_size)
     # ShuffleNetV2_1.0
-    model = ShuffleYolo(opt.cfg, opt.img_size)
+    model = ShuffleYolo(cfg, img_size)
 
-    evaluator = MeanApEvaluating(opt.imageFile)
+    evaluator = MeanApEvaluating(imageFile)
 
     # YoloLoss
     yoloLoss = []
@@ -35,17 +60,17 @@ def main(opt):
                 yoloLoss.append(layer)
 
     if torch.cuda.device_count() > 1:
-        checkpoint = convert_state_dict(torch.load(opt.weights_path, map_location='cpu')['model'])
+        checkpoint = convert_state_dict(torch.load(weights_path, map_location='cpu')['model'])
         model.load_state_dict(checkpoint)
     else:
-        checkpoint = torch.load(opt.weights_path, map_location='cpu')
+        checkpoint = torch.load(weights_path, map_location='cpu')
         model.load_state_dict(checkpoint['model'])
     del checkpoint
 
     model.to(device).eval()
 
     # Set Dataloader
-    dataloader = ImageDetectValDataLoader(opt.imageFile, batch_size=1, img_size=opt.img_size)
+    dataloader = ImageDetectValDataLoader(imageFile, batch_size=1, img_size=img_size)
 
     prev_time = time.time()
     for i, (img_path, img) in enumerate(dataloader):
@@ -69,11 +94,11 @@ def main(opt):
 
         img = cv2.imread(img_path)
         # The amount of padding that was added
-        pad_x = 0 if (opt.img_size[0]/img.shape[1]) < (opt.img_size[1]/img.shape[0]) else opt.img_size[0] - opt.img_size[1] / img.shape[0] * img.shape[1]
-        pad_y = 0 if (opt.img_size[0]/img.shape[1]) > (opt.img_size[1]/img.shape[0]) else opt.img_size[1] - opt.img_size[0] / img.shape[1] * img.shape[0]
+        pad_x = 0 if (img_size[0]/img.shape[1]) < (img_size[1]/img.shape[0]) else img_size[0] - img_size[1] / img.shape[0] * img.shape[1]
+        pad_y = 0 if (img_size[0]/img.shape[1]) > (img_size[1]/img.shape[0]) else img_size[1] - img_size[0] / img.shape[1] * img.shape[0]
         # Image height and width after padding is removed
-        unpad_h = opt.img_size[1] - pad_y
-        unpad_w = opt.img_size[0] - pad_x
+        unpad_h = img_size[1] - pad_y
+        unpad_w = img_size[0] - pad_x
 
         path, fileNameAndPost = os.path.split(img_path)
         fileName, post = os.path.splitext(fileNameAndPost)
@@ -102,4 +127,6 @@ def main(opt):
 
 if __name__ == '__main__':
     torch.cuda.empty_cache()
-    main(opt)
+    options = parse_arguments()
+    img_size = 608
+    main(options.cfg, options.weights_path, img_size, options.valPath)
