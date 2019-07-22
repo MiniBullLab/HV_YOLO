@@ -1,9 +1,8 @@
-import time, cv2
+import time
+import cv2
 from optparse import OptionParser
-from models import *
-from modelsShuffleNet import *
+from model.modelsShuffleNet import *
 from utils.evaluatingOfmAp import *
-#from utils.utils import *
 from data_loader import *
 
 import config.config as config

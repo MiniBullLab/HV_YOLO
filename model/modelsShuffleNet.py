@@ -1,3 +1,6 @@
+import os
+import sys
+sys.path.insert(0, os.getcwd() + "/..")
 from collections import defaultdict
 
 import torch
@@ -6,7 +9,7 @@ import torch.nn as nn
 from utils.parse_config import *
 from utils.utils import *
 from loss import *
-from cfg.shufflenetv2 import ShuffleNetV2
+from .shufflenetv2 import ShuffleNetV2
 
 
 def create_modules(module_defs):

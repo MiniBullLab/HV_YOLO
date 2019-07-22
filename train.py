@@ -1,7 +1,6 @@
 import time
 from optparse import OptionParser
-from models import *
-from modelsShuffleNet import *
+from model.modelsShuffleNet import *
 from data_loader import *
 from utils.utils import *
 

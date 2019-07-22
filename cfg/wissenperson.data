@@ -1,6 +1,0 @@
-classes=1
-train = /home/wfw/darknetV3-master/data/trainperson.txt
-valid = /home/wfw/darknetV3-master/data/testperson.txt
-names = /home/wfw/darknetV3-master/data/wissenperson.names
-backup = backup
-
