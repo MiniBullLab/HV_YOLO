@@ -90,14 +90,6 @@ class ImageDetectTrainDataLoader(DataLoader):
             if self.augment:
                 rgbImage, labels, M = self.random_affine(rgbImage, labels, degrees=(-5, 5), translate=(0.1, 0.1), scale=(0.8, 1.1))
 
-            plotFlag = False
-            if plotFlag:
-                import matplotlib.pyplot as plt
-                plt.figure(figsize=(10, 10)) if index == 0 else None
-                plt.subplot(4, 4, index + 1).imshow(rgbImage[:, :, ::-1])
-                plt.plot(labels[:, [1, 3, 3, 1, 1]].T, labels[:, [2, 2, 4, 4, 2]].T, '.-')
-                plt.axis('off')
-
             nL = len(labels)
             if nL > 0:
                 # convert xyxy to xywh

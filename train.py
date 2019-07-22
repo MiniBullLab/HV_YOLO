@@ -1,4 +1,3 @@
-import argparse
 import time
 from optparse import OptionParser
 from models import *
@@ -180,7 +179,7 @@ def train(
                 continue
 
             # SGD burn-in
-            if (epoch == 0) & (i <= 1000):
+            if (epoch == 0) and (i <= 1000):
                 lr = lr0 * (i / 1000) ** 4
                 for g in optimizer.param_groups:
                     g['lr'] = lr

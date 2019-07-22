@@ -1,4 +1,3 @@
-import argparse
 import time, cv2
 from optparse import OptionParser
 from models import *
