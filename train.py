@@ -1,5 +1,6 @@
 import time
 from optparse import OptionParser
+from model.modelParse import ModelParse
 from model.modelsShuffleNet import *
 from data_loader import *
 from utils.utils import *
@@ -98,11 +99,13 @@ def train(
     valPath = data_config["valid"]
 
     # Initialize model
-    model = ShuffleYolo(net_config_path, img_size, freeze_bn=freeze_bn)
+    modelParse = ModelParse()
+    model = modelParse.parse(net_config_path, freeze_bn)
+    #model = ShuffleYolo(net_config_path, img_size, freeze_bn=freeze_bn)
 
     # yoloLoss
     yoloLoss = []
-    for m in model.module_list:
+    for m in model.taskModules:
         for layer in m:
             if isinstance(layer, YoloLoss):
                 yoloLoss.append(layer)

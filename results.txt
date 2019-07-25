@@ -1,0 +1,1 @@
+Epoch: 42 | mAP: 0.043 | bike: 0.010 bus: 0.049 car: 0.146 motor: 0.007 person: 0.031 rider: 0.002 truck: 0.054 

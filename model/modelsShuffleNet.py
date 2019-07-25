@@ -10,6 +10,7 @@ from utils.parse_config import *
 from utils.utils import *
 from loss import *
 from .shufflenetv2 import ShuffleNetV2
+from .baseLayer import EmptyLayer, Upsample
 
 
 def create_modules(module_defs):
@@ -82,30 +83,10 @@ def create_modules(module_defs):
 
     return hyperparams, module_list
 
-
-class EmptyLayer(nn.Module):
-    """Placeholder for 'route' and 'shortcut' layers"""
-
-    def __init__(self):
-        super(EmptyLayer, self).__init__()
-
-
-class Upsample(nn.Module):
-    # Custom Upsample layer (nn.Upsample gives deprecated warning message)
-
-    def __init__(self, scale_factor=1, mode='nearest'):
-        super(Upsample, self).__init__()
-        self.scale_factor = scale_factor
-        self.mode = mode
-
-    def forward(self, x):
-        return F.interpolate(x, scale_factor=self.scale_factor, mode=self.mode)
-
-
 class ShuffleYolo(nn.Module):
     """YOLOv3 object detection model"""
 
-    def __init__(self, cfg_path, img_size=416, sync_bn=False, freeze_bn=False):
+    def __init__(self, cfg_path, img_size=416, freeze_bn=False):
         super(ShuffleYolo, self).__init__()
 
         self.module_defs = parse_model_config(cfg_path)

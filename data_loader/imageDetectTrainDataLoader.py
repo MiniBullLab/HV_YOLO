@@ -97,7 +97,7 @@ class ImageDetectTrainDataLoader(DataLoader):
                 labels[:, (1,3)] = labels[:, (1,3)] / width
                 labels[:, (2,4)] = labels[:, (2,4)] / height
 
-            self.augmentImageFlip(rgbImage, labels)
+            rgbImage, labels = self.augmentImageFlip(rgbImage, labels)
 
             delete_index = []
             for i, label in enumerate(labels):
@@ -146,6 +146,7 @@ class ImageDetectTrainDataLoader(DataLoader):
                     maxX = ratio * box.max_corner.x + pad[0] // 2
                     maxY = ratio * box.max_corner.y + pad[1] // 2
                     result[index, :] = np.array([classId, minX, minY, maxX, maxY])
+                    index += 1
         return result
 
     def shuffledImages(self):
@@ -197,6 +198,7 @@ class ImageDetectTrainDataLoader(DataLoader):
                 inputRGBImage = np.flipud(inputRGBImage)
                 if nL > 0:
                     labels[:, 2] = 1 - labels[:, 2]
+        return inputRGBImage, labels
 
     def __len__(self):
         return self.nB  # number of batches
