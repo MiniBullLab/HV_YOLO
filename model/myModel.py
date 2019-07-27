@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 from collections import defaultdict
-from .baseLayer import EmptyLayer, Upsample
-from .shufflenetv2 import ShuffleNetV2
+from base_model.baseLayer import EmptyLayer, Upsample
+from base_model.shufflenetv2 import ShuffleNetV2
 from loss import *
 
 class MyModel(nn.Module):
@@ -13,8 +13,8 @@ class MyModel(nn.Module):
         self.freezeBn = freezeBn
         self.basicModel = self.creatBaseModel()
         self.taskModules = self.createTask()
-        self.setFreezeBn()
         self.lossList = self.createLoss()
+        self.setFreezeBn()
 
     def creatBaseModel(self):
         result = None

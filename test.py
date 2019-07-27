@@ -50,7 +50,6 @@ def main(cfg, weights_path, img_size, imageFile):
     # ShuffleNetV2_1.0
     modelParse = ModelParse()
     model = modelParse.parse(cfg)
-    #model = ShuffleYolo(cfg, img_size)
 
     evaluator = MeanApEvaluating(imageFile)
 

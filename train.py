@@ -102,7 +102,6 @@ def train(
     # Initialize model
     modelParse = ModelParse()
     model = modelParse.parse(net_config_path, freeze_bn)
-    #model = ShuffleYolo(net_config_path, img_size, freeze_bn=freeze_bn)
 
     # Get dataloader
     dataloader = ImageDetectTrainDataLoader(train_path, batch_size, img_size,

@@ -9,8 +9,8 @@ import torch.nn as nn
 from utils.parse_config import *
 from utils.utils import *
 from loss import *
-from .shufflenetv2 import ShuffleNetV2
-from .baseLayer import EmptyLayer, Upsample
+from base_model.baseLayer import EmptyLayer, Upsample
+from base_model.shufflenetv2 import ShuffleNetV2
 
 
 def create_modules(module_defs):
