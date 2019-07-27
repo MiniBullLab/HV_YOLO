@@ -14,6 +14,7 @@ class MyModel(nn.Module):
         self.basicModel = self.creatBaseModel()
         self.taskModules = self.createTask()
         self.setFreezeBn()
+        self.lossList = self.createLoss()
 
     def creatBaseModel(self):
         result = None
@@ -32,6 +33,14 @@ class MyModel(nn.Module):
             moduleList = self.getModuleList(outChannels)
         return moduleList
 
+    def createLoss(self):
+        # yoloLoss
+        yoloLoss = []
+        for m in self.taskModules:
+            for layer in m:
+                if isinstance(layer, YoloLoss):
+                    yoloLoss.append(layer)
+        return yoloLoss
 
     def getModuleList(self, inputChannels):
         output_filters = [inputChannels[-1]]

@@ -1,7 +1,8 @@
 import time
 from optparse import OptionParser
+from torch import nn
 from model.modelParse import ModelParse
-from model.modelsShuffleNet import *
+from utils.parse_config import *
 from data_loader import *
 from utils.utils import *
 
@@ -103,13 +104,6 @@ def train(
     model = modelParse.parse(net_config_path, freeze_bn)
     #model = ShuffleYolo(net_config_path, img_size, freeze_bn=freeze_bn)
 
-    # yoloLoss
-    yoloLoss = []
-    for m in model.taskModules:
-        for layer in m:
-            if isinstance(layer, YoloLoss):
-                yoloLoss.append(layer)
-
     # Get dataloader
     dataloader = ImageDetectTrainDataLoader(train_path, batch_size, img_size,
                                         multi_scale=multi_scale, augment=True, balancedSample=True)
@@ -190,7 +184,7 @@ def train(
             loss = 0
             output = model(imgs.to(device))
             for k in range(0, 3):
-                loss += yoloLoss[k](output[k], targets)
+                loss += model.lossList[k](output[k], targets)
             loss.backward()
 
             # accumulate gradient for x batches before optimizing

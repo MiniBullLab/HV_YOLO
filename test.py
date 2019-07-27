@@ -1,9 +1,11 @@
 import time
 import cv2
+import torch
 from optparse import OptionParser
-from model.modelsShuffleNet import *
+from model.modelParse import ModelParse
 from utils.evaluatingOfmAp import *
 from data_loader import *
+from utils.utils import *
 
 import config.config as config
 
@@ -46,16 +48,11 @@ def main(cfg, weights_path, img_size, imageFile):
     # Darknet53
     # model = Darknet(opt.cfg, opt.img_size)
     # ShuffleNetV2_1.0
-    model = ShuffleYolo(cfg, img_size)
+    modelParse = ModelParse()
+    model = modelParse.parse(cfg)
+    #model = ShuffleYolo(cfg, img_size)
 
     evaluator = MeanApEvaluating(imageFile)
-
-    # YoloLoss
-    yoloLoss = []
-    for m in model.module_list:
-        for layer in m:
-            if isinstance(layer, YoloLoss):
-                yoloLoss.append(layer)
 
     if torch.cuda.device_count() > 1:
         checkpoint = convert_state_dict(torch.load(weights_path, map_location='cpu')['model'])
@@ -79,7 +76,7 @@ def main(cfg, weights_path, img_size, imageFile):
             output = model(torch.from_numpy(img).unsqueeze(0).to(device))
             preds = []
             for i in range(0, 3):
-                predEach = yoloLoss[i](output[i])
+                predEach = model.lossList[i](output[i])
                 preds.append(predEach)
             pred = torch.cat(preds, 1)
             pred = pred[pred[:, :, 4] > 5e-3]
