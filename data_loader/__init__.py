@@ -4,3 +4,4 @@ from .videoLoader import VideoLoader
 from .imageDetectTrainDataLoader import ImageDetectTrainDataLoader
 from .imageDetectValDataLoader import ImageDetectValDataLoader
 from .imageSegmentTrainDataLoader import ImageSegmentTrainDataLoader
+from .imageSegmentValDataLoader import ImageSegmentValDataLoader

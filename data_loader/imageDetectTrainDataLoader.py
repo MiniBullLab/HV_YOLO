@@ -198,6 +198,7 @@ class ImageDetectTrainDataLoader(DataLoader):
                 inputRGBImage = np.flipud(inputRGBImage)
                 if nL > 0:
                     labels[:, 2] = 1 - labels[:, 2]
+
         return inputRGBImage, labels
 
     def __len__(self):

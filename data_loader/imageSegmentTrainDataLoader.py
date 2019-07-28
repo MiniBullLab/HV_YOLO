@@ -3,15 +3,11 @@ from .dataLoader import *
 class ImageSegmentTrainDataLoader(DataLoader):
     def __init__(self, path, batch_size=1, img_size=[768, 320], augment=False):
         super().__init__(path)
-        # self.img_files = sorted(glob.glob('%s/*.*' % path))
+        # self.img_files = sorted(glob.glob('%s/*.*' % ssspath))
         with open(path, 'r') as file:
             self.img_files = file.readlines()
 
-        if sys.platform == 'darwin':  # MacOS (local)
-            self.img_files = [path.replace('\n', '').replace('/images', './data/coco/images')
-                              for path in self.img_files]
-        else:  # linux (gcp cloud)
-            self.img_files = [path.replace('\n', '').replace('/images', './data/coco/images') for path in self.img_files]
+        self.img_files = [path.replace('\n', '') for path in self.img_files]
 
         self.seg_files = [path.replace('JPEGImages', 'SegmentLabel').replace('.png', '.png').replace('.jpg', '.png') for path in
                             self.img_files]
@@ -25,9 +21,8 @@ class ImageSegmentTrainDataLoader(DataLoader):
         #                         37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 51, 53, 58, 59, 60, 62, 63, 64, 65]
         # self.valid_label_seg = [[54, 55, 56, 61], [19, 20, 21], [52, 57], [7, 13], [2, 3, 15, 29], [6, 17], [30],
         #                         [27], [23, 24], [48], [49, 50]]
-        self.volid_label_seg = [0, 1, 2, 3, 4, 5, 6, 9, 10, 14, 15, 16, 18, 29, 30, -1]
-        self.valid_label_seg = [[7], [8], [11], [12], [13], [17], [19], [20], [21], [22],
-                                [23], [24], [25], [26], [27], [28], [31], [32], [33]]
+        self.volid_label_seg = []
+        self.valid_label_seg = [[0], [1]]
 
         self.augment = augment
 

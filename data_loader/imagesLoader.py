@@ -40,6 +40,7 @@ class ImagesLoader(DataLoader):
         img, _, _, _ = self.resize_square(img, width=self.width, height=self.height, color=(127.5, 127.5, 127.5))
         rgbImage = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
+        rgbImage = rgbImage.transpose(2, 0, 1) ######################
         img = np.ascontiguousarray(rgbImage, dtype=np.float32)
         # img -= self.rgb_mean
         # img /= self.rgb_std

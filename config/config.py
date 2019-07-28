@@ -5,22 +5,24 @@ data_config_path = "cfg/berkeley.data"
 net_config_path = "cfg/shufflenetV2-0.5_spp_BerkeleyAll.cfg"
 
 # pretrained model
-#pretrainedModel = "./weights/darknet53.pth"#"./snapshot/yolov3SPP_best_model_0.6709.pkl"#
+pretainModel = None #"./weights/model_best.pth"
 
 # resume from checkpoint
-resume = "./weights/best.pt"#"./snapshot/yolov3-SPP_best_model.pkl"#None#
+resume = "./weights/model_best.pth" #None #"./weights/best.pt"#"./snapshot/yolov3-SPP_best_model.pkl"#None#
 
 # learning rate
-base_lr = 1e-3
+base_lr = 5e-4
 lr_decay_epochs = [120,160]
 lr_decay = 0.1
 
-max_epoch =300
+maxEpochs =500
 
 # L2 regularizer
 optimizer = 'SGD'
-weight_decay = 5e-4
+lr_power = 0.9
 momentum = 0.9
+weight_decay = 5e-3
+accumulated_batches = 1
 
 snapshot = 2
 snapshot_path = "snapshot"
@@ -32,7 +34,7 @@ imgSize = [640, 352]
 trainList = "/home/sugon/darknetV3-master/data/train.txt"
 valList = "/home/sugon/darknetV3-master/data/test.txt"
 valLabelPath = "/home/sugon/data/VOCdevkit/BerkeleyDet/Annotations/"
-train_batch_size = 8
+train_batch_size = 32
 test_batch_size = 1
 
 # yolo param
