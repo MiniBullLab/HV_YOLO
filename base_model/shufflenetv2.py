@@ -1,13 +1,9 @@
-'''ShuffleNetV2 in PyTorch.
-
-See the paper "ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design" for more details.
-'''
-import torch
-import torch.nn as nn
+# ShuffleNetV2 in PyTorch.
+# See the paper "ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design" for more details.
+from .baseModel import *
 import torch.nn.functional as F
 
-
-class ShuffleBlock(nn.Module):
+class ShuffleBlock(BaseModel):
     def __init__(self, groups=2):
         super(ShuffleBlock, self).__init__()
         self.groups = groups
@@ -93,9 +89,10 @@ class DownBlock(nn.Module):
         return out
 
 
-class ShuffleNetV2(nn.Module):
+class ShuffleNetV2(BaseModel):
     def __init__(self, net_size):
-        super(ShuffleNetV2, self).__init__()
+        super().__init__()
+        self.setModelName("ShuffleNetV2")
         out_channels = configs[net_size]['out_channels']
         self.out_channels = (24, out_channels[0], out_channels[1], out_channels[2])
         num_blocks = configs[net_size]['num_blocks']

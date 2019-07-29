@@ -1,11 +1,11 @@
-"""MobileNetV2"""
-import torch.nn as nn
-
+# MobileNetV2 in PyTorch.
+from .baseModel import *
 from .baseLayer import ConvBNReLU, InvertedResidual
 
-class MobileNetV2(nn.Module):
+class MobileNetV2(BaseModel):
     def __init__(self, width_mult=1.0, dilated=False, norm_layer=nn.BatchNorm2d, **kwargs):
-        super(MobileNetV2, self).__init__()
+        super().__init__()
+        self.setModelName("MobileNetV2")
         layer1_setting = [
             # t, c, n, s
             [1, 16, 1, 1]]

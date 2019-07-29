@@ -1,11 +1,13 @@
-import torch
-import torch.nn as nn
+import os
+import sys
+sys.path.insert(0, os.getcwd() + "/..")
+from base_model.baseModel import *
 from collections import defaultdict
 from base_model.baseLayer import EmptyLayer, Upsample
 from base_model.shufflenetv2 import ShuffleNetV2
 from loss import *
 
-class MyModel(nn.Module):
+class MyModel(BaseModel):
 
     def __init__(self, modelDefine, freezeBn=False):
         super().__init__()
@@ -15,6 +17,7 @@ class MyModel(nn.Module):
         self.taskModules = self.createTask()
         self.lossList = self.createLoss()
         self.setFreezeBn()
+        self.setModelName("ShuffleNetV2Yolo")
 
     def creatBaseModel(self):
         result = None

@@ -9,3 +9,4 @@ protobuf
 pandas
 tabulate
 pydot
+netron

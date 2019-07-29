@@ -1,8 +1,7 @@
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
-import torch
-import torch.nn as nn
+from base_model.baseModel import *
 from utils.parse_config import *
 from base_model.baseLayer import EmptyLayer, Upsample
 from base_model.mobilenetv2 import MobileNetV2
@@ -67,12 +66,12 @@ def create_modules(module_defs):
 
     return hyperparams, module_list
 
-class MobileFCN(nn.Module):
+class MobileFCN(BaseModel):
     """YOLOv3 object detection model"""
 
     def __init__(self, cfg_path, img_size=[224, 224], freeze_bn=False):
-        super(MobileFCN, self).__init__()
-
+        super().__init__()
+        self.setModelName("MobileFCN")
         self.module_defs = parse_model_config(cfg_path)
         self.module_defs[0]['cfg'] = cfg_path
         self.module_defs[0]['width'] = img_size[0]
