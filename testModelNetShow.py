@@ -1,6 +1,7 @@
 from optparse import OptionParser
 from model.modelParse import ModelParse
 from drawing.modelNetShow import ModelNetShow
+from model.mobileV2FCN import MobileFCN
 
 def parseArguments():
 
@@ -12,12 +13,13 @@ def parseArguments():
                       help="cfg file path")
 
 def main(cfgPath):
-    modelParse = ModelParse()
+    #modelParse = ModelParse()
     modelNetShow = ModelNetShow(3, 640, 352)
-    model = modelParse.parse(cfgPath)
+    #model = modelParse.parse(cfgPath)
+    model = MobileFCN(cfgPath)
     modelNetShow.showNet(model)
 
 if __name__ == '__main__':
     #options = parseArguments()
     #main(options.cfg)
-    main("./cfg/shufflenetV2-0.5_spp_BerkeleyAll.cfg")
+    main("./cfg/mobileFCN.cfg")

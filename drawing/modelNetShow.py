@@ -14,7 +14,7 @@ class ModelNetShow():
         self.__torch2onnx(model, self.input)
 
     def __torch2onnx(self, model, input):
-        saveModelPath = os.path.join(".", "%s.onnx" % model.getModelName())
+        saveModelPath = os.path.join("./onnx", "%s.onnx" % model.getModelName())
         #print(saveModelPath)
         onnx.export(model, input, saveModelPath)
-        netron.start(saveModelPath)
+        netron.start(saveModelPath, port=9999, host='localhost')
