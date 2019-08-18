@@ -1,11 +1,11 @@
 import config
 import time
 from data_loader import *
-from utils.utils import *
+from utility.utils import *
 from model.mobileV2FCN import MobileFCN
 from loss.enetLoss import cross_entropy2dDet
 
-from utils.metrics import runningScore
+from utility.metrics import runningScore
 
 def evalModel(evaluate_weight):
 

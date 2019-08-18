@@ -3,7 +3,7 @@ import time, cv2, os
 
 import torch
 import torch.nn as nn
-from utils.utils import *
+from utility.utils import *
 import scipy.misc as misc
 
 from data_loader import *

@@ -2,7 +2,7 @@ from data_loader import *
 import cv2
 import numpy as np
 import torch
-from utils.utilss import *
+from utility.utilss import *
 
 from model.mobileV2FCN import *
 

@@ -2,8 +2,8 @@ import argparse
 import time
 
 from modelsShuffleNet import *
-from utils.datasets import *
-from utils.utils import *
+from utility.datasets import *
+from utility.utils import *
 
 cuda = torch.cuda.is_available()
 device = torch.device('cuda:0' if cuda else 'cpu')

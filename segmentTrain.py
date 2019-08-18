@@ -10,7 +10,10 @@ from segmentTest import *
 from data_loader import *
 from model.mobileV2FCN import MobileFCN
 from loss.enetLoss import cross_entropy2dDet
-from helper.lr_policy import PolyLR
+from loss.loss import OhemCrossEntropy2d
+from loss.focalloss import focalLoss
+from utility.lr_policy import PolyLR
+from utility.logger import AverageMeter, Logger
 
 cuda = torch.cuda.is_available()
 
@@ -24,8 +27,9 @@ if cuda:
 
 def main():
     latest_weights_file = "./weights/mobileFCN.pt"
+    logger = Logger(os.path.join("./weights", "logs"))
     # Get dataloader
-    dataloader = ImageSegmentTrainDataLoader("/home/wfw/data/VOCdevkit/Tusimple/ImageSets/train.txt", batch_size=config.train_batch_size,
+    dataloader = ImageSegmentTrainDataLoader("/home/wfw/data/VOCdevkit/CULane/ImageSets/train.txt", batch_size=config.train_batch_size,
                                             img_size=[640, 352], augment=True)
 
     # set lr_policy
@@ -37,16 +41,24 @@ def main():
     # init model
     model = MobileFCN("./cfg/mobileFCN.cfg", img_size=[640, 352])
 
+    # freeze bn
+    # for m in model.modules():
+    #     if isinstance(m, nn.BatchNorm2d):
+    #         m.eval()
+
     # set optimize
     optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=config.base_lr,
                                     momentum=config.momentum, weight_decay=config.weight_decay)
 
-    loss_fn = cross_entropy2dDet(ignore_index=250, size_average=True)
+    # loss_fn = cross_entropy2dDet(ignore_index=250, size_average=True)
+    # min_kept = int(config.train_batch_size // 1 * 640 * 352 // 16)
+    # loss_fn = OhemCrossEntropy2d(ignore_index=250, thresh=0.7, min_kept=min_kept).cuda()
+    loss_fn = focalLoss(gamma=0, alpha=None, class_num=2, ignoreIndex=250).cuda()
     # focalLoss = focalLoss
     # boundedInverseClassLoss = boundedInverseClassLoss
 
     if len(config.CUDA_DEVICE) > 1:
-        logging.info('Using {} GPUS'.format(len(config.CUDA_DEVICE)))
+        print('Using {} GPUS'.format(len(config.CUDA_DEVICE)))
         model = nn.DataParallel(model, device_ids=config.CUDA_DEVICE)
     model.cuda()
 
@@ -83,6 +95,8 @@ def main():
 
     # summary the model
     # model_info(model)
+
+    lossTrain = AverageMeter()
 
     # if config.evaluate == True:
     #     logging.info("Evalution---------------------------")
@@ -130,11 +144,17 @@ def main():
 
             print('Epoch: {}/{}[{}/{}]\t Loss: {}\t LossSeg: {}\t Rate: {} \t Time: {}\t'.format(epoch, config.maxEpochs - 1,\
                    idx, len(dataloader), '%.3f' % loss, '%.3f' % lossSeg, '%.7f' % lr, time.time() - t0))
+
+            lossTrain.update(loss.data)
+            if (epoch * (len(dataloader) - 1) + idx) % config.display == 0:
+                print(lossTrain.avg)
+                logger.scalar_summary("losstrain", lossTrain.avg, (epoch * (len(dataloader) - 1) + idx))
+                lossTrain.reset()
             t0 = time.time()
 
         # test
         score, class_iou = evalModel(model.state_dict())
-        print("++ Evalution Epoch: {}, mIou: {}".format(epoch, score['Mean IoU : \t']))
+        print("++ Evalution Epoch: {}, mIou: {}, Lane IoU: {}".format(epoch, score['Mean IoU : \t'], class_iou[1]))
 
         # checkpoint = {'epoch': epoch,
         #               'best_mIoU': score['Mean IoU : \t'],

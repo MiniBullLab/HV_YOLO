@@ -3,9 +3,9 @@ import cv2
 import torch
 from optparse import OptionParser
 from model.modelParse import ModelParse
-from utils.evaluatingOfmAp import *
+from utility.evaluatingOfmAp import *
 from data_loader import *
-from utils.utils import *
+from utility.utils import *
 
 import config.config as config
 

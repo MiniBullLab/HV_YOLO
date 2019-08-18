@@ -2,11 +2,11 @@ import time
 from optparse import OptionParser
 from torch import nn
 from model.modelParse import ModelParse
-from utils.parse_config import *
+from utility.parse_config import *
 from data_loader import *
-from utils.utils import *
+from utility.utils import *
 
-from utils import torch_utils
+from utility import torch_utils
 import config.config as config
 
 # Import test.py to get mAP after each epoch

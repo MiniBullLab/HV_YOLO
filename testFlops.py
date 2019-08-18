@@ -1,5 +1,5 @@
 import torch
-from utils.model_summary import summary
+from utility.model_summary import summary
 from model.mobileV2FCN import *
 
 model = MobileFCN("./cfg/mobileFCN.cfg", img_size=[640, 352])
