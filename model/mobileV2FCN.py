@@ -1,85 +1,65 @@
 import os
 import sys
+import numpy as np
 sys.path.insert(0, os.getcwd() + "/..")
 from base_model.baseModel import *
-from utils.parse_config import *
-from base_model.baseLayer import EmptyLayer, Upsample
+from base_model.baseLayer import EmptyLayer, Upsample, ConvBNReLU
 from base_model.mobilenetv2 import MobileNetV2
 
-def create_modules(module_defs):
-    """
-    Constructs module list of layer blocks from module configuration in module_defs
-    """
-    # create basic model
-    basicModel = MobileNetV2(width_mult=1.0)
-    out_channels = basicModel.out_channels
-
-    hyperparams = module_defs.pop(0)
-    output_filters = [out_channels[-1]]
-    module_list = nn.ModuleList()
-
-    for i, module_def in enumerate(module_defs):
-        modules = nn.Sequential()
-
-        if module_def['type'] == 'convolutional':
-            bn = int(module_def['batch_normalize'])
-            filters = int(module_def['filters'])
-            kernel_size = int(module_def['size'])
-            pad = (kernel_size - 1) // 2 if int(module_def['pad']) else 0
-            modules.add_module('conv_%d' % i, nn.Conv2d(in_channels=output_filters[-1],
-                                                        out_channels=filters,
-                                                        kernel_size=kernel_size,
-                                                        stride=int(module_def['stride']),
-                                                        padding=pad,
-                                                        bias=not bn))
-            if bn:
-                modules.add_module('batch_norm_%d' % i, nn.BatchNorm2d(filters))
-            if module_def['activation'] == 'relu':
-                modules.add_module('leaky_%d' % i, nn.ReLU())
-
-        elif module_def['type'] == 'maxpool':
-            kernel_size = int(module_def['size'])
-            stride = int(module_def['stride'])
-            if kernel_size == 2 and stride == 1:
-                modules.add_module('_debug_padding_%d' % i, nn.ZeroPad2d((0, 1, 0, 1)))
-            maxpool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride, padding=int((kernel_size - 1) // 2))
-            modules.add_module('maxpool_%d' % i, maxpool)
-
-        elif module_def['type'] == 'upsample':
-            # upsample = nn.Upsample(scale_factor=int(module_def['stride']), mode='nearest')  # WARNING: deprecated
-            upsample = Upsample(scale_factor=int(module_def['stride']), mode='bilinear')
-            modules.add_module('upsample_%d' % i, upsample)
-
-        elif module_def['type'] == 'route':
-            layers = [int(x) for x in module_def['layers'].split(',')]
-            filters = sum([out_channels[i] if i >= 0 else output_filters[i] for i in layers])
-            # filters = sum([output_filters[i + 1 if i > 0 else i] for i in layers])
-            modules.add_module('route_%d' % i, EmptyLayer())
-
-        elif module_def['type'] == 'shortcut':
-            filters = output_filters[int(module_def['from'])]
-            modules.add_module('shortcut_%d' % i, EmptyLayer())
-
-        # Register module list and number of output filters
-        module_list.append(modules)
-        output_filters.append(filters)
-
-    return hyperparams, module_list
-
-class MobileFCN(BaseModel):
+class MobileV2FCN(BaseModel):
     """YOLOv3 object detection model"""
 
-    def __init__(self, cfg_path, img_size=[224, 224], freeze_bn=False):
+    def __init__(self, classNum = 2, freeze_bn=False):
         super().__init__()
-        self.setModelName("MobileFCN")
-        self.module_defs = parse_model_config(cfg_path)
-        self.module_defs[0]['cfg'] = cfg_path
-        self.module_defs[0]['width'] = img_size[0]
-        self.module_defs[0]['height'] = img_size[1]
+        self.setModelName("MobileV2FCN")
 
         self.basicModel = MobileNetV2(width_mult=1.0)
-        self.hyperparams, self.module_list = create_modules(self.module_defs)
-        self.img_size = img_size
+        basicModelChannels = self.basicModel.out_channels
+        # basicModelChannels = []
+        # for channel in channels:
+        #     print(channel)
+        #     if torch.is_tensor(channel):
+        #         basicModelChannels.append(np.asarray(channel))
+        #     else:
+        #         basicModelChannels.append(channel)
+        #
+        # print(basicModelChannels[4], basicModelChannels[4]/2)
+
+        self.FCNStep1 = nn.Sequential(ConvBNReLU(basicModelChannels[4], basicModelChannels[4]//2, 1, 1, 0, relu6=False,
+                                        norm_layer=nn.BatchNorm2d),
+                                      ConvBNReLU(basicModelChannels[4]//2, basicModelChannels[4], 3, 1, 1, relu6=False,
+                                        norm_layer=nn.BatchNorm2d),
+                                      ConvBNReLU(basicModelChannels[4], basicModelChannels[4]//2, 1, 1, 0, relu6=False,
+                                        norm_layer=nn.BatchNorm2d),
+                                      Upsample(scale_factor = 2, mode='bilinear'))
+        self.FCNSkipLayerStep1 = ConvBNReLU(basicModelChannels[3], basicModelChannels[4]//2, 1, 1, 0, relu6=False,
+                                        norm_layer=nn.BatchNorm2d)
+        self.FCNStep2 = nn.Sequential(ConvBNReLU(basicModelChannels[4], int(basicModelChannels[4]//4), 1, 1, 0, relu6=False,
+                                        norm_layer=nn.BatchNorm2d),
+                                      ConvBNReLU(basicModelChannels[4]//4, basicModelChannels[4]//2, 3, 1, 1, relu6=False,
+                                        norm_layer=nn.BatchNorm2d),
+                                      ConvBNReLU(basicModelChannels[4]//2, basicModelChannels[4]//4, 1, 1, 0, relu6=False,
+                                        norm_layer=nn.BatchNorm2d),
+                                      Upsample(scale_factor=2, mode='bilinear'))
+        self.FCNSkipLayerStep2 = ConvBNReLU(basicModelChannels[2], basicModelChannels[4]//4, 1, 1, 0, relu6=False,
+                                        norm_layer=nn.BatchNorm2d)
+        self.FCNStep3 = nn.Sequential(ConvBNReLU(basicModelChannels[4]//2, basicModelChannels[4]//8, 1, 1, 0, relu6=False,
+                                        norm_layer=nn.BatchNorm2d),
+                                      ConvBNReLU(basicModelChannels[4]//8, basicModelChannels[4]//4, 3, 1, 1, relu6=False,
+                                        norm_layer=nn.BatchNorm2d),
+                                      ConvBNReLU(basicModelChannels[4]//4, basicModelChannels[4]//8, 1, 1, 0, relu6=False,
+                                        norm_layer=nn.BatchNorm2d),
+                                      Upsample(scale_factor=2, mode='bilinear'))
+        self.FCNSkipLayerStep3 = ConvBNReLU(basicModelChannels[1], basicModelChannels[4]//8, 1, 1, 0, relu6=False,
+                                        norm_layer=nn.BatchNorm2d)
+        self.FCNStep4 = nn.Sequential(ConvBNReLU(basicModelChannels[4]//4, basicModelChannels[4]//16, 1, 1, 0, relu6=False,
+                                        norm_layer=nn.BatchNorm2d),
+                                      ConvBNReLU(basicModelChannels[4]//16, basicModelChannels[4]//8, 3, 1, 1, relu6=False,
+                                        norm_layer=nn.BatchNorm2d),
+                                      ConvBNReLU(basicModelChannels[4]//8, basicModelChannels[4]//16, 1, 1, 0, relu6=False,
+                                        norm_layer=nn.BatchNorm2d),
+                                      nn.Conv2d(int(basicModelChannels[4]//16), classNum, 1, 1, 0),
+                                      Upsample(scale_factor=4, mode='bilinear'))
 
         self._init_weight()
 
@@ -110,18 +90,17 @@ class MobileFCN(BaseModel):
         layer_outputs = []
 
         blocks = self.basicModel(x)
-        x = blocks[-1]
 
-        for i, (module_def, module) in enumerate(zip(self.module_defs, self.module_list)):
-            if module_def['type'] in ['convolutional', 'upsample', 'maxpool']:
-                x = module(x)
-            elif module_def['type'] == 'route':
-                layer_i = [int(x) for x in module_def['layers'].split(',')]
-                x = torch.cat([layer_outputs[i] if i < 0 else blocks[i] for i in layer_i], 1)
-            elif module_def['type'] == 'shortcut':
-                layer_i = int(module_def['from'])
-                x = layer_outputs[-1] + layer_outputs[layer_i]
-
-            layer_outputs.append(x)
+        x = self.FCNStep1(blocks[4])
+        xSkip1 = self.FCNSkipLayerStep1(blocks[3])
+        x = torch.cat([xSkip1, x], 1)
+        x = self.FCNStep2(x)
+        xSkip2 = self.FCNSkipLayerStep2(blocks[2])
+        x = torch.cat([xSkip2, x], 1)
+        x = self.FCNStep3(x)
+        xSkip3 = self.FCNSkipLayerStep3(blocks[1])
+        x = torch.cat([xSkip3, x], 1)
+        x = self.FCNStep4(x)
+        # print(x.shape)
 
         return x

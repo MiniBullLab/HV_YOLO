@@ -2,7 +2,7 @@ import config
 import time
 from data_loader import *
 from utility.utils import *
-from model.mobileV2FCN import MobileFCN
+from model.modelParse import ModelParse
 from loss.enetLoss import cross_entropy2dDet
 
 from utility.metrics import runningScore
@@ -11,7 +11,8 @@ def evalModel(evaluate_weight):
 
     running_metrics = runningScore(2)
     # init model
-    model = MobileFCN("./cfg/mobileFCN.cfg", img_size=[640, 352])
+    modelParse = ModelParse()
+    model = modelParse.parse("./cfg/mobileFCN.cfg")
 
     model.load_state_dict(evaluate_weight)
     model.cuda().eval()

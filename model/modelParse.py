@@ -1,3 +1,6 @@
+import os
+import sys
+sys.path.insert(0, os.getcwd() + "/..")
 from .myModel import MyModel
 
 class ModelParse():
@@ -6,8 +9,11 @@ class ModelParse():
         pass
 
     def parse(self, cfgPath, freezeBn=False):
+        path, fileNameAndPost = os.path.split(cfgPath)
+        fileName, post = os.path.splitext(fileNameAndPost)
         modelDefine = self.readCfgFile(cfgPath)
         model = MyModel(modelDefine, freezeBn)
+        model.setModelName(fileName)
         return model
 
     def readCfgFile(self, cfgPath):

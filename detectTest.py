@@ -5,7 +5,8 @@ from optparse import OptionParser
 from model.modelParse import ModelParse
 from utility.evaluatingOfmAp import *
 from data_loader import *
-from utility.utils import *
+from utility.nonMaximumSuppression import *
+#from utility.utils import *
 
 import config.config as config
 

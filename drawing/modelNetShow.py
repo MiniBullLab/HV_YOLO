@@ -10,7 +10,7 @@ class ModelNetShow():
         self.input = torch.ones(1, channel, width, height)
 
     def showNet(self, model):
-        print(model.state_dict())
+        #print(model.state_dict())
         self.__torch2onnx(model, self.input)
 
     def __torch2onnx(self, model, input):

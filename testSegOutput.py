@@ -8,7 +8,7 @@ import scipy.misc as misc
 
 from data_loader import *
 # from models.bisenet import BiSeNet
-from model.mobileV2FCN import MobileFCN
+from model.modelParse import ModelParse
 from config import config
 import matplotlib.pyplot as plt
 
@@ -62,7 +62,8 @@ def decode_segmap(pic, detections, nClass):
 
 # model select
 # model = BiSeNet(config.num_classes, is_training=False, criterion=None, ohem_criterion=None)
-model = MobileFCN("./cfg/mobileFCN.cfg", img_size=[640, 352])
+modelParse = ModelParse()
+model = modelParse.parse("./cfg/mobileFCN.cfg")
 
 if torch.cuda.device_count() > 1:
 	checkpoint = convert_state_dict(torch.load("/home/wfw/HASCO/MultiTask/MTSD/snapshot/Shuffle_BiseNet_best_model_0.566.pkl", map_location='cpu')['model_state'])

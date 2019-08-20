@@ -8,7 +8,7 @@ import torch.nn as nn
 import config as config
 from segmentTest import *
 from data_loader import *
-from model.mobileV2FCN import MobileFCN
+from model.modelParse import ModelParse
 from loss.enetLoss import cross_entropy2dDet
 from loss.loss import OhemCrossEntropy2d
 from loss.focalloss import focalLoss
@@ -39,12 +39,8 @@ def main():
     print("Train data num: {}".format(dataloader.nF))
 
     # init model
-    model = MobileFCN("./cfg/mobileFCN.cfg", img_size=[640, 352])
-
-    # freeze bn
-    # for m in model.modules():
-    #     if isinstance(m, nn.BatchNorm2d):
-    #         m.eval()
+    modelParse = ModelParse()
+    model = modelParse.parse("./cfg/mobileFCN.cfg")
 
     # set optimize
     optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=config.base_lr,
