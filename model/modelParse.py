@@ -1,7 +1,9 @@
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
+from .moduleType import *
 from .myModel import MyModel
+from .mobileV2FCN import MobileV2FCN
 
 class ModelParse():
 
@@ -33,3 +35,9 @@ class ModelParse():
                 modelDefine[-1][key.strip()] = value.strip()
         print(modelDefine)
         return modelDefine
+
+    def getModel(self, modelName):
+        model = None
+        if modelName == ModuleName.MobileV2FCN:
+            model = MobileV2FCN()
+        return model

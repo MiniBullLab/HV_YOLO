@@ -5,8 +5,8 @@ from optparse import OptionParser
 from model.modelParse import ModelParse
 from utility.evaluatingOfmAp import *
 from data_loader import *
+from utility.torchModelProcess import TorchModelProcess
 from utility.nonMaximumSuppression import *
-#from utility.utils import *
 
 import config.config as config
 
@@ -45,17 +45,16 @@ def parse_arguments():
 def main(cfg, weights_path, img_size, imageFile):
     os.system('rm -rf ' + 'results')
     os.makedirs('results', exist_ok=True)
-    # Load model
-    # Darknet53
-    # model = Darknet(opt.cfg, opt.img_size)
-    # ShuffleNetV2_1.0
+
+    torchModelProcess = TorchModelProcess()
+
     modelParse = ModelParse()
     model = modelParse.parse(cfg)
 
     evaluator = MeanApEvaluating(imageFile)
 
     if torch.cuda.device_count() > 1:
-        checkpoint = convert_state_dict(torch.load(weights_path, map_location='cpu')['model'])
+        checkpoint = torchModelProcess.convert_state_dict(torch.load(weights_path, map_location='cpu')['model'])
         model.load_state_dict(checkpoint)
     else:
         checkpoint = torch.load(weights_path, map_location='cpu')

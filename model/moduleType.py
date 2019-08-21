@@ -10,3 +10,13 @@ class ModuleType():
     Route = "route"
     Shortcut = "shortcut"
     Yolo = "yolo"
+
+class ModuleName():
+
+    MobileV2FCN = "MobileV2FCN"
+
+class BaseModuleName():
+
+    ShuffleNetV2 = "ShuffleNetV2"
+    MobileNetV2 = "MobileNetV2"
+

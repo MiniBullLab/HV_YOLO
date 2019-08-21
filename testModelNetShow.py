@@ -1,7 +1,6 @@
 from optparse import OptionParser
 from model.modelParse import ModelParse
 from drawing.modelNetShow import ModelNetShow
-from model.mobileV2FCN import MobileFCN
 
 def parseArguments():
 
@@ -13,10 +12,10 @@ def parseArguments():
                       help="cfg file path")
 
 def main(cfgPath):
-    #modelParse = ModelParse()
+    modelParse = ModelParse()
     modelNetShow = ModelNetShow(3, 640, 352)
-    #model = modelParse.parse(cfgPath)
-    model = MobileFCN(cfgPath)
+    model = modelParse.parse(cfgPath)
+    model = modelParse.getModel("MobileV2FCN")
     modelNetShow.showNet(model)
 
 if __name__ == '__main__':

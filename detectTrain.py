@@ -1,15 +1,16 @@
+import os
 import time
 from optparse import OptionParser
+import torch
 from torch import nn
 from model.modelParse import ModelParse
 from utility.parse_config import *
 from data_loader import *
-from utility.utils import *
+from utility.torchModelProcess import TorchModelProcess
 
 from utility import torch_utils
 import config.config as config
 
-# Import test.py to get mAP after each epoch
 import detectTest
 
 def parse_arguments():
@@ -94,6 +95,8 @@ def train(
     train_path = data_config['train']
     valPath = data_config["valid"]
 
+    torchModelProcess = TorchModelProcess()
+
     # Initialize model
     modelParse = ModelParse()
     model = modelParse.parse(net_config_path, freeze_bn)
@@ -107,7 +110,7 @@ def train(
     if resume:
         if torch.cuda.device_count() > 1:
             checkpoint = torch.load(latest_weights_file, map_location='cpu')
-            state = convert_state_dict(checkpoint['model'])
+            state = torchModelProcess.convert_state_dict(checkpoint['model'])
             model.load_state_dict(state)
         else:
             checkpoint = torch.load(latest_weights_file, map_location='cpu')

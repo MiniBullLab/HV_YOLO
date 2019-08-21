@@ -3,14 +3,14 @@ import sys
 sys.path.insert(0, os.getcwd() + "/..")
 from base_model.baseModel import *
 from collections import defaultdict
-from base_model.mobilenetv2 import MobileNetV2
-from base_model.shufflenetv2 import ShuffleNetV2
 from .createModelList import *
+from .baseModelFactory import BaseModelFactory
 
 class MyModel(BaseModel):
 
     def __init__(self, modelDefine, freezeBn=False):
         super().__init__()
+        self.baseModelFactory = BaseModelFactory()
         self.createTaskList = CreateModuleList()
         self.modelDefine = modelDefine
         self.freezeBn = freezeBn
@@ -26,10 +26,7 @@ class MyModel(BaseModel):
         if baseNet["type"] == "baseNet":
             baseNetName = baseNet["name"]
             self.modelDefine.pop(0)
-            if baseNetName == "ShuffleNetV2":
-                result = ShuffleNetV2(net_size=1)
-            elif baseNetName == "MobileNetV2":
-                result = MobileNetV2(width_mult=1.0)
+            result = self.baseModelFactory.getBaseModel(baseNetName)
         return result
 
     def createTask(self):
