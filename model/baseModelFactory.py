@@ -16,3 +16,4 @@ class BaseModelFactory():
             result = ShuffleNetV2(net_size=1)
         elif baseNetName == BaseModuleName.MobileNetV2:
             result = MobileNetV2(width_mult=1.0)
+        return result

@@ -52,8 +52,6 @@ class DataLoader():
     def random_affine(self, img, targets=None, Segment=None, degrees=(-10, 10), translate=(.1, .1), scale=(.9, 1.1),
                       shear=(-3, 3),
                       borderValue=(127.5, 127.5, 127.5)):
-        # torchvision.transforms.RandomAffine(degrees=(-10, 10), translate=(.1, .1), scale=(.9, 1.1), shear=(-10, 10))
-        # https://medium.com/uruvideo/dataset-augmentation-with-random-homographies-a8f4b44830d4
 
         border = 0  # width of added border (optional)
         height = img.shape[0] + border * 2
@@ -125,17 +123,6 @@ class DataLoader():
         else:
             return imw
 
-    def decode_labels(self, img, labels):
-
-        h, w, _ = img.shape
-
-        x1 = w * (labels[1] - labels[3] / 2)
-        y1 = h * (labels[2] - labels[4] / 2)
-        x2 = w * (labels[1] + labels[3] / 2)
-        y2 = h * (labels[2] + labels[4] / 2)
-
-        return x1, y1, x2, y2
-
     def encode_segmap(self, mask, volid_label, valid_label):
         classes = -np.ones([100, 100])
         valid = [x for j in valid_label for x in j]
@@ -147,44 +134,3 @@ class DataLoader():
             mask[mask == validc] = np.uint8(np.where(classes == validc)[0])
 
         return mask
-
-    def decode_segmap(self, temp):
-
-        colors = [  # [  0,   0,   0],
-            [128, 64, 128],
-            [244, 35, 232],
-            [70, 70, 70],
-            [102, 102, 156],
-            [190, 153, 153],
-            [153, 153, 153],
-            [250, 170, 30],
-            [220, 220, 0],
-            [107, 142, 35],
-            [152, 251, 152],
-            [0, 130, 180],
-            [220, 20, 60],
-            [255, 0, 0],
-            [0, 0, 142],
-            [0, 0, 70],
-            [0, 60, 100],
-            [0, 80, 100],
-            [0, 0, 230],
-            [119, 11, 32]]
-
-        label_colours = dict(zip(range(19), colors))
-
-        r = temp.copy()
-        g = temp.copy()
-        b = temp.copy()
-        for l in range(0, 19):
-            r[temp == l] = label_colours[l][0]
-            g[temp == l] = label_colours[l][1]
-            b[temp == l] = label_colours[l][2]
-
-        rgb = np.zeros((temp.shape[0], temp.shape[1], 3))
-
-        rgb[:, :, 0] = r / 255.0
-        rgb[:, :, 1] = g / 255.0
-        rgb[:, :, 2] = b / 255.0
-
-        return rgb

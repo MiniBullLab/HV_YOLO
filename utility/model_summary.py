@@ -123,5 +123,4 @@ def summary(model, shape, *args, **kwargs):
     print("# Mult-Adds: {0:,.2f}M".format(total_macs / 1000000))
 
     print("-" * 150)
-    #draw_img_classifier_to_file(model, os.path.join(save_path, 'model.png'), Variable(x.type(torch.FloatTensor), requires_grad=False))
 

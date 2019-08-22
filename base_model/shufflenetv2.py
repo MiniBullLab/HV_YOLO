@@ -105,9 +105,6 @@ class ShuffleNetV2(BaseModel):
         self.layer1 = self._make_layer(out_channels[0], num_blocks[0], dilation[0])
         self.layer2 = self._make_layer(out_channels[1], num_blocks[1], dilation[1])
         self.layer3 = self._make_layer(out_channels[2], num_blocks[2], dilation[2])
-        # self.conv2 = nn.Conv2d(out_channels[2], out_channels[3],
-        #                       kernel_size=1, stride=1, padding=0, bias=False)
-        # self.bn2 = nn.BatchNorm2d(out_channels[3])
 
     def _make_layer(self, out_channels, num_blocks, dilation):
         layers = [DownBlock(self.in_channels, out_channels)]
