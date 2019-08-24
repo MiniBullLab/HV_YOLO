@@ -3,7 +3,7 @@ import sys
 sys.path.insert(0, os.getcwd() + "/..")
 import torch.nn as nn
 from .moduleType import ModuleType
-from base_model.baseLayer import EmptyLayer, Upsample
+from base_model.baseLayer import EmptyLayer, Upsample, GlobalAvgPool2d
 from loss import *
 
 class CreateModuleList():
@@ -41,7 +41,12 @@ class CreateModuleList():
                 if kernel_size == 2 and stride == 1:
                     modules.add_module('_debug_padding_%d' % i, nn.ZeroPad2d((0, 1, 0, 1)))
                 maxpool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride, padding=int((kernel_size - 1) // 2))
-                modules.add_module('maxpool_%d' % i, maxpool)
+                modules.add_module('Maxpool_%d' % i, maxpool)
+
+            ###############################################
+            elif module_def['type'] == ModuleType.GlobalAvgPool:
+                globalAvgPool = GlobalAvgPool2d()
+                modules.add_module('GlobalAvgPool' % i, globalAvgPool)
 
             elif module_def['type'] == ModuleType.Upsample:
                 # upsample = nn.Upsample(scale_factor=int(module_def['stride']), mode='nearest')  # WARNING: deprecated
@@ -69,6 +74,8 @@ class CreateModuleList():
                 yolo_layer = YoloLoss(num_classes, anchors=anchors, anchors_mask=anchor_idxs, smoothLabel=False,
                                       focalLoss=False)
                 modules.add_module('yolo_%d' % i, yolo_layer)
+            elif module_def["type"] == ModuleType.Softmax:
+                modules.add_module('softmax_%d' % i, EmptyLayer())
 
             # Register module list and number of output filters
             moduleList.append(modules)

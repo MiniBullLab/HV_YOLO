@@ -16,50 +16,6 @@ cuda = torch.cuda.is_available()
 device = torch.device('cuda:0' if cuda else 'cpu')
 f_path = os.path.dirname(os.path.realpath(__file__)) + '/'
 
-cuda = torch.cuda.is_available()
-device = torch.device('cuda:0' if cuda else 'cpu')
-
-def decode_segmap(pic, detections, nClass):
-	colors = [  # [  0,   0,   0],
-			[128, 64, 128],
-			[244, 35, 232],
-			[70, 70, 70],
-			[102, 102, 156],
-			[190, 153, 153],
-			[153, 153, 153],
-			[250, 170, 30],
-			[220, 220, 0],
-			[107, 142, 35],
-			[152, 251, 152],
-			[0, 130, 180],
-			[220, 20, 60],
-			[255, 0, 0],
-			[0, 0, 142],
-			[0, 0, 70],
-			[0, 60, 100],
-			[0, 80, 100],
-			[0, 0, 230],
-			[119, 11, 32]]
-
-	label_colours = dict(zip(range(19), colors))
-	img = cv2.cvtColor(np.asarray(pic), cv2.COLOR_RGB2BGR)  # convert PIL.image to cv2.mat
-
-	r = detections.copy()
-	g = detections.copy()
-	b = detections.copy()
-	for l in range(0, nClass):
-		r[detections == l] = label_colours[l][0]
-		g[detections == l] = label_colours[l][1]
-		b[detections == l] = label_colours[l][2]
-
-	rgb = np.zeros((detections.shape[0], detections.shape[1], 3))
-
-	rgb[:, :, 0] = (r * 0.4 + img[:,:,2] * 0.6) / 255.0
-	rgb[:, :, 1] = (g * 0.4 + img[:,:,1] * 0.6) / 255.0
-	rgb[:, :, 2] = (b * 0.4 + img[:,:,0] * 0.6) / 255.0
-
-	return rgb
-
 # model select
 # model = BiSeNet(config.num_classes, is_training=False, criterion=None, ohem_criterion=None)
 modelParse = ModelParse()

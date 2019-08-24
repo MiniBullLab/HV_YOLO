@@ -6,9 +6,11 @@ class ModuleType():
 
     Convolutional = "convolutional"
     Maxpool = "maxpool"
+    GlobalAvgPool = "globalavgpool"
     Upsample = "upsample"
     Route = "route"
     Shortcut = "shortcut"
+    Softmax = "softmax"
     Yolo = "yolo"
 
 class ModuleName():

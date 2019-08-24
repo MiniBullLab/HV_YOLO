@@ -44,3 +44,4 @@ class Rect2D(DetectObject):
 
     def __str__(self):
         return '%s:%d %d %d %d' % (self.name, self.min_corner.x, self.min_corner.y, self.max_corner.x, self.max_corner.y)
+

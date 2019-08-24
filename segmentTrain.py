@@ -13,6 +13,7 @@ from loss.enetLoss import cross_entropy2dDet
 from loss.loss import OhemCrossEntropy2d
 from loss.focalloss import focalLoss
 from utility.lr_policy import PolyLR
+from utility.torchModelProcess import TorchModelProcess
 from utility.logger import AverageMeter, Logger
 
 cuda = torch.cuda.is_available()
@@ -26,6 +27,8 @@ if cuda:
     torch.backends.cudnn.benchmark = True
 
 def main():
+
+    modelProcess = TorchModelProcess()
     latest_weights_file = "./weights/mobileFCN.pt"
     logger = Logger(os.path.join("./weights", "logs"))
     # Get dataloader
@@ -70,7 +73,7 @@ def main():
         print("Loading resume from {}".format(config.resume))
         if len(config.CUDA_DEVICE) > 1:
             checkpoint = torch.load(latest_weights_file, map_location='cpu')
-            state = convert_state_dict(checkpoint['model'])
+            state = modelProcess.convert_state_dict(checkpoint['model'])
             model.load_state_dict(state)
         else:
             checkpoint = torch.load(latest_weights_file, map_location='cpu')
@@ -119,6 +122,9 @@ def main():
             current_idx = epoch * len(dataloader) + idx
             lr = lr_policy.get_lr(current_idx)
 
+            for g in optimizer.param_groups:
+                g['lr'] = lr
+
             # SGD burn-in
             if False:
                 if (epoch == 0) & (idx <= 1000):
@@ -128,7 +134,7 @@ def main():
 
             # Compute loss, compute gradient, update parameters
             lossSeg = 0
-            output = model(imgs.cuda())
+            output = model(imgs.cuda())[0]
 
             loss = loss_fn(output, segments.cuda())
             loss.backward()
@@ -139,11 +145,11 @@ def main():
                 optimizer.zero_grad()
 
             print('Epoch: {}/{}[{}/{}]\t Loss: {}\t LossSeg: {}\t Rate: {} \t Time: {}\t'.format(epoch, config.maxEpochs - 1,\
-                   idx, len(dataloader), '%.3f' % loss, '%.3f' % lossSeg, '%.7f' % lr, time.time() - t0))
+                   idx, len(dataloader), '%.3f' % loss, '%.3f' % lossSeg, '%.7f' % optimizer[0].lr, time.time() - t0))
 
             lossTrain.update(loss.data)
             if (epoch * (len(dataloader) - 1) + idx) % config.display == 0:
-                print(lossTrain.avg)
+                # print(lossTrain.avg)
                 logger.scalar_summary("losstrain", lossTrain.avg, (epoch * (len(dataloader) - 1) + idx))
                 lossTrain.reset()
             t0 = time.time()

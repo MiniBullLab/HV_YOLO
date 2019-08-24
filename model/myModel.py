@@ -1,12 +1,12 @@
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
-from base_model.baseModel import *
+from base_model.baseBlock import *
 from collections import defaultdict
 from .createModelList import *
 from .baseModelFactory import BaseModelFactory
 
-class MyModel(BaseModel):
+class MyModel(BaseBlock):
 
     def __init__(self, modelDefine, freezeBn=False):
         super().__init__()
@@ -68,6 +68,8 @@ class MyModel(BaseModel):
                 layer_i = int(module_def['from'])
                 x = layer_outputs[-1] + layer_outputs[layer_i]
             elif module_def['type'] == ModuleType.Yolo:
+                output.append(x)
+            elif module_def['type'] == ModuleType.Softmax:
                 output.append(x)
 
             layer_outputs.append(x)

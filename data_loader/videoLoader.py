@@ -23,27 +23,21 @@ class VideoLoader(DataLoader):
     def __next__(self):
         self.count += 1
 
-        img_all = []
-        frame_all = []
-
         for i in range(0, self.batch_size):
             success, frame = self.videoCapture.read()
 
             if success == False:
                 break
-
+            oriImg = frame[:]
             # Padded resize
             img, _, _, _ = self.resize_square(frame, width=self.width, height=self.height, color=(127.5, 127.5, 127.5))
             rgbImage = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            img_all.append(rgbImage)
-            frame_all.append(frame)
 
-        if len(img_all) > 0:
-            img_all = np.ascontiguousarray(img_all, dtype=np.float32)
-            # img_all -= self.rgb_mean
-            # img_all /= self.rgb_std
-            img_all /= 255.0
+        if frame:
+            rgbImage = rgbImage.transpose(2, 0, 1)
+            img = np.ascontiguousarray(rgbImage, dtype=np.float32)
+            img /= 255.0
 
-            return frame_all, torch.from_numpy(img_all)
+            return oriImg, torch.from_numpy(img).unsqueeze(0)
         else:
             raise StopIteration

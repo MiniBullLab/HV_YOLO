@@ -15,7 +15,7 @@ def main(cfgPath):
     modelParse = ModelParse()
     modelNetShow = ModelNetShow(3, 640, 352)
     model = modelParse.parse(cfgPath)
-    model = modelParse.getModel("MobileV2FCN")
+    #model = modelParse.getModel("MobileV2FCN")
     modelNetShow.showNet(model)
 
 if __name__ == '__main__':

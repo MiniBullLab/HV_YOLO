@@ -42,7 +42,7 @@ class ImageDetectValDataLoader(DataLoader):
         # img /= self.rgb_std
         rgbImage /= 255.0
 
-        return img_path, rgbImage
+        return img_path, torch.from_numpy(rgbImage).unsqueeze(0)
 
     def __len__(self):
         return self.nB  # number of batches

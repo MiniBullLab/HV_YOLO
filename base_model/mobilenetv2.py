@@ -1,8 +1,22 @@
 # MobileNetV2 in PyTorch.
-from .baseModel import *
-from .baseLayer import ConvBNReLU, InvertedResidual
+from .baseBlock import *
+from .moduleBlock import InvertedResidual
 
-class MobileNetV2(BaseModel):
+class ConvBNReLU(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
+                 dilation=1, groups=1, relu6=False, norm_layer=nn.BatchNorm2d, **kwargs):
+        super(ConvBNReLU, self).__init__()
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, dilation, groups, bias=False)
+        self.bn = norm_layer(out_channels)
+        self.relu = nn.ReLU6(True) if relu6 else nn.ReLU(True)
+
+    def forward(self, x):
+        x = self.conv(x)
+        x = self.bn(x)
+        x = self.relu(x)
+        return x
+
+class MobileNetV2(BaseBlock):
     def __init__(self, width_mult=1.0, dilated=False, norm_layer=nn.BatchNorm2d, **kwargs):
         super().__init__()
         self.setModelName("MobileNetV2")

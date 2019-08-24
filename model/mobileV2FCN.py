@@ -2,11 +2,12 @@ import os
 import sys
 import numpy as np
 sys.path.insert(0, os.getcwd() + "/..")
-from base_model.baseModel import *
-from base_model.baseLayer import EmptyLayer, Upsample, ConvBNReLU
+from base_model.baseBlock import *
+from base_model.baseLayer import EmptyLayer, Upsample
+from base_model.moduleBlock import ConvBNReLU
 from base_model.mobilenetv2 import MobileNetV2
 
-class MobileV2FCN(BaseModel):
+class MobileV2FCN(BaseBlock):
     """YOLOv3 object detection model"""
 
     def __init__(self, classNum = 2, freeze_bn=False):
@@ -15,15 +16,6 @@ class MobileV2FCN(BaseModel):
 
         self.basicModel = MobileNetV2(width_mult=1.0)
         basicModelChannels = self.basicModel.out_channels
-        # basicModelChannels = []
-        # for channel in channels:
-        #     print(channel)
-        #     if torch.is_tensor(channel):
-        #         basicModelChannels.append(np.asarray(channel))
-        #     else:
-        #         basicModelChannels.append(channel)
-        #
-        # print(basicModelChannels[4], basicModelChannels[4]/2)
 
         self.FCNStep1 = nn.Sequential(ConvBNReLU(basicModelChannels[4], basicModelChannels[4]//2, 1, 1, 0, relu6=False,
                                         norm_layer=nn.BatchNorm2d),

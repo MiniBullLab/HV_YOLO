@@ -26,7 +26,7 @@ def evalModel(evaluate_weight):
 
         # Get detections
         with torch.no_grad():
-            output = model(img.cuda())
+            output = model(img.cuda())[0]
 
             #------------seg---------------------
             pred = np.squeeze(output.data.max(1)[1].cpu().numpy(), axis=0)

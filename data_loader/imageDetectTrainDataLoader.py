@@ -4,7 +4,7 @@ sys.path.insert(0, os.getcwd() + "/..")
 from helper import XMLProcess
 from .dataLoader import *
 import config.config as config
-from utils.utils import xyxy2xywh
+from utility.utils import xyxy2xywh
 
 class ImageDetectTrainDataLoader(DataLoader):
     def __init__(self, trainPath, batchSize=1, imageSize=[768, 320], \

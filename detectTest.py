@@ -49,7 +49,7 @@ def main(cfg, weights_path, img_size, imageFile):
     torchModelProcess = TorchModelProcess()
 
     modelParse = ModelParse()
-    model = modelParse.parse(cfg)
+    model = modelParse.parse(cfg, freezeBn=True)
 
     evaluator = MeanApEvaluating(imageFile)
 
@@ -72,7 +72,7 @@ def main(cfg, weights_path, img_size, imageFile):
 
         # Get detections
         with torch.no_grad():
-            output = model(torch.from_numpy(img).unsqueeze(0).to(device))
+            output = model(img.to(device))
             preds = []
             for i in range(0, 3):
                 predEach = model.lossList[i](output[i])

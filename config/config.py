@@ -8,7 +8,7 @@ net_config_path = "cfg/shufflenetV2-0.5_spp_BerkeleyAll.cfg"
 pretainModel = None #"./weights/model_best.pth"
 
 # resume from checkpoint
-resume = "./weights/model_best.pth" #None #"./weights/best.pt"#"./snapshot/yolov3-SPP_best_model.pkl"#None#
+resume = None #"./weights/model_best.pth" #None #"./weights/best.pt"#"./snapshot/yolov3-SPP_best_model.pkl"#None#
 
 # learning rate
 base_lr = 5e-4
@@ -31,8 +31,8 @@ snapshot_path = "snapshot"
 #imdb_train = "/home/lipj/Car_identify/data/DayData/train/"
 #imdb_val = "/home/lipj/Car_identify/data/DayData/val/"
 imgSize = [640, 352]
-trainList = "/home/sugon/darknetV3-master/data/train.txt"
-valList = "/home/sugon/darknetV3-master/data/test.txt"
+trainList = "/home/wfw/data/VOCdevkit/cifar100/train.list"
+valList = "/home/wfw/data/VOCdevkit/cifar100/test.list"
 valLabelPath = "/home/sugon/data/VOCdevkit/BerkeleyDet/Annotations/"
 train_batch_size = 32
 test_batch_size = 1

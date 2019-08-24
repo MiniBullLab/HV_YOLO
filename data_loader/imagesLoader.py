@@ -34,19 +34,18 @@ class ImagesLoader(DataLoader):
         img_path = self.files[self.count]
 
         # Read image
-        img = cv2.imread(img_path)  # BGR
+        image = cv2.imread(img_path)  # BGR
+        oriImg = image[:]
 
         # Padded resize
-        img, _, _, _ = self.resize_square(img, width=self.width, height=self.height, color=(127.5, 127.5, 127.5))
+        img, _, _, _ = self.resize_square(image, width=self.width, height=self.height, color=(127.5, 127.5, 127.5))
         rgbImage = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         rgbImage = rgbImage.transpose(2, 0, 1) ######################
         img = np.ascontiguousarray(rgbImage, dtype=np.float32)
-        # img -= self.rgb_mean
-        # img /= self.rgb_std
         img /= 255.0
 
-        return [img_path], img
+        return oriImg, torch.from_numpy(rgbImage).unsqueeze(0)
 
     def __len__(self):
         return self.nB  # number of batches

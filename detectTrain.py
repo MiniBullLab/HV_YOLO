@@ -4,11 +4,10 @@ from optparse import OptionParser
 import torch
 from torch import nn
 from model.modelParse import ModelParse
-from utility.parse_config import *
 from data_loader import *
 from utility.torchModelProcess import TorchModelProcess
+from utility.model_summary import summary
 
-from utility import torch_utils
 import config.config as config
 
 import detectTest
@@ -146,7 +145,7 @@ def train(
     # Set scheduler
     # scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[54, 61], gamma=0.1)
 
-    model_info(model)
+    summary(model, [1, 3, 640, 352])
     t0 = time.time()
     for epoch in range(start_epoch, epochs):
 
