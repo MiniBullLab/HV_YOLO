@@ -33,7 +33,7 @@ class ModelParse():
                 key, value = line.split("=")
                 value = value.strip()
                 modelDefine[-1][key.strip()] = value.strip()
-        print(modelDefine)
+        #print(modelDefine)
         return modelDefine
 
     def getModel(self, modelName):

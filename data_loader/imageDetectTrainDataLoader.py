@@ -54,6 +54,7 @@ class ImageDetectTrainDataLoader(DataLoader):
 
         if self.multi_scale:
             # Multi-Scale YOLO Training
+            print("wrong code for MultiScale")
             width = random.choice(range(10, 20)) * 32  # 320 - 608 pixels
             scale = float(self.width) / float(self.height)
             height = int(round(float(width / scale) / 32.0) * 32)
@@ -100,13 +101,18 @@ class ImageDetectTrainDataLoader(DataLoader):
             rgbImage, labels = self.augmentImageFlip(rgbImage, labels)
 
             delete_index = []
+            # reject warped points outside of image (0.999 for the image boundary)
             for i, label in enumerate(labels):
-                if label[2] + label[4]/2 > 1:
-                    yold = label[2] - label[4] / 2
-                    label[2] = (yold + float(1)) / float(2)
-                    label[4] = float(1) - yold
-                if label[3] < 0.005 or label[4] < 0.005:
-                    delete_index.append(i)
+                if label[2] + label[4]/2 >= float(1):
+                    yoldH = label[2] - label[4] / 2
+                    label[2] = (yoldH + float(0.999)) / float(2)
+                    label[4] = float(0.999) - yoldH
+                if label[1] + label[3]/2 >= float(1):
+                    yoldW = label[1] - label[3] / 2
+                    label[1] = (yoldW + float(0.999)) / float(2)
+                    label[3] = float(0.999) - yoldW
+                if label[3] < 0.0053 or label[4] < 0.0055: # filter the small object (w for label[3] in 1280 is limit to 6.8 pixel (6.8/1280=0.0053))
+                    delete_index.append(i)               # filter the small object (h for label[4] in 720 is limit to 4.0 pixel (4.0/1280=0.0053))
 
             labels = np.delete(labels, delete_index, axis=0)
 
@@ -116,8 +122,6 @@ class ImageDetectTrainDataLoader(DataLoader):
         # Normalize
         img_all = np.stack(img_all).transpose(0, 3, 1, 2)
         img_all = np.ascontiguousarray(img_all, dtype=np.float32)
-        # img_all -= self.rgb_mean
-        # img_all /= self.rgb_std
         img_all /= 255.0
 
         return torch.from_numpy(img_all), labels_all

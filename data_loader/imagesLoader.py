@@ -45,7 +45,7 @@ class ImagesLoader(DataLoader):
         img = np.ascontiguousarray(rgbImage, dtype=np.float32)
         img /= 255.0
 
-        return oriImg, torch.from_numpy(rgbImage).unsqueeze(0)
+        return oriImg, torch.from_numpy(img).unsqueeze(0)
 
     def __len__(self):
         return self.nB  # number of batches

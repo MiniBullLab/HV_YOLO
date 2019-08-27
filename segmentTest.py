@@ -7,17 +7,17 @@ from loss.enetLoss import cross_entropy2dDet
 
 from utility.metrics import runningScore
 
-def evalModel(evaluate_weight):
+def main(cfg, weights_path, img_size, valPath):
 
     running_metrics = runningScore(2)
     # init model
     modelParse = ModelParse()
-    model = modelParse.parse("./cfg/mobileFCN.cfg")
+    model = modelParse.parse(cfg)
 
-    model.load_state_dict(evaluate_weight)
+    model.load_state_dict(weights_path)
     model.cuda().eval()
 
-    dataloader = ImageSegmentValDataLoader("/home/wfw/data/VOCdevkit/Tusimple/ImageSets/val.txt", batch_size=config.test_batch_size, img_size=[640, 352])
+    dataloader = ImageSegmentValDataLoader(valPath, batch_size=config.test_batch_size, img_size=img_size)
     print("Eval data num: {}".format(len(dataloader)))
 
     prev_time = time.time()

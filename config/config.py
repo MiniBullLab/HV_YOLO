@@ -1,62 +1,91 @@
-# select architecture
-#arch = "yolov3SPP"
-cfg = "cfg/darknet53_mask.cfg"
-data_config_path = "cfg/berkeley.data"
-net_config_path = "cfg/shufflenetV2-0.5_spp_BerkeleyAll.cfg"
+## data
+root_dir =  "/home/wfw/data/VOCdevkit/CityscapesFine/"
+imgSize = [640, 352]
+trainPath = "/home/wfw/data/VOCdevkit/BerkeleyDet/ImageSets/train.txt"
+valPath = "/home/wfw/data/VOCdevkit/BerkeleyDet/ImageSets/test.txt"
+# class_path = "./data/berkeley.names"
+train_batch_size = 16
+test_batch_size = 1
+className = ['bike', 'bus', 'car', 'motor', 'person', 'rider', 'truck']
 
-# pretrained model
-pretainModel = None #"./weights/model_best.pth"
+## detect
+net_config_path = "./cfg/shufflenetV2-0.5_spp_BerkeleyAll.cfg"
+snapshotPath = "./snapshot/"
+maxEpochs = 300
 
-# resume from checkpoint
-resume = None #"./weights/model_best.pth" #None #"./weights/best.pt"#"./snapshot/yolov3-SPP_best_model.pkl"#None#
+resume = True #"./snapshot/latest.pt"
 
-# learning rate
-base_lr = 5e-4
-lr_decay_epochs = [120,160]
-lr_decay = 0.1
-
-maxEpochs =500
-
-# L2 regularizer
-optimizer = 'SGD'
+optimType = 'poly'
+base_lr = 2e-4
 lr_power = 0.9
 momentum = 0.9
-weight_decay = 5e-3
+weight_decay = 5e-4
 accumulated_batches = 1
 
-snapshot = 2
-snapshot_path = "snapshot"
+display = 20
 
-# dataSet
-#imdb_train = "/home/lipj/Car_identify/data/DayData/train/"
-#imdb_val = "/home/lipj/Car_identify/data/DayData/val/"
-imgSize = [640, 352]
-trainList = "/home/wfw/data/VOCdevkit/cifar100/train.list"
-valList = "/home/wfw/data/VOCdevkit/cifar100/test.list"
-valLabelPath = "/home/sugon/data/VOCdevkit/BerkeleyDet/Annotations/"
-train_batch_size = 32
-test_batch_size = 1
+## speed
+runType = "video"
+testImageFolder = "/home/wfw/HASCO/data/image/"
+testVideoFile = "/home/wfw/HASCO/data/video/VIDEO-5.MPG"
+weightPath = "./weights/backup74.pt"
+confThresh = 0.5
+nmsThresh = 0.45
+bnFuse = True
 
-# yolo param
-anchors = [[[44,76], [65,116], [117,164]],
-           [[15,18], [22,38], [29,56]],
-           [[7,10], [9,18], [14,30]]]
-#className = ['truck', 'person', 'bicycle', 'car', 'motorbike', 'bus']
-className = ['bike', 'bus', 'car', 'motor', 'person', 'rider', 'truck']#['car', 'person', 'motor']
-numClasses = 7
-iouThresh = 0.45
-confThresh=0.24
-
-jitter = 0.3
-#hue = 0.1
-hue = 0
-saturation = 1.5
-exposure = 1.5
-
-# GPU SETTINGS
-CUDA_DEVICE = [0] # Enter device ID of your gpu if you want to run on gpu. Otherwise neglect.
-GPU_MODE = 1 # set to 1 if want to run on gpu.
-
-# SETTINGS FOR DISPLAYING ON TENSORBOARD
-visdomTrain = False
-visdomVal = False
+## train
+# detection = False
+# segmentation = True
+# det_num_class = 7
+# seg_num_class = 19
+#
+# net_config_path = "./cfg/shuffleMTSD.cfg"
+# snapshotPath = "./snapshot/"
+# maxEpochs = 300
+#
+# # model
+# pretainModel = None # "./shuffleMTSD.pth"
+# resume = "./snapshot/latest.pt"
+#
+# optimType = 'poly'
+# base_lr = 1e-3
+# lr_power = 0.9
+# momentum = 0.9
+# weight_decay = 5e-4
+# accumulated_batches = 1
+#
+# net_size = 1 # net size for shufflenetV2
+# CUDA_DEVICE = [0]
+#
+# # evalute in train process
+# evaluate = True
+#
+# # freeze param
+# freezeParam = True
+# finetuneParam = False
+# finetuneRate = 0.3
+# detRate = 0
+# segRate = 1
+# warm_up = False
+#
+# ## eval
+# image_folder = root_dir + "/JPEGImages/val/"
+# output_path = "./results/"
+# annotation_path = root_dir + "Annotations/val/"
+# className = ['bike', 'bus', 'car', 'motor', 'person', 'rider', 'truck']
+# # ["truck", "person", "bicycle", "car", "motorbike", "bus"]
+# nms_thres = 0.45
+#
+# ## speed
+# runType = "video"
+# testImageFolder = "/home/wfw/HASCO/data/image/"
+# testVideoFile = "/home/wfw/HASCO/data/video/VIDEO-5.MPG"
+# weightPath = "./snapshot/best.pt"
+# confThresh = 0.5
+# bnFuse = True
+#
+# #output flag
+# detOutput = True
+# segOutput = False
+# segLineOutput = True
+# lablemap = "./docs/segCityscapesclass.json"

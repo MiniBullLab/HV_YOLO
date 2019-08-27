@@ -1,38 +1,26 @@
+import os
 import time
 import cv2
-import torch
 from optparse import OptionParser
-from model.modelParse import ModelParse
 from utility.evaluatingOfmAp import *
 from data_loader import *
 from utility.torchModelProcess import TorchModelProcess
+from utility.torchDeviceProcess import TorchDeviceProcess
 from utility.nonMaximumSuppression import *
-
 import config.config as config
-
-cuda = torch.cuda.is_available()
-device = torch.device('cuda:0' if cuda else 'cpu')
-f_path = os.path.dirname(os.path.realpath(__file__)) + '/'
-
-cuda = torch.cuda.is_available()
-device = torch.device('cuda:0' if cuda else 'cpu')
 
 def parse_arguments():
 
     parser = OptionParser()
     parser.description = "This program test model"
 
-    parser.add_option("-b", "--batch_size'", dest="batch_size",
-                      type="int", default=16,
-                      help="size of each image batch")
+    parser.add_option("-i", "--valPath", dest="valPath",
+                      metavar="PATH", type="string", default="./val.txt",
+                      help="path to data config file")
 
     parser.add_option("-c", "--cfg", dest="cfg",
                       metavar="PATH", type="string", default="cfg/yolov3.cfg",
                       help="cfg file path")
-
-    parser.add_option("-i", "--valPath", dest="valPath",
-                      metavar="PATH", type="string", default="./val.txt",
-                      help="path to data config file")
 
     parser.add_option("-w", "--weights", dest="weights",
                       metavar="PATH", type="string", default="weights/latest.pt",
@@ -40,31 +28,31 @@ def parse_arguments():
 
     (options, args) = parser.parse_args()
 
+    if options.valPath:
+        if not os.path.exists(options.valPath):
+            parser.error("Could not find the input val file")
+        else:
+            options.input_path = os.path.normpath(options.valPath)
+    else:
+        parser.error("'valPath' option is required to run this program")
+
     return options
 
-def main(cfg, weights_path, img_size, imageFile):
+def detectTest(valPath, cfgPath, weights_path):
     os.system('rm -rf ' + 'results')
     os.makedirs('results', exist_ok=True)
 
     torchModelProcess = TorchModelProcess()
 
-    modelParse = ModelParse()
-    model = modelParse.parse(cfg, freezeBn=True)
+    model = torchModelProcess.initModel(cfgPath)
+    model.setFreezeBn(True)
 
-    evaluator = MeanApEvaluating(imageFile)
+    evaluator = MeanApEvaluating(valPath)
 
-    if torch.cuda.device_count() > 1:
-        checkpoint = torchModelProcess.convert_state_dict(torch.load(weights_path, map_location='cpu')['model'])
-        model.load_state_dict(checkpoint)
-    else:
-        checkpoint = torch.load(weights_path, map_location='cpu')
-        model.load_state_dict(checkpoint['model'])
-    del checkpoint
+    torchModelProcess.loadLatestModelWeight(weights_path, model)
+    torchModelProcess.modelTestInit(model)
 
-    model.to(device).eval()
-
-    # Set Dataloader
-    dataloader = ImageDetectValDataLoader(imageFile, batch_size=1, img_size=img_size)
+    dataloader = ImageDetectValDataLoader(valPath, batch_size=1, img_size=config.imgSize)
 
     prev_time = time.time()
     for i, (img_path, img) in enumerate(dataloader):
@@ -72,7 +60,7 @@ def main(cfg, weights_path, img_size, imageFile):
 
         # Get detections
         with torch.no_grad():
-            output = model(img.to(device))
+            output = model(img.to(TorchDeviceProcess.device))
             preds = []
             for i in range(0, 3):
                 predEach = model.lossList[i](output[i])
@@ -81,23 +69,23 @@ def main(cfg, weights_path, img_size, imageFile):
             pred = pred[pred[:, :, 4] > 5e-3]
 
             if len(pred) > 0:
-                detections = non_max_suppression(pred.unsqueeze(0), 5e-3, config.iouThresh) # select nms method (or, and, soft-nms)
+                detections = non_max_suppression(pred.unsqueeze(0), 5e-3, config.nmsThresh) # select nms method (or, and, soft-nms)
 
         print('Batch %d... Done. (%.3fs)' % (i, time.time() - prev_time))
         prev_time = time.time()
 
         img = cv2.imread(img_path)
         # The amount of padding that was added
-        pad_x = 0 if (img_size[0]/img.shape[1]) < (img_size[1]/img.shape[0]) else img_size[0] - img_size[1] / img.shape[0] * img.shape[1]
-        pad_y = 0 if (img_size[0]/img.shape[1]) > (img_size[1]/img.shape[0]) else img_size[1] - img_size[0] / img.shape[1] * img.shape[0]
+        pad_x = 0 if (config.imgSize[0]/img.shape[1]) < (config.imgSize[1]/img.shape[0]) else config.imgSize[0] - config.imgSize[1] / img.shape[0] * img.shape[1]
+        pad_y = 0 if (config.imgSize[0]/img.shape[1]) > (config.imgSize[1]/img.shape[0]) else config.imgSize[1] - config.imgSize[0] / img.shape[1] * img.shape[0]
         # Image height and width after padding is removed
-        unpad_h = img_size[1] - pad_y
-        unpad_w = img_size[0] - pad_x
+        unpad_h = config.imgSize[1] - pad_y
+        unpad_w = config.imgSize[0] - pad_x
 
         path, fileNameAndPost = os.path.split(img_path)
         fileName, post = os.path.splitext(fileNameAndPost)
 
-        if detections is not None:
+        if detections[0] is not None:
             for x1, y1, x2, y2, conf, cls_conf, cls_pred in detections[0]:
                 # Rescale coordinates to original dimensions
                 box_h = ((y2 - y1) / unpad_h) * img.shape[0]
@@ -106,7 +94,7 @@ def main(cfg, weights_path, img_size, imageFile):
                 x1 = (((x1 - pad_x // 2) / unpad_w) * img.shape[1]).round().item()
                 x2 = (x1 + box_w).round().item()
                 y2 = (y1 + box_h).round().item()
-                x1, y1, x2, y2 = max(x1, 1.0), max(y1, 1.0), max(x2, 0), max(y2, 0)
+                x1, y1, x2, y2 = max(x1, 1.0), max(y1, 1.0), min(x2, img.shape[1]-1.0), min(y2, img.shape[0]-1.0)
 
                 # write to file
                 for i in range(0, len(config.className)):
@@ -119,8 +107,12 @@ def main(cfg, weights_path, img_size, imageFile):
 
     return mAP, aps
 
-if __name__ == '__main__':
+def main():
+    print("process start...")
     torch.cuda.empty_cache()
     options = parse_arguments()
-    img_size = 608
-    main(options.cfg, options.weights_path, img_size, options.valPath)
+    detectTest(options.valPath, options.cfg, options.weights)
+    print("process end!")
+
+if __name__ == '__main__':
+    main()

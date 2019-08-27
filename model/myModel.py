@@ -17,7 +17,7 @@ class MyModel(BaseBlock):
         self.basicModel = self.creatBaseModel()
         self.taskModules = self.createTask()
         self.lossList = self.createLoss()
-        self.setFreezeBn()
+        self.setFreezeBn(freezeBn)
         self._init_weight()
 
     def creatBaseModel(self):
@@ -45,9 +45,9 @@ class MyModel(BaseBlock):
                     lossResult.append(layer)
         return lossResult
 
-    def setFreezeBn(self):
+    def setFreezeBn(self, freezeBn):
         for m in self.modules():
-            if self.freezeBn and isinstance(m, nn.BatchNorm2d):
+            if freezeBn and isinstance(m, nn.BatchNorm2d):
                 m.eval()
 
     def forward(self, x):

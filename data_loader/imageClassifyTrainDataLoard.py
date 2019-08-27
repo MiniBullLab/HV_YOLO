@@ -37,7 +37,6 @@ class ImageClassifyTrainDataLoader(DataLoader):
         for i in range(ia, ia + self.batch_size):
             # Read image
             img_path = self.img_files[i]
-            print(img_path)
             imagePath = img_path.split(" ")[0]
             label = int(img_path.split(" ")[1])
             img = cv2.imread(imagePath)  # BGR
