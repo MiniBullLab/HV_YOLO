@@ -1,185 +1,172 @@
 import os
-import random
-import torch
 import time
 import numpy as np
-import torch.nn as nn
-
-import config as config
-from segmentTest import *
+from optparse import OptionParser
+import torch
 from data_loader import *
-from model.modelParse import ModelParse
-from loss.enetLoss import cross_entropy2dDet
-from loss.loss import OhemCrossEntropy2d
-from loss.focalloss import focalLoss
-from utility.lr_policy import PolyLR
 from utility.torchModelProcess import TorchModelProcess
+from utility.torchDeviceProcess import TorchDeviceProcess
+from utility.model_summary import summary
+from utility.lr_policy import MultiStageLR
 from utility.logger import AverageMeter, Logger
 
-import segmentTest
+import config.config as config
+import detectTest
 
-cuda = torch.cuda.is_available()
+def parse_arguments():
 
-random.seed(0)
-np.random.seed(0)
-torch.manual_seed(0)
-if cuda:
-    torch.cuda.manual_seed(0)
-    torch.cuda.manual_seed_all(0)
-    torch.backends.cudnn.benchmark = True
+    parser = OptionParser()
+    parser.description = "This program train model"
 
-def testModel(valPath, img_size, cfg, epoch):
-    # test
-    weights_path = 'weights/latest.pt'
-    score, class_iou = segmentTest.main(cfg, weights_path, img_size, valPath)
-    print("++ Evalution Epoch: {}, mIou: {}, Lane IoU: {}".format(epoch, score['Mean IoU : \t'], class_iou[1]))
+    parser.add_option("-i", "--trainPath", dest="trainPath",
+                      metavar="PATH", type="string", default="./train.txt",
+                      help="path to data config file")
 
+    parser.add_option("-v", "--valPath", dest="valPath",
+                      metavar="PATH", type="string", default="./val.txt",
+                      help="path to data config file")
+
+    parser.add_option("-c", "--cfg", dest="cfg",
+                      metavar="PATH", type="string", default="cfg/yolov3.cfg",
+                      help="cfg file path")
+
+    parser.add_option("-p", "--pretrainModel", dest="pretrainModel",
+                      metavar="PATH", type="string", default="weights/pretrain.pt",
+                      help="path to store weights")
+
+    (options, args) = parser.parse_args()
+
+    if options.trainPath:
+        if not os.path.exists(options.trainPath):
+            parser.error("Could not find the input train file")
+        else:
+            options.input_path = os.path.normpath(options.trainPath)
+    else:
+        parser.error("'trainPath' option is required to run this program")
+
+    return options
+
+def testModel(valPath, cfgPath, weights_path, epoch):
+    # Calculate mAP
+    mAP, aps = detectTest.detectTest(valPath, cfgPath, weights_path)
 
     # Write epoch results
     with open('results.txt', 'a') as file:
         # file.write('%11.3g' * 2 % (mAP, aps[0]) + '\n')
-        file.write("Epoch: {} | mIoU: {:.3f} | ".format(epoch, score['Mean IoU : \t']))
-        for i, iou in enumerate(class_iou):
-            file.write(config.className[i] + ": {:.3f} ".format(iou))
+        file.write("Epoch: {} | mAP: {:.3f} | ".format(epoch, mAP))
+        for i, ap in enumerate(aps):
+            file.write(config.className[i] + ": {:.3f} ".format(ap))
         file.write("\n")
 
-    return score, class_iou
+    return mAP, aps
 
-def train():
-    device = "cuda:0"
-    print("Using device: \"{}\"".format(device))
-
-    os.makedirs(config.snapshotPath, exist_ok=True)
-    latest_weights_file = os.path.join(config.snapshotPath, 'latest.pt')
-    best_weights_file = os.path.join(config.snapshotPath, 'best.pt')
-    logger = Logger(os.path.join("./weights", "logs"))
-
-    # Configure run
-    train_path = config.trainPath
-    valPath = config.valPath
-
-    modelProcess = TorchModelProcess()
-    # Get dataloader
-    dataloader = ImageSegmentTrainDataLoader(train_path, batch_size=config.train_batch_size,
-                                            img_size=[640, 352], augment=True)
-
-    # set lr_policy
-    total_iteration = config.maxEpochs * len(dataloader)
-    lr_policy = PolyLR(config.base_lr, config.lr_power, total_iteration)
-    print("Train data num: {}".format(dataloader.nF))
-
-    # init model
-    modelParse = ModelParse()
-    model = modelParse.parse("./cfg/mobileFCN.cfg")
-
-    loss_fn = cross_entropy2dDet(ignore_index=250, size_average=True)
-    # min_kept = int(config.train_batch_size // 1 * 640 * 352 // 16)
-    # loss_fn = OhemCrossEntropy2d(ignore_index=250, thresh=0.7, min_kept=min_kept).cuda()
-    # loss_fn = focalLoss(gamma=0, alpha=None, class_num=2, ignoreIndex=250).cuda()
-    # focalLoss = focalLoss
-    # boundedInverseClassLoss = boundedInverseClassLoss
-
-    if torch.cuda.device_count() > 1:
-        print('Using ', torch.cuda.device_count(), ' GPUs')
-        model = nn.DataParallel(model)
-    model.to(device).train()
-
-    lossTrain = AverageMeter()
-    if config.pretainModel is not None:
-        if not os.path.exists(config.pretainModel):
-            raise Exception("Invaid path", config.pretainModel)
-        print("Loading pretainModel from {}".format(config.pretainModel))
-        model.load_state_dict(torch.load(config.pretainModel), strict=True)
-
-    if config.resume is not None:
-        if not os.path.exists(config.resume):
-            raise Exception("Invaid path", config.resume)
-        print("Loading resume from {}".format(config.resume))
-        if len(config.CUDA_DEVICE) > 1:
-            checkpoint = torch.load(latest_weights_file, map_location='cpu')
-            state = modelProcess.convert_state_dict(checkpoint['model'])
-            model.load_state_dict(state)
-        else:
-            checkpoint = torch.load(latest_weights_file, map_location='cpu')
-            model.load_state_dict(checkpoint['model'])
-
-        # Set optimizer
-        optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=config.base_lr,
-                                    momentum=config.momentum, weight_decay=config.weight_decay)
-
+def initOptimizer(model, checkpoint):
+    start_epoch = 0
+    best_mAP = -1
+    optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=config.base_lr,\
+                                momentum=config.momentum, weight_decay=config.weight_decay)
+    if checkpoint:
         start_epoch = checkpoint['epoch'] + 1
         if checkpoint['optimizer'] is not None:
             optimizer.load_state_dict(checkpoint['optimizer'])
-            bestmIoU = checkpoint['best_mIoU']
+            best_mAP = checkpoint['best_mAP']
+    return start_epoch, best_mAP, optimizer
 
-        del checkpoint  # current, saved
-        print("Epoch: {}, mIoU: {}".format(checkpoint['epoch'], bestmIoU))
+def saveBestModel(mAP, best_mAP, latest_weights_file, best_weights_file):
+    if mAP >= best_mAP:
+        best_mAP = mAP
+        os.system('cp {} {}'.format(
+            latest_weights_file,
+            best_weights_file,
+        ))
+    return best_mAP
 
+
+def detectTrain(trainPath, valPath, cfgPath):
+
+    if not os.path.exists(config.snapshotPath):
+        os.makedirs(config.snapshotPath, exist_ok=True)
+    latest_weights_file = os.path.join(config.snapshotPath, 'latest.pt')
+    best_weights_file = os.path.join(config.snapshotPath, 'best.pt')
+
+    torchModelProcess = TorchModelProcess()
+
+    #logger
+    logger = Logger(os.path.join("./weights", "logs"))
+    #set learning policy
+    multiLR = MultiStageLR([[49, config.base_lr * 0.1], [70, config.base_lr * 0.01]])
+    #model init
+    model = torchModelProcess.initModel(cfgPath)
+    #loss init
+    lossTrain = AverageMeter()
+    #get dataloader
+    dataloader = ImageDetectTrainDataLoader(trainPath, config.train_batch_size, config.imgSize,
+                                        multi_scale=True, augment=True, balancedSample=True)
+
+    avg_loss = -1
+    checkpoint = None
+    if config.resume:
+        checkpoint = torchModelProcess.loadLatestModelWeight(latest_weights_file, model)
+        torchModelProcess.modelTrainInit(model)
     else:
-        start_epoch = 0
-        bestmIoU = -1
+        torchModelProcess.modelTrainInit(model)
+    start_epoch, best_mAP, optimizer = initOptimizer(model, checkpoint)
 
-        # set optimize
-        optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=config.base_lr,
-                                    momentum=config.momentum, weight_decay=config.weight_decay)
-
-    # summary the model
-    # model_info(model)
-
+    # summary(model, [1, 3, 640, 352])
     t0 = time.time()
     for epoch in range(start_epoch, config.maxEpochs):
 
-        model.train()
+        # get learning rate
+        lr = multiLR.get_lr(epoch)
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = lr
 
         optimizer.zero_grad()
-        for idx, (imgs, segments) in enumerate(dataloader):
+        for i, (imgs, targets) in enumerate(dataloader):
+            if sum([len(x) for x in targets]) < 1:  # if no targets continue
+                continue
 
-            current_idx = epoch * len(dataloader) + idx
-            lr = lr_policy.get_lr(current_idx)
-
-            for g in optimizer.param_groups:
-                g['lr'] = lr
+            # SGD burn-in
+            if (epoch == 0) and (i <= 1000):
+                lr = config.base_lr * (i / 1000) ** 4
+                for param_group in optimizer.param_groups:
+                    param_group['lr'] = lr
 
             # Compute loss, compute gradient, update parameters
-            lossSeg = 0
-            output = model(imgs.cuda())[0]
-
-            loss = loss_fn(output, segments.cuda())
+            loss = 0
+            output = model(imgs.to(TorchDeviceProcess.device))
+            for k in range(0, 3):
+                loss += model.lossList[k](output[k], targets)
             loss.backward()
 
             # accumulate gradient for x batches before optimizing
-            if ((idx + 1) % config.accumulated_batches == 0) or (idx == len(dataloader) - 1):
+            if ((i + 1) % config.accumulated_batches == 0) or (i == len(dataloader) - 1):
                 optimizer.step()
                 optimizer.zero_grad()
 
-            print('Epoch: {}/{}[{}/{}]\t Loss: {}\t Rate: {} \t Time: {}\t'.format(epoch, config.maxEpochs - 1,\
-                   idx, len(dataloader), '%.3f' % loss, '%.7f' % optimizer.param_groups[0].lr, time.time() - t0))
+            if avg_loss < 0:
+                avg_loss = (loss.cpu().detach().numpy() / config.train_batch_size)
+            avg_loss = 0.9 * (loss.cpu().detach().numpy() / config.train_batch_size) + 0.1 * avg_loss
+            print('Epoch: {}[{}/{}]\t Loss: {}\t Rate: {} \t Time: {}\t'.format(epoch, i, len(dataloader), '%.3f' % avg_loss, '%.7f' % optimizer.param_groups[0]['lr'], time.time() - t0))
 
             lossTrain.update(loss.data)
-            if (epoch * (len(dataloader) - 1) + idx) % config.display == 0:
+            if (epoch * (len(dataloader) - 1) + i) % config.display == 0:
                 # print(lossTrain.avg)
-                logger.scalar_summary("losstrain", lossTrain.avg, (epoch * (len(dataloader) - 1) + idx))
+                logger.scalar_summary("losstrain", lossTrain.avg, (epoch * (len(dataloader) - 1) + i))
                 lossTrain.reset()
+
             t0 = time.time()
 
-        score, class_iou = testModel(valPath, config.imgSize, config.net_config_path, epoch)
+        torchModelProcess.saveLatestModel(latest_weights_file, model, optimizer, epoch, best_mAP)
+        mAP, aps = testModel(valPath, cfgPath, latest_weights_file, epoch)
+        best_mAP = saveBestModel(mAP, best_mAP, latest_weights_file, best_weights_file)
 
-        checkpoint = {'epoch': epoch,
-                      'best_mIoU': score['Mean IoU : \t'],
-                      'model': model.state_dict(),
-                      'optimizer': optimizer.state_dict()}
-        torch.save(checkpoint, latest_weights_file)
-
-        # Save best checkpoint
-        if score['Mean IoU : \t'] > bestmIoU:
-            bestmIoU = score['Mean IoU : \t']
-            print("++ Saving model: Epoch: {}, mIou: {}".format(epoch, bestmIoU))
-            checkpoint = {'epoch': epoch,
-                          'best_mIoU': bestmIoU,
-                          'model': model.state_dict(),
-                          'optimizer': optimizer.state_dict()}
-            torch.save(checkpoint, latest_weights_file)
-
-if __name__ == "__main__":
+def main():
+    print("process start...")
     torch.cuda.empty_cache()
-    train()
+    options = parse_arguments()
+    detectTrain(options.trainPath, options.valPath, options.cfg)
+    print("process end!")
+
+if __name__ == '__main__':
+    main()
