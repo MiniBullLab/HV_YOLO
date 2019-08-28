@@ -1,27 +1,31 @@
+import os
+import sys
+sys.path.insert(0, os.getcwd() + "/..")
 from .dataLoader import *
+from helper import DirProcess
+from .trainDataProcess import TrainDataProcess
 
 class ImagesLoader(DataLoader):
     '''
     load images
     '''
-    def __init__(self, path, batch_size=1, img_size=[416, 416]):
+    def __init__(self, path, batch_size=1, img_size=(416, 416)):
         super().__init__(path)
-        if os.path.isdir(path):
-            self.files = sorted(glob.glob('%s/*.*' % path))
-        elif os.path.isfile(path):
-            self.files = [path]
 
-        self.nF = len(self.files)  # number of image files
+        self.trainDataProcess = TrainDataProcess()
+        dirProcess = DirProcess()
+        tempFiles = dirProcess.getDirFiles(path, "*.*")
+        if tempFiles:
+            self.files = list(tempFiles)
+            self.nF = len(self.files)
+        else:
+            self.files = []
+            self.nF = []
         self.nB = math.ceil(self.nF / batch_size)  # number of batches
         self.batch_size = batch_size
-        self.width = img_size[0]
-        self.height = img_size[1]
-
+        self.imageSize = img_size
+        self.color = (127.5, 127.5, 127.5)
         assert self.nF > 0, 'No images found in path %s' % path
-
-        # RGB normalization values
-        # self.rgb_mean = np.array([60.134, 49.697, 40.746], dtype=np.float32).reshape((3, 1, 1))
-        # self.rgb_std = np.array([29.99, 24.498, 22.046], dtype=np.float32).reshape((3, 1, 1))
 
     def __iter__(self):
         self.count = -1
@@ -38,14 +42,11 @@ class ImagesLoader(DataLoader):
         oriImg = image[:]
 
         # Padded resize
-        img, _, _, _ = self.resize_square(image, width=self.width, height=self.height, color=(127.5, 127.5, 127.5))
+        img, _, _, _ = self.trainDataProcess.resize_square(image, self.imageSize, self.color)
         rgbImage = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        torchImage = self.convertTorchTensor(rgbImage)
 
-        rgbImage = rgbImage.transpose(2, 0, 1) ######################
-        img = np.ascontiguousarray(rgbImage, dtype=np.float32)
-        img /= 255.0
-
-        return oriImg, torch.from_numpy(img).unsqueeze(0)
+        return oriImg, torchImage
 
     def __len__(self):
         return self.nB  # number of batches

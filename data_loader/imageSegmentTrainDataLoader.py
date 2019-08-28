@@ -1,11 +1,14 @@
 from .dataLoader import *
+from .trainDataProcess import TrainDataProcess
+from PIL import Image
 
 multi_scale = False
 
 class ImageSegmentTrainDataLoader(DataLoader):
-    def __init__(self, path, batch_size=1, img_size=[768, 320], augment=False):
+    def __init__(self, path, batch_size=1, img_size=(768, 320), augment=False):
         super().__init__(path)
 
+        self.trainDataProcess = TrainDataProcess()
         with open(path, 'r') as file:
             self.img_files = file.readlines()
 
@@ -16,8 +19,8 @@ class ImageSegmentTrainDataLoader(DataLoader):
         self.nF = len(self.img_files)  # number of image files
         self.nB = math.ceil(self.nF / batch_size)  # number of batches
         self.batch_size = batch_size
-        self.width = img_size[0]
-        self.height = img_size[1]
+        self.imageSize = img_size
+        self.color = (127.5, 127.5, 127.5)
 
         self.volid_label_seg = []
         self.valid_label_seg = [[0], [1]]
@@ -42,12 +45,12 @@ class ImageSegmentTrainDataLoader(DataLoader):
         if multi_scale:
             # Multi-Scale YOLO Training
             width = random.choice(range(10, 20)) * 32  # 320 - 608 pixels
-            scale = float(self.width) / float(self.height)
+            scale = float(self.imageSize[0]) / float(self.imageSize[1])
             height = int(round(float(width / scale) / 32.0) * 32)
         else:
             # Fixed-Scale YOLO Training
-            height = self.height
-            width = self.width
+            width = self.imageSize[0]
+            height = self.imageSize[1]
 
         img_all = []
         seg_all = []
@@ -71,11 +74,13 @@ class ImageSegmentTrainDataLoader(DataLoader):
             self.augmentImageHSV(img)
 
             h, w, _ = img.shape
-            img, ratio, padw, padh = self.resize_square(img, width=width, height=height, color=(127.5, 127.5, 127.5))
+            img, ratio, padw, padh = self.trainDataProcess.resize_square(img,
+                                                                         (width, height),
+                                                                         self.color)
             #----------seg------------------------------------------------------------------
             ratio = min(float(width) / w, float(height) / h)  # ratio  = old / new
             new_shape = [round(h * ratio), round(w * ratio)]
-            seg = self.encode_segmap(np.array(seg, dtype=np.uint8), self.volid_label_seg, self.valid_label_seg)
+            seg = self.trainDataProcess.encode_segmap(np.array(seg, dtype=np.uint8), self.volid_label_seg, self.valid_label_seg)
             seg = cv2.resize(seg, (new_shape[1], new_shape[0]))
             seg = np.pad(seg, ((padh // 2, padh - (padh // 2)), (padw // 2, padw - (padw // 2))), 'constant', constant_values=250)
             ################################################################################
@@ -104,16 +109,12 @@ class ImageSegmentTrainDataLoader(DataLoader):
             img_all.append(img)
             seg_all.append(seg)
 
-        # Normalize
-        img_all = np.stack(img_all)[:, :, :, ::-1].transpose(0, 3, 1, 2)  # BGR to RGB and cv2 to pytorch
-        img_all = np.ascontiguousarray(img_all, dtype=np.float32)
-        img_all /= 255.0
+        numpyImages = np.stack(img_all)[:, :, :, ::-1]
+        torchImages = self.convertTorchTensor(numpyImages)
 
-        #-------------seg-------------------
-        img_all = torch.from_numpy(img_all)
         seg_all = torch.from_numpy(np.array(seg_all)).long()
 
-        return img_all, seg_all
+        return torchImages, seg_all
 
     def augmentImageHSV(self, inputRGBImage):
         augment_hsv = True

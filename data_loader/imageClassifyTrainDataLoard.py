@@ -1,7 +1,7 @@
 from .dataLoader import *
 
 class ImageClassifyTrainDataLoader(DataLoader):
-    def __init__(self, path, batch_size=1, img_size=[416, 416]):
+    def __init__(self, path, batch_size=1, img_size=(416, 416)):
         super().__init__(path)
         with open(path, 'r') as file:
             self.img_files = file.readlines()
@@ -11,9 +11,7 @@ class ImageClassifyTrainDataLoader(DataLoader):
         self.nF = len(self.img_files)  # number of image files
         self.nB = math.ceil(self.nF / batch_size)  # number of batches
         self.batch_size = batch_size
-        self.width = img_size[0]
-        self.height = img_size[1]
-
+        self.imageSize = img_size
         assert self.nF > 0, 'No images found in path %s' % path
 
         # RGB normalization values
@@ -40,19 +38,17 @@ class ImageClassifyTrainDataLoader(DataLoader):
             imagePath = img_path.split(" ")[0]
             label = int(img_path.split(" ")[1])
             img = cv2.imread(imagePath)  # BGR
-            img = cv2.resize(img, (self.height, self.width))
+            img = cv2.resize(img, self.imageSize)
 
             # Padded resize
             rgbImage = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             img_all.append(rgbImage)
             labels_all.append(label)
+        trochLabels = torch.from_numpy(np.asarray(labels_all))
+        numpyImages = np.stack(img_all)
+        torchImages = self.convertTorchTensor(numpyImages)
 
-        if len(img_all) > 0:
-            img_all = np.stack(img_all).transpose(0, 3, 1, 2)
-            img_all = np.ascontiguousarray(img_all, dtype=np.float32)
-            img_all /= 255.0
-
-        return torch.from_numpy(img_all), torch.from_numpy(np.asarray(labels_all))
+        return torchImages, torchImages
 
     def __len__(self):
-        return self.nB  # number of batches
+        return self.nB

@@ -5,6 +5,7 @@ from helper import XMLProcess
 from .dataLoader import *
 import config.config as config
 from utility.utils import xyxy2xywh
+from .trainDataProcess import TrainDataProcess
 
 class ImageDetectTrainDataLoader(DataLoader):
     def __init__(self, trainPath, batchSize=1, imageSize=[768, 320], \
@@ -13,6 +14,7 @@ class ImageDetectTrainDataLoader(DataLoader):
         path, _ = os.path.split(trainPath)
         self.dataPath = path
         self.xmlProcess = XMLProcess()
+        self.trainDataProcess = TrainDataProcess()
         self.multi_scale = multi_scale
         self.augment = augment
         self.balancedSample = balancedSample
@@ -27,9 +29,8 @@ class ImageDetectTrainDataLoader(DataLoader):
         self.nF = len(self.imageAndLabelList)  # number of image files
         self.nB = math.ceil(self.nF / batchSize)  # number of batches
         self.batch_size = batchSize
-        self.width = imageSize[0]
-        self.height = imageSize[1]
-
+        self.imageSize = imageSize
+        self.color = (127.5, 127.5, 127.5)
         assert self.nB > 0, 'No images found in path %s' % trainPath
 
     def __iter__(self):
@@ -56,12 +57,12 @@ class ImageDetectTrainDataLoader(DataLoader):
             # Multi-Scale YOLO Training
             print("wrong code for MultiScale")
             width = random.choice(range(10, 20)) * 32  # 320 - 608 pixels
-            scale = float(self.width) / float(self.height)
+            scale = float(self.imageSize[0]) / float(self.imageSize[1])
             height = int(round(float(width / scale) / 32.0) * 32)
         else:
             # Fixed-Scale YOLO Training
-            height = self.height
-            width = self.width
+            width = self.imageSize[0]
+            height = self.imageSize[1]
 
         img_all = []
         labels_all = []
@@ -82,8 +83,9 @@ class ImageDetectTrainDataLoader(DataLoader):
             self.augmentImageHSV(rgbImage)
 
             h, w, _ = rgbImage.shape
-            rgbImage, ratio, padw, padh = self.resize_square(rgbImage, width=width, height=height,\
-                                                             color=(127.5, 127.5, 127.5))
+            rgbImage, ratio, padw, padh = self.trainDataProcess.resize_square(rgbImage,
+                                                                              (width, height),
+                                                                              self.color)
             _, _, boxes = self.xmlProcess.parseRectData(label_path)
             labels = self.getResizeLabels(boxes, ratio, (padw, padh))
 
@@ -118,13 +120,10 @@ class ImageDetectTrainDataLoader(DataLoader):
 
             img_all.append(rgbImage)
             labels_all.append(torch.from_numpy(labels))
+        numpyImages = np.stack(img_all)
+        torchImages = self.convertTorchTensor(numpyImages)
 
-        # Normalize
-        img_all = np.stack(img_all).transpose(0, 3, 1, 2)
-        img_all = np.ascontiguousarray(img_all, dtype=np.float32)
-        img_all /= 255.0
-
-        return torch.from_numpy(img_all), labels_all
+        return torchImages, labels_all
 
     def getBlanceFileList(self):
         blancedFileList = {}

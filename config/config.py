@@ -1,6 +1,6 @@
 ## data
 root_dir =  "/home/wfw/data/VOCdevkit/CityscapesFine/"
-imgSize = [640, 352]
+imgSize = (640, 352)
 trainPath = "/home/wfw/data/VOCdevkit/BerkeleyDet/ImageSets/train.txt"
 valPath = "/home/wfw/data/VOCdevkit/BerkeleyDet/ImageSets/test.txt"
 # class_path = "./data/berkeley.names"

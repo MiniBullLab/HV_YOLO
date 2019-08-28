@@ -49,10 +49,9 @@ def detect(imageFolder, cfgPath, weightsPath):
     dataloader = ImagesLoader(imageFolder, batch_size=1, img_size=config.imgSize)
     #dataloader = VideoLoader(opt.image_folder, batch_size=1, img_size=opt.img_size)
 
-    prev_time = time.time()
     for i, (oriImg, img) in enumerate(dataloader):
         print('%g/%g' % (i + 1, len(dataloader)), end=' ')
-
+        prev_time = time.time()
         # Get detections
         detections = []
         with torch.no_grad():
@@ -68,7 +67,6 @@ def detect(imageFolder, cfgPath, weightsPath):
                 detections = non_max_suppression(pred.unsqueeze(0), config.confThresh, config.nmsThresh)
 
         print('Batch %d... Done. (%.3fs)' % (i, time.time() - prev_time))
-        prev_time = time.time()
 
         # The amount of padding that was added
         pad_x = 0 if (config.imgSize[0]/oriImg.shape[1]) < (config.imgSize[1]/oriImg.shape[0]) else config.imgSize[0] - config.imgSize[1] / oriImg.shape[0] * oriImg.shape[1]

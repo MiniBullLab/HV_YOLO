@@ -61,7 +61,7 @@ def train():
     modelProcess = TorchModelProcess()
     # Get dataloader
     dataloader = ImageSegmentTrainDataLoader(train_path, batch_size=config.train_batch_size,
-                                            img_size=[640, 352], augment=True)
+                                            img_size=(640, 352), augment=True)
 
     # set lr_policy
     total_iteration = config.maxEpochs * len(dataloader)

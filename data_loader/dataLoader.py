@@ -1,10 +1,8 @@
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
-import glob
 import random
 import math
-from PIL import Image
 import numpy as np
 import cv2
 import torch
@@ -38,16 +36,19 @@ class DataLoader():
                 result.append((imagePath, annotationPath))
         return result
 
-    def resize_square(self, img, width=416, height=416, color=(0, 0, 0)):  # resize a rectangular image to a padded square
-        shape = img.shape[:2]  # shape = [height, width]
-        ratio = min(float(width) / shape[1], float(height) / shape[0])  # ratio  = old / new
-        new_shape = [round(shape[0] * ratio), round(shape[1] * ratio)]
-        dw = width - new_shape[1]  # width padding
-        dh = height - new_shape[0]  # height padding
-        top, bottom = dh // 2, dh - (dh // 2)
-        left, right = dw // 2, dw - (dw // 2)
-        img = cv2.resize(img, (new_shape[1], new_shape[0]), interpolation=cv2.INTER_AREA)  # resized, no border
-        return cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color), ratio, dw, dh
+    def convertTorchTensor(self, rgbImages):
+        result = None
+        if rgbImages.ndim == 3:
+            image = rgbImages.transpose(2, 0, 1)
+            image = np.ascontiguousarray(image, dtype=np.float32)
+            image /= 255.0
+            result = torch.from_numpy(image).unsqueeze(0)
+        elif rgbImages.ndim == 4:
+            img_all = rgbImages.transpose(0, 3, 1, 2)
+            img_all = np.ascontiguousarray(img_all, dtype=np.float32)
+            img_all /= 255.0
+            result = torch.from_numpy(img_all)
+        return result
 
     def random_affine(self, img, targets=None, Segment=None, degrees=(-10, 10), translate=(.1, .1), scale=(.9, 1.1),
                       shear=(-3, 3),
@@ -122,15 +123,3 @@ class DataLoader():
             return imw, targets, M
         else:
             return imw
-
-    def encode_segmap(self, mask, volid_label, valid_label):
-        classes = -np.ones([100, 100])
-        valid = [x for j in valid_label for x in j]
-        for i in range(0, len(valid_label)):
-            classes[i, :len(valid_label[i])] = valid_label[i]
-        for label in volid_label:
-            mask[mask == label] = 250
-        for validc in valid:
-            mask[mask == validc] = np.uint8(np.where(classes == validc)[0])
-
-        return mask

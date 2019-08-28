@@ -1,9 +1,12 @@
 from .dataLoader import *
+from .trainDataProcess import TrainDataProcess
+from PIL import Image
 
 class ImageSegmentValDataLoader(DataLoader):
-    def __init__(self, path, batch_size=1, img_size=[768, 320]):
+    def __init__(self, path, batch_size=1, img_size=(768, 320)):
         super().__init__(path)
         # self.img_files = sorted(glob.glob('%s/*.*' % path))
+        self.trainDataProcess = TrainDataProcess()
         with open(path, 'r') as file:
             self.img_files = file.readlines()
 
@@ -15,8 +18,8 @@ class ImageSegmentValDataLoader(DataLoader):
         self.nF = len(self.img_files)  # number of image files
         self.nB = math.ceil(self.nF / batch_size)  # number of batches
         self.batch_size = batch_size
-        self.width = img_size[0]
-        self.height = img_size[1]
+        self.imageSize = img_size
+        self.color = (127.5, 127.5, 127.5)
         # self.volid_label_seg = [0, 1, 4, 5, 8, 9, 10, 11, 12, 14, 16, 18, 22, 25, 26, 28, 31, 32, 33, 34, 35, 36,
         #                         37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 51, 53, 58, 59, 60, 62, 63, 64, 65]
         # self.valid_label_seg = [[54, 55, 56, 61], [19, 20, 21], [52, 57], [7, 13], [2, 3, 15, 29], [6, 17], [30],
@@ -43,8 +46,8 @@ class ImageSegmentValDataLoader(DataLoader):
         ia = self.count * self.batch_size
         ib = min((self.count + 1) * self.batch_size, self.nF)
 
-        height = self.height
-        width = self.width
+        width = self.imageSize[0]
+        height = self.imageSize[1]
 
         img_all = []
         seg_all = []
@@ -58,11 +61,11 @@ class ImageSegmentValDataLoader(DataLoader):
                 continue
 
             h, w, _ = img.shape
-            img, ratio, padw, padh = self.resize_square(img, width=width, height=height, color=(127.5, 127.5, 127.5))
+            img, ratio, padw, padh = self.trainDataProcess.resize_square(img, (width, height), self.color)
             #----------seg------------------------------------------------------------------
             ratio = min(float(width) / w, float(height) / h)  # ratio  = old / new
             new_shape = [round(h * ratio), round(w * ratio)]
-            seg = self.encode_segmap(np.array(seg, dtype=np.uint8), self.volid_label_seg, self.valid_label_seg)
+            seg = self.trainDataProcess.encode_segmap(np.array(seg, dtype=np.uint8), self.volid_label_seg, self.valid_label_seg)
             #seg = np.array(seg, dtype=np.uint8)
             #print(set(list(seg.flatten())))
             seg = cv2.resize(seg, (new_shape[1], new_shape[0]))
@@ -84,17 +87,13 @@ class ImageSegmentValDataLoader(DataLoader):
             img_all.append(img)
             seg_all.append(seg)
 
-        # Normalize
-        img_all = np.stack(img_all)[:, :, :, ::-1].transpose(0, 3, 1, 2)  # BGR to RGB and cv2 to pytorch
-        img_all = np.ascontiguousarray(img_all, dtype=np.float32)
-        # img_all -= self.rgb_mean
-        # img_all /= self.rgb_std
-        img_all /= 255.0
+        numpyImages = np.stack(img_all)[:, :, :, ::-1]
+        torchImages = self.convertTorchTensor(numpyImages)
 
         #-------------seg
         seg_all = torch.from_numpy(np.array(seg_all)).long()
 
-        return torch.from_numpy(img_all), seg_all
+        return torchImages, seg_all
 
     def __len__(self):
         return self.nB  # number of batches
