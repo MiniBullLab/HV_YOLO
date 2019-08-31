@@ -5,15 +5,15 @@ import numpy as np
 from helper import XMLProcess
 from helper import DirProcess
 from data_loader import DataLoader
-import config.config as config
 
 class MeanApEvaluating():
 
-    def __init__(self, valPath):
+    def __init__(self, valPath, className):
         path, _ = os.path.split(valPath)
         self.annotationDir = os.path.join(path, "../Annotations")
         self.xmlProcess = XMLProcess()
         self.dataLoader = DataLoader(path)
+        self.className = className
         self.imageAndAnnotationList = self.dataLoader.getImageAndAnnotationList(valPath)
 
     def do_python_eval(self, output_dir, detection_path):
@@ -24,7 +24,7 @@ class MeanApEvaluating():
 
         if not os.path.isdir(output_dir):
             os.mkdir(output_dir)
-        for i, cls in enumerate(config.className):
+        for i, cls in enumerate(self.className):
             filename = detpath + cls + '.txt'
             if cls == '__background__' and \
                 not os.path.exists(filename):
@@ -40,8 +40,8 @@ class MeanApEvaluating():
         print('~~~~~~~~')
         print('Results:')
         for i, ap in enumerate(aps):
-            print(config.className[i] + ': ' + '{:.3f}'.format(ap))
-            # print(config.className[i] + '_iou: ' + '{:.3f}'.format(ious[aps.index(ap)]))
+            print(self.className[i] + ': ' + '{:.3f}'.format(ap))
+            # print(self.className[i] + '_iou: ' + '{:.3f}'.format(ious[aps.index(ap)]))
 
         print('mAP: ' + '{:.3f}'.format(np.mean(aps)))
         # print('Iou acc: ' + '{:.3f}'.format(np.mean(ious)))

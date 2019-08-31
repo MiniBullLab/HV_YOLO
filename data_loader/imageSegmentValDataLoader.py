@@ -55,8 +55,16 @@ class ImageSegmentValDataLoader(DataLoader):
             img_path = self.img_files[self.shuffled_vector[files_index]]
             seg_path = self.seg_files[self.shuffled_vector[files_index]]
 
+            # judge the path
+            if not os.path.exists(img_path):
+                print ("{} not exists.".format(img_path))
+
+            if not os.path.exists(seg_path):
+                print ("{} not exists.".format(seg_path))
+
             img = cv2.imread(img_path)  # BGR
             seg = Image.open(seg_path)
+
             if img is None:
                 continue
 
@@ -70,8 +78,6 @@ class ImageSegmentValDataLoader(DataLoader):
             #print(set(list(seg.flatten())))
             seg = cv2.resize(seg, (new_shape[1], new_shape[0]))
             seg = np.pad(seg, ((padh // 2, padh - (padh // 2)), (padw // 2, padw - (padw // 2))), 'constant', constant_values=250)
-            #seg[(seg != 0) & (seg != 250)] = 1
-            #seg = decode_segmap(seg)
             ################################################################################
 
             # seg

@@ -5,7 +5,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import config.config as config
 import xml.etree.ElementTree as ET
 from collections import OrderedDict
 

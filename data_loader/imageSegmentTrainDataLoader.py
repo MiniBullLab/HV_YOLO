@@ -59,11 +59,11 @@ class ImageSegmentTrainDataLoader(DataLoader):
             seg_path = self.seg_files[self.shuffled_vector[files_index]]
 
             # judge the path
-            if os.path.exists(img_path):
-                raise ("{} not exists.".format(img_path))
+            if not os.path.exists(img_path):
+                print ("{} not exists.".format(img_path))
 
-            if os.path.exists(seg_path):
-                raise ("{} not exists.".format(seg_path))
+            if not os.path.exists(seg_path):
+                print ("{} not exists.".format(seg_path))
 
             img = cv2.imread(img_path)  # BGR
             seg = Image.open(seg_path)

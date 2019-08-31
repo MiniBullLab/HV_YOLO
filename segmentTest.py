@@ -1,29 +1,26 @@
-import config
+from config import configSegment
 import time
 from data_loader import *
 from utility.utils import *
-from model.modelParse import ModelParse
+from utility.torchModelProcess import TorchModelProcess
 from loss.enetLoss import cross_entropy2dDet
-
 from utility.metrics import runningScore
 
-def main(cfg, weights_path, img_size, valPath):
+def main(cfgPath, weights_path, img_size, valPath):
 
     running_metrics = runningScore(2)
-    # init model
-    modelParse = ModelParse()
-    model = modelParse.parse(cfg)
+    torchModelProcess = TorchModelProcess()
 
-    model.load_state_dict(weights_path)
-    model.cuda().eval()
+    model = torchModelProcess.initModel(cfgPath, 0)
+    model.setFreezeBn(True)
+    torchModelProcess.loadLatestModelWeight(weights_path, model)
+    torchModelProcess.modelTestInit(model)
 
-    dataloader = ImageSegmentValDataLoader(valPath, batch_size=config.test_batch_size, img_size=img_size)
+    dataloader = ImageSegmentValDataLoader(valPath, batch_size=configSegment.test_batch_size, img_size=img_size)
     print("Eval data num: {}".format(len(dataloader)))
 
     prev_time = time.time()
     for i, (img, segMap_val) in enumerate(dataloader):
-        # print('%g/%g' % (i + 1, len(dataloader)), end=' ')
-
         # Get detections
         with torch.no_grad():
             output = model(img.cuda())[0]

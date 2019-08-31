@@ -13,8 +13,8 @@ class TorchModelProcess():
         self.torchDeviceProcess = TorchDeviceProcess()
         self.modelParse = ModelParse()
 
-    def initModel(self, cfgPath):
-        self.torchDeviceProcess.initTorch();
+    def initModel(self, cfgPath, gpuId):
+        self.torchDeviceProcess.initTorch(gpuId)
         model = self.modelParse.parse(cfgPath, freezeBn=False)
         return model
 
@@ -26,7 +26,7 @@ class TorchModelProcess():
             print("Loading %s fail" % weightPath)
 
     def loadLatestModelWeight(self, weightPath, model):
-        count = self.torchDeviceProcess.getCUDACount();
+        count = self.torchDeviceProcess.getCUDACount()
         checkpoint = None
         if os.path.exists(weightPath):
             if count > 1:
@@ -43,7 +43,7 @@ class TorchModelProcess():
     def saveLatestModel(self, latestWeightsFile, model, optimizer, epoch=0, best_mAP=0):
         # Save latest checkpoint
         checkpoint = {'epoch': epoch,
-                      'best_mAP': best_mAP,
+                      'best_value': best_mAP,
                       'model': model.state_dict(),
                       'optimizer': optimizer.state_dict()}
         torch.save(checkpoint, latestWeightsFile)
@@ -53,10 +53,10 @@ class TorchModelProcess():
         if count > 1:
             print('Using ', count, ' GPUs')
             model = nn.DataParallel(model)
-        model.to(TorchDeviceProcess.device).train()
+        model.to(self.torchDeviceProcess.device).train()
 
     def modelTestInit(self, model):
-        model.to(TorchDeviceProcess.device).eval()
+        model.to(self.torchDeviceProcess.device).eval()
 
     def convert_state_dict(self, state_dict):
         """Converts a state dict saved from a dataParallel module to normal
@@ -69,3 +69,6 @@ class TorchModelProcess():
             name = k[7:]  # remove `module.`
             new_state_dict[name] = v
         return new_state_dict
+
+    def getDevice(self):
+        return self.torchDeviceProcess.device

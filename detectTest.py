@@ -5,9 +5,8 @@ from optparse import OptionParser
 from utility.evaluatingOfmAp import *
 from data_loader import *
 from utility.torchModelProcess import TorchModelProcess
-from utility.torchDeviceProcess import TorchDeviceProcess
 from utility.nonMaximumSuppression import *
-import config.config as config
+from config import detectConfig
 
 def parse_arguments():
 
@@ -44,15 +43,15 @@ def detectTest(valPath, cfgPath, weights_path):
 
     torchModelProcess = TorchModelProcess()
 
-    model = torchModelProcess.initModel(cfgPath)
+    model = torchModelProcess.initModel(cfgPath, 0)
     model.setFreezeBn(True)
 
-    evaluator = MeanApEvaluating(valPath)
+    evaluator = MeanApEvaluating(valPath, detectConfig.className)
 
     torchModelProcess.loadLatestModelWeight(weights_path, model)
     torchModelProcess.modelTestInit(model)
 
-    dataloader = ImageDetectValDataLoader(valPath, batch_size=1, img_size=config.imgSize)
+    dataloader = ImageDetectValDataLoader(valPath, batch_size=1, img_size=detectConfig.imgSize)
 
     prev_time = time.time()
     for i, (img_path, img) in enumerate(dataloader):
@@ -60,7 +59,7 @@ def detectTest(valPath, cfgPath, weights_path):
 
         # Get detections
         with torch.no_grad():
-            output = model(img.to(TorchDeviceProcess.device))
+            output = model(img.to(torchModelProcess.getDevice()))
             preds = []
             for i in range(0, 3):
                 predEach = model.lossList[i](output[i])
@@ -69,18 +68,18 @@ def detectTest(valPath, cfgPath, weights_path):
             pred = pred[pred[:, :, 4] > 5e-3]
 
             if len(pred) > 0:
-                detections = non_max_suppression(pred.unsqueeze(0), 5e-3, config.nmsThresh) # select nms method (or, and, soft-nms)
+                detections = non_max_suppression(pred.unsqueeze(0), 5e-3, detectConfig.nmsThresh) # select nms method (or, and, soft-nms)
 
         print('Batch %d... Done. (%.3fs)' % (i, time.time() - prev_time))
         prev_time = time.time()
 
         img = cv2.imread(img_path)
         # The amount of padding that was added
-        pad_x = 0 if (config.imgSize[0]/img.shape[1]) < (config.imgSize[1]/img.shape[0]) else config.imgSize[0] - config.imgSize[1] / img.shape[0] * img.shape[1]
-        pad_y = 0 if (config.imgSize[0]/img.shape[1]) > (config.imgSize[1]/img.shape[0]) else config.imgSize[1] - config.imgSize[0] / img.shape[1] * img.shape[0]
+        pad_x = 0 if (detectConfig.imgSize[0]/img.shape[1]) < (detectConfig.imgSize[1]/img.shape[0]) else detectConfig.imgSize[0] - detectConfig.imgSize[1] / img.shape[0] * img.shape[1]
+        pad_y = 0 if (detectConfig.imgSize[0]/img.shape[1]) > (detectConfig.imgSize[1]/img.shape[0]) else detectConfig.imgSize[1] - detectConfig.imgSize[0] / img.shape[1] * img.shape[0]
         # Image height and width after padding is removed
-        unpad_h = config.imgSize[1] - pad_y
-        unpad_w = config.imgSize[0] - pad_x
+        unpad_h = detectConfig.imgSize[1] - pad_y
+        unpad_w = detectConfig.imgSize[0] - pad_x
 
         path, fileNameAndPost = os.path.split(img_path)
         fileName, post = os.path.splitext(fileNameAndPost)
@@ -97,9 +96,9 @@ def detectTest(valPath, cfgPath, weights_path):
                 x1, y1, x2, y2 = max(x1, 1.0), max(y1, 1.0), min(x2, img.shape[1]-1.0), min(y2, img.shape[0]-1.0)
 
                 # write to file
-                for i in range(0, len(config.className)):
+                for i in range(0, len(detectConfig.className)):
                     if int(cls_pred.cpu().numpy()) == i:
-                        with open("./results/comp4_det_test_" + config.className[i] + ".txt", 'a') as file:
+                        with open("./results/comp4_det_test_" + detectConfig.className[i] + ".txt", 'a') as file:
                             file.write(
                                 "{} {} {} {} {} {}\n".format(fileName, cls_conf * conf, x1, y1, x2, y2))
 

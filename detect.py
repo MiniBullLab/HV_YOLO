@@ -4,9 +4,8 @@ from optparse import OptionParser
 from data_loader import *
 from utility.utils import *
 from utility.torchModelProcess import TorchModelProcess
-from utility.torchDeviceProcess import TorchDeviceProcess
 from utility.nonMaximumSuppression import *
-import config.config as config
+from config import detectConfig
 
 def parse_arguments():
 
@@ -38,15 +37,15 @@ def parse_arguments():
     return options
 
 def detect(imageFolder, cfgPath, weightsPath):
-    torchModelProcess = TorchModelProcess()
 
-    model = torchModelProcess.initModel(cfgPath)
+    torchModelProcess = TorchModelProcess()
+    model = torchModelProcess.initModel(cfgPath, 0)
     model.setFreezeBn(True)
 
     torchModelProcess.loadLatestModelWeight(weightsPath, model)
     torchModelProcess.modelTestInit(model)
 
-    dataloader = ImagesLoader(imageFolder, batch_size=1, img_size=config.imgSize)
+    dataloader = ImagesLoader(imageFolder, batch_size=1, img_size=detectConfig.imgSize)
     #dataloader = VideoLoader(opt.image_folder, batch_size=1, img_size=opt.img_size)
 
     for i, (oriImg, img) in enumerate(dataloader):
@@ -55,26 +54,26 @@ def detect(imageFolder, cfgPath, weightsPath):
         # Get detections
         detections = []
         with torch.no_grad():
-            output = model(img.to(TorchDeviceProcess.device))
+            output = model(img.to(torchModelProcess.getDevice()))
             preds = []
             for i in range(0, 3):
                 predEach = model.lossList[i](output[i])
                 preds.append(predEach)
             pred = torch.cat(preds, 1)
-            pred = pred[pred[:, :, 4] > config.confThresh]
+            pred = pred[pred[:, :, 4] > detectConfig.confThresh]
 
             if len(pred) > 0:
-                detections = non_max_suppression(pred.unsqueeze(0), config.confThresh, config.nmsThresh)
+                detections = non_max_suppression(pred.unsqueeze(0), detectConfig.confThresh, detectConfig.nmsThresh)
 
         print('Batch %d... Done. (%.3fs)' % (i, time.time() - prev_time))
 
         # The amount of padding that was added
-        pad_x = 0 if (config.imgSize[0]/oriImg.shape[1]) < (config.imgSize[1]/oriImg.shape[0]) else config.imgSize[0] - config.imgSize[1] / oriImg.shape[0] * oriImg.shape[1]
-        pad_y = 0 if (config.imgSize[0]/oriImg.shape[1]) > (config.imgSize[1]/oriImg.shape[0]) else config.imgSize[1] - config.imgSize[0] / oriImg.shape[1] * oriImg.shape[0]
+        pad_x = 0 if (detectConfig.imgSize[0]/oriImg.shape[1]) < (detectConfig.imgSize[1]/oriImg.shape[0]) else detectConfig.imgSize[0] - detectConfig.imgSize[1] / oriImg.shape[0] * oriImg.shape[1]
+        pad_y = 0 if (detectConfig.imgSize[0]/oriImg.shape[1]) > (detectConfig.imgSize[1]/oriImg.shape[0]) else detectConfig.imgSize[1] - detectConfig.imgSize[0] / oriImg.shape[1] * oriImg.shape[0]
 
         # Image height and width after padding is removed
-        unpad_h = config.imgSize[1] - pad_y
-        unpad_w = config.imgSize[0] - pad_x
+        unpad_h = detectConfig.imgSize[1] - pad_y
+        unpad_w = detectConfig.imgSize[0] - pad_x
 
         # Draw bounding boxes and labels of detections
         if detections[0] is not None:

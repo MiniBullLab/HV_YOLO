@@ -4,32 +4,37 @@ import numpy as np
 
 class TorchDeviceProcess():
 
-    device = "cuda:0"
-    cuda = None
-
     def __init__(self):
-        self.cude = None
-        self.count = 1
+        self.cuda = None
+        self.device = "cpu"
+        self.hasCUDA()
+        self.setGpuId(0)
 
-    @classmethod
-    def hasCUDA(cls):
-        cls.cuda = torch.cuda.is_available()
-        if cls.cuda:
-            cls.device = "cuda:0"
+    def hasCUDA(self):
+        self.cuda = torch.cuda.is_available()
+        if self.cuda:
             return True
         else:
-            cls.device = "cpu"
             return False
 
-    def getCUDACount(self):
-        self.count = torch.cuda.device_count()
-        return self.count
+    def setGpuId(self, id):
+        if self.cuda:
+            count = self.getCUDACount()
+            if id >= 0 and id < count:
+                self.device = "cuda:%d" % id
+        else:
+            self.device = "cpu"
 
-    def initTorch(self):
+    def getCUDACount(self):
+        count = torch.cuda.device_count()
+        return count
+
+    def initTorch(self, gpuId):
         random.seed(0)
         np.random.seed(0)
         torch.manual_seed(0)
         if self.hasCUDA():
+            self.setGpuId(gpuId)
             torch.cuda.manual_seed(0)
             torch.cuda.manual_seed_all(0)
             torch.backends.cudnn.benchmark = True

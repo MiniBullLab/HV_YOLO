@@ -3,16 +3,16 @@ import sys
 sys.path.insert(0, os.getcwd() + "/..")
 from helper import XMLProcess
 from .dataLoader import *
-import config.config as config
 from utility.utils import xyxy2xywh
 from .trainDataProcess import TrainDataProcess
 
 class ImageDetectTrainDataLoader(DataLoader):
-    def __init__(self, trainPath, batchSize=1, imageSize=[768, 320], \
+    def __init__(self, trainPath, className, batchSize=1, imageSize=(768, 320), \
                  multi_scale=False, augment=False, balancedSample=False):
         super().__init__(trainPath)
         path, _ = os.path.split(trainPath)
         self.dataPath = path
+        self.className = className
         self.xmlProcess = XMLProcess()
         self.trainDataProcess = TrainDataProcess()
         self.multi_scale = multi_scale
@@ -44,12 +44,12 @@ class ImageDetectTrainDataLoader(DataLoader):
             raise StopIteration
 
         if self.balancedSample:
-            randomLabel = np.random.randint(0, len(config.className))
-            print("loading labels {}".format(config.className[randomLabel]))
-            balanced_file = self.balancedFiles[config.className[randomLabel]]
+            randomLabel = np.random.randint(0, len(self.className))
+            print("loading labels {}".format(self.className[randomLabel]))
+            balanced_file = self.balancedFiles[self.className[randomLabel]]
             ia = int(self.balancedCount[randomLabel])
             self.balancedCount[randomLabel] = (self.balancedCount[randomLabel] + self.batch_size) % \
-                                              self.balanceFileCount[config.className[randomLabel]]
+                                              self.balanceFileCount[self.className[randomLabel]]
         else:
             ia = self.count * self.batch_size
 
@@ -68,8 +68,8 @@ class ImageDetectTrainDataLoader(DataLoader):
         labels_all = []
         for index, files_index in enumerate(range(ia, ia + self.batch_size)):
             if self.balancedSample:
-                trainFileIndex = files_index % self.balanceFileCount[config.className[randomLabel]]
-                img_path, label_path = balanced_file[self.shuffled_vectors[config.className[randomLabel]][trainFileIndex]]
+                trainFileIndex = files_index % self.balanceFileCount[self.className[randomLabel]]
+                img_path, label_path = balanced_file[self.shuffled_vectors[self.className[randomLabel]][trainFileIndex]]
             else:
                 trainFileIndex = files_index % self.nF
                 img_path, label_path = self.imageAndLabelList[self.shuffled_vector[trainFileIndex]]
@@ -128,22 +128,22 @@ class ImageDetectTrainDataLoader(DataLoader):
     def getBlanceFileList(self):
         blancedFileList = {}
         blancedFileCount = {}
-        for i in range(0, len(config.className)):
-            classFile = config.className[i] + ".txt"
+        for i in range(0, len(self.className)):
+            classFile = self.className[i] + ".txt"
             calssFilePath = os.path.join(self.dataPath, classFile)
-            blancedFileList[config.className[i]] = self.getImageAndAnnotationList(calssFilePath)
-            blancedFileCount[config.className[i]] = len(blancedFileList[config.className[i]])
+            blancedFileList[self.className[i]] = self.getImageAndAnnotationList(calssFilePath)
+            blancedFileCount[self.className[i]] = len(blancedFileList[self.className[i]])
         return blancedFileList, blancedFileCount
 
     def getResizeLabels(self, boxes, ratio, pad):
         result = np.array([])
-        allNames = [box.name for box in boxes if box.name in config.className]
+        allNames = [box.name for box in boxes if box.name in self.className]
         if len(allNames) > 0:
             result = np.zeros((len(allNames), 5), dtype=np.float32)
             index = 0
             for box in boxes:
-                if box.name in config.className:
-                    classId = config.className.index(box.name)
+                if box.name in self.className:
+                    classId = self.className.index(box.name)
                     minX = ratio * box.min_corner.x + pad[0] // 2
                     minY = ratio * box.min_corner.y + pad[1] // 2
                     maxX = ratio * box.max_corner.x + pad[0] // 2
@@ -154,11 +154,11 @@ class ImageDetectTrainDataLoader(DataLoader):
 
     def shuffledImages(self):
         if self.balancedSample:
-            self.balancedCount = np.zeros(len(config.className))
+            self.balancedCount = np.zeros(len(self.className))
             self.shuffled_vectors = {}
-            for i in range(0, len(config.className)):
-                self.shuffled_vectors[config.className[i]] = \
-                    np.random.permutation(self.balanceFileCount[config.className[i]])
+            for i in range(0, len(self.className)):
+                self.shuffled_vectors[self.className[i]] = \
+                    np.random.permutation(self.balanceFileCount[self.className[i]])
         else:
             self.shuffled_vector = np.random.permutation(self.nF)
 
