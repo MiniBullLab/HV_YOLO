@@ -1,4 +1,0 @@
-train = /home/lpj/github/data/VOCdevkit/Berkeley/ImageSets/train.txt
-valid = /home/lpj/github/data/VOCdevkit/Berkeley/ImageSets/val.txt
-backup = backup
-

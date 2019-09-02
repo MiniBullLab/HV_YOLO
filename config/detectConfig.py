@@ -10,7 +10,7 @@ net_config_path = "./cfg/shufflenetV2-0.5_spp_BerkeleyAll.cfg"
 snapshotPath = "./snapshot/"
 maxEpochs = 300
 
-resume = True
+resume = False
 
 optimType = 'poly'
 base_lr = 2e-4

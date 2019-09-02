@@ -1,12 +1,41 @@
 from config import configSegment
-import time
+import os, time
+from optparse import OptionParser
 from data_loader import *
 from utility.utils import *
 from utility.torchModelProcess import TorchModelProcess
-from loss.enetLoss import cross_entropy2dDet
 from utility.metrics import runningScore
 
-def main(cfgPath, weights_path, img_size, valPath):
+def parse_arguments():
+
+    parser = OptionParser()
+    parser.description = "This program test model"
+
+    parser.add_option("-i", "--valPath", dest="valPath",
+                      metavar="PATH", type="string", default="./val.txt",
+                      help="path to data config file")
+
+    parser.add_option("-c", "--cfg", dest="cfg",
+                      metavar="PATH", type="string", default="cfg/mobileFCN.cfg",
+                      help="cfg file path")
+
+    parser.add_option("-w", "--weights", dest="weights",
+                      metavar="PATH", type="string", default="weights/latest.pt",
+                      help="path to store weights")
+
+    (options, args) = parser.parse_args()
+
+    if options.valPath:
+        if not os.path.exists(options.valPath):
+            parser.error("Could not find the input val file")
+        else:
+            options.input_path = os.path.normpath(options.valPath)
+    else:
+        parser.error("'valPath' option is required to run this program")
+
+    return options
+
+def segmentTest(valPath, cfgPath, weights_path):
 
     running_metrics = runningScore(2)
     torchModelProcess = TorchModelProcess()
@@ -16,7 +45,7 @@ def main(cfgPath, weights_path, img_size, valPath):
     torchModelProcess.loadLatestModelWeight(weights_path, model)
     torchModelProcess.modelTestInit(model)
 
-    dataloader = ImageSegmentValDataLoader(valPath, batch_size=configSegment.test_batch_size, img_size=img_size)
+    dataloader = ImageSegmentValDataLoader(valPath, batch_size=configSegment.test_batch_size, img_size=configSegment.imgSize)
     print("Eval data num: {}".format(len(dataloader)))
 
     prev_time = time.time()
@@ -30,9 +59,22 @@ def main(cfgPath, weights_path, img_size, valPath):
             gt = segMap_val[0].data.cpu().numpy()
             running_metrics.update(gt, pred)
 
+        print('Batch %d... Done. (%.3fs)' % (i, time.time() - prev_time))
+        prev_time = time.time()
+
     score, class_iou = running_metrics.get_scores()
     for k, v in score.items():
         print(k, v)
     running_metrics.reset()
 
     return score, class_iou
+
+def main():
+    print("process start...")
+    torch.cuda.empty_cache()
+    options = parse_arguments()
+    segmentTest(options.valPath, options.cfg, options.weights)
+    print("process end!")
+
+if __name__ == '__main__':
+    main()

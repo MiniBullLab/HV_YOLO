@@ -1,3 +1,6 @@
+import os
+import sys
+sys.path.insert(0, os.getcwd() + "/..")
 from utility.model_summary import summary
 from model.modelParse import ModelParse
 

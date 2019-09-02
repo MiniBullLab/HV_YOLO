@@ -100,7 +100,7 @@ def detectTrain(trainPath, valPath, cfgPath):
     #get dataloader
     dataloader = ImageDetectTrainDataLoader(trainPath, detectConfig.className,
                                             detectConfig.train_batch_size, detectConfig.imgSize,
-                                            multi_scale=True, augment=True, balancedSample=True)
+                                            multi_scale=False, augment=True, balancedSample=True)
 
     avg_loss = -1
     checkpoint = None

@@ -5,7 +5,7 @@ from .baseBlock import *
 
 class ConvBNReLU(BaseBlock):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
-                 dilation=1, groups=1, relu6=False, norm_layer=nn.BatchNorm2d, **kwargs):
+                 dilation=1, groups=1, norm_layer=nn.BatchNorm2d, **kwargs):
         super().__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, \
                               stride, padding, dilation, groups, bias=False)
@@ -33,6 +33,22 @@ class ConvBNLeakyReLU(BaseBlock):
         x = self.conv(x)
         x = self.bn(x)
         x = self.leakyRelu(x)
+        return x
+
+class ConvSycnBnReLU(BaseBlock):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
+                 dilation=1, groups=1, norm_layer=nn.SyncBatchNorm, **kwargs):
+        super().__init__()
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, \
+                              stride, padding, dilation, groups, bias=False)
+        self.bn = norm_layer(out_channels)
+        self.relu = nn.ReLU()
+        self.setModelName("ConvBNReLU")
+
+    def forward(self, x):
+        x = self.conv(x)
+        x = self.bn(x)
+        x = self.relu(x)
         return x
 
 # -----------------------------------------------------------------
