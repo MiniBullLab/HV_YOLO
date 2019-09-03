@@ -1,6 +1,10 @@
-# MobileNetV2 in PyTorch.
-from .baseBlock import *
-from .moduleBlock import InvertedResidual
+# MobileNetV2 in PyTorch
+import os
+import sys
+sys.path.insert(0, os.getcwd() + "/..")
+from base_block.utilityBlock import InvertedResidual
+from .baseModelName import BaseModelName
+from .baseModel import *
 
 class ConvBNReLU(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
@@ -16,10 +20,10 @@ class ConvBNReLU(nn.Module):
         x = self.relu(x)
         return x
 
-class MobileNetV2(BaseBlock):
+class MobileNetV2(BaseModel):
     def __init__(self, width_mult=1.0, dilated=False, norm_layer=nn.BatchNorm2d, **kwargs):
         super().__init__()
-        self.setModelName("MobileNetV2")
+        self.setModelName(BaseModelName.MobileNetV2)
         layer1_setting = [
             # t, c, n, s
             [1, 16, 1, 1]]

@@ -1,7 +1,7 @@
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
-from .moduleType import *
+from .modelName import  ModelName
 from .myModel import MyModel
 from .mobileV2FCN import MobileV2FCN
 
@@ -38,6 +38,6 @@ class ModelParse():
 
     def getModel(self, modelName):
         model = None
-        if modelName == ModuleName.MobileV2FCN:
+        if modelName == ModelName.MobileV2FCN:
             model = MobileV2FCN()
         return model

@@ -2,8 +2,8 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 import torch.nn as nn
-from .moduleType import ModuleType
-from base_model.baseLayer import EmptyLayer, Upsample, GlobalAvgPool2d
+from base_block.baseBlock import ModuleType
+from base_block.baseLayer import EmptyLayer, Upsample, GlobalAvgPool2d
 from loss import *
 
 class CreateModuleList():

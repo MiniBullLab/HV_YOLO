@@ -1,12 +1,13 @@
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
-from base_model.baseBlock import *
+from base_model.baseModel import *
 from collections import defaultdict
 from .createModelList import *
+from base_block.baseBlock import ModuleType
 from .baseModelFactory import BaseModelFactory
 
-class MyModel(BaseBlock):
+class MyModel(BaseModel):
 
     def __init__(self, modelDefine, freezeBn=False):
         super().__init__()

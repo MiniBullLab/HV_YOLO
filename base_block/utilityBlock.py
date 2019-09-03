@@ -6,12 +6,11 @@ from .baseBlock import *
 class ConvBNReLU(BaseBlock):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
                  dilation=1, groups=1, norm_layer=nn.BatchNorm2d, **kwargs):
-        super().__init__()
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, \
+        super().__init__(ModuleType.ConvBNReLU)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size,
                               stride, padding, dilation, groups, bias=False)
         self.bn = norm_layer(out_channels)
         self.relu = nn.ReLU()
-        self.setModelName("ConvBNReLU")
 
     def forward(self, x):
         x = self.conv(x)
@@ -22,12 +21,11 @@ class ConvBNReLU(BaseBlock):
 class ConvBNLeakyReLU(BaseBlock):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
                  dilation=1, groups=1, norm_layer=nn.BatchNorm2d, **kwargs):
-        super().__init__()
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size,\
+        super().__init__(ModuleType.ConvBNLeakyReLU)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size,
                               stride, padding, dilation, groups, bias=False)
         self.bn = norm_layer(out_channels)
         self.leakyRelu = nn.LeakyReLU(0.1)
-        self.setModelName("ConvBNLeakyReLU")
 
     def forward(self, x):
         x = self.conv(x)
@@ -35,21 +33,21 @@ class ConvBNLeakyReLU(BaseBlock):
         x = self.leakyRelu(x)
         return x
 
-class ConvSycnBnReLU(BaseBlock):
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
-                 dilation=1, groups=1, norm_layer=nn.SyncBatchNorm, **kwargs):
-        super().__init__()
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, \
-                              stride, padding, dilation, groups, bias=False)
-        self.bn = norm_layer(out_channels)
-        self.relu = nn.ReLU()
-        self.setModelName("ConvBNReLU")
-
-    def forward(self, x):
-        x = self.conv(x)
-        x = self.bn(x)
-        x = self.relu(x)
-        return x
+# class ConvSycnBnReLU(BaseBlock):
+#     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
+#                  dilation=1, groups=1, norm_layer=nn.SyncBatchNorm, **kwargs):
+#         super().__init__()
+#         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, \
+#                               stride, padding, dilation, groups, bias=False)
+#         self.bn = norm_layer(out_channels)
+#         self.relu = nn.ReLU()
+#         self.setModelName("ConvBNReLU")
+#
+#     def forward(self, x):
+#         x = self.conv(x)
+#         x = self.bn(x)
+#         x = self.relu(x)
+#         return x
 
 # -----------------------------------------------------------------
 #                      For MobileNetV2
@@ -57,7 +55,7 @@ class ConvSycnBnReLU(BaseBlock):
 class InvertedResidual(BaseBlock):
     def __init__(self, in_channels, out_channels, stride, expand_ratio,
                  dilation=1, norm_layer=nn.BatchNorm2d, **kwargs):
-        super().__init__()
+        super().__init__(ModuleType.InvertedResidual)
         assert stride in [1, 2]
         self.use_res_connect = stride == 1 and in_channels == out_channels
 
@@ -74,7 +72,6 @@ class InvertedResidual(BaseBlock):
             nn.Conv2d(inter_channels, out_channels, 1, bias=False),
             norm_layer(out_channels)])
         self.conv = nn.Sequential(*layers)
-        self.setModelName("InvertedResidual")
 
     def forward(self, x):
         if self.use_res_connect:
@@ -85,12 +82,12 @@ class InvertedResidual(BaseBlock):
 # -----------------------------------------------------------------
 #                      For Resnet
 # -----------------------------------------------------------------
-class residualBasciNeck(BaseBlock):
+class ResidualBasciNeck(BaseBlock):
 
     expansion = 1
 
     def __init__(self, inplanes, planes, stride=1):
-        super().__init__()
+        super().__init__(ModuleType.ResidualBasciNeck)
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=3, stride=stride,
                      padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
@@ -99,7 +96,6 @@ class residualBasciNeck(BaseBlock):
                   padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(planes)
         self.stride = stride
-        self.setModelName("residualBasciNeck")
 
     def forward(self, x):
         residual = x
@@ -116,11 +112,11 @@ class residualBasciNeck(BaseBlock):
 
         return out
 
-class residualBottleneck(BaseBlock):
+class ResidualBottleneck(BaseBlock):
     expansion = 4
 
     def __init__(self, inplanes, planes, stride=1):
-        super(residualBottleneck, self).__init__()
+        super().__init__(ModuleType.ResidualBottleneck)
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
         self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
@@ -130,7 +126,6 @@ class residualBottleneck(BaseBlock):
         self.bn3 = nn.BatchNorm2d(planes * 4)
         self.relu = nn.ReLU(inplace=True)
         self.stride = stride
-        self.setModelName("residualBottleneck")
 
     def forward(self, x):
         residual = x
@@ -156,7 +151,7 @@ class residualBottleneck(BaseBlock):
 # -----------------------------------------------------------------
 class SEBlock(BaseBlock):
     def __init__(self, channel, reduction=16):
-        super().__init__()
+        super().__init__(ModuleType.SEBlock)
         self.avg_pool = GlobalAvgPool2d()
         self.fc = nn.Sequential(
             nn.Linear(channel, channel // reduction),
@@ -177,7 +172,7 @@ class testNet(nn.Module):
     def __init__(self):
         super(testNet, self).__init__()
 
-        self.conv1 = residualBottleneck(16, 4, 1)
+        self.conv1 = ResidualBottleneck(16, 4, 1)
         # self.conv1 = residualBasciNeck(16, 16, 1)
         # self.conv1 = InvertedResidual(16, 16, 1, 2)
         self.globalPool = GlobalAvgPool2d()

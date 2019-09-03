@@ -2,17 +2,18 @@ import os
 import sys
 import numpy as np
 sys.path.insert(0, os.getcwd() + "/..")
-from base_model.baseBlock import *
-from base_model.baseLayer import EmptyLayer, Upsample
-from base_model.moduleBlock import ConvBNReLU
+from base_block.baseLayer import EmptyLayer, Upsample
+from base_block.utilityBlock import ConvBNReLU
 from base_model.mobilenetv2 import MobileNetV2
+from base_model.baseModel import *
+from .modelName import ModelName
 
-class MobileV2FCN(BaseBlock):
+class MobileV2FCN(BaseModel):
     """YOLOv3 object detection model"""
 
     def __init__(self, classNum = 2, freeze_bn=False):
         super().__init__()
-        self.setModelName("MobileV2FCN")
+        self.setModelName(ModelName.MobileV2FCN)
 
         self.basicModel = MobileNetV2(width_mult=1.0)
         basicModelChannels = self.basicModel.out_channels
