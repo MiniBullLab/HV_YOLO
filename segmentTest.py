@@ -1,10 +1,10 @@
-from config import configSegment
 import os, time
 from optparse import OptionParser
 from data_loader import *
 from utility.utils import *
 from utility.torchModelProcess import TorchModelProcess
 from utility.metrics import runningScore
+from config import segmentConfig
 
 def parse_arguments():
 
@@ -45,7 +45,8 @@ def segmentTest(valPath, cfgPath, weights_path):
     torchModelProcess.loadLatestModelWeight(weights_path, model)
     torchModelProcess.modelTestInit(model)
 
-    dataloader = ImageSegmentValDataLoader(valPath, batch_size=configSegment.test_batch_size, img_size=configSegment.imgSize)
+    dataloader = ImageSegmentValDataLoader(valPath, batch_size=segmentConfig.test_batch_size,
+                                           img_size=segmentConfig.imgSize)
     print("Eval data num: {}".format(len(dataloader)))
 
     prev_time = time.time()

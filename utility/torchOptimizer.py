@@ -114,7 +114,6 @@ def main():
     for epoch in range(0, 5):
         print("epoch {}...............".format(epoch))
         optimizerMethod = torchOptimizer(model, epoch, optimizerM)
-
         optimizerMethod.adjust_optimizer()
 
 if __name__ == "__main__":

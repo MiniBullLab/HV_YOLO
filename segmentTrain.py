@@ -9,7 +9,7 @@ from loss.focalloss import focalLoss
 from utility.lr_policy import PolyLR
 from utility.torchModelProcess import TorchModelProcess
 from utility.logger import AverageMeter, Logger
-from config import configSegment
+from config import segmentConfig
 import segmentTest
 
 def parse_arguments():
@@ -55,7 +55,7 @@ def testModel(valPath, cfgPath, weights_path, epoch):
         # file.write('%11.3g' * 2 % (mAP, aps[0]) + '\n')
         file.write("Epoch: {} | mIoU: {:.3f} | ".format(epoch, score['Mean IoU : \t']))
         for i, iou in enumerate(class_iou):
-            file.write(configSegment.className[i] + ": {:.3f} ".format(iou))
+            file.write(segmentConfig.className[i] + ": {:.3f} ".format(iou))
         file.write("\n")
 
     return score, class_iou
@@ -63,8 +63,8 @@ def testModel(valPath, cfgPath, weights_path, epoch):
 def initOptimizer(model, checkpoint):
     start_epoch = 0
     bestmIoU = -1
-    optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=configSegment.base_lr,
-                                momentum=configSegment.momentum, weight_decay=configSegment.weight_decay)
+    optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=segmentConfig.base_lr,
+                                momentum=segmentConfig.momentum, weight_decay=segmentConfig.weight_decay)
     if checkpoint:
         start_epoch = checkpoint['epoch'] + 1
         if checkpoint.get('optimizer'):
@@ -73,20 +73,10 @@ def initOptimizer(model, checkpoint):
             bestmIoU = checkpoint['best_value']
     return start_epoch, bestmIoU, optimizer
 
-def saveBestModel(score, bestmIoU, latest_weights_file, best_weights_file):
-    if score >= bestmIoU:
-        bestmIoU = score
-        os.system('cp {} {}'.format(
-            latest_weights_file,
-            best_weights_file,
-        ))
-    return bestmIoU
-
 def segmentTrain(trainPath, valPath, cfgPath):
-    if not os.path.exists(configSegment.snapshotPath):
-        os.makedirs(configSegment.snapshotPath, exist_ok=True)
-    latest_weights_file = os.path.join(configSegment.snapshotPath, 'latest.pt')
-    best_weights_file = os.path.join(configSegment.snapshotPath, 'best.pt')
+
+    if not os.path.exists(segmentConfig.snapshotPath):
+        os.makedirs(segmentConfig.snapshotPath, exist_ok=True)
 
     torchModelProcess = TorchModelProcess()
 
@@ -94,12 +84,12 @@ def segmentTrain(trainPath, valPath, cfgPath):
     logger = Logger(os.path.join("./weights", "logs"))
 
     # Get dataloader
-    dataloader = ImageSegmentTrainDataLoader(trainPath, batch_size=configSegment.train_batch_size,
-                                            img_size=configSegment.imgSize, augment=True)
+    dataloader = ImageSegmentTrainDataLoader(trainPath, batch_size=segmentConfig.train_batch_size,
+                                            img_size=segmentConfig.imgSize, augment=True)
 
     # set learning policy
-    total_iteration = configSegment.maxEpochs * len(dataloader)
-    polyLR = PolyLR(configSegment.base_lr, configSegment.lr_power, total_iteration)
+    total_iteration = segmentConfig.maxEpochs * len(dataloader)
+    polyLR = PolyLR(segmentConfig.base_lr, segmentConfig.lr_power, total_iteration)
 
     # model init
     model = torchModelProcess.initModel(cfgPath, 0)
@@ -113,18 +103,19 @@ def segmentTrain(trainPath, valPath, cfgPath):
     lossTrain = AverageMeter()
 
     checkpoint = None
-    if configSegment.resume is not None:
-        checkpoint = torchModelProcess.loadLatestModelWeight(latest_weights_file, model)
+    if segmentConfig.resume is not None:
+        checkpoint = torchModelProcess.loadLatestModelWeight(segmentConfig.latest_weights_file, model)
         torchModelProcess.modelTrainInit(model)
     else:
         torchModelProcess.modelTrainInit(model)
     start_epoch, bestmIoU, optimizer = initOptimizer(model, checkpoint)
+    torchModelProcess.setModelBestValue(bestmIoU)
 
     # summary the model
     # model_info(model)
 
     t0 = time.time()
-    for epoch in range(start_epoch, configSegment.maxEpochs):
+    for epoch in range(start_epoch, segmentConfig.maxEpochs):
         optimizer.zero_grad()
         for idx, (imgs, segments) in enumerate(dataloader):
 
@@ -141,22 +132,25 @@ def segmentTrain(trainPath, valPath, cfgPath):
             loss.backward()
 
             # accumulate gradient for x batches before optimizing
-            if ((idx + 1) % configSegment.accumulated_batches == 0) or (idx == len(dataloader) - 1):
+            if ((idx + 1) % segmentConfig.accumulated_batches == 0) or (idx == len(dataloader) - 1):
                 optimizer.step()
                 optimizer.zero_grad()
 
-            print('Epoch: {}/{}[{}/{}]\t Loss: {}\t Rate: {} \t Time: {}\t'.format(epoch, configSegment.maxEpochs - 1,\
+            print('Epoch: {}/{}[{}/{}]\t Loss: {}\t Rate: {} \t Time: {}\t'.format(epoch, segmentConfig.maxEpochs - 1,\
                    idx, len(dataloader), '%.3f' % loss, '%.7f' % optimizer.param_groups[0]['lr'], time.time() - t0))
 
             lossTrain.update(loss.data)
-            if (epoch * (len(dataloader) - 1) + idx) % configSegment.display == 0:
+            if (epoch * (len(dataloader) - 1) + idx) % segmentConfig.display == 0:
                 logger.scalar_summary("losstrain", lossTrain.avg, (epoch * (len(dataloader) - 1) + idx))
                 lossTrain.reset()
             t0 = time.time()
 
-        torchModelProcess.saveLatestModel(latest_weights_file, model, optimizer, epoch, bestmIoU)
-        score, class_iou = testModel(valPath, cfgPath, latest_weights_file, epoch)
-        bestmIoU = saveBestModel(score['Mean IoU : \t'], bestmIoU, latest_weights_file, best_weights_file)
+        torchModelProcess.saveLatestModel(segmentConfig.latest_weights_file, model,
+                                          optimizer, epoch, bestmIoU)
+        score, class_iou = testModel(valPath, cfgPath, segmentConfig.latest_weights_file, epoch)
+        bestmIoU = torchModelProcess.saveBestModel(score['Mean IoU : \t'],
+                                                   segmentConfig.latest_weights_file,
+                                                   segmentConfig.best_weights_file)
 
 def main():
     print("process start...")

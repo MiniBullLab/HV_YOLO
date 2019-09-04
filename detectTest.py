@@ -84,7 +84,7 @@ def detectTest(valPath, cfgPath, weights_path):
         path, fileNameAndPost = os.path.split(img_path)
         fileName, post = os.path.splitext(fileNameAndPost)
 
-        if detections[0] is not None:
+        if detections and detections[0] is not None:
             for x1, y1, x2, y2, conf, cls_conf, cls_pred in detections[0]:
                 # Rescale coordinates to original dimensions
                 box_h = ((y2 - y1) / unpad_h) * img.shape[0]

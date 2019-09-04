@@ -70,22 +70,10 @@ def initOptimizer(model, checkpoint):
             best_mAP = checkpoint['best_value']
     return start_epoch, best_mAP, optimizer
 
-def saveBestModel(mAP, best_mAP, latest_weights_file, best_weights_file):
-    if mAP >= best_mAP:
-        best_mAP = mAP
-        os.system('cp {} {}'.format(
-            latest_weights_file,
-            best_weights_file,
-        ))
-    return best_mAP
-
-
 def detectTrain(trainPath, valPath, cfgPath):
 
     if not os.path.exists(detectConfig.snapshotPath):
         os.makedirs(detectConfig.snapshotPath, exist_ok=True)
-    latest_weights_file = os.path.join(detectConfig.snapshotPath, 'latest.pt')
-    best_weights_file = os.path.join(detectConfig.snapshotPath, 'best.pt')
 
     torchModelProcess = TorchModelProcess()
 
@@ -105,11 +93,12 @@ def detectTrain(trainPath, valPath, cfgPath):
     avg_loss = -1
     checkpoint = None
     if detectConfig.resume:
-        checkpoint = torchModelProcess.loadLatestModelWeight(latest_weights_file, model)
+        checkpoint = torchModelProcess.loadLatestModelWeight(detectConfig.latest_weights_file, model)
         torchModelProcess.modelTrainInit(model)
     else:
         torchModelProcess.modelTrainInit(model)
     start_epoch, best_mAP, optimizer = initOptimizer(model, checkpoint)
+    torchModelProcess.setModelBestValue(best_mAP)
 
     # summary(model, [1, 3, 640, 352])
     t0 = time.time()
@@ -156,9 +145,11 @@ def detectTrain(trainPath, valPath, cfgPath):
 
             t0 = time.time()
 
-        torchModelProcess.saveLatestModel(latest_weights_file, model, optimizer, epoch, best_mAP)
-        mAP, aps = testModel(valPath, cfgPath, latest_weights_file, epoch)
-        best_mAP = saveBestModel(mAP, best_mAP, latest_weights_file, best_weights_file)
+        torchModelProcess.saveLatestModel(detectConfig.latest_weights_file, model,
+                                          optimizer, epoch, best_mAP)
+        mAP, aps = testModel(valPath, cfgPath, detectConfig.latest_weights_file, epoch)
+        best_mAP = torchModelProcess.saveBestModel(mAP, detectConfig.latest_weights_file,
+                                        detectConfig.best_weights_file)
 
 def main():
     print("process start...")

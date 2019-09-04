@@ -12,6 +12,7 @@ class TorchModelProcess():
     def __init__(self):
         self.torchDeviceProcess = TorchDeviceProcess()
         self.modelParse = ModelParse()
+        self.best_value = 0
 
     def initModel(self, cfgPath, gpuId):
         self.torchDeviceProcess.initTorch(gpuId)
@@ -47,6 +48,18 @@ class TorchModelProcess():
                       'model': model.state_dict(),
                       'optimizer': optimizer.state_dict()}
         torch.save(checkpoint, latestWeightsFile)
+
+    def setModelBestValue(self, value):
+        self.best_value = value
+
+    def saveBestModel(self, value, latest_weights_file, best_weights_file):
+        if value >= self.best_value:
+            self.best_value = value
+            os.system('cp {} {}'.format(
+                latest_weights_file,
+                best_weights_file,
+            ))
+        return self.best_value
 
     def modelTrainInit(self, model):
         count = self.torchDeviceProcess.getCUDACount()

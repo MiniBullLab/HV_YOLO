@@ -75,11 +75,7 @@ def detect(imageFolder, cfgPath, weightsPath):
         unpad_h = detectConfig.imgSize[1] - pad_y
         unpad_w = detectConfig.imgSize[0] - pad_x
 
-        # Draw bounding boxes and labels of detections
-        if detections[0] is not None:
-            # unique_classes = detections[:, -1].cpu().unique()
-            # bbox_colors = random.sample(ColorDefine.colors, len(unique_classes))
-
+        if detections and detections[0] is not None:
             for x1, y1, x2, y2, conf, cls_conf, cls_pred in detections[0]:
                 # Rescale coordinates to original dimensions
                 box_h = ((y2 - y1) / unpad_h) * oriImg.shape[0]

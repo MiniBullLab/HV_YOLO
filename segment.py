@@ -6,7 +6,7 @@ from data_loader import *
 from utility.torchModelProcess import TorchModelProcess
 from drawing.imageDraw import ImageDraw
 
-from config import configSegment
+from config import segmentConfig
 
 def parse_arguments():
 
@@ -44,8 +44,8 @@ def segment(imageFolder, cfgPath, weightsPath):
     torchModelProcess.loadLatestModelWeight(weightsPath, model)
     torchModelProcess.modelTestInit(model)
 
-    #dataloader = ImagesLoader(imageFolder, batch_size=1, img_size=configSegment.imgSize)
-    dataloader = VideoLoader(imageFolder, batch_size=1, img_size=configSegment.imgSize)
+    #dataloader = ImagesLoader(imageFolder, batch_size=1, img_size=segmentConfig.imgSize)
+    dataloader = VideoLoader(imageFolder, batch_size=1, img_size=segmentConfig.imgSize)
 
     prev_time = time.time()
     for i, (oriImg, img) in enumerate(dataloader):
@@ -58,7 +58,7 @@ def segment(imageFolder, cfgPath, weightsPath):
 
         # oriImage shape, input shape
         ori_w, ori_h = oriImg.shape[1], oriImg.shape[0]
-        pre_h, pre_w = configSegment.imgSize[1], configSegment.imgSize[0]
+        pre_h, pre_w = segmentConfig.imgSize[1], segmentConfig.imgSize[0]
 
         # segmentation
         segmentations = np.squeeze(output.data.max(1)[1].cpu().numpy(), axis=0)
@@ -73,7 +73,7 @@ def segment(imageFolder, cfgPath, weightsPath):
         segmentations = misc.imresize(segmentations, [ori_h, ori_w], 'nearest',
                                       mode='F')  # float32 with F mode, resize back to orig_size
         drawSeg = ImageDraw()
-        decoded = drawSeg.drawSegmentResult(oriImg, segmentations, configSegment.className)
+        decoded = drawSeg.drawSegmentResult(oriImg, segmentations, segmentConfig.className)
 
         cv2.namedWindow("image", 0)
         cv2.resizeWindow("image", int(decoded.shape[1] * 0.5), int(decoded.shape[0] * 0.5))

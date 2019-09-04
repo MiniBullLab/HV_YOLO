@@ -8,6 +8,8 @@ className = ['bike', 'bus', 'car', 'motor', 'person', 'rider', 'truck']
 ## detect
 net_config_path = "./cfg/shufflenetV2-0.5_spp_BerkeleyAll.cfg"
 snapshotPath = "./snapshot/"
+latest_weights_file = './snapshot/latest.pt'
+best_weights_file = './snapshot/best.pt'
 maxEpochs = 300
 
 resume = False

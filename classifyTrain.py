@@ -6,78 +6,85 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
-
+from optparse import OptionParser
 from data_loader import *
-from torch.utils.data import Dataset, DataLoader
-from model.modelParse import ModelParse
-import config as config
+from utility.torchModelProcess import TorchModelProcess
+from config import classifyConfig
 from utility.lr_policy import PolyLR
 
-cuda = torch.cuda.is_available()
+def parse_arguments():
 
-random.seed(0)
-np.random.seed(0)
-torch.manual_seed(0)
-if cuda:
-    torch.cuda.manual_seed(0)
-    torch.cuda.manual_seed_all(0)
-    torch.backends.cudnn.benchmark = True
+    parser = OptionParser()
+    parser.description = "This program train model"
 
-def main():
-    dataloader = ImageClassifyTrainDataLoader(config.trainList, batch_size=config.train_batch_size,
-                                            img_size=[32, 32])
+    parser.add_option("-i", "--trainPath", dest="trainPath",
+                      metavar="PATH", type="string", default="./train.txt",
+                      help="path to data config file")
+
+    parser.add_option("-v", "--valPath", dest="valPath",
+                      metavar="PATH", type="string", default="./val.txt",
+                      help="path to data config file")
+
+    parser.add_option("-c", "--cfg", dest="cfg",
+                      metavar="PATH", type="string", default="cfg/yolov3.cfg",
+                      help="cfg file path")
+
+    parser.add_option("-p", "--pretrainModel", dest="pretrainModel",
+                      metavar="PATH", type="string", default="weights/pretrain.pt",
+                      help="path to store weights")
+
+    (options, args) = parser.parse_args()
+
+    if options.trainPath:
+        if not os.path.exists(options.trainPath):
+            parser.error("Could not find the input train file")
+        else:
+            options.input_path = os.path.normpath(options.trainPath)
+    else:
+        parser.error("'trainPath' option is required to run this program")
+
+    return options
+
+def initOptimizer(model, checkpoint):
+    start_epoch = 0
+    best_mAP = -1
+    optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=classifyConfig.base_lr,\
+                                momentum=classifyConfig.momentum, weight_decay=classifyConfig.weight_decay)
+    if checkpoint:
+        start_epoch = checkpoint['epoch'] + 1
+        if checkpoint.get('optimizer'):
+            optimizer.load_state_dict(checkpoint['optimizer'])
+        if checkpoint.get('best_value'):
+            best_mAP = checkpoint['best_value']
+    return start_epoch, best_mAP, optimizer
+
+def main(trainPath, valPath, cfgPath):
+
+    torchModelProcess = TorchModelProcess()
+
+    model = torchModelProcess.initModel(cfgPath, 0)
+
+    dataloader = ImageClassifyTrainDataLoader(trainPath, batch_size=classifyConfig.train_batch_size,
+                                            img_size=(32, 32))
 
     # set lr_policy
-    total_iteration = config.maxEpochs * len(dataloader)
-    lr_policy = PolyLR(config.base_lr, config.lr_power, total_iteration)
+    total_iteration = classifyConfig.maxEpochs * len(dataloader)
+    lr_policy = PolyLR(classifyConfig.base_lr, classifyConfig.lr_power, total_iteration)
 
-    # Initialize model
-    modelParse = ModelParse()
-    model = modelParse.parse("./cfg/cifar100.cfg")
-
-    if config.pretainModel is not None:
-        if not os.path.exists(config.pretainModel):
-            raise Exception("Invaid path", config.pretainModel)
-        print("Loading pretainModel from {}".format(config.pretainModel))
-        model.load_state_dict(torch.load(config.pretainModel), strict=True)
-
-    if config.resume is not None:
-        if not os.path.exists(config.resume):
-            raise Exception("Invaid path", config.resume)
-        print("Loading resume from {}".format(config.resume))
-        if len(config.CUDA_DEVICE) > 1:
-            checkpoint = torch.load(latest_weights_file, map_location='cpu')
-            state = convert_state_dict(checkpoint['model'])
-            model.load_state_dict(state)
-        else:
-            checkpoint = torch.load(latest_weights_file, map_location='cpu')
-            model.load_state_dict(checkpoint['model'])
-
-        #if checkpoint['optimizer'] is not None:# and \
-                #len(optimizer.param_groups) == len(checkpoint['optimizer']):
-            #logging.info("Loading optimizer param")
-            #optimizer.load_state_dict(checkpoint['optimizer'])
-
-        bestPrec1 = checkpoint['best_prec1']
-
-        start_epoch = checkpoint['epoch'] + 1
-        print("Epoch: {}, bestPrec1: {}".format(checkpoint['epoch'], bestPrec1))
+    checkpoint = None
+    if classifyConfig.resume:
+        checkpoint = torchModelProcess.loadLatestModelWeight(latest_weights_file, model)
+        torchModelProcess.modelTrainInit(model)
     else:
-        bestPrec1 = -100
-        start_epoch = 0
+        torchModelProcess.modelTrainInit(model)
 
-    # set optimize
-    optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=config.base_lr,
-                                    momentum=config.momentum, weight_decay=config.weight_decay)
+    start_epoch, best_value, optimizer = initOptimizer(model, checkpoint)
 
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss()
 
-    model.cuda()
-    model.train()
-
     optimizer.zero_grad()
-    for epoch in range(start_epoch, config.maxEpochs):
+    for epoch in range(start_epoch, classifyConfig.maxEpochs):
 
         for i, (imgs, target) in enumerate(dataloader):
             current_idx = epoch * len(dataloader) + i
@@ -95,7 +102,7 @@ def main():
             loss.backward()
 
             # accumulate gradient for x batches before optimizing
-            if ((i + 1) % config.accumulated_batches == 0) or (i == len(dataloader) - 1):
+            if ((i + 1) % classifyConfig.accumulated_batches == 0) or (i == len(dataloader) - 1):
                 optimizer.step()
                 optimizer.zero_grad()
 
@@ -104,12 +111,12 @@ def main():
                 'losstrain': loss.data
             }
 
-            if i % config.display == 0:
-                print('Epoch: {}/{}[{}/{}]\t Loss: {}\t Rate: {} \t Time: {}\t'.format(epoch, config.maxEpochs - 1,\
+            if i % classifyConfig.display == 0:
+                print('Epoch: {}/{}[{}/{}]\t Loss: {}\t Rate: {} \t Time: {}\t'.format(epoch, classifyConfig.maxEpochs - 1,\
                     idx, len(dataloader), '%.3f' % loss, '%.7f' % optimizer[0].lr, time.time() - t0))
                 
                 for tag, value in infotrain.items():
-                    self.logger.scalar_summary(tag, value, (epoch * (len(data_loader) - 1) + i))
+                    self.logger.scalar_summary(tag, value, (epoch * (len(dataloader) - 1) + i))
 
         # remember best prec@1 and save checkpoint
         # if val_prec1 > best_prec1:

@@ -48,7 +48,7 @@ class ImageClassifyTrainDataLoader(DataLoader):
         numpyImages = np.stack(img_all)
         torchImages = self.convertTorchTensor(numpyImages)
 
-        return torchImages, torchImages
+        return torchImages, trochLabels
 
     def __len__(self):
         return self.nB
