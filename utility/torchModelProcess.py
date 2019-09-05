@@ -49,6 +49,17 @@ class TorchModelProcess():
                       'optimizer': optimizer.state_dict()}
         torch.save(checkpoint, latestWeightsFile)
 
+    def getLatestModelValue(self, checkpoint):
+        start_epoch = 0
+        value = -1
+        if checkpoint:
+            if checkpoint.get('epoch'):
+                start_epoch = checkpoint['epoch'] + 1
+            if checkpoint.get('best_value'):
+                value = checkpoint['best_value']
+        self.setModelBestValue(value)
+        return start_epoch, value
+
     def setModelBestValue(self, value):
         self.best_value = value
 

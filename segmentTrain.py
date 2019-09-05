@@ -8,6 +8,7 @@ from loss.loss import OhemCrossEntropy2d
 from loss.focalloss import focalLoss
 from utility.lr_policy import PolyLR
 from utility.torchModelProcess import TorchModelProcess
+from utility.torchOptimizer import TorchOptimizer
 from utility.logger import AverageMeter, Logger
 from config import segmentConfig
 import segmentTest
@@ -60,25 +61,13 @@ def testModel(valPath, cfgPath, weights_path, epoch):
 
     return score, class_iou
 
-def initOptimizer(model, checkpoint):
-    start_epoch = 0
-    bestmIoU = -1
-    optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=segmentConfig.base_lr,
-                                momentum=segmentConfig.momentum, weight_decay=segmentConfig.weight_decay)
-    if checkpoint:
-        start_epoch = checkpoint['epoch'] + 1
-        if checkpoint.get('optimizer'):
-            optimizer.load_state_dict(checkpoint['optimizer'])
-        if checkpoint.get('best_value'):
-            bestmIoU = checkpoint['best_value']
-    return start_epoch, bestmIoU, optimizer
-
 def segmentTrain(trainPath, valPath, cfgPath):
 
     if not os.path.exists(segmentConfig.snapshotPath):
         os.makedirs(segmentConfig.snapshotPath, exist_ok=True)
 
     torchModelProcess = TorchModelProcess()
+    torchOptimizer = TorchOptimizer(segmentConfig.optimizerConfig)
 
     #logger
     logger = Logger(os.path.join("./weights", "logs"))
@@ -108,8 +97,8 @@ def segmentTrain(trainPath, valPath, cfgPath):
         torchModelProcess.modelTrainInit(model)
     else:
         torchModelProcess.modelTrainInit(model)
-    start_epoch, bestmIoU, optimizer = initOptimizer(model, checkpoint)
-    torchModelProcess.setModelBestValue(bestmIoU)
+    start_epoch, bestmIoU = torchModelProcess.getLatestModelValue(checkpoint)
+    optimizer = torchOptimizer.getLatestModelOptimizer(model, checkpoint)
 
     # summary the model
     # model_info(model)
@@ -122,8 +111,7 @@ def segmentTrain(trainPath, valPath, cfgPath):
             current_idx = epoch * len(dataloader) + idx
             lr = polyLR.get_lr(current_idx)
 
-            for g in optimizer.param_groups:
-                g['lr'] = lr
+            optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
 
             # Compute loss, compute gradient, update parameters
             output = model(imgs.cuda())[0]

@@ -4,6 +4,7 @@ from optparse import OptionParser
 import torch
 from data_loader import *
 from utility.torchModelProcess import TorchModelProcess
+from utility.torchOptimizer import TorchOptimizer
 from utility.model_summary import summary
 from utility.lr_policy import MultiStageLR
 from utility.logger import AverageMeter, Logger
@@ -57,25 +58,13 @@ def testModel(valPath, cfgPath, weights_path, epoch):
 
     return mAP, aps
 
-def initOptimizer(model, checkpoint):
-    start_epoch = 0
-    best_mAP = -1
-    optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=detectConfig.base_lr,\
-                                momentum=detectConfig.momentum, weight_decay=detectConfig.weight_decay)
-    if checkpoint:
-        start_epoch = checkpoint['epoch'] + 1
-        if checkpoint.get('optimizer'):
-            optimizer.load_state_dict(checkpoint['optimizer'])
-        if checkpoint.get('best_value'):
-            best_mAP = checkpoint['best_value']
-    return start_epoch, best_mAP, optimizer
-
 def detectTrain(trainPath, valPath, cfgPath):
 
     if not os.path.exists(detectConfig.snapshotPath):
         os.makedirs(detectConfig.snapshotPath, exist_ok=True)
 
     torchModelProcess = TorchModelProcess()
+    torchOptimizer = TorchOptimizer(detectConfig.optimizerConfig)
 
     #logger
     logger = Logger(os.path.join("./weights", "logs"))
@@ -97,8 +86,8 @@ def detectTrain(trainPath, valPath, cfgPath):
         torchModelProcess.modelTrainInit(model)
     else:
         torchModelProcess.modelTrainInit(model)
-    start_epoch, best_mAP, optimizer = initOptimizer(model, checkpoint)
-    torchModelProcess.setModelBestValue(best_mAP)
+    start_epoch, best_mAP = torchModelProcess.getLatestModelValue(checkpoint)
+    optimizer = torchOptimizer.getLatestModelOptimizer(model, checkpoint)
 
     # summary(model, [1, 3, 640, 352])
     t0 = time.time()
@@ -106,9 +95,7 @@ def detectTrain(trainPath, valPath, cfgPath):
 
         # get learning rate
         lr = multiLR.get_lr(epoch)
-        for param_group in optimizer.param_groups:
-            param_group['lr'] = lr
-
+        optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
         optimizer.zero_grad()
         for i, (imgs, targets) in enumerate(dataloader):
             if sum([len(x) for x in targets]) < 1:  # if no targets continue
