@@ -3,7 +3,9 @@ import time
 from optparse import OptionParser
 from data_loader import *
 from utility.utils import *
+from model.modelResultProcess import ModelResultProcess
 from utility.torchModelProcess import TorchModelProcess
+from drawing.imageDraw import ImageDraw
 from utility.nonMaximumSuppression import *
 from config import detectConfig
 
@@ -38,7 +40,12 @@ def parse_arguments():
 
 def detect(imageFolder, cfgPath, weightsPath):
 
+
+    imageDraw = ImageDraw()
+    trainDataProcess = TrainDataProcess()
     torchModelProcess = TorchModelProcess()
+    modelResultProcess = ModelResultProcess()
+
     model = torchModelProcess.initModel(cfgPath, 0)
     model.setFreezeBn(True)
 
@@ -52,40 +59,17 @@ def detect(imageFolder, cfgPath, weightsPath):
         print('%g/%g' % (i + 1, len(dataloader)), end=' ')
         prev_time = time.time()
         # Get detections
-        detections = []
         with torch.no_grad():
             output = model(img.to(torchModelProcess.getDevice()))
-            preds = []
-            for i in range(0, 3):
-                predEach = model.lossList[i](output[i])
-                preds.append(predEach)
-            pred = torch.cat(preds, 1)
-            pred = pred[pred[:, :, 4] > detectConfig.confThresh]
-
-            if len(pred) > 0:
-                detections = non_max_suppression(pred.unsqueeze(0), detectConfig.confThresh, detectConfig.nmsThresh)
+            pred = modelResultProcess.detectResult(model, output, detectConfig.confThresh)
+            #print(pred)
+            detections = non_max_suppression(pred, detectConfig.confThresh, detectConfig.nmsThresh)
 
         print('Batch %d... Done. (%.3fs)' % (i, time.time() - prev_time))
 
-        # The amount of padding that was added
-        pad_x = 0 if (detectConfig.imgSize[0]/oriImg.shape[1]) < (detectConfig.imgSize[1]/oriImg.shape[0]) else detectConfig.imgSize[0] - detectConfig.imgSize[1] / oriImg.shape[0] * oriImg.shape[1]
-        pad_y = 0 if (detectConfig.imgSize[0]/oriImg.shape[1]) > (detectConfig.imgSize[1]/oriImg.shape[0]) else detectConfig.imgSize[1] - detectConfig.imgSize[0] / oriImg.shape[1] * oriImg.shape[0]
-
-        # Image height and width after padding is removed
-        unpad_h = detectConfig.imgSize[1] - pad_y
-        unpad_w = detectConfig.imgSize[0] - pad_x
-
-        if detections and detections[0] is not None:
-            for x1, y1, x2, y2, conf, cls_conf, cls_pred in detections[0]:
-                # Rescale coordinates to original dimensions
-                box_h = ((y2 - y1) / unpad_h) * oriImg.shape[0]
-                box_w = ((x2 - x1) / unpad_w) * oriImg.shape[1]
-                y1 = (((y1 - pad_y // 2) / unpad_h) * oriImg.shape[0]).round().item()
-                x1 = (((x1 - pad_x // 2) / unpad_w) * oriImg.shape[1]).round().item()
-                x2 = (x1 + box_w).round().item()
-                y2 = (y1 + box_h).round().item()
-                x1, y1, x2, y2 = max(x1, 1.0), max(y1, 1.0), min(x2, oriImg.shape[1]-1.0), min(y2, oriImg.shape[0]-1.0)
-                cv2.rectangle(oriImg, (int(x1), int(y1)), (int(x2), int(y2)), [0,255,0], 2)
+        detectObjects = trainDataProcess.resizeDetectObjects(oriImg, detectConfig.imgSize, detections,
+                                                             detectConfig.className)
+        imageDraw.drawDetectObjects(oriImg, detectObjects)
 
         cv2.namedWindow("image", 0)
         cv2.resizeWindow("image", int(oriImg.shape[1] * 0.8), int(oriImg.shape[0] * 0.8))

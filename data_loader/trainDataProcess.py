@@ -1,5 +1,10 @@
+import os
+import sys
+sys.path.insert(0, os.getcwd() + "/..")
 import cv2
 import numpy as np
+
+from helper.dataType import DetectionObject
 
 class TrainDataProcess():
 
@@ -16,6 +21,37 @@ class TrainDataProcess():
         left, right = dw // 2, dw - (dw // 2)
         img = cv2.resize(img, (new_shape[1], new_shape[0]), interpolation=cv2.INTER_AREA)  # resized, no border
         return cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color), ratio, dw, dh
+
+    def resizeDetectObjects(self, srcImage, imageSize, detections, className):
+        result = []
+        # The amount of padding that was added
+        pad_x = 0 if (imageSize[0] / srcImage.shape[1]) < (imageSize[1] / srcImage.shape[0]) else imageSize[0] - imageSize[1] / srcImage.shape[0] * srcImage.shape[1]
+        pad_y = 0 if (imageSize[0] / srcImage.shape[1]) > (imageSize[1] / srcImage.shape[0]) else \
+            imageSize[1] - imageSize[0] / srcImage.shape[1] * srcImage.shape[0]
+
+        # Image height and width after padding is removed
+        unpad_h = imageSize[1] - pad_y
+        unpad_w = imageSize[0] - pad_x
+        for x1, y1, x2, y2, conf, cls_conf, cls_pred in detections:
+            # Rescale coordinates to original dimensions
+            box_h = ((y2 - y1) / unpad_h) * srcImage.shape[0]
+            box_w = ((x2 - x1) / unpad_w) * srcImage.shape[1]
+            y1 = (((y1 - pad_y // 2) / unpad_h) * srcImage.shape[0]).round().item()
+            x1 = (((x1 - pad_x // 2) / unpad_w) * srcImage.shape[1]).round().item()
+            x2 = (x1 + box_w).round().item()
+            y2 = (y1 + box_h).round().item()
+            x1, y1, x2, y2 = max(x1, 1.0), max(y1, 1.0), min(x2, srcImage.shape[1]-1.0), min(y2, srcImage.shape[0]-1.0)
+            tempObject = DetectionObject()
+            tempObject.min_corner.x = x1
+            tempObject.min_corner.y = y1
+            tempObject.max_corner.x = x2
+            tempObject.max_corner.y = y2
+            tempObject.classIndex = int(cls_pred)
+            tempObject.objectConfidence = conf
+            tempObject.classConfidence = cls_conf
+            tempObject.name = className[tempObject.classIndex]
+            result.append(tempObject)
+        return result
 
     def encode_segmap(self, mask, volid_label, valid_label):
         classes = -np.ones([100, 100])

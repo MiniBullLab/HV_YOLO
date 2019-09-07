@@ -35,16 +35,7 @@ def bbox_iou(box1, box2, x1y1x2y2=True, GIoU=False):
 
     return iou
 
-def xywh2xyxy(x):  # Convert bounding box format from [x, y, w, h] to [x1, y1, x2, y2]
-    y = torch.zeros(x.shape) if x.dtype is torch.float32 else np.zeros(x.shape)
-    y[:, 0] = (x[:, 0] - x[:, 2] / 2)
-    y[:, 1] = (x[:, 1] - x[:, 3] / 2)
-    y[:, 2] = (x[:, 0] + x[:, 2] / 2)
-    y[:, 3] = (x[:, 1] + x[:, 3] / 2)
-    return y
-
-def non_max_suppression(prediction, conf_thres=0.5, nms_thres=0.45, nms_style="OR", useNewConf=False,
-                        GIoU=False):
+def non_max_suppression(pred, conf_thres=0.5, nms_thres=0.45, nms_style="OR", GIoU=False):
     """
     Removes detections with lower object confidence score than 'conf_thres'
     Non-Maximum Suppression to further filter detections.
@@ -52,128 +43,105 @@ def non_max_suppression(prediction, conf_thres=0.5, nms_thres=0.45, nms_style="O
         (x1, y1, x2, y2, object_conf, class_conf, class)
     """
 
-    min_wh = 2  # (pixels) minimum box width and height
+    output = []
 
-    output = [None] * len(prediction)
-    for image_i, pred in enumerate(prediction):
+    # If none are remaining => process next image
+    if len(pred) == 0:
+        return output
 
-        # Multiply conf by class conf to get combined confidence
-        class_conf, class_pred = pred[:, 5:].max(1)
+    # Get detections sorted by decreasing confidence scores
+    adIndex = np.argsort((-pred[:, 4]).cpu().numpy())
+    pred = pred[adIndex]
 
-        if useNewConf:
-            pred[:, 4] *= class_conf # improves mAP from 0.549 to 0.551
-
-        # Select only suitable predictions
-        i = (pred[:, 4] > conf_thres) & (pred[:, 2:4] > min_wh).all(1) & torch.isfinite(pred).all(1)
-        pred = pred[i]
-
-        # If none are remaining => process next image
-        if len(pred) == 0:
+    det_max = []
+    for c in pred[:, -1].unique():
+        dc = pred[pred[:, -1] == c]  # select class c
+        n = len(dc)
+        if n == 1:
+            det_max.append(dc)  # No NMS required if only 1 prediction
             continue
+        elif n > 100:
+            dc = dc[:100]  # limit to first 100 boxes: https://github.com/ultralytics/yolov3/issues/117
 
-        # Select predicted classes
-        class_conf = class_conf[i]
-        class_pred = class_pred[i].unsqueeze(1).float()
+        # Non-maximum suppression
+        if nms_style == 'OR':  # default
 
-        # Box (center x, center y, width, height) to (x1, y1, x2, y2)
-        pred[:, :4] = xywh2xyxy(pred[:, :4])
+            # METHOD2
+            while dc.shape[0]:
+                det_max.append(dc[:1])  # save highest conf detection
+                if len(dc) == 1:  # Stop if we're at the last detection
+                    break
+                iou = bbox_iou(dc[0], dc[1:], GIoU=GIoU)  # iou with other boxes
+                dc = dc[1:][iou < nms_thres]  # remove ious > threshold
 
-        # Detections ordered as (x1y1x2y2, obj_conf, class_conf, class_pred)
-        pred = torch.cat((pred[:, :5], class_conf.unsqueeze(1), class_pred), 1)
-
-        # Get detections sorted by decreasing confidence scores
-        adIndex = np.argsort((-pred[:, 4]).cpu().numpy())
-        pred = pred[adIndex]
-
-        det_max = []
-        for c in pred[:, -1].unique():
-            dc = pred[pred[:, -1] == c]  # select class c
-            n = len(dc)
-            if n == 1:
-                det_max.append(dc)  # No NMS required if only 1 prediction
-                continue
-            elif n > 100:
-                dc = dc[:100]  # limit to first 100 boxes: https://github.com/ultralytics/yolov3/issues/117
-
-            # Non-maximum suppression
-            if nms_style == 'OR':  # default
-
-                # METHOD2
-                while dc.shape[0]:
-                    det_max.append(dc[:1])  # save highest conf detection
-                    if len(dc) == 1:  # Stop if we're at the last detection
-                        break
-                    iou = bbox_iou(dc[0], dc[1:], GIoU=GIoU)  # iou with other boxes
-                    dc = dc[1:][iou < nms_thres]  # remove ious > threshold
-
-            elif nms_style == 'AND':  # requires overlap, single boxes erased
-                while len(dc) > 1:
-                    iou = bbox_iou(dc[0], dc[1:], GIoU=GIoU)  # iou with other boxes
-                    if iou.max() > 0.5:
-                        det_max.append(dc[:1])
-                    dc = dc[1:][iou < nms_thres]  # remove ious > threshold
-            
-            elif nms_style == 'MERGE':  # weighted mixture box
-                while len(dc):
-                    if len(dc) == 1:
-                        det_max.append(dc)
-                        break
-                    i = bbox_iou(dc[0], dc, GIoU=GIoU) > nms_thres  # iou with other boxes
-                    weights = dc[i, 4:5]
-                    dc[0, :4] = (weights * dc[i, :4]).sum(0) / weights.sum()
+        elif nms_style == 'AND':  # requires overlap, single boxes erased
+            while len(dc) > 1:
+                iou = bbox_iou(dc[0], dc[1:], GIoU=GIoU)  # iou with other boxes
+                if iou.max() > 0.5:
                     det_max.append(dc[:1])
-                    dc = dc[i == 0]
+                dc = dc[1:][iou < nms_thres]  # remove ious > threshold
 
-            elif nms_style == 'SOFT_Linear':
-                while dc.shape[0]:
-                    # Get detection with highest confidence and save as max detection
-                    det_max.append(dc[0].unsqueeze(0))
-                    # Stop if we're at the last detection
-                    if len(dc) == 1:
-                        break
-                    # Get the IOUs for all boxes with lower confidence
-                    ious = bbox_iou(det_max[-1], dc[1:], GIoU=GIoU)
+        elif nms_style == 'MERGE':  # weighted mixture box
+            while len(dc):
+                if len(dc) == 1:
+                    det_max.append(dc)
+                    break
+                i = bbox_iou(dc[0], dc, GIoU=GIoU) > nms_thres  # iou with other boxes
+                weights = dc[i, 4:5]
+                dc[0, :4] = (weights * dc[i, :4]).sum(0) / weights.sum()
+                det_max.append(dc[:1])
+                dc = dc[i == 0]
 
-                    # Remove detections with IoU >= NMS threshold
-                    weight = (ious > nms_thres).type_as(dc) * (1 - ious) + (ious < nms_thres).type_as(dc)
-                    dc[1:, 4] *= weight
-                    dc = dc[1:]
-                    dc = dc[dc[:, 4] > conf_thres]
-                    # Stop if we're at the last detection
-                    if len(dc) == 0:
-                        break
+        elif nms_style == 'SOFT_Linear':
+            while dc.shape[0]:
+                # Get detection with highest confidence and save as max detection
+                det_max.append(dc[0].unsqueeze(0))
+                # Stop if we're at the last detection
+                if len(dc) == 1:
+                    break
+                # Get the IOUs for all boxes with lower confidence
+                ious = bbox_iou(det_max[-1], dc[1:], GIoU=GIoU)
 
-                    _, conf_sort_index = torch.sort(dc[:, 4], descending=True)
-                    dc = dc[conf_sort_index]
+                # Remove detections with IoU >= NMS threshold
+                weight = (ious > nms_thres).type_as(dc) * (1 - ious) + (ious < nms_thres).type_as(dc)
+                dc[1:, 4] *= weight
+                dc = dc[1:]
+                dc = dc[dc[:, 4] > conf_thres]
+                # Stop if we're at the last detection
+                if len(dc) == 0:
+                    break
 
-            elif nms_style == 'SOFT_Gaussian':
-                sigma = 0.5
-                while dc.shape[0]:
-                    # Get detection with highest confidence and save as max detection
-                    det_max.append(dc[0].unsqueeze(0))
-                    # Stop if we're at the last detection
-                    if len(dc) == 1:
-                        break
-                    # Get the IOUs for all boxes with lower confidence
-                    ious = bbox_iou(det_max[-1], dc[1:], GIoU=GIoU)
+                _, conf_sort_index = torch.sort(dc[:, 4], descending=True)
+                dc = dc[conf_sort_index]
 
-                    # Remove detections with IoU >= NMS threshold
-                    weight = np.exp( - (ious * ious) / sigma)
-                    dc[1:, 4] *= weight.type_as(dc)
-                    dc = dc[1:]
-                    dc = dc[dc[:, 4] > conf_thres]
-                    # Stop if we're at the last detection
-                    if len(dc) == 0:
-                        break
+        elif nms_style == 'SOFT_Gaussian':
+            sigma = 0.5
+            while dc.shape[0]:
+                # Get detection with highest confidence and save as max detection
+                det_max.append(dc[0].unsqueeze(0))
+                # Stop if we're at the last detection
+                if len(dc) == 1:
+                    break
+                # Get the IOUs for all boxes with lower confidence
+                ious = bbox_iou(det_max[-1], dc[1:], GIoU=GIoU)
 
-                    _, conf_sort_index = torch.sort(dc[:, 4], descending=True)
-                    dc = dc[conf_sort_index]
+                # Remove detections with IoU >= NMS threshold
+                weight = np.exp( - (ious * ious) / sigma)
+                dc[1:, 4] *= weight.type_as(dc)
+                dc = dc[1:]
+                dc = dc[dc[:, 4] > conf_thres]
+                # Stop if we're at the last detection
+                if len(dc) == 0:
+                    break
 
-        # mark 当框的重合度大于一定值时，被认为是同一个目标，那么较小置信度的目标会被抑制
+                _, conf_sort_index = torch.sort(dc[:, 4], descending=True)
+                dc = dc[conf_sort_index]
 
-        if len(det_max):
-            det_max = torch.cat(det_max)  # concatenate
-            detIndex = np.argsort((-det_max[:, 4]).cpu().numpy())
-            output[image_i] = det_max[detIndex]  # sort
+    # mark 当框的重合度大于一定值时，被认为是同一个目标，那么较小置信度的目标会被抑制
+
+    if len(det_max) > 0:
+        det_max = torch.cat(det_max)  # concatenate
+        detIndex = np.argsort((-det_max[:, 4]).cpu().numpy())
+        output = det_max[detIndex]  # sort
 
     return output

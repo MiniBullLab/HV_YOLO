@@ -4,6 +4,7 @@ import cv2
 from optparse import OptionParser
 from utility.evaluatingOfmAp import *
 from data_loader import *
+from model.modelResultProcess import ModelResultProcess
 from utility.torchModelProcess import TorchModelProcess
 from utility.nonMaximumSuppression import *
 from config import detectConfig
@@ -41,7 +42,9 @@ def detectTest(valPath, cfgPath, weights_path):
     os.system('rm -rf ' + 'results')
     os.makedirs('results', exist_ok=True)
 
+    trainDataProcess = TrainDataProcess()
     torchModelProcess = TorchModelProcess()
+    modelResultProcess = ModelResultProcess()
 
     model = torchModelProcess.initModel(cfgPath, 0)
     model.setFreezeBn(True)
@@ -60,47 +63,29 @@ def detectTest(valPath, cfgPath, weights_path):
         # Get detections
         with torch.no_grad():
             output = model(img.to(torchModelProcess.getDevice()))
-            preds = []
-            for i in range(0, 3):
-                predEach = model.lossList[i](output[i])
-                preds.append(predEach)
-            pred = torch.cat(preds, 1)
-            pred = pred[pred[:, :, 4] > 5e-3]
-
-            if len(pred) > 0:
-                detections = non_max_suppression(pred.unsqueeze(0), 5e-3, detectConfig.nmsThresh) # select nms method (or, and, soft-nms)
+            pred = modelResultProcess.detectResult(model, output, 5e-3)
+            # print(pred)
+            detections = non_max_suppression(pred, 5e-3, detectConfig.nmsThresh)
 
         print('Batch %d... Done. (%.3fs)' % (i, time.time() - prev_time))
         prev_time = time.time()
 
-        img = cv2.imread(img_path)
-        # The amount of padding that was added
-        pad_x = 0 if (detectConfig.imgSize[0]/img.shape[1]) < (detectConfig.imgSize[1]/img.shape[0]) else detectConfig.imgSize[0] - detectConfig.imgSize[1] / img.shape[0] * img.shape[1]
-        pad_y = 0 if (detectConfig.imgSize[0]/img.shape[1]) > (detectConfig.imgSize[1]/img.shape[0]) else detectConfig.imgSize[1] - detectConfig.imgSize[0] / img.shape[1] * img.shape[0]
-        # Image height and width after padding is removed
-        unpad_h = detectConfig.imgSize[1] - pad_y
-        unpad_w = detectConfig.imgSize[0] - pad_x
-
         path, fileNameAndPost = os.path.split(img_path)
         fileName, post = os.path.splitext(fileNameAndPost)
+        img = cv2.imread(img_path)
 
-        if detections and detections[0] is not None:
-            for x1, y1, x2, y2, conf, cls_conf, cls_pred in detections[0]:
-                # Rescale coordinates to original dimensions
-                box_h = ((y2 - y1) / unpad_h) * img.shape[0]
-                box_w = ((x2 - x1) / unpad_w) * img.shape[1]
-                y1 = (((y1 - pad_y // 2) / unpad_h) * img.shape[0]).round().item()
-                x1 = (((x1 - pad_x // 2) / unpad_w) * img.shape[1]).round().item()
-                x2 = (x1 + box_w).round().item()
-                y2 = (y1 + box_h).round().item()
-                x1, y1, x2, y2 = max(x1, 1.0), max(y1, 1.0), min(x2, img.shape[1]-1.0), min(y2, img.shape[0]-1.0)
+        detectObjects = trainDataProcess.resizeDetectObjects(img, detectConfig.imgSize, detections,
+                                             detectConfig.className)
 
-                # write to file
-                for i in range(0, len(detectConfig.className)):
-                    if int(cls_pred.cpu().numpy()) == i:
-                        with open("./results/comp4_det_test_" + detectConfig.className[i] + ".txt", 'a') as file:
-                            file.write(
-                                "{} {} {} {} {} {}\n".format(fileName, cls_conf * conf, x1, y1, x2, y2))
+        for object in detectObjects:
+            confidence = object.classConfidence * object.objectConfidence
+            x1 = object.min_corner.x
+            y1 = object.min_corner.y
+            x2 = object.max_corner.x
+            y2 = object.max_corner.y
+            with open("./results/comp4_det_test_" + object.name + ".txt", 'a') as file:
+                file.write(
+                    "{} {} {} {} {} {}\n".format(fileName, confidence, x1, y1, x2, y2))
 
     mAP, aps = evaluator.do_python_eval("./results/", "./results/comp4_det_test_")
 

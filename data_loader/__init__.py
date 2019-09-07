@@ -1,6 +1,7 @@
 from .dataLoader import DataLoader
 from .imagesLoader import ImagesLoader
 from .videoLoader import VideoLoader
+from .trainDataProcess import TrainDataProcess
 from .imageClassifyTrainDataLoard import ImageClassifyTrainDataLoader
 from .imageDetectTrainDataLoader import ImageDetectTrainDataLoader
 from .imageDetectValDataLoader import ImageDetectValDataLoader

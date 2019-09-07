@@ -7,6 +7,13 @@ class ImageDraw():
     def __init__(self):
         pass
 
+    def drawDetectObjects(self, srcImage, detectObjects):
+        for object in detectObjects:
+            point1 = (int(object.min_corner.x), int(object.min_corner.y))
+            point2 = (int(object.max_corner.x), int(object.max_corner.y))
+            index = object.classIndex
+            cv2.rectangle(srcImage, point1, point2, ColorDefine.colors[index], 2)
+
     def drawSegmentResult(self, srcImage, segmentResult, className):
         count = len(className)
         label_colours = dict(zip(range(19), ColorDefine.colors))
