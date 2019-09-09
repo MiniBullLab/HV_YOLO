@@ -38,7 +38,7 @@ def parse_arguments():
 
     return options
 
-def detect(imageFolder, cfgPath, weightsPath):
+def detect(inputPath, cfgPath, weightsPath):
 
 
     imageDraw = ImageDraw()
@@ -52,8 +52,8 @@ def detect(imageFolder, cfgPath, weightsPath):
     torchModelProcess.loadLatestModelWeight(weightsPath, model)
     torchModelProcess.modelTestInit(model)
 
-    dataloader = ImagesLoader(imageFolder, batch_size=1, img_size=detectConfig.imgSize)
-    #dataloader = VideoLoader(opt.image_folder, batch_size=1, img_size=opt.img_size)
+    #dataloader = ImagesLoader(inputPath, batch_size=1, img_size=detectConfig.imgSize)
+    dataloader = VideoLoader(inputPath, batch_size=1, img_size=detectConfig.imgSize)
 
     for i, (oriImg, img) in enumerate(dataloader):
         print('%g/%g' % (i + 1, len(dataloader)), end=' ')
@@ -74,7 +74,8 @@ def detect(imageFolder, cfgPath, weightsPath):
         cv2.namedWindow("image", 0)
         cv2.resizeWindow("image", int(oriImg.shape[1] * 0.8), int(oriImg.shape[0] * 0.8))
         cv2.imshow("image", oriImg)
-        cv2.waitKey()
+        if cv2.waitKey() & 0xff == ord('q'):  # 按q退出
+            break
 
 def main():
     print("process start...")

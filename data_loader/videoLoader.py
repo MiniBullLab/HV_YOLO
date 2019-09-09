@@ -16,6 +16,7 @@ class VideoLoader(DataLoader):
         self.videoCapture = cv2.VideoCapture(path)
         self.batch_size = batch_size
         self.imageSize = img_size
+        self.frameCount = self.videoCapture.get(cv2.CAP_PROP_FRAME_COUNT)
         self.color = (127.5, 127.5, 127.5)
 
     def __iter__(self):
@@ -35,7 +36,7 @@ class VideoLoader(DataLoader):
             img, _, _, _ = self.trainDataProcess.resize_square(frame, self.imageSize, self.color)
             rgbImage = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        if frame:
+        if frame is not None:
             rgbImage = rgbImage.transpose(2, 0, 1)
             img = np.ascontiguousarray(rgbImage, dtype=np.float32)
             img /= 255.0
@@ -43,3 +44,6 @@ class VideoLoader(DataLoader):
             return oriImg, torch.from_numpy(img).unsqueeze(0)
         else:
             raise StopIteration
+
+    def __len__(self):
+        return int(self.frameCount)  # number of batches
