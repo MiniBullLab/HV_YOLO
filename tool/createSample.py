@@ -5,7 +5,7 @@ import random
 import cv2
 import numpy as np
 from helper import DirProcess, XMLProcess
-import config
+from config import detectConfig
 
 class CreateSample():
 
@@ -29,7 +29,7 @@ class CreateSample():
             if os.path.exists(annotationPath) and \
                os.path.exists(imagePath):
                 _, _, boxes = self.xmlProcess.parseRectData(annotationPath)
-                allNames = [box.name for box in boxes if box.name in config.className]
+                allNames = [box.name for box in boxes if box.name in detectConfig.className]
                 names = set(allNames)
                 print(names)
                 for className in names:
@@ -61,7 +61,7 @@ class CreateSample():
 
     def createWriteFile(self, outputPath):
         result = {}
-        for className in config.className:
+        for className in detectConfig.className:
             classImagePath = os.path.join(outputPath, className + ".txt")
             result[className] = open(classImagePath, "w")
         return result

@@ -1,7 +1,5 @@
 ## data
 imgSize = (640, 352)
-trainPath = "/home/lpj/github/data/Tusimple/ImageSets/train.txt"
-valPath = "/home/lpj/github/data/Tusimple/ImageSets/val.txt"
 # class_path = "./data/berkeley.names"
 train_batch_size = 16
 test_batch_size = 1

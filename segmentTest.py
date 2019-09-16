@@ -2,7 +2,7 @@ import os, time
 from optparse import OptionParser
 from data_loader import *
 from utility.utils import *
-from utility.torchModelProcess import TorchModelProcess
+from torch_utility.torchModelProcess import TorchModelProcess
 from utility.metrics import runningScore
 from config import segmentConfig
 

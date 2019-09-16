@@ -1,9 +1,10 @@
-import time, cv2, os
+import os
+import time, cv2
 from optparse import OptionParser
 from utility.utils import *
 import scipy.misc as misc
 from data_loader import *
-from utility.torchModelProcess import TorchModelProcess
+from torch_utility.torchModelProcess import TorchModelProcess
 from drawing.imageDraw import ImageDraw
 
 from config import segmentConfig

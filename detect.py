@@ -4,9 +4,9 @@ from optparse import OptionParser
 from data_loader import *
 from utility.utils import *
 from model.modelResultProcess import ModelResultProcess
-from utility.torchModelProcess import TorchModelProcess
+from torch_utility.torchModelProcess import TorchModelProcess
 from drawing.imageDraw import ImageDraw
-from utility.nonMaximumSuppression import *
+from base_algorithm.nonMaximumSuppression import *
 from config import detectConfig
 
 def parse_arguments():

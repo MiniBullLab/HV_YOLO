@@ -5,8 +5,8 @@ from optparse import OptionParser
 from utility.evaluatingOfmAp import *
 from data_loader import *
 from model.modelResultProcess import ModelResultProcess
-from utility.torchModelProcess import TorchModelProcess
-from utility.nonMaximumSuppression import *
+from torch_utility.torchModelProcess import TorchModelProcess
+from base_algorithm.nonMaximumSuppression import *
 from config import detectConfig
 
 def parse_arguments():

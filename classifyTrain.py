@@ -8,9 +8,9 @@ import torch.nn as nn
 from torch.autograd import Variable
 from optparse import OptionParser
 from data_loader import *
-from utility.torchModelProcess import TorchModelProcess
+from torch_utility.torchModelProcess import TorchModelProcess
+from torch_utility.lr_policy import PolyLR
 from config import classifyConfig
-from utility.lr_policy import PolyLR
 
 def parse_arguments():
 

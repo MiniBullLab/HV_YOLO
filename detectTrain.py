@@ -3,10 +3,10 @@ import time
 from optparse import OptionParser
 import torch
 from data_loader import *
-from utility.torchModelProcess import TorchModelProcess
-from utility.torchOptimizer import TorchOptimizer
-from utility.model_summary import summary
-from utility.lr_policy import MultiStageLR
+from torch_utility.torchModelProcess import TorchModelProcess
+from torch_utility.torchOptimizer import TorchOptimizer
+from torch_utility.model_summary import summary
+from torch_utility.lr_policy import MultiStageLR
 from utility.logger import AverageMeter, Logger
 from config import detectConfig
 import detectTest
@@ -67,7 +67,7 @@ def detectTrain(trainPath, valPath, cfgPath):
     torchOptimizer = TorchOptimizer(detectConfig.optimizerConfig)
 
     #logger
-    logger = Logger(os.path.join("./weights", "logs"))
+    logger = Logger(os.path.join("./log", "logs"))
     #set learning policy
     multiLR = MultiStageLR([[49, detectConfig.base_lr * 0.1], [70, detectConfig.base_lr * 0.01]])
     #model init

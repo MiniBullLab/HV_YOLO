@@ -6,9 +6,9 @@ from data_loader import *
 from loss.enetLoss import cross_entropy2dDet
 from loss.loss import OhemCrossEntropy2d
 from loss.focalloss import focalLoss
-from utility.lr_policy import PolyLR
-from utility.torchModelProcess import TorchModelProcess
-from utility.torchOptimizer import TorchOptimizer
+from torch_utility.lr_policy import PolyLR
+from torch_utility.torchModelProcess import TorchModelProcess
+from torch_utility.torchOptimizer import TorchOptimizer
 from utility.logger import AverageMeter, Logger
 from config import segmentConfig
 import segmentTest
@@ -70,7 +70,7 @@ def segmentTrain(trainPath, valPath, cfgPath):
     torchOptimizer = TorchOptimizer(segmentConfig.optimizerConfig)
 
     #logger
-    logger = Logger(os.path.join("./weights", "logs"))
+    logger = Logger(os.path.join("./log", "logs"))
 
     # Get dataloader
     dataloader = ImageSegmentTrainDataLoader(trainPath, batch_size=segmentConfig.train_batch_size,
