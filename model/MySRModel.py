@@ -1,12 +1,15 @@
-import torch
-import torch.nn as nn
+import os
+import sys
+sys.path.insert(0, os.getcwd() + "/..")
+from base_model.baseModel import *
+from modelName import ModelName
 import torch.nn.init as init
 
 
-class MySRModel(nn.Module):
+class MySRModel(BaseModel):
     def __init__(self, upscale_factor):
         super().__init__()
-
+        self.setModelName(ModelName.MySRModel)
         self.relu = nn.ReLU()
         self.conv1 = nn.Conv2d(1, 64, (5, 5), (1, 1), (2, 2))
         self.conv2 = nn.Conv2d(64, 64, (3, 3), (1, 1), (1, 1))
@@ -31,7 +34,10 @@ class MySRModel(nn.Module):
 
 
 if __name__ == "__main__":
-    dummy_input = torch.randn(1, 1, 72, 72)
-    model = Net(upscale_factor=3)
-    torch.onnx.export(model, dummy_input, "./SR.onnx")
-
+    from drawing.modelNetShow import ModelNetShow
+    input = torch.randn(1, 1, 72, 72)
+    modelNetShow = ModelNetShow()
+    model = MySRModel(upscale_factor=3)
+    modelNetShow.setInput(input)
+    modelNetShow.setSaveDir("../onnx")
+    modelNetShow.showNet(model)

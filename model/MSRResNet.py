@@ -1,7 +1,9 @@
+import os
+import sys
+sys.path.insert(0, os.getcwd() + "/..")
+from base_model.baseModel import *
+from modelName import ModelName
 import functools
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
 import torch.nn.init as init
 
 class ResidualBlock_noBN(nn.Module):
@@ -11,7 +13,7 @@ class ResidualBlock_noBN(nn.Module):
     '''
 
     def __init__(self, nf=64):
-        super(ResidualBlock_noBN, self).__init__()
+        super().__init__()
         self.conv1 = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
         self.conv2 = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
 
@@ -43,12 +45,13 @@ class ResidualBlock_noBN(nn.Module):
                     init.constant_(m.weight, 1)
                     init.constant_(m.bias.data, 0.0)
 
-class MSRResNet(nn.Module):
+class MSRResNet(BaseModel):
     ''' modified SRResNet'''
 
 
     def __init__(self, in_nc=3, nf=64, nb=3, upscale_factor=3):
-        super(MSRResNet, self).__init__()
+        super().__init__()
+        self.setModelName(ModelName.MSRResNet)
         self.upscale_factor = upscale_factor
 
         self.conv_first = nn.Conv2d(in_nc, nf, 3, 1, 1, bias=True)
@@ -103,6 +106,10 @@ class MSRResNet(nn.Module):
                     init.constant_(m.bias.data, 0.0)
 
 if __name__ == "__main__":
-    dummy_input = torch.randn(1, 1, 72, 72)
+    from drawing.modelNetShow import ModelNetShow
+    input = torch.randn(1, 1, 72, 72)
+    modelNetShow = ModelNetShow()
     model = MSRResNet(in_nc=1, upscale_factor=3)
-    torch.onnx.export(model, dummy_input, "./SR.onnx")
+    modelNetShow.setInput(input)
+    modelNetShow.setSaveDir("../onnx")
+    modelNetShow.showNet(model)

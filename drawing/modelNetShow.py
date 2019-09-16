@@ -8,13 +8,20 @@ class ModelNetShow():
 
     def __init__(self, channel=3, width=224, height=224):
         self.input = torch.ones(1, channel, width, height)
+        self.saveDir = "./onnx"
+
+    def setInput(self, inputTorch):
+        self.input = inputTorch
+
+    def setSaveDir(self, saveDir):
+        self.saveDir = saveDir
 
     def showNet(self, model):
         #print(model.state_dict())
         self.__torch2onnx(model, self.input)
 
     def __torch2onnx(self, model, input):
-        saveModelPath = os.path.join("./onnx", "%s.onnx" % model.getModelName())
+        saveModelPath = os.path.join(self.saveDir, "%s.onnx" % model.getModelName())
         #print(saveModelPath)
         onnx.export(model, input, saveModelPath)
         netron.start(saveModelPath, port=9999, host='localhost')
