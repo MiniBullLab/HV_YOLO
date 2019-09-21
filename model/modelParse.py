@@ -3,7 +3,7 @@ import sys
 sys.path.insert(0, os.getcwd() + "/..")
 from .modelName import  ModelName
 from .myModel import MyModel
-from .mobileV2FCN import MobileV2FCN
+#from .mobileV2FCN import MobileV2FCN
 
 class ModelParse():
 

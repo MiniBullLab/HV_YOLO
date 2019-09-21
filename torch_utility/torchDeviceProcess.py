@@ -30,6 +30,7 @@ class TorchDeviceProcess():
         return count
 
     def initTorch(self, gpuId):
+        torch.cuda.empty_cache()
         random.seed(0)
         np.random.seed(0)
         torch.manual_seed(0)

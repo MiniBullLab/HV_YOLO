@@ -3,6 +3,7 @@ import sys
 sys.path.insert(0, os.getcwd() + "/..")
 from .dataLoader import *
 from helper import DirProcess
+from helper import ImageProcess
 from .trainDataProcess import TrainDataProcess
 
 class ImagesLoader(DataLoader):
@@ -12,6 +13,7 @@ class ImagesLoader(DataLoader):
     def __init__(self, path, batch_size=1, img_size=(416, 416)):
         super().__init__(path)
 
+        self.imageProcess = ImageProcess()
         self.trainDataProcess = TrainDataProcess()
         dirProcess = DirProcess()
         tempFiles = dirProcess.getDirFiles(path, "*.*")
@@ -38,15 +40,13 @@ class ImagesLoader(DataLoader):
         img_path = self.files[self.count]
 
         # Read image
-        image = cv2.imread(img_path)  # BGR
-        oriImg = image[:]
+        srcImage, rgbImage = self.imageProcess.readRgbImage(img_path)
 
         # Padded resize
-        img, _, _, _ = self.trainDataProcess.resize_square(image, self.imageSize, self.color)
-        rgbImage = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        rgbImage, _, _, _ = self.trainDataProcess.resize_square(rgbImage, self.imageSize, self.color)
         torchImage = self.convertTorchTensor(rgbImage)
 
-        return oriImg, torchImage
+        return srcImage, torchImage
 
     def __len__(self):
         return self.nB  # number of batches

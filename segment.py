@@ -85,7 +85,6 @@ def segment(imageFolder, cfgPath, weightsPath):
 
 def main():
     print("process start...")
-    torch.cuda.empty_cache()
     options = parse_arguments()
     segment(options.inputPath, options.cfg, options.weights)
     print("process end!")

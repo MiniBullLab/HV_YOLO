@@ -1,17 +1,21 @@
-from .baseBlock import *
 import numpy as np
+from .baseBlock import *
+from .blockName import BlockType
 
 class EmptyLayer(BaseBlock):
     """Placeholder for 'route' and 'shortcut' layers"""
 
     def __init__(self):
-        super().__init__(ModuleType.EmptyLayer)
+        super().__init__(BlockType.EmptyLayer)
+
+    def forward(self, x):
+        pass
 
 class Upsample(BaseBlock):
     # Custom Upsample layer (nn.Upsample gives deprecated warning message)
 
     def __init__(self, scale_factor=1, mode='bilinear'):
-        super().__init__(ModuleType.Upsample)
+        super().__init__(BlockType.Upsample)
         self.scale_factor = scale_factor
         self.mode = mode
 
@@ -20,7 +24,7 @@ class Upsample(BaseBlock):
 
 class GlobalAvgPool2d(BaseBlock):
     def __init__(self):
-        super().__init__(ModuleType.GlobalAvgPool)
+        super().__init__(BlockType.GlobalAvgPool)
 
     def forward(self, x):
         h, w = x.shape[2:]
@@ -34,7 +38,7 @@ class GlobalAvgPool2d(BaseBlock):
 
 class FcLayer(BaseBlock):
     def __init__(self, in_channels, out_channels):
-        super().__init__(ModuleType.FcLayer)
+        super().__init__(BlockType.FcLayer)
         self.linear = nn.Linear(in_channels, out_channels)
 
     def forward(self, x):

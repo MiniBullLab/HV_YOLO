@@ -38,7 +38,9 @@ class DataLoader():
 
     def convertTorchTensor(self, rgbImages):
         result = None
-        if rgbImages.ndim == 3:
+        if rgbImages is None:
+            result = None
+        elif rgbImages.ndim == 3:
             image = rgbImages.transpose(2, 0, 1)
             image = np.ascontiguousarray(image, dtype=np.float32)
             image /= 255.0

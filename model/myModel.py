@@ -4,7 +4,7 @@ sys.path.insert(0, os.getcwd() + "/..")
 from base_model.baseModel import *
 from collections import defaultdict
 from .createModelList import *
-from base_block.baseBlock import ModuleType
+from base_block.blockName import BlockType, LossType
 from .baseModelFactory import BaseModelFactory
 
 class MyModel(BaseModel):
@@ -19,7 +19,6 @@ class MyModel(BaseModel):
         self.taskModules = self.createTask()
         self.lossList = self.createLoss()
         self.setFreezeBn(freezeBn)
-        self._init_weight()
 
     def creatBaseModel(self):
         result = None
@@ -60,34 +59,22 @@ class MyModel(BaseModel):
         x = blocks[-1]
 
         for i, (module_def, module) in enumerate(zip(self.modelDefine, self.taskModules)):
-            if module_def['type'] in [ModuleType.Convolutional, ModuleType.Upsample, ModuleType.Maxpool]:
+            if module_def['type'] in [BlockType.Convolutional, BlockType.ConvActivationBlock,\
+                                      BlockType.ConvBNActivationBlock]:
                 x = module(x)
-            elif module_def['type'] == ModuleType.Route:
+            elif module_def['type'] in [BlockType.Upsample, BlockType.Maxpool]:
+                x = module(x)
+            elif module_def['type'] == BlockType.Route:
                 layer_i = [int(x) for x in module_def['layers'].split(',')]
                 x = torch.cat([layer_outputs[i] if i < 0 else blocks[i] for i in layer_i], 1)
-            elif module_def['type'] == ModuleType.Shortcut:
+            elif module_def['type'] == BlockType.Shortcut:
                 layer_i = int(module_def['from'])
                 x = layer_outputs[-1] + layer_outputs[layer_i]
-            elif module_def['type'] == ModuleType.Yolo:
+            elif module_def['type'] == LossType.Yolo:
                 output.append(x)
-            elif module_def['type'] == ModuleType.Softmax:
+            elif module_def['type'] == LossType.Softmax:
                 output.append(x)
 
             layer_outputs.append(x)
 
         return output
-
-    def _init_weight(self):
-        # weight initialization
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode='fan_out')
-                if m.bias is not None:
-                    nn.init.zeros_(m.bias)
-            elif isinstance(m, nn.BatchNorm2d):
-                nn.init.ones_(m.weight)
-                nn.init.zeros_(m.bias)
-            elif isinstance(m, nn.Linear):
-                nn.init.normal_(m.weight, 0, 0.01)
-                if m.bias is not None:
-                    nn.init.zeros_(m.bias)

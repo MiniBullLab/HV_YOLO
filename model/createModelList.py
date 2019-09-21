@@ -2,7 +2,8 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 import torch.nn as nn
-from base_block.baseBlock import ModuleType
+from base_block.blockName import BatchNormType, ActivationType, BlockType, LossType
+from base_block.utilityBlock import ConvBNActivationBlock, ConvActivationBlock
 from base_block.baseLayer import EmptyLayer, Upsample, GlobalAvgPool2d
 from loss import *
 
@@ -17,25 +18,50 @@ class CreateModuleList():
         for i, module_def in enumerate(modelDefine):
             modules = nn.Sequential()
 
-            if module_def['type'] == ModuleType.Convolutional:
-                bn = int(module_def['batch_normalize'])
+            if module_def['type'] == BlockType.Convolutional:
                 filters = int(module_def['filters'])
                 kernel_size = int(module_def['size'])
+                stride = int(module_def['stride'])
                 pad = (kernel_size - 1) // 2 if int(module_def['pad']) else 0
-                modules.add_module('conv_%d' % i, nn.Conv2d(in_channels=output_filters[-1],
-                                                            out_channels=filters,
-                                                            kernel_size=kernel_size,
-                                                            stride=int(module_def['stride']),
-                                                            padding=pad,
-                                                            bias=not bn))
-                if bn:
-                    modules.add_module('batch_norm_%d' % i, nn.BatchNorm2d(filters))
-                if module_def['activation'] == 'leaky':
-                    modules.add_module('leaky_%d' % i, nn.LeakyReLU(0.1))
-                elif module_def['activation'] == 'relu':
-                    modules.add_module('leaky_%d' % i, nn.ReLU())
-
-            elif module_def['type'] == ModuleType.Maxpool:
+                block = nn.Conv2d(in_channels=output_filters[-1],
+                                out_channels=filters,
+                                kernel_size=kernel_size,
+                                stride=stride,
+                                padding=pad,
+                                bias=True)
+                blockName = "%s_%d" % (BlockType.Convolutional, i)
+                modules.add_module(blockName, block)
+            elif module_def['type'] == BlockType.ConvActivationBlock:
+                filters = int(module_def['filters'])
+                kernel_size = int(module_def['size'])
+                stride = int(module_def['stride'])
+                pad = (kernel_size - 1) // 2 if int(module_def['pad']) else 0
+                activationName = module_def['activation']
+                block = ConvActivationBlock(in_channels=output_filters[-1],
+                                          out_channels=filters,
+                                          kernel_size=kernel_size,
+                                          stride=stride,
+                                          padding=pad,
+                                          activationName=activationName)
+                blockName = "%s_%d" % (BlockType.ConvActivationBlock, i)
+                modules.add_module(blockName, block)
+            elif module_def['type'] == BlockType.ConvBNActivationBlock:
+                bnName = module_def['batch_normalize']
+                filters = int(module_def['filters'])
+                kernel_size = int(module_def['size'])
+                stride = int(module_def['stride'])
+                pad = (kernel_size - 1) // 2 if int(module_def['pad']) else 0
+                activationName = module_def['activation']
+                block = ConvBNActivationBlock(in_channels=output_filters[-1],
+                                              out_channels=filters,
+                                              kernel_size=kernel_size,
+                                              stride=stride,
+                                              padding=pad,
+                                              bnName=bnName,
+                                              activationName=activationName)
+                blockName = "%s_%d" % (BlockType.ConvBNActivationBlock, i)
+                modules.add_module(blockName, block)
+            elif module_def['type'] == BlockType.Maxpool:
                 kernel_size = int(module_def['size'])
                 stride = int(module_def['stride'])
                 if kernel_size == 2 and stride == 1:
@@ -44,27 +70,27 @@ class CreateModuleList():
                 modules.add_module('Maxpool_%d' % i, maxpool)
 
             ###############################################
-            elif module_def['type'] == ModuleType.GlobalAvgPool:
+            elif module_def['type'] == BlockType.GlobalAvgPool:
                 globalAvgPool = GlobalAvgPool2d()
                 modules.add_module('GlobalAvgPool' % i, globalAvgPool)
 
-            elif module_def['type'] == ModuleType.Upsample:
+            elif module_def['type'] == BlockType.Upsample:
                 # upsample = nn.Upsample(scale_factor=int(module_def['stride']), mode='nearest')  # WARNING: deprecated
                 #upsample = Upsample(scale_factor=int(module_def['stride']), mode='bilinear')
                 upsample = Upsample(scale_factor=int(module_def['stride']), mode='nearest')
                 modules.add_module('upsample_%d' % i, upsample)
 
-            elif module_def['type'] == ModuleType.Route:
+            elif module_def['type'] == BlockType.Route:
                 layers = [int(x) for x in module_def['layers'].split(',')]
                 filters = sum([inputChannels[i] if i >= 0 else output_filters[i] for i in layers])
                 # filters = sum([output_filters[i + 1 if i > 0 else i] for i in layers])
                 modules.add_module('route_%d' % i, EmptyLayer())
 
-            elif module_def['type'] == ModuleType.Shortcut:
+            elif module_def['type'] == BlockType.Shortcut:
                 filters = output_filters[int(module_def['from'])]
                 modules.add_module('shortcut_%d' % i, EmptyLayer())
 
-            elif module_def['type'] == ModuleType.Yolo:
+            elif module_def['type'] == LossType.Yolo:
                 anchor_idxs = [int(x) for x in module_def['mask'].split(',')]
                 # Extract anchors
                 anchors = [float(x) for x in module_def['anchors'].split(',')]
@@ -74,7 +100,7 @@ class CreateModuleList():
                 yolo_layer = YoloLoss(num_classes, anchors=anchors, anchors_mask=anchor_idxs, smoothLabel=False,
                                       focalLoss=False)
                 modules.add_module('yolo_%d' % i, yolo_layer)
-            elif module_def["type"] == ModuleType.Softmax:
+            elif module_def["type"] == LossType.Softmax:
                 modules.add_module('softmax_%d' % i, EmptyLayer())
 
             # Register module list and number of output filters

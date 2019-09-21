@@ -142,7 +142,6 @@ def segmentTrain(trainPath, valPath, cfgPath):
 
 def main():
     print("process start...")
-    torch.cuda.empty_cache()
     options = parse_arguments()
     segmentTrain(options.trainPath, options.valPath, options.cfg)
     print("process end!")

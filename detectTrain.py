@@ -140,7 +140,6 @@ def detectTrain(trainPath, valPath, cfgPath):
 
 def main():
     print("process start...")
-    torch.cuda.empty_cache()
     options = parse_arguments()
     detectTrain(options.trainPath, options.valPath, options.cfg)
     print("process end!")

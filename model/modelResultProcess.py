@@ -2,7 +2,7 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 import torch
-from utility.nonMaximumSuppression import *
+import numpy as np
 
 class ModelResultProcess():
 

@@ -79,7 +79,6 @@ def detect(inputPath, cfgPath, weightsPath):
 
 def main():
     print("process start...")
-    torch.cuda.empty_cache()
     options = parse_arguments()
     detect(options.inputPath, options.cfg, options.weights)
     print("process end!")
