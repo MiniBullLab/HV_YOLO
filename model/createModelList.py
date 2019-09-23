@@ -13,7 +13,7 @@ class CreateModuleList():
         pass
 
     def getModuleList(self, inputChannels, modelDefine):
-        output_filters = [inputChannels[-1]]
+        output_filters = []
         moduleList = nn.ModuleList()
         for i, module_def in enumerate(modelDefine):
             modules = nn.Sequential()

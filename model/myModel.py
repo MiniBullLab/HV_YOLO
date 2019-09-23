@@ -65,8 +65,10 @@ class MyModel(BaseModel):
             elif module_def['type'] in [BlockType.Upsample, BlockType.Maxpool]:
                 x = module(x)
             elif module_def['type'] == BlockType.Route:
-                layer_i = [int(x) for x in module_def['layers'].split(',')]
-                x = torch.cat([layer_outputs[i] if i < 0 else blocks[i] for i in layer_i], 1)
+                layer_i = [int(x) for x in module_def['layers'].split(',') if x]
+                #print(layer_i)
+                tempLayerOutputs = [layer_outputs[i] if i < 0 else blocks[i] for i in layer_i]
+                x = torch.cat(tempLayerOutputs, 1)
             elif module_def['type'] == BlockType.Shortcut:
                 layer_i = int(module_def['from'])
                 x = layer_outputs[-1] + layer_outputs[layer_i]
