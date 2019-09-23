@@ -1,7 +1,7 @@
 ## data
 root_dir = "/home/wfw/data/VOCdevkit/CityscapesFine/"
 imgSize = (640, 352)
-train_batch_size = 16
+train_batch_size = 2
 test_batch_size = 1
 className = ['bike', 'bus', 'car', 'motor', 'person', 'rider', 'truck']
 

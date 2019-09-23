@@ -27,8 +27,6 @@ class ModelParse():
             if line.startswith('['):  # This marks the start of a new block
                 modelDefine.append({})
                 modelDefine[-1]['type'] = line[1:-1].rstrip()
-                if modelDefine[-1]['type'] == 'convolutional':
-                    modelDefine[-1]['batch_normalize'] = 0
             else:
                 key, value = line.split("=")
                 value = value.strip()

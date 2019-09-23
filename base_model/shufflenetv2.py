@@ -2,6 +2,10 @@
 # See the paper "ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design" for more details.
 from .baseModelName import BaseModelName
 from .baseModel import *
+from base_block.blockName import BatchNormType, ActivationType, BlockType, LossType
+from base_block.utilityBlock import ConvBNActivationBlock, ConvActivationBlock
+
+__all__ = ['shufflenet_v2_1_0']
 
 class ShuffleBlock(nn.Module):
     def __init__(self, groups=2):
@@ -14,155 +18,173 @@ class ShuffleBlock(nn.Module):
         g = self.groups
         return x.view(N, g, int(C/g), H, W).permute(0, 2, 1, 3, 4).reshape(N, C, H, W)
 
-
 class SplitBlock(nn.Module):
     def __init__(self, ratio):
         super(SplitBlock, self).__init__()
         self.ratio = ratio
 
     def forward(self, x):
-        c = int(x.size(1) * self.ratio)
+        xChannel = x.size(1)
+        if torch.is_tensor(xChannel):
+            xChannel = np.asarray(xChannel)
+
+        c = int(xChannel * self.ratio)
         return x[:, :c, :, :], x[:, c:, :, :]
 
-
 class BasicBlock(nn.Module):
-    def __init__(self, in_channels, dilation, split_ratio=0.5):
+    def __init__(self, in_channels, out_channels, stride=1, dilation=1,
+                 bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU, split_ratio=0.5):
         super(BasicBlock, self).__init__()
         self.split = SplitBlock(split_ratio)
         in_channels = int(in_channels * split_ratio)
-        self.conv1 = nn.Conv2d(in_channels, in_channels,
-                               kernel_size=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(in_channels)
-        self.conv2 = nn.Conv2d(in_channels, in_channels,
-                                   kernel_size=3, stride=1, padding=dilation, groups=in_channels, dilation=dilation, bias=False)
-        self.bn2 = nn.BatchNorm2d(in_channels)
-        self.conv3 = nn.Conv2d(in_channels, in_channels,
-                               kernel_size=1, bias=False)
-        self.bn3 = nn.BatchNorm2d(in_channels)
+
+        self.convBnReLU1 = ConvBNActivationBlock(in_channels=in_channels,
+                                          out_channels=in_channels,
+                                          kernel_size=1,
+                                          bnName=bnName,
+                                          activationName=activationName)
+
+        self.convBn2 = ConvBNActivationBlock(in_channels=in_channels,
+                                          out_channels=in_channels,
+                                          kernel_size=3,
+                                          stride=stride,
+                                          padding=dilation,
+                                          dilation=dilation,
+                                          groups=in_channels,
+                                          bnName=bnName,
+                                          activationName=ActivationType.Linear)
+
+        self.convBnReLU3 = ConvBNActivationBlock(in_channels=in_channels,
+                                          out_channels=in_channels,
+                                          kernel_size=1,
+                                          bnName=bnName,
+                                          activationName=activationName)
+
         self.shuffle = ShuffleBlock()
 
     def forward(self, x):
         x1, x2 = self.split(x)
-        out = F.relu(self.bn1(self.conv1(x2)))
-        out = self.bn2(self.conv2(out))
-        out = F.relu(self.bn3(self.conv3(out)))
+        out = self.convBnReLU1(x2)
+        out = self.convBn2(out)
+        out = self.convBnReLU3(out)
         out = torch.cat([x1, out], 1)
         out = self.shuffle(out)
         return out
 
 
 class DownBlock(nn.Module):
-    def __init__(self, in_channels, out_channels):
+    def __init__(self, in_channels, out_channels, stride=2,
+                 bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
         super(DownBlock, self).__init__()
         mid_channels = out_channels // 2
         # left
-        self.conv1 = nn.Conv2d(in_channels, in_channels,
-                               kernel_size=3, stride=2, padding=1, groups=in_channels, bias=False)
-        self.bn1 = nn.BatchNorm2d(in_channels)
-        self.conv2 = nn.Conv2d(in_channels, mid_channels,
-                               kernel_size=1, bias=False)
-        self.bn2 = nn.BatchNorm2d(mid_channels)
+        self.convBn1l = ConvBNActivationBlock(in_channels=in_channels,
+                                          out_channels=in_channels,
+                                          kernel_size=3,
+                                          stride=stride,
+                                          padding=1,
+                                          groups=in_channels,
+                                          bnName=bnName,
+                                          activationName=ActivationType.Linear)
+
+        self.convBnReLU2l = ConvBNActivationBlock(in_channels=in_channels,
+                                          out_channels=mid_channels,
+                                          kernel_size=1,
+                                          bnName=bnName,
+                                          activationName=activationName)
         # right
-        self.conv3 = nn.Conv2d(in_channels, mid_channels,
-                               kernel_size=1, bias=False)
-        self.bn3 = nn.BatchNorm2d(mid_channels)
-        self.conv4 = nn.Conv2d(mid_channels, mid_channels,
-                               kernel_size=3, stride=2, padding=1, groups=mid_channels, bias=False)
-        self.bn4 = nn.BatchNorm2d(mid_channels)
-        self.conv5 = nn.Conv2d(mid_channels, mid_channels,
-                               kernel_size=1, bias=False)
-        self.bn5 = nn.BatchNorm2d(mid_channels)
+        self.convBnReLU1r = ConvBNActivationBlock(in_channels=in_channels,
+                                          out_channels=mid_channels,
+                                          kernel_size=1,
+                                          bnName=bnName,
+                                          activationName=activationName)
+
+        self.convBn2r = ConvBNActivationBlock(in_channels=mid_channels,
+                                          out_channels=mid_channels,
+                                          kernel_size=3,
+                                          stride=stride,
+                                          padding=1,
+                                          groups=mid_channels,
+                                          bnName=bnName,
+                                          activationName=ActivationType.Linear)
+
+        self.convBnReLU3r = ConvBNActivationBlock(in_channels=mid_channels,
+                                          out_channels=mid_channels,
+                                          kernel_size=1,
+                                          bnName=bnName,
+                                          activationName=activationName)
 
         self.shuffle = ShuffleBlock()
 
     def forward(self, x):
         # left
-        out1 = self.bn1(self.conv1(x))
-        out1 = F.relu(self.bn2(self.conv2(out1)))
+        outl = self.convBnReLU2l(self.convBn1l(x))
         # right
-        out2 = F.relu(self.bn3(self.conv3(x)))
-        out2 = self.bn4(self.conv4(out2))
-        out2 = F.relu(self.bn5(self.conv5(out2)))
+        outr = self.convBnReLU3r(self.convBn2r(self.convBnReLU1r(x)))
         # concat
-        out = torch.cat([out1, out2], 1)
+        out = torch.cat([outl, outr], 1)
         out = self.shuffle(out)
         return out
 
-
 class ShuffleNetV2(BaseModel):
-    def __init__(self, net_size):
+    def __init__(self, data_channel=3, num_blocks=[3,7,3], out_channels=(24, 24, 48, 96, 192), stride=[2,2,2],
+                 dilation=[1,1,1], bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
         super().__init__()
+        # init param
         self.setModelName(BaseModelName.ShuffleNetV2)
-        out_channels = configs[net_size]['out_channels']
-        self.out_channels = (24, out_channels[0], out_channels[1], out_channels[2])
-        num_blocks = configs[net_size]['num_blocks']
-        dilation = configs[net_size]['dilation']
+        self.data_channel = data_channel
+        self.num_blocks = num_blocks # [3, 7, 3]
+        self.out_channels = out_channels
+        self.stride = stride
+        self.dilation = dilation
+        self.activationName = activationName
+        self.bnName = bnName
 
-        self.conv1 = nn.Conv2d(3, 24, kernel_size=3,
-                               stride=2, padding=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(24)
-        self.in_channels = 24
-        self.layer1 = self._make_layer(out_channels[0], num_blocks[0], dilation[0])
-        self.layer2 = self._make_layer(out_channels[1], num_blocks[1], dilation[1])
-        self.layer3 = self._make_layer(out_channels[2], num_blocks[2], dilation[2])
+        # init layer
+        self.layer1 = ConvBNActivationBlock(in_channels=self.data_channel,
+                                          out_channels=self.out_channels[0],
+                                          kernel_size=3,
+                                          stride=2,
+                                          padding=1,
+                                          bnName=self.bnName,
+                                          activationName=self.activationName)
+        self.layer2 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
-    def _make_layer(self, out_channels, num_blocks, dilation):
-        layers = [DownBlock(self.in_channels, out_channels)]
+        self.in_channels = self.out_channels[1]
+        self.layer3 = self._make_layer(self.out_channels[2], self.num_blocks[0], self.stride[0], self.dilation[0], bnName, activationName)
+        self.layer4 = self._make_layer(self.out_channels[3], self.num_blocks[1], self.stride[0], self.dilation[1], bnName, activationName)
+        self.layer5 = self._make_layer(self.out_channels[4], self.num_blocks[2], self.stride[0], self.dilation[2], bnName, activationName)
+
+    def _make_layer(self, out_channels, num_blocks, stride, dilation, bnName, activationName):
+        layers = [DownBlock(self.in_channels, out_channels, stride=stride,
+                 bnName=bnName, activationName=activationName)]
         for i in range(num_blocks):
-            layers.append(BasicBlock(out_channels, dilation))
+            layers.append(BasicBlock(out_channels, out_channels, stride=1, dilation=dilation,
+                 bnName=bnName, activationName=activationName))
             self.in_channels = out_channels
         return nn.Sequential(*layers)
 
     def forward(self, x):
         blocks = []
-        out = F.relu(self.bn1(self.conv1(x)))
-        out = F.max_pool2d(out, 3, stride=2, padding=1)  # or delete max_pool
-        blocks.append(out)
-        out = self.layer1(out)
+        out = self.layer1(x)
         blocks.append(out)
         out = self.layer2(out)
         blocks.append(out)
         out = self.layer3(out)
         blocks.append(out)
+        out = self.layer4(out)
+        blocks.append(out)
+        out = self.layer5(out)
+        blocks.append(out)
 
         return blocks
 
+def get_shufflenet_v2(pretrained=False, **kwargs):
+    model = ShuffleNetV2()
 
-configs = {
-    0.5: {
-        'out_channels': (48, 96, 192, 1024),
-        'num_blocks': (3, 7, 3),
-        'dilation': (1, 1, 1)
-    },
+    if pretrained:
+        raise ValueError("Not support pretrained")
+    return model
 
-    1: {
-        'out_channels': (116, 232, 464, 1024),
-        'num_blocks': (3, 7, 3),
-        'dilation': (1, 1, 1)
-    },
-    1.5: {
-        'out_channels': (176, 352, 704, 1024),
-        'num_blocks': (3, 7, 3),
-        'dilation': (1, 1, 1)
-    },
-    2: {
-        'out_channels': (224, 488, 976, 2048),
-        'num_blocks': (3, 7, 3),
-        'dilation': (1, 1, 1)
-    },
-    3: {
-        'out_channels': (116, 232, 464, 1024),
-        'num_blocks': (3, 7, 3),
-        'dilation': (1, 2, 4)
-    }
-}
-
-
-def test():
-    net = ShuffleNetV2(net_size=3)
-    x = torch.randn(3, 3, 640, 352)
-    y = net(x)
-    print(y)
-
-
-# test()
+def shufflenet_v2_1_0(**kwargs):
+    return get_shufflenet_v2(**kwargs)

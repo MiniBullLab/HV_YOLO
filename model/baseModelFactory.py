@@ -13,7 +13,7 @@ class BaseModelFactory():
     def getBaseModel(self, baseNetName):
         result = None
         if baseNetName == BaseModelName.ShuffleNetV2:
-            result = ShuffleNetV2(net_size=1)
+            result = ShuffleNetV2()
         elif baseNetName == BaseModelName.MobileNetV2:
             result = MobileNetV2(width_mult=1.0)
         return result
