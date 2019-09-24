@@ -1,4 +1,4 @@
-# ShuffleYOLO
+# smartPytorch
 shufflenet yolo detection architecture
 # dataset
   * [dataset](https://github.com/lpj0822/dataset_process)
