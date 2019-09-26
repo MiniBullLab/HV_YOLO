@@ -32,7 +32,7 @@ class MyModel(BaseModel):
     def createTask(self):
         moduleList = nn.ModuleList()
         if self.basicModel:
-            outChannels = self.basicModel.out_channels
+            outChannels = self.basicModel.getOutChannelList()
             moduleList = self.createTaskList.getModuleList(outChannels, self.modelDefine)
         return moduleList
 
