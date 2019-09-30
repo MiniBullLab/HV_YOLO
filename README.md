@@ -1,5 +1,9 @@
 # smartPytorch
 shufflenet yolo detection architecture
+
+## Get Started
+Please see [wiki] for the basic usage, i.e., training and testing
+
 # dataset
   * [dataset](https://github.com/lpj0822/dataset_process)
 # Annotations
