@@ -89,13 +89,12 @@ def detectTrain(trainPath, valPath, cfgPath):
     start_epoch, best_mAP = torchModelProcess.getLatestModelValue(checkpoint)
     optimizer = torchOptimizer.getLatestModelOptimizer(model, checkpoint)
 
-    # summary(model, [1, 3, 640, 352])
     t0 = time.time()
     for epoch in range(start_epoch, detectConfig.maxEpochs):
 
         # get learning rate
         lr = multiLR.get_lr(epoch)
-        optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
+        #optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
         optimizer.zero_grad()
         for i, (imgs, targets) in enumerate(dataloader):
             if sum([len(x) for x in targets]) < 1:  # if no targets continue

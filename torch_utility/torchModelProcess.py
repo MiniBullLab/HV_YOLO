@@ -80,10 +80,12 @@ class TorchModelProcess():
         if count > 1:
             print('Using ', count, ' GPUs')
             model = nn.DataParallel(model)
-        model.to(self.torchDeviceProcess.device).train()
+        model = model.to(self.torchDeviceProcess.device)
+        model.train()
 
     def modelTestInit(self, model):
-        model.to(self.torchDeviceProcess.device).eval()
+        model = model.to(self.torchDeviceProcess.device)
+        model.eval()
 
     def convert_state_dict(self, state_dict):
         """Converts a state dict saved from a dataParallel module to normal

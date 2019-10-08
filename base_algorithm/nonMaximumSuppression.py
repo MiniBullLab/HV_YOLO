@@ -60,8 +60,8 @@ def non_max_suppression(pred, conf_thres=0.5, nms_thres=0.45, nms_style="OR", GI
         if n == 1:
             det_max.append(dc)  # No NMS required if only 1 prediction
             continue
-        elif n > 100:
-            dc = dc[:100]  # limit to first 100 boxes: https://github.com/ultralytics/yolov3/issues/117
+        # elif n > 100:
+        #     dc = dc[:100]  # limit to first 100 boxes: https://github.com/ultralytics/yolov3/issues/117
 
         # Non-maximum suppression
         if nms_style == 'OR':  # default

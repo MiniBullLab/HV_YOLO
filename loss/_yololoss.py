@@ -184,6 +184,7 @@ class YoloLoss(nn.Module):
             pred_boxes*= self.reduction
             conf = conf.view(nB, -1, 1)
             cls = output[:, :, 5:].contiguous().view(nB * nA, nC, nH * nW).transpose(1, 2).contiguous().view(nB, -1, nC)
+            cls = F.softmax(cls, 2)
 
             return torch.cat([pred_boxes, conf, cls], 2)
 

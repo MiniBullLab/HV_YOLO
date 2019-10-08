@@ -15,5 +15,5 @@ class BaseModelFactory():
         if baseNetName == BaseModelName.ShuffleNetV2:
             result = ShuffleNetV2()
         elif baseNetName == BaseModelName.MobileNetV2:
-            result = MobileNetV2(width_mult=1.0)
+            result = MobileNetV2()
         return result
