@@ -1,5 +1,9 @@
 # smartPytorch
 shufflenet yolo detection architecture
+
+## Get Started
+Please see [wiki](https://github.com/MiniBullLab/HV_YOLO/wiki) for the basic usage, _i.e.,_ training and testing
+
 # dataset
   * [dataset](https://github.com/lpj0822/dataset_process)
 # Annotations
