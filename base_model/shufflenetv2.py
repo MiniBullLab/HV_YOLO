@@ -5,25 +5,22 @@ from .baseModelName import BaseModelName
 from base_block.blockName import BatchNormType, ActivationType, BlockType
 from base_block.utilityBlock import ConvBNActivationBlock
 from base_block.shufflenetBlock import DownBlock, BasicBlock
-from collections import OrderedDict
-import re
 
 __all__ = ['shufflenet_v2_1_0']
 
 class ShuffleNetV2(BaseModel):
-    def __init__(self, data_channel=3, num_blocks=[3,7,3], out_channels=(24, 24, 48, 96, 192), stride=[2,2,2],
-                 dilation=[1,1,1], bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
+    def __init__(self, data_channel=3, num_blocks=[3, 7, 3], out_channels=(24, 24, 48, 96, 192), stride=[2, 2, 2],
+                 dilation=[1, 1, 1], bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
         super().__init__()
         # init param
         self.setModelName(BaseModelName.ShuffleNetV2)
         self.data_channel = data_channel
-        self.num_blocks = num_blocks # [3, 7, 3]
+        self.num_blocks = num_blocks
         self.out_channels = out_channels
         self.stride = stride
         self.dilation = dilation
         self.activationName = activationName
         self.bnName = bnName
-        self.moduleList = OrderedDict()
         self.outChannelList = []
         self.index = 0
 
@@ -64,7 +61,7 @@ class ShuffleNetV2(BaseModel):
 
     def addBlockList(self, blockName, block, out_channel):
         blockName = "base_%s_%d" % (blockName, self.index)
-        self.moduleList[blockName] = block
+        self.add_module(blockName, block)
         self.outChannelList.append(out_channel)
         self.index += 1
 
@@ -72,21 +69,15 @@ class ShuffleNetV2(BaseModel):
         return self.outChannelList
 
     def printBlockName(self):
-        for key, layer in self.moduleList.items():
+        for key in self._modules.keys():
             print(key)
 
     def forward(self, x):
-        blocks = []
-        out = None
-        for key, layer in self.moduleList.items():
-            index = int(re.sub("\D", "", key))
-            print(key, index)
-            if index == 0:
-                out = layer(x)
-            else:
-                out = layer(out)
-            blocks.append(out)
-        return blocks
+        output_list = []
+        for block in self._modules.values():
+            x = block(x)
+            output_list.append(x)
+        return output_list
 
 def get_shufflenet_v2(pretrained=False, **kwargs):
     model = ShuffleNetV2()
