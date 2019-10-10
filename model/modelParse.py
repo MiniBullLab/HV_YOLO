@@ -1,22 +1,9 @@
-import os
-import sys
-sys.path.insert(0, os.getcwd() + "/..")
-from .modelName import  ModelName
-from .myModel import MyModel
-#from .mobileV2FCN import MobileV2FCN
+# -*-coding:utf-8-*-
 
 class ModelParse():
 
     def __init__(self):
         pass
-
-    def parse(self, cfgPath, freezeBn=False):
-        path, fileNameAndPost = os.path.split(cfgPath)
-        fileName, post = os.path.splitext(fileNameAndPost)
-        modelDefine = self.readCfgFile(cfgPath)
-        model = MyModel(modelDefine, freezeBn)
-        model.setModelName(fileName)
-        return model
 
     def readCfgFile(self, cfgPath):
         modelDefine = []
@@ -33,9 +20,3 @@ class ModelParse():
                 modelDefine[-1][key.strip()] = value.strip()
         #print(modelDefine)
         return modelDefine
-
-    def getModel(self, modelName):
-        model = None
-        if modelName == ModelName.MobileV2FCN:
-            model = MobileV2FCN()
-        return model

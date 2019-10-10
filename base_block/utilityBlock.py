@@ -154,31 +154,5 @@ class SEBlock(BaseBlock):
         y = self.fc(y).view(b, c, 1, 1)
         return x * y
 
-
-# check the module
-class testNet(nn.Module):
-    def __init__(self):
-        super(testNet, self).__init__()
-
-        self.conv1 = ResidualBottleneck(16, 4, 1)
-        # self.conv1 = residualBasciNeck(16, 16, 1)
-        # self.conv1 = InvertedResidual(16, 16, 1, 2)
-        self.globalPool = GlobalAvgPool2d()
-        self.se = SEBlock(16)
-        # self.pool = nn.AvgPool2d(kernel_size=2)
-
-    def forward(self, input):
-
-        x = self.conv1(input)
-
-        return x
-
 if __name__ == "__main__":
-    import netron
-    import torch.onnx as onnx
-
-    input = torch.randn(1, 16, 32, 32)
-    model = testNet()
-    out = model(input)
-    onnx.export(model, input, "./a.onnx")
-    netron.start("./a.onnx", port=9999, host='localhost')
+    pass

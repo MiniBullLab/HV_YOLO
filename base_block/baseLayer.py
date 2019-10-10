@@ -11,6 +11,28 @@ class EmptyLayer(BaseBlock):
     def forward(self, x):
         pass
 
+class RouteLayer(BaseBlock):
+
+    def __init__(self, layers):
+        super().__init__(BlockType.RouteLayer)
+        self.layers = [int(x) for x in layers.split(',') if x]
+
+    def forward(self, layer_outputs, base_outputs):
+        # print(self.layers)
+        temp_layer_outputs = [layer_outputs[i] if i < 0 else base_outputs[i] for i in self.layers]
+        x = torch.cat(temp_layer_outputs, 1)
+        return x
+
+class ShortcutLayer(BaseBlock):
+
+    def __init__(self, layer_from):
+        super().__init__(BlockType.ShortcutLayer)
+        self.layer_from = int(layer_from)
+
+    def forward(self, layer_outputs):
+        x = layer_outputs[-1] + layer_outputs[self.layer_from]
+        return x
+
 class Upsample(BaseBlock):
     # Custom Upsample layer (nn.Upsample gives deprecated warning message)
 

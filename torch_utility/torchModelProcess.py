@@ -5,20 +5,20 @@ import torch
 from torch import nn
 from collections import OrderedDict
 from .torchDeviceProcess import TorchDeviceProcess
-from model.modelParse import ModelParse
+from model.model_factory import ModelFactory
 from model.modeWeightInit import ModelWeightInit
 
 class TorchModelProcess():
 
     def __init__(self):
         self.torchDeviceProcess = TorchDeviceProcess()
-        self.modelParse = ModelParse()
+        self.modelFactory = ModelFactory()
         self.modelWeightInit = ModelWeightInit()
         self.best_value = 0
 
     def initModel(self, cfgPath, gpuId):
         self.torchDeviceProcess.initTorch(gpuId)
-        model = self.modelParse.parse(cfgPath, freezeBn=False)
+        model = self.modelFactory.getModelFromCfg(cfgPath)
         self.modelWeightInit.initWeight(model)
         return model
 

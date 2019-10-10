@@ -1,50 +1,56 @@
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
+from collections import OrderedDict
 import torch.nn as nn
 from base_block.blockName import BlockType, LossType
 from base_block.utilityBlock import ConvBNActivationBlock, ConvActivationBlock
-from base_block.baseLayer import EmptyLayer, Upsample, GlobalAvgPool2d
+from base_block.baseLayer import EmptyLayer, RouteLayer, ShortcutLayer, Upsample, GlobalAvgPool2d
 from loss import *
 
 class CreateModuleList():
 
     def __init__(self):
-        pass
+        self.index = 0
+        self.outChannelList = []
+        self.blockDict = OrderedDict()
 
-    def getModuleList(self, inputChannels, modelDefine):
-        output_filters = []
-        moduleList = nn.ModuleList()
-        for i, module_def in enumerate(modelDefine):
-            modules = nn.Sequential()
+    def getBlockList(self):
+        return self.blockDict
 
+    def getOutChannelList(self):
+        return self.outChannelList
+
+    def createOrderedDict(self, modelDefine, inputChannels):
+        self.index = 0
+        self.blockDict.clear()
+        self.outChannelList.clear()
+        for module_def in modelDefine:
             if module_def['type'] == BlockType.Convolutional:
                 filters = int(module_def['filters'])
                 kernel_size = int(module_def['size'])
                 stride = int(module_def['stride'])
                 pad = (kernel_size - 1) // 2 if int(module_def['pad']) else 0
-                block = nn.Conv2d(in_channels=output_filters[-1],
+                block = nn.Conv2d(in_channels=self.outChannelList[-1],
                                 out_channels=filters,
                                 kernel_size=kernel_size,
                                 stride=stride,
                                 padding=pad,
                                 bias=True)
-                blockName = "%s_%d" % (BlockType.Convolutional, i)
-                modules.add_module(blockName, block)
+                self.addBlockList(BlockType.Convolutional, block, filters)
             elif module_def['type'] == BlockType.ConvActivationBlock:
                 filters = int(module_def['filters'])
                 kernel_size = int(module_def['size'])
                 stride = int(module_def['stride'])
                 pad = (kernel_size - 1) // 2 if int(module_def['pad']) else 0
                 activationName = module_def['activation']
-                block = ConvActivationBlock(in_channels=output_filters[-1],
+                block = ConvActivationBlock(in_channels=self.outChannelList[-1],
                                           out_channels=filters,
                                           kernel_size=kernel_size,
                                           stride=stride,
                                           padding=pad,
                                           activationName=activationName)
-                blockName = "%s_%d" % (BlockType.ConvActivationBlock, i)
-                modules.add_module(blockName, block)
+                self.addBlockList(BlockType.ConvActivationBlock, block, filters)
             elif module_def['type'] == BlockType.ConvBNActivationBlock:
                 bnName = module_def['batch_normalize']
                 filters = int(module_def['filters'])
@@ -52,43 +58,36 @@ class CreateModuleList():
                 stride = int(module_def['stride'])
                 pad = (kernel_size - 1) // 2 if int(module_def['pad']) else 0
                 activationName = module_def['activation']
-                block = ConvBNActivationBlock(in_channels=output_filters[-1],
+                block = ConvBNActivationBlock(in_channels=self.outChannelList[-1],
                                               out_channels=filters,
                                               kernel_size=kernel_size,
                                               stride=stride,
                                               padding=pad,
                                               bnName=bnName,
                                               activationName=activationName)
-                blockName = "%s_%d" % (BlockType.ConvBNActivationBlock, i)
-                modules.add_module(blockName, block)
+                self.addBlockList(BlockType.ConvBNActivationBlock, block, filters)
             elif module_def['type'] == BlockType.Maxpool:
                 kernel_size = int(module_def['size'])
                 stride = int(module_def['stride'])
                 if kernel_size == 2 and stride == 1:
-                    modules.add_module('_debug_padding_%d' % i, nn.ZeroPad2d((0, 1, 0, 1)))
+                    block = nn.ZeroPad2d((0, 1, 0, 1))
+                    self.addBlockList(BlockType.Maxpool, block, filters)
                 maxpool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride, padding=int((kernel_size - 1) // 2))
-                blockName = "%s_%d" % (BlockType.Maxpool, i)
-                modules.add_module(blockName, maxpool)
+                self.addBlockList(BlockType.Maxpool, maxpool, filters)
             elif module_def['type'] == BlockType.GlobalAvgPool:
                 globalAvgPool = GlobalAvgPool2d()
-                blockName = "%s_%d" % (BlockType.GlobalAvgPool, i)
-                modules.add_module(blockName, globalAvgPool)
+                self.addBlockList(BlockType.GlobalAvgPool, globalAvgPool, filters)
             elif module_def['type'] == BlockType.Upsample:
-                # upsample = nn.Upsample(scale_factor=int(module_def['stride']), mode='nearest')  # WARNING: deprecated
-                #upsample = Upsample(scale_factor=int(module_def['stride']), mode='bilinear')
                 upsample = Upsample(scale_factor=int(module_def['stride']), mode='nearest')
-                blockName = "%s_%d" % (BlockType.Upsample, i)
-                modules.add_module(blockName, upsample)
-            elif module_def['type'] == BlockType.Route:
-                layers = [int(x) for x in module_def['layers'].split(',')]
-                filters = sum([inputChannels[i] if i >= 0 else output_filters[i] for i in layers])
-                # filters = sum([output_filters[i + 1 if i > 0 else i] for i in layers])
-                blockName = "%s_%d" % (BlockType.Route, i)
-                modules.add_module(blockName, EmptyLayer())
-            elif module_def['type'] == BlockType.Shortcut:
-                filters = output_filters[int(module_def['from'])]
-                blockName = "%s_%d" % (BlockType.Shortcut, i)
-                modules.add_module(blockName, EmptyLayer())
+                self.addBlockList(BlockType.Upsample, upsample, filters)
+            elif module_def['type'] == BlockType.RouteLayer:
+                block = RouteLayer(module_def['layers'])
+                filters = sum([inputChannels[i] if i >= 0 else self.outChannelList[i] for i in block.layers])
+                self.addBlockList(BlockType.RouteLayer, block, filters)
+            elif module_def['type'] == BlockType.ShortcutLayer:
+                block = ShortcutLayer(module_def['from'])
+                filters = self.outChannelList[block.layer_from]
+                self.addBlockList(BlockType.ShortcutLayer, block, filters)
             elif module_def['type'] == LossType.Yolo:
                 anchor_idxs = [int(x) for x in module_def['mask'].split(',')]
                 # Extract anchors
@@ -98,13 +97,12 @@ class CreateModuleList():
                 # Define detection layer
                 yolo_layer = YoloLoss(num_classes, anchors=anchors, anchors_mask=anchor_idxs, smoothLabel=False,
                                       focalLoss=False)
-                blockName = "%s_%d" % (LossType.Yolo, i)
-                modules.add_module(blockName, yolo_layer)
+                self.addBlockList(LossType.Yolo, yolo_layer, filters)
             elif module_def["type"] == LossType.Softmax:
-                blockName = "%s_%d" % (LossType.Softmax, i)
-                modules.add_module(blockName, EmptyLayer())
+                self.addBlockList(LossType.Softmax, EmptyLayer(), filters)
 
-            # Register module list and number of output filters
-            moduleList.append(modules)
-            output_filters.append(filters)
-        return moduleList
+    def addBlockList(self, blockName, block, out_channel):
+        blockName = "%s_%d" % (blockName, self.index)
+        self.blockDict[blockName] = block
+        self.outChannelList.append(out_channel)
+        self.index += 1

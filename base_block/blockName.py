@@ -14,8 +14,13 @@ class BatchNormType():
 
 class BlockType():
 
+    BaseNet = "baseNet"
+
     ActivationLinearLayer = "activationLinearLayer"
     EmptyLayer = "emptyLayer"
+    RouteLayer = "route"
+    ShortcutLayer = "shortcut"
+    Maxpool = "maxpool"
     Upsample = "upsample"
     GlobalAvgPool = "globalavgpool"
     FcLayer = "fcLayer"
@@ -28,10 +33,6 @@ class BlockType():
     ResidualBasciNeck = "residualBasciNeck"
     ResidualBottleneck = "residualBottleneck"
     SEBlock = "seBlock"
-
-    Maxpool = "maxpool"
-    Route = "route"
-    Shortcut = "shortcut"
 
 class LossType():
 
