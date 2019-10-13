@@ -3,6 +3,7 @@
 *.workspace
 *.log
 .idea/
+log/
 build/
 devel/
 result/
