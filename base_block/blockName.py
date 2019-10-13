@@ -20,7 +20,7 @@ class BlockType():
     EmptyLayer = "emptyLayer"
     RouteLayer = "route"
     ShortcutLayer = "shortcut"
-    Maxpool = "maxpool"
+    MyMaxPool2d = "maxpool"
     Upsample = "upsample"
     GlobalAvgPool = "globalavgpool"
     FcLayer = "fcLayer"

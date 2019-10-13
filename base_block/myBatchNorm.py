@@ -1,5 +1,5 @@
 import torch.nn as nn
-from .blockName import BatchNormType, BlockType
+from .blockName import BatchNormType
 
 class MyBatchNormalize():
 

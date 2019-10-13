@@ -5,7 +5,7 @@ from collections import OrderedDict
 import torch.nn as nn
 from base_block.blockName import BlockType, LossType
 from base_block.utilityBlock import ConvBNActivationBlock, ConvActivationBlock
-from base_block.baseLayer import EmptyLayer, RouteLayer, ShortcutLayer, Upsample, GlobalAvgPool2d
+from base_block.baseLayer import EmptyLayer, RouteLayer, ShortcutLayer, MyMaxPool2d, Upsample, GlobalAvgPool2d
 from loss import *
 
 class CreateModuleList():
@@ -66,14 +66,11 @@ class CreateModuleList():
                                               bnName=bnName,
                                               activationName=activationName)
                 self.addBlockList(BlockType.ConvBNActivationBlock, block, filters)
-            elif module_def['type'] == BlockType.Maxpool:
+            elif module_def['type'] == BlockType.MyMaxPool2d:
                 kernel_size = int(module_def['size'])
                 stride = int(module_def['stride'])
-                if kernel_size == 2 and stride == 1:
-                    block = nn.ZeroPad2d((0, 1, 0, 1))
-                    self.addBlockList(BlockType.Maxpool, block, filters)
-                maxpool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride, padding=int((kernel_size - 1) // 2))
-                self.addBlockList(BlockType.Maxpool, maxpool, filters)
+                maxpool = MyMaxPool2d(kernel_size, stride)
+                self.addBlockList(BlockType.MyMaxPool2d, maxpool, filters)
             elif module_def['type'] == BlockType.GlobalAvgPool:
                 globalAvgPool = GlobalAvgPool2d()
                 self.addBlockList(BlockType.GlobalAvgPool, globalAvgPool, filters)

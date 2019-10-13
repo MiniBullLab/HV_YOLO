@@ -60,7 +60,6 @@ def main():
                      'momentum': 0.9,
                      'weight_decay': 5e-4},
                  2: {'optimizer': 'Adam',
-                     'lr': 1e-2,
                      'momentum': 0.9,
                      'weight_decay': 5e-4},
                  4: {'optimizer': 'SGD',

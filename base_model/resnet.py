@@ -6,8 +6,8 @@ Reference:
 [1] Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun
     Deep Residual Learning for Image Recognition. arXiv:1512.03385
 '''
-from .baseModelName import BaseModelName
 from .baseModel import *
+from .baseModelName import BaseModelName
 from base_block.blockName import BatchNormType, ActivationType, BlockType, LossType
 from base_block.utilityBlock import ConvBNActivationBlock, ConvActivationBlock
 from base_block.activationFunction import ActivationFunction

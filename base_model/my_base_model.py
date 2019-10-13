@@ -44,11 +44,11 @@ class MyBaseModel(BaseModel):
                 x = block(x)
             elif BlockType.Upsample in key:
                 x = block(x)
-            elif BlockType.Maxpool in key:
+            elif BlockType.MyMaxPool2d in key:
                 x = block(x)
-            elif BlockType.Route in key:
+            elif BlockType.RouteLayer in key:
                 x = block(layer_outputs, base_outputs)
-            elif BlockType.Shortcut in key:
+            elif BlockType.ShortcutLayer in key:
                 x = block(layer_outputs)
             elif LossType.Yolo in key:
                 output.append(x)

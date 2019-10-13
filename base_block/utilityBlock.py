@@ -9,34 +9,37 @@ class ConvActivationBlock(BaseBlock):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
                  dilation=1, groups=1, activationName=ActivationType.ReLU):
         super().__init__(BlockType.ConvActivationBlock)
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size,
+        conv = nn.Conv2d(in_channels, out_channels, kernel_size,
                               stride, padding, dilation, groups, bias=True)
-        self.activation = ActivationFunction.getFunction(activationName)
+        activation = ActivationFunction.getFunction(activationName)
+        self.block = nn.Sequential(OrderedDict([
+            (BlockType.Convolutional, conv),
+            (activationName, activation)
+        ]))
 
     def forward(self, x):
-        convX = self.conv(x)
-        activationX = self.activation(convX)
-        return activationX
+        x = self.block(x)
+        return x
 
 class ConvBNActivationBlock(BaseBlock):
 
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
                  dilation=1, groups=1, bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
         super().__init__(BlockType.ConvBNActivationBlock)
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size,
+        conv = nn.Conv2d(in_channels, out_channels, kernel_size,
                               stride, padding, dilation, groups, bias=False)
-        self.bn = MyBatchNormalize.getFunction(bnName, out_channels)
-        self.activation = ActivationFunction.getFunction(activationName)
+        bn = MyBatchNormalize.getFunction(bnName, out_channels)
+        activation = ActivationFunction.getFunction(activationName)
+        self.block = nn.Sequential(OrderedDict([
+            (BlockType.Convolutional, conv),
+            (bnName, bn),
+            (activationName, activation)
+        ]))
 
     def forward(self, x):
-        convX = self.conv(x)
-        bnX = self.bn(convX)
-        activationX = self.activation(bnX)
-        return activationX
+        x = self.block(x)
+        return x
 
-# -----------------------------------------------------------------
-#                      For MobileNetV2
-# -----------------------------------------------------------------
 class InvertedResidual(BaseBlock):
     def __init__(self, in_channels, out_channels, stride, expand_ratio,
                  dilation=1, bnName=BatchNormType.BatchNormalize, **kwargs):
@@ -44,99 +47,35 @@ class InvertedResidual(BaseBlock):
         assert stride in [1, 2]
         self.use_res_connect = stride == 1 and in_channels == out_channels
 
-        layers = list()
+        layers = OrderedDict()
         inter_channels = int(round(in_channels * expand_ratio))
         if expand_ratio != 1:
             # pw
-            convBNReLUBlock = ConvBNActivationBlock(in_channels, inter_channels, 1,\
-                                                    activationName=ActivationType.ReLU6, bnName=bnName)
-            layers.append(convBNReLUBlock)
-        layers.extend([
-            # dw
-            ConvBNActivationBlock(inter_channels, inter_channels, 3, \
-                                  stride, dilation, dilation, groups=inter_channels,\
-                                  activationName=ActivationType.ReLU6, bnName=bnName),
-            # pw-linear
-            nn.Conv2d(inter_channels, out_channels, 1, bias=False),
-            MyBatchNormalize.getFunction(bnName, out_channels)])
-        self.conv = nn.Sequential(*layers)
+            conv1 = ConvBNActivationBlock(in_channels, inter_channels, 1,\
+                                                    activationName=ActivationType.ReLU6,
+                                                    bnName=bnName)
+            conv2 = ConvBNActivationBlock(inter_channels, inter_channels, 3, \
+                                  stride, dilation, dilation, groups=inter_channels, \
+                                  activationName=ActivationType.ReLU6, bnName=bnName)
+            conv3 = nn.Conv2d(inter_channels, out_channels, 1, bias=False)
+            bn = MyBatchNormalize.getFunction(bnName, out_channels)
+            layer_name = "%s_1" % BlockType.ConvBNActivationBlock
+            layers[layer_name] = conv1
+            layer_name = "%s_2" % BlockType.ConvBNActivationBlock
+            layers[layer_name] = conv2
+            layer_name = BlockType.Convolutional
+            layers[layer_name] = conv3
+            layer_name = bnName
+            layers[layer_name] = bn
+
+        self.block = nn.Sequential(layers)
 
     def forward(self, x):
         if self.use_res_connect:
-            return x + self.conv(x)
+            return x + self.block(x)
         else:
-            return self.conv(x)
+            return self.block(x)
 
-# -----------------------------------------------------------------
-#                      For Resnet
-# -----------------------------------------------------------------
-class ResidualBasciNeck(BaseBlock):
-
-    expansion = 1
-
-    def __init__(self, inplanes, planes, stride=1):
-        super().__init__(BlockType.ResidualBasciNeck)
-        self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=3, stride=stride,
-                     padding=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(planes)
-        self.relu = nn.ReLU(inplace=True)
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
-                  padding=1, bias=False)
-        self.bn2 = nn.BatchNorm2d(planes)
-        self.stride = stride
-
-    def forward(self, x):
-        residual = x
-
-        out = self.conv1(x)
-        out = self.bn1(out)
-        out = self.relu(out)
-
-        out = self.conv2(out)
-        out = self.bn2(out)
-
-        out += residual
-        out = self.relu(out)
-
-        return out
-
-class ResidualBottleneck(BaseBlock):
-    expansion = 4
-
-    def __init__(self, inplanes, planes, stride=1):
-        super().__init__(BlockType.ResidualBottleneck)
-        self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
-                               padding=1, bias=False)
-        self.bn2 = nn.BatchNorm2d(planes)
-        self.conv3 = nn.Conv2d(planes, planes * 4, kernel_size=1, bias=False)
-        self.bn3 = nn.BatchNorm2d(planes * 4)
-        self.relu = nn.ReLU(inplace=True)
-        self.stride = stride
-
-    def forward(self, x):
-        residual = x
-
-        out = self.conv1(x)
-        out = self.bn1(out)
-        out = self.relu(out)
-
-        out = self.conv2(out)
-        out = self.bn2(out)
-        out = self.relu(out)
-
-        out = self.conv3(out)
-        out = self.bn3(out)
-
-        out += residual
-        out = self.relu(out)
-
-        return out
-
-# -----------------------------------------------------------------
-#                      New addition SELayer
-# -----------------------------------------------------------------
 class SEBlock(BaseBlock):
     def __init__(self, channel, reduction=16):
         super().__init__(BlockType.SEBlock)
@@ -146,7 +85,6 @@ class SEBlock(BaseBlock):
             nn.ReLU(inplace=True),
             nn.Linear(channel // reduction, channel),
             nn.Sigmoid())
-        self.setModelName("SEBlock")
 
     def forward(self, x):
         b, c, _, _ = x.size()

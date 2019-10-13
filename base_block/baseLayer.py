@@ -44,6 +44,24 @@ class Upsample(BaseBlock):
     def forward(self, x):
         return F.interpolate(x, scale_factor=self.scale_factor, mode=self.mode)
 
+class MyMaxPool2d(BaseBlock):
+
+    def __init__(self, kernel_size, stride):
+        super().__init__(BlockType.MyMaxPool2d)
+        layers = OrderedDict()
+        maxpool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride, padding=int((kernel_size - 1) // 2))
+        if kernel_size == 2 and stride == 1:
+            layer1 = nn.ZeroPad2d((0, 1, 0, 1))
+            layers["pad2d"] = layer1
+            layers[BlockType.MyMaxPool2d] = maxpool
+        else:
+            layers[BlockType.MyMaxPool2d] = maxpool
+        self.layer = nn.Sequential(layers)
+
+    def forward(self, x):
+        x = self.layer(x)
+        return x
+
 class GlobalAvgPool2d(BaseBlock):
     def __init__(self):
         super().__init__(BlockType.GlobalAvgPool)

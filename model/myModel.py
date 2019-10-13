@@ -73,7 +73,7 @@ class MyModel(BaseModel):
                 x = block(x)
             elif BlockType.Upsample in key:
                 x = block(x)
-            elif BlockType.Maxpool in key:
+            elif BlockType.MyMaxPool2d in key:
                 x = block(x)
             elif BlockType.RouteLayer in key:
                 x = block(layer_outputs, base_outputs)

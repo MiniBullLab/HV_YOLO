@@ -3,6 +3,7 @@
 from .baseModel import *
 from .baseModelName import BaseModelName
 from base_block.blockName import BatchNormType, ActivationType, BlockType
+from base_block.baseLayer import MyMaxPool2d
 from base_block.utilityBlock import ConvBNActivationBlock
 from base_block.shufflenetBlock import DownBlock, BasicBlock
 
@@ -37,8 +38,8 @@ class ShuffleNetV2(BaseModel):
                                        activationName=self.activationName)
         self.addBlockList(layer1.getModelName(), layer1, self.out_channels[0])
 
-        layer2 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.addBlockList(BlockType.Maxpool, layer2, self.out_channels[0])
+        layer2 = MyMaxPool2d(kernel_size=3, stride=2)
+        self.addBlockList(BlockType.MyMaxPool2d, layer2, self.out_channels[0])
 
         self.in_channels = self.out_channels[1]
         self.makeSuffleBlock(self.out_channels[2], self.num_blocks[0], self.stride[0], self.dilation[0],
