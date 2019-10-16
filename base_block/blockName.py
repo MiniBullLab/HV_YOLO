@@ -30,11 +30,4 @@ class BlockType():
     Convolutional = "convolutional"
 
     InvertedResidual = "invertedResidual"
-    ResidualBasciNeck = "residualBasciNeck"
-    ResidualBottleneck = "residualBottleneck"
     SEBlock = "seBlock"
-
-class LossType():
-
-    Softmax = "softmax"
-    Yolo = "yolo"

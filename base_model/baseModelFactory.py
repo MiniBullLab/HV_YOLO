@@ -5,6 +5,7 @@ from model.modelParse import ModelParse
 from .baseModelName import BaseModelName
 from .mobilenetv2 import MobileNetV2
 from .shufflenetv2 import ShuffleNetV2
+from .resnet import ResNet
 from .my_base_model import MyBaseModel
 
 class BaseModelFactory():
@@ -34,4 +35,6 @@ class BaseModelFactory():
             result = ShuffleNetV2()
         elif net_name == BaseModelName.MobileNetV2:
             result = MobileNetV2()
+        elif net_name == BaseModelName.ResNet:
+            result = ResNet()
         return result

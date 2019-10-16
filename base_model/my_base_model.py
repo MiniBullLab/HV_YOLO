@@ -6,13 +6,12 @@ from model.createModelList import *
 
 class MyBaseModel(BaseModel):
 
-    def __init__(self, modelDefine, freezeBn=False):
+    def __init__(self, modelDefine):
         super().__init__()
         self.createTaskList = CreateModuleList()
         self.modelDefine = modelDefine
         self.outChannelList = []
         self.createModel()
-        self.setFreezeBn(freezeBn)
 
     def createModel(self):
         outChannels = []
@@ -30,6 +29,10 @@ class MyBaseModel(BaseModel):
         for m in self.modules():
             if freezeBn and isinstance(m, nn.BatchNorm2d):
                 m.eval()
+
+    def printBlockName(self):
+        for key in self._modules.keys():
+            print(key)
 
     def forward(self, x):
         base_outputs = []

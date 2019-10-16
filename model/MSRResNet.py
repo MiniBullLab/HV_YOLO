@@ -2,7 +2,7 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 from base_model.baseModel import *
-from modelName import ModelName
+from .modelName import ModelName
 import functools
 import torch.nn.init as init
 
@@ -106,10 +106,4 @@ class MSRResNet(BaseModel):
                     init.constant_(m.bias.data, 0.0)
 
 if __name__ == "__main__":
-    from drawing.modelNetShow import ModelNetShow
-    input = torch.randn(1, 1, 72, 72)
-    modelNetShow = ModelNetShow()
-    model = MSRResNet(in_nc=1, upscale_factor=3)
-    modelNetShow.setInput(input)
-    modelNetShow.setSaveDir("../onnx")
-    modelNetShow.showNet(model)
+    pass

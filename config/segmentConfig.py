@@ -18,7 +18,6 @@ optimType = 'poly'
 base_lr = 1e-3
 lr_power = 0.9
 optimizerConfig = {0: {'optimizer': 'SGD',
-                     'lr': base_lr,
                      'momentum': 0.9,
                      'weight_decay': 5e-4}
                   }

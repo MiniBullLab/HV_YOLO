@@ -41,8 +41,8 @@ class ConvBNActivationBlock(BaseBlock):
         return x
 
 class InvertedResidual(BaseBlock):
-    def __init__(self, in_channels, out_channels, stride, expand_ratio,
-                 dilation=1, bnName=BatchNormType.BatchNormalize, **kwargs):
+    def __init__(self, in_channels, out_channels, stride=1, expand_ratio=1, dilation=1,
+                  bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU6, **kwargs):
         super().__init__(BlockType.InvertedResidual)
         assert stride in [1, 2]
         self.use_res_connect = stride == 1 and in_channels == out_channels
@@ -51,23 +51,34 @@ class InvertedResidual(BaseBlock):
         inter_channels = int(round(in_channels * expand_ratio))
         if expand_ratio != 1:
             # pw
-            conv1 = ConvBNActivationBlock(in_channels, inter_channels, 1,\
-                                                    activationName=ActivationType.ReLU6,
-                                                    bnName=bnName)
-            conv2 = ConvBNActivationBlock(inter_channels, inter_channels, 3, \
-                                  stride, dilation, dilation, groups=inter_channels, \
-                                  activationName=ActivationType.ReLU6, bnName=bnName)
-            conv3 = nn.Conv2d(inter_channels, out_channels, 1, bias=False)
-            bn = MyBatchNormalize.getFunction(bnName, out_channels)
+            convBNReLU1 = ConvBNActivationBlock(in_channels=in_channels,
+                                                out_channels=inter_channels,
+                                                kernel_size=1,
+                                                bnName=bnName,
+                                                activationName=activationName)
             layer_name = "%s_1" % BlockType.ConvBNActivationBlock
-            layers[layer_name] = conv1
-            layer_name = "%s_2" % BlockType.ConvBNActivationBlock
-            layers[layer_name] = conv2
-            layer_name = BlockType.Convolutional
-            layers[layer_name] = conv3
-            layer_name = bnName
-            layers[layer_name] = bn
+            layers[layer_name] = convBNReLU1
+        # dw
+        convBNReLU2 = ConvBNActivationBlock(in_channels=inter_channels,
+                                            out_channels=inter_channels,
+                                            kernel_size=3,
+                                            stride=stride,
+                                            padding=dilation,
+                                            dilation=dilation,
+                                            groups=inter_channels,
+                                            bnName=bnName,
+                                            activationName=activationName)
+        # pw-linear
+        convBNReLU3 = ConvBNActivationBlock(in_channels=inter_channels,
+                                            out_channels=out_channels,
+                                            kernel_size=1,
+                                            bnName=bnName,
+                                            activationName=ActivationType.Linear)
 
+        layer_name = "%s_2" % BlockType.ConvBNActivationBlock
+        layers[layer_name] = convBNReLU2
+        layer_name = "%s_3" % BlockType.ConvBNActivationBlock
+        layers[layer_name] = convBNReLU3
         self.block = nn.Sequential(layers)
 
     def forward(self, x):

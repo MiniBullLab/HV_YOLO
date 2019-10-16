@@ -3,7 +3,8 @@ import sys
 sys.path.insert(0, os.getcwd() + "/..")
 from collections import OrderedDict
 import torch.nn as nn
-from base_block.blockName import BlockType, LossType
+from base_block.blockName import BlockType
+from loss.loss_name import LossType
 from base_block.utilityBlock import ConvBNActivationBlock, ConvActivationBlock
 from base_block.baseLayer import EmptyLayer, RouteLayer, ShortcutLayer, MyMaxPool2d, Upsample, GlobalAvgPool2d
 from loss import *

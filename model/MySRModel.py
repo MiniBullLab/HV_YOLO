@@ -2,7 +2,7 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 from base_model.baseModel import *
-from modelName import ModelName
+from .modelName import ModelName
 import torch.nn.init as init
 
 
@@ -34,10 +34,4 @@ class MySRModel(BaseModel):
 
 
 if __name__ == "__main__":
-    from drawing.modelNetShow import ModelNetShow
-    input = torch.randn(1, 1, 72, 72)
-    modelNetShow = ModelNetShow()
-    model = MySRModel(upscale_factor=3)
-    modelNetShow.setInput(input)
-    modelNetShow.setSaveDir("../onnx")
-    modelNetShow.showNet(model)
+    pass

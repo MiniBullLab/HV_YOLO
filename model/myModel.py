@@ -3,20 +3,19 @@ import sys
 sys.path.insert(0, os.getcwd() + "/..")
 from collections import OrderedDict
 from base_model.baseModel import *
-from base_block.blockName import BlockType, LossType
+from base_block.blockName import BlockType
 from base_model.baseModelFactory import BaseModelFactory
 from .createModelList import *
 
 class MyModel(BaseModel):
 
-    def __init__(self, modelDefine, freezeBn=False):
+    def __init__(self, modelDefine):
         super().__init__()
         self.baseModelFactory = BaseModelFactory()
         self.createTaskList = CreateModuleList()
         self.modelDefine = modelDefine
         self.lossList = []
         self.createModel()
-        self.setFreezeBn(freezeBn)
 
     def createModel(self):
         basicModel = self.creatBaseModel()

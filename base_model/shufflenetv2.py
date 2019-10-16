@@ -10,7 +10,7 @@ from base_block.shufflenetBlock import DownBlock, BasicBlock
 __all__ = ['shufflenet_v2_1_0']
 
 class ShuffleNetV2(BaseModel):
-    def __init__(self, data_channel=3, num_blocks=[3, 7, 3], out_channels=(24, 24, 48, 96, 192), stride=[2, 2, 2],
+    def __init__(self, data_channel=3, num_blocks=[3, 7, 3], out_channels=(24, 24, 116, 232, 464), stride=[2, 2, 2],
                  dilation=[1, 1, 1], bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
         super().__init__()
         # init param
@@ -55,7 +55,7 @@ class ShuffleNetV2(BaseModel):
         downLayer = DownBlock(self.in_channels, out_channels, stride=stride,
                             bnName=bnName, activationName=activationName)
         self.addBlockList(downLayer.getModelName(), downLayer, out_channels)
-        for i in range(num_blocks):
+        for _ in range(num_blocks):
             tempLayer = BasicBlock(out_channels, out_channels, stride=1, dilation=dilation,
                  bnName=bnName, activationName=activationName)
             self.addBlockList(tempLayer.getModelName(), tempLayer, out_channels)

@@ -69,7 +69,8 @@ def detectTrain(trainPath, valPath, cfgPath):
     #logger
     logger = Logger(os.path.join("./log", "logs"))
     #set learning policy
-    multiLR = MultiStageLR([[49, detectConfig.base_lr * 0.1], [70, detectConfig.base_lr * 0.01]])
+    multiLR = MultiStageLR([[49, detectConfig.base_lr], [70, detectConfig.base_lr * 0.1],
+                            [100, detectConfig.base_lr * 0.01]])
     #model init
     model = torchModelProcess.initModel(cfgPath, 0)
     #loss init
@@ -87,13 +88,16 @@ def detectTrain(trainPath, valPath, cfgPath):
     else:
         torchModelProcess.modelTrainInit(model)
     start_epoch, best_mAP = torchModelProcess.getLatestModelValue(checkpoint)
-    optimizer = torchOptimizer.getLatestModelOptimizer(model, checkpoint)
+
+    torchOptimizer.createOptimizer(start_epoch, model, detectConfig.base_lr)
+    optimizer = torchOptimizer.getLatestModelOptimizer(checkpoint)
 
     t0 = time.time()
     for epoch in range(start_epoch, detectConfig.maxEpochs):
 
         # get learning rate
         lr = multiLR.get_lr(epoch)
+        torchOptimizer.adjust_lr(optimizer, lr)
         #optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
         optimizer.zero_grad()
         for i, (imgs, targets) in enumerate(dataloader):

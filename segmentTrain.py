@@ -98,6 +98,8 @@ def segmentTrain(trainPath, valPath, cfgPath):
     else:
         torchModelProcess.modelTrainInit(model)
     start_epoch, bestmIoU = torchModelProcess.getLatestModelValue(checkpoint)
+
+    torchOptimizer.createOptimizer(start_epoch, model, segmentConfig.base_lr)
     optimizer = torchOptimizer.getLatestModelOptimizer(model, checkpoint)
 
     # summary the model
@@ -110,8 +112,8 @@ def segmentTrain(trainPath, valPath, cfgPath):
 
             current_idx = epoch * len(dataloader) + idx
             lr = polyLR.get_lr(current_idx)
-
-            optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
+            torchOptimizer.adjust_lr(optimizer, lr)
+            #optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
 
             # Compute loss, compute gradient, update parameters
             output = model(imgs.cuda())[0]

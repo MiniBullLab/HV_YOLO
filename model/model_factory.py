@@ -1,7 +1,9 @@
 import os
 from .modelParse import ModelParse
-from .modelName import  ModelName
+from .modelName import ModelName
 from .myModel import MyModel
+from .MSRResNet import MSRResNet
+from .MySRModel import MySRModel
 #from .mobileV2FCN import MobileV2FCN
 
 class ModelFactory():
@@ -19,6 +21,10 @@ class ModelFactory():
 
     def getModelFromName(self, modelName):
         model = None
-        # if modelName == ModelName.MobileV2FCN:
+        if modelName == ModelName.MSRResNet:
+            model = MSRResNet(in_nc=1, upscale_factor=3)
+        elif model == ModelName.MySRModel:
+            model = MySRModel(upscale_factor=3)
+        # elif modelName == ModelName.MobileV2FCN:
         #     model = MobileV2FCN()
         return model
