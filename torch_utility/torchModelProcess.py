@@ -8,6 +8,7 @@ from .torchDeviceProcess import TorchDeviceProcess
 from model.model_factory import ModelFactory
 from model.modeWeightInit import ModelWeightInit
 
+
 class TorchModelProcess():
 
     def __init__(self):
@@ -18,7 +19,7 @@ class TorchModelProcess():
 
     def initModel(self, cfgPath, gpuId):
         self.torchDeviceProcess.initTorch(gpuId)
-        model = self.modelFactory.getModelFromCfg(cfgPath)
+        model = self.modelFactory.get_model(cfgPath)
         self.modelWeightInit.initWeight(model)
         return model
 

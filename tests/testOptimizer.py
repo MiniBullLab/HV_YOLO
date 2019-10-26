@@ -1,8 +1,13 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 from model.model_factory import ModelFactory
 from torch_utility.torchOptimizer import TorchOptimizer
+
 
 def main():
     optimizerM = {0: {'optimizer': 'SGD',
@@ -25,6 +30,7 @@ def main():
         print("epoch {}...............".format(epoch))
         optimizerMethod = TorchOptimizer(model, epoch, optimizerM)
         optimizerMethod.adjust_optimizer()
+
 
 if __name__ == "__main__":
     main()

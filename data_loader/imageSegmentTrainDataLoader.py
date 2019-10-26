@@ -1,5 +1,6 @@
-from .dataLoader import *
-from .trainDataProcess import TrainDataProcess
+import os.path
+from data_loader.dataLoader import *
+from data_loader.trainDataProcess import TrainDataProcess
 from PIL import Image
 
 multi_scale = False

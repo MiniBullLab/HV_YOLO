@@ -1,11 +1,14 @@
-import os
-import sys
-sys.path.insert(0, os.getcwd() + "/..")
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
 from collections import OrderedDict
-from base_model.baseModel import *
-from base_block.blockName import BlockType
-from base_model.baseModelFactory import BaseModelFactory
-from .createModelList import *
+from base_model.base_model import *
+from base_block.block_name import BlockType
+from loss.loss_name import LossType
+from base_model.base_model_factory import BaseModelFactory
+from model.createModelList import CreateModuleList
+
 
 class MyModel(BaseModel):
 
@@ -31,7 +34,7 @@ class MyModel(BaseModel):
         if baseNet["type"] == BlockType.BaseNet:
             baseNetName = baseNet["name"]
             self.modelDefine.pop(0)
-            result = self.baseModelFactory.getBaseModel(baseNetName)
+            result = self.baseModelFactory.get_base_model(baseNetName)
         return result
 
     def createTask(self, basicModel):
@@ -45,9 +48,9 @@ class MyModel(BaseModel):
     def createLoss(self, taskBlockDict):
         lossResult = []
         for key, block in taskBlockDict.items():
-            if LossType.Softmax in key:
+            if LossType.CrossEntropy2d in key:
                 lossResult.append(block)
-            elif LossType.Yolo in key:
+            elif LossType.YoloLoss in key:
                 lossResult.append(block)
         return lossResult
 
@@ -78,9 +81,13 @@ class MyModel(BaseModel):
                 x = block(layer_outputs, base_outputs)
             elif BlockType.ShortcutLayer in key:
                 x = block(layer_outputs)
-            elif LossType.Yolo in key:
+            elif BlockType.GlobalAvgPool in key:
+                x = block(x)
+            elif BlockType.FcLayer in key:
+                x = block(x)
+            elif LossType.YoloLoss in key:
                 output.append(x)
-            elif LossType.Softmax in key:
+            elif LossType.CrossEntropy2d in key:
                 output.append(x)
 
             layer_outputs.append(x)

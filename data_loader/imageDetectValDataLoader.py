@@ -1,9 +1,7 @@
-import os
-import sys
-sys.path.insert(0, os.getcwd() + "/..")
+import os.path
 from helper import DirProcess, XMLProcess
-from .dataLoader import *
-from .trainDataProcess import TrainDataProcess
+from data_loader.dataLoader import *
+from data_loader.trainDataProcess import TrainDataProcess
 
 class ImageDetectValDataLoader(DataLoader):
 

@@ -1,10 +1,9 @@
 import os
-import sys
-sys.path.insert(0, os.getcwd() + "/..")
-from .dataLoader import *
+from data_loader.dataLoader import *
+from data_loader.trainDataProcess import TrainDataProcess
 from helper import DirProcess
 from helper import ImageProcess
-from .trainDataProcess import TrainDataProcess
+
 
 class ImagesLoader(DataLoader):
     '''

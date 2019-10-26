@@ -1,24 +1,22 @@
-'''ResNet in PyTorch.
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
 
-For Pre-activation ResNet, see 'preact_resnet.py'.
-
-Reference:
-[1] Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun
-    Deep Residual Learning for Image Recognition. arXiv:1512.03385
-'''
-from .baseModel import *
-from .baseModelName import BaseModelName
-from base_block.blockName import BatchNormType, ActivationType, BlockType
-from base_block.utilityBlock import ConvBNActivationBlock
+from base_model.base_model import *
+from base_model.base_model_name import BaseModelName
+from base_block.block_name import BatchNormType, ActivationType, BlockType
+from base_block.utility_block import ConvBNActivationBlock
 from base_block.resnet_block import BasicBlock, Bottleneck
 
 __all__ = ['resnet_18']
 
+
 class ResNet(BaseModel):
-    def __init__(self, data_channel=3, num_blocks=[2,2,2,2], out_channels=[64,64,128,256,512], stride=[1,2,2,2],
-                 dilation=[1,1,1,1], bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU, block=BasicBlock, **kwargss):
+    def __init__(self, data_channel=3, num_blocks=[2,2,2,2], out_channels=[64,64,128,256,512],
+                 stride=[1,2,2,2], dilation=[1,1,1,1], bnName=BatchNormType.BatchNormalize,
+                 activationName=ActivationType.ReLU, block=BasicBlock):
         super().__init__()
-        self.setModelName(BaseModelName.ResNet)
+        self.set_name(BaseModelName.ResNet)
         self.data_channel = data_channel
         self.num_blocks = num_blocks # [3, 7, 3]
         self.out_channels = out_channels
@@ -40,7 +38,7 @@ class ResNet(BaseModel):
                                        padding=1,
                                        bnName=self.bnName,
                                        activationName=self.activationName)
-        self.addBlockList(layer1.getModelName(), layer1, self.out_channels[0])
+        self.addBlockList(layer1.get_name(), layer1, self.out_channels[0])
 
         layer2 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         self.addBlockList(BlockType.MyMaxPool2d, layer2, self.out_channels[0])
@@ -63,11 +61,11 @@ class ResNet(BaseModel):
 
     def make_resnet_layer(self, out_channels, num_blocks, stride, dilation, BatchNorm, activation, block):
         down_layers = block(self.in_channels, out_channels, stride)
-        name = "down_%s" % down_layers.getModelName()
+        name = "down_%s" % down_layers.get_name()
         self.addBlockList(name, down_layers, out_channels)
         for i in range(num_blocks - 1):
             layer = block(out_channels, out_channels, 1)
-            self.addBlockList(layer.getModelName(), layer, out_channels)
+            self.addBlockList(layer.get_name(), layer, out_channels)
 
     def addBlockList(self, blockName, block, out_channel):
         blockName = "base_%s_%d" % (blockName, self.index)
@@ -89,12 +87,14 @@ class ResNet(BaseModel):
             output_list.append(x)
         return output_list
 
+
 def get_resnet(pretrained=False, root='~/.torch/models', **kwargs):
     model = ResNet()
 
     if pretrained:
         raise ValueError("Not support pretrained")
     return model
+
 
 def resnet_18(**kwargs):
     return get_resnet(**kwargs)

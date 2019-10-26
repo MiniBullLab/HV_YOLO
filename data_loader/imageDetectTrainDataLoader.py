@@ -1,10 +1,9 @@
-import os
-import sys
-sys.path.insert(0, os.getcwd() + "/..")
+import os.path
 from helper import XMLProcess
-from .dataLoader import *
+from data_loader.dataLoader import *
 from utility.utils import xyxy2xywh
-from .trainDataProcess import TrainDataProcess
+from data_loader.trainDataProcess import TrainDataProcess
+
 
 class ImageDetectTrainDataLoader(DataLoader):
     def __init__(self, trainPath, className, batchSize=1, imageSize=(768, 320), \

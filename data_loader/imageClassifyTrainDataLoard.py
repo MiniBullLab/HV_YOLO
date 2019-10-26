@@ -1,4 +1,8 @@
-from .dataLoader import *
+from data_loader.dataLoader import DataLoader
+import math
+import cv2
+import torch
+import numpy as np
 
 class ImageClassifyTrainDataLoader(DataLoader):
     def __init__(self, path, batch_size=1, img_size=(416, 416)):
@@ -34,7 +38,8 @@ class ImageClassifyTrainDataLoader(DataLoader):
 
         for i in range(ia, ia + self.batch_size):
             # Read image
-            img_path = self.img_files[i]
+            trainFileIndex = i % self.nF
+            img_path = self.img_files[trainFileIndex]
             imagePath = img_path.split(" ")[0]
             label = int(img_path.split(" ")[1])
             img = cv2.imread(imagePath)  # BGR

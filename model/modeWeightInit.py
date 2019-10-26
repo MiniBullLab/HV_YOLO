@@ -1,4 +1,10 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
+
 from torch import nn
+
 
 class ModelWeightInit():
 

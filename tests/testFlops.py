@@ -1,13 +1,19 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
+
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 from torch_utility.model_summary import summary
-from model.modelParse import ModelParse
+from model.model_factory import ModelFactory
+
 
 def main():
     print("process start...")
-    modelParse = ModelParse()
-    model = modelParse.getModel("MobileV2FCN")
+    model_factory = ModelFactory()
+    model = model_factory.get_model("../cfg/yolov3.cfg")
     summary(model, [1, 3, 640, 352])
     print("process end!")
 

@@ -1,5 +1,13 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
 
 class LossType():
 
-    Softmax = "softmax"
-    Yolo = "yolo"
+    OhemCrossEntropy2d = "ohemCrossEntropy2d"
+    SmoothCrossEntropy = "smoothCrossEntropy"
+    CrossEntropy2d = "crossEntropy2d"
+    FocalLoss = "focalLoss"
+    FocalBinaryLoss = "focalBinaryLoss"
+    YoloLoss = "yolo"

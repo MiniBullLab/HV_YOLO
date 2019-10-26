@@ -63,5 +63,6 @@ class TorchOptimizer():
         for param_group in optimizer.param_groups:
             param_group['lr'] = lr
 
+
 if __name__ == "__main__":
     pass

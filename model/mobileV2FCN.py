@@ -1,99 +1,153 @@
-# import os
-# import sys
-# import numpy as np
-# sys.path.insert(0, os.getcwd() + "/..")
-# from base_block.baseLayer import EmptyLayer, Upsample
-# from base_block.utilityBlock import ConvBNReLU
-# from base_model.mobilenetv2 import MobileNetV2
-# from base_model.baseModel import *
-# from .modelName import ModelName
-#
-# class MobileV2FCN(BaseModel):
-#     """YOLOv3 object detection model"""
-#
-#     def __init__(self, classNum = 2, freeze_bn=False):
-#         super().__init__()
-#         self.setModelName(ModelName.MobileV2FCN)
-#
-#         self.basicModel = MobileNetV2(width_mult=1.0)
-#         basicModelChannels = self.basicModel.out_channels
-#
-#         self.FCNStep1 = nn.Sequential(ConvBNReLU(basicModelChannels[4], basicModelChannels[4]//2, 1, 1, 0, relu6=False,
-#                                         norm_layer=nn.BatchNorm2d),
-#                                       ConvBNReLU(basicModelChannels[4]//2, basicModelChannels[4], 3, 1, 1, relu6=False,
-#                                         norm_layer=nn.BatchNorm2d),
-#                                       ConvBNReLU(basicModelChannels[4], basicModelChannels[4]//2, 1, 1, 0, relu6=False,
-#                                         norm_layer=nn.BatchNorm2d),
-#                                       Upsample(scale_factor = 2, mode='bilinear'))
-#         self.FCNSkipLayerStep1 = ConvBNReLU(basicModelChannels[3], basicModelChannels[4]//2, 1, 1, 0, relu6=False,
-#                                         norm_layer=nn.BatchNorm2d)
-#         self.FCNStep2 = nn.Sequential(ConvBNReLU(basicModelChannels[4], int(basicModelChannels[4]//4), 1, 1, 0, relu6=False,
-#                                         norm_layer=nn.BatchNorm2d),
-#                                       ConvBNReLU(basicModelChannels[4]//4, basicModelChannels[4]//2, 3, 1, 1, relu6=False,
-#                                         norm_layer=nn.BatchNorm2d),
-#                                       ConvBNReLU(basicModelChannels[4]//2, basicModelChannels[4]//4, 1, 1, 0, relu6=False,
-#                                         norm_layer=nn.BatchNorm2d),
-#                                       Upsample(scale_factor=2, mode='bilinear'))
-#         self.FCNSkipLayerStep2 = ConvBNReLU(basicModelChannels[2], basicModelChannels[4]//4, 1, 1, 0, relu6=False,
-#                                         norm_layer=nn.BatchNorm2d)
-#         self.FCNStep3 = nn.Sequential(ConvBNReLU(basicModelChannels[4]//2, basicModelChannels[4]//8, 1, 1, 0, relu6=False,
-#                                         norm_layer=nn.BatchNorm2d),
-#                                       ConvBNReLU(basicModelChannels[4]//8, basicModelChannels[4]//4, 3, 1, 1, relu6=False,
-#                                         norm_layer=nn.BatchNorm2d),
-#                                       ConvBNReLU(basicModelChannels[4]//4, basicModelChannels[4]//8, 1, 1, 0, relu6=False,
-#                                         norm_layer=nn.BatchNorm2d),
-#                                       Upsample(scale_factor=2, mode='bilinear'))
-#         self.FCNSkipLayerStep3 = ConvBNReLU(basicModelChannels[1], basicModelChannels[4]//8, 1, 1, 0, relu6=False,
-#                                         norm_layer=nn.BatchNorm2d)
-#         self.FCNStep4 = nn.Sequential(ConvBNReLU(basicModelChannels[4]//4, basicModelChannels[4]//16, 1, 1, 0, relu6=False,
-#                                         norm_layer=nn.BatchNorm2d),
-#                                       ConvBNReLU(basicModelChannels[4]//16, basicModelChannels[4]//8, 3, 1, 1, relu6=False,
-#                                         norm_layer=nn.BatchNorm2d),
-#                                       ConvBNReLU(basicModelChannels[4]//8, basicModelChannels[4]//16, 1, 1, 0, relu6=False,
-#                                         norm_layer=nn.BatchNorm2d),
-#                                       nn.Conv2d(int(basicModelChannels[4]//16), classNum, 1, 1, 0),
-#                                       Upsample(scale_factor=4, mode='bilinear'))
-#
-#         self._init_weight()
-#
-#         if freeze_bn:
-#             self.freeze_bn()
-#
-#     def freeze_bn(self):
-#         for m in self.modules():
-#             if isinstance(m, nn.BatchNorm2d):
-#                 m.eval()
-#
-#     def _init_weight(self):
-#         # weight initialization
-#         for m in self.modules():
-#             if isinstance(m, nn.Conv2d):
-#                 nn.init.kaiming_normal_(m.weight, mode='fan_out')
-#                 if m.bias is not None:
-#                     nn.init.zeros_(m.bias)
-#             elif isinstance(m, nn.BatchNorm2d):
-#                 nn.init.ones_(m.weight)
-#                 nn.init.zeros_(m.bias)
-#             elif isinstance(m, nn.Linear):
-#                 nn.init.normal_(m.weight, 0, 0.01)
-#                 if m.bias is not None:
-#                     nn.init.zeros_(m.bias)
-#
-#     def forward(self, x):
-#         layer_outputs = []
-#
-#         blocks = self.basicModel(x)
-#
-#         x = self.FCNStep1(blocks[4])
-#         xSkip1 = self.FCNSkipLayerStep1(blocks[3])
-#         x = torch.cat([xSkip1, x], 1)
-#         x = self.FCNStep2(x)
-#         xSkip2 = self.FCNSkipLayerStep2(blocks[2])
-#         x = torch.cat([xSkip2, x], 1)
-#         x = self.FCNStep3(x)
-#         xSkip3 = self.FCNSkipLayerStep3(blocks[1])
-#         x = torch.cat([xSkip3, x], 1)
-#         x = self.FCNStep4(x)
-#         # print(x.shape)
-#
-#         return x
+from base_block.utility_layer import RouteLayer, Upsample, EmptyLayer
+from base_block.utility_block import ConvBNActivationBlock, ConvActivationBlock
+from base_block.block_name import BatchNormType, ActivationType, BlockType
+from loss.loss_name import LossType
+from loss.cross_entropy2d import CrossEntropy2d
+from base_model.mobilenetv2 import MobileNetV2
+from base_model.base_model import *
+from model.modelName import ModelName
+
+
+class MobileV2FCN(BaseModel):
+
+    def __init__(self, class_num=2):
+        super().__init__()
+        self.set_name(ModelName.MobileV2FCN)
+        self.class_number = class_num
+        self.bn_name = BatchNormType.BatchNormalize
+        self.activation_name = ActivationType.ReLU6
+        self.lossList = []
+        self.out_channels = []
+        self.index = 0
+        self.create_model()
+
+    def create_model(self):
+        basic_model = MobileNetV2(bnName=self.bn_name, activationName=self.activation_name)
+        base_out_channels = basic_model.getOutChannelList()
+        self.add_block_list(BlockType.BaseNet, basic_model, base_out_channels[-1])
+
+        input_channel = self.out_channels[-1]
+        output_channel = base_out_channels[-1] // 2
+        self.make_block(input_channel, output_channel)
+
+        layer1 = Upsample(scale_factor=2, mode='bilinear')
+        self.add_block_list(layer1.get_name(), layer1, self.out_channels[-1])
+
+        layer2 = RouteLayer('13')
+        output_channel = sum([base_out_channels[i] if i >= 0 else self.out_channels[i] for i in layer2.layers])
+        self.add_block_list(layer2.get_name(), layer2, output_channel)
+
+        input_channel = self.out_channels[-1]
+        output_channel = base_out_channels[-1] // 2
+        conv1 = ConvBNActivationBlock(input_channel, output_channel,
+                                      kernel_size=1, stride=1, padding=0,
+                                      bnName=self.bn_name, activationName=self.activation_name)
+        self.add_block_list(conv1.get_name(), conv1, output_channel)
+
+        layer3 = RouteLayer('-1,-3')
+        output_channel = sum([base_out_channels[i] if i >= 0 else self.out_channels[i] for i in layer3.layers])
+        self.add_block_list(layer3.get_name(), layer3, output_channel)
+
+        layer4 = Upsample(scale_factor=2, mode='bilinear')
+        self.add_block_list(layer4.get_name(), layer4, self.out_channels[-1])
+
+        input_channel = self.out_channels[-1]
+        output_channel = base_out_channels[-1] // 4
+        self.make_block(input_channel, output_channel)
+
+        layer5 = RouteLayer('6')
+        output_channel = sum([base_out_channels[i] if i >= 0 else self.out_channels[i] for i in layer5.layers])
+        self.add_block_list(layer5.get_name(), layer5, output_channel)
+
+        input_channel = self.out_channels[-1]
+        output_channel = base_out_channels[-1] // 4
+        conv2 = ConvBNActivationBlock(input_channel, output_channel,
+                                      kernel_size=1, stride=1, padding=0,
+                                      bnName=self.bn_name, activationName=self.activation_name)
+        self.add_block_list(conv2.get_name(), conv2, output_channel)
+
+        layer6 = RouteLayer('-1,-3')
+        output_channel = sum([base_out_channels[i] if i >= 0 else self.out_channels[i] for i in layer6.layers])
+        self.add_block_list(layer6.get_name(), layer6, output_channel)
+
+        input_channel = self.out_channels[-1]
+        output_channel = base_out_channels[-1] // 8
+        self.make_block(input_channel, output_channel)
+
+        input_channel = self.out_channels[-1]
+        output_channel = self.class_number
+        conv3 = ConvActivationBlock(input_channel, output_channel,
+                                    kernel_size=1, stride=1, padding=0,
+                                    activationName=ActivationType.Linear)
+        self.add_block_list(conv3.get_name(), conv3, output_channel)
+
+        layer7 = Upsample(scale_factor=8, mode='bilinear')
+        self.add_block_list(layer1.get_name(), layer7, self.out_channels[-1])
+
+        loss = CrossEntropy2d(ignore_index=250, size_average=True)
+        self.add_block_list(LossType.CrossEntropy2d, loss, self.out_channels[-1])
+        self.lossList.append(loss)
+
+    def make_block(self, input_channel, output_channel):
+        conv1 = ConvBNActivationBlock(input_channel, output_channel,
+                                      kernel_size=1, stride=1, padding=0,
+                                      bnName=self.bn_name, activationName=self.activation_name)
+        self.add_block_list(conv1.get_name(), conv1, output_channel)
+
+        temp_input_channel = self.out_channels[-1]
+        temp_output_channel = output_channel * 2
+        conv2 = ConvBNActivationBlock(temp_input_channel, temp_output_channel,
+                                      kernel_size=3, stride=1, padding=1,
+                                      bnName=self.bn_name, activationName=self.activation_name)
+        self.add_block_list(conv2.get_name(), conv2, temp_output_channel)
+
+        temp_input_channel = self.out_channels[-1]
+        temp_output_channel = output_channel
+        conv3 = ConvBNActivationBlock(temp_input_channel, temp_output_channel,
+                                      kernel_size=1, stride=1, padding=0,
+                                      bnName=self.bn_name, activationName=self.activation_name)
+        self.add_block_list(conv3.get_name(), conv3, temp_output_channel)
+
+    def add_block_list(self, block_name, block, output_channel):
+        block_name = "%s_%d" % (block_name, self.index)
+        self.add_module(block_name, block)
+        self.index += 1
+        self.out_channels.append(output_channel)
+
+    def freeze_bn(self, freezeBn):
+        for m in self.modules():
+            if freezeBn and isinstance(m, nn.BatchNorm2d):
+                m.eval()
+
+    def forward(self, x):
+        base_outputs = []
+        layer_outputs = []
+        output = []
+        for key, block in self._modules.items():
+            if BlockType.BaseNet in key:
+                base_outputs = block(x)
+                x = base_outputs[-1]
+            elif BlockType.Convolutional in key:
+                x = block(x)
+            elif BlockType.ConvActivationBlock in key:
+                x = block(x)
+            elif BlockType.ConvBNActivationBlock in key:
+                x = block(x)
+            elif BlockType.Upsample in key:
+                x = block(x)
+            elif BlockType.MyMaxPool2d in key:
+                x = block(x)
+            elif BlockType.RouteLayer in key:
+                x = block(layer_outputs, base_outputs)
+            elif BlockType.ShortcutLayer in key:
+                x = block(layer_outputs)
+            elif BlockType.GlobalAvgPool in key:
+                x = block(x)
+            elif BlockType.FcLayer in key:
+                x = block(x)
+            elif LossType.YoloLoss in key:
+                output.append(x)
+            elif LossType.CrossEntropy2d in key:
+                output.append(x)
+            layer_outputs.append(x)
+        return output

@@ -1,12 +1,18 @@
-from .baseBlock import *
-from base_block.activationFunction import ActivationFunction
-from base_block.blockName import BatchNormType, ActivationType
-from base_block.utilityBlock import ConvBNActivationBlock
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
+from base_block.base_block import *
+from base_block.activation_function import ActivationFunction
+from base_block.block_name import BatchNormType, ActivationType
+from base_block.utility_block import ConvBNActivationBlock
+
 
 class ResnetNetBlockName():
 
     BasicBlock = "basicBlock"
     Bottleneck = "bottleneck"
+
 
 class BasicBlock(BaseBlock):
     expansion = 1
@@ -15,7 +21,7 @@ class BasicBlock(BaseBlock):
                  bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
         super().__init__(ResnetNetBlockName.BasicBlock)
 
-        self.convBnReLU1 =  ConvBNActivationBlock(in_channels=in_channels,
+        self.convBnReLU1 = ConvBNActivationBlock(in_channels=in_channels,
                                           out_channels=planes,
                                           kernel_size=3,
                                           stride=stride,
@@ -42,7 +48,7 @@ class BasicBlock(BaseBlock):
                                           bnName=bnName,
                                           activationName=ActivationType.Linear)
 
-        self.ReLU = ActivationFunction.getFunction(activationName)
+        self.ReLU = ActivationFunction.get_function(activationName)
 
     def forward(self, x):
         out = self.convBnReLU1(x)
@@ -51,6 +57,7 @@ class BasicBlock(BaseBlock):
         out = self.ReLU(out)
         return out
 
+
 class Bottleneck(BaseBlock):
     expansion = 4
 
@@ -58,7 +65,7 @@ class Bottleneck(BaseBlock):
                  bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
         super(Bottleneck, self).__init__(ResnetNetBlockName.Bottleneck)
 
-        self.convBnReLU1 =  ConvBNActivationBlock(in_channels=in_channels,
+        self.convBnReLU1 = ConvBNActivationBlock(in_channels=in_channels,
                                           out_channels=planes,
                                           kernel_size=1,
                                           bnName=bnName,
@@ -73,7 +80,7 @@ class Bottleneck(BaseBlock):
                                           bnName=bnName,
                                           activationName=activationName)
 
-        self.convBn3 =  ConvBNActivationBlock(in_channels=planes,
+        self.convBn3 = ConvBNActivationBlock(in_channels=planes,
                                           out_channels=self.expansion*planes,
                                           kernel_size=1,
                                           bnName=bnName,
@@ -88,7 +95,7 @@ class Bottleneck(BaseBlock):
                                           bnName=bnName,
                                           activationName=ActivationType.Linear)
 
-        self.ReLU = ActivationFunction.getFunction(activationName)
+        self.ReLU = ActivationFunction.get_function(activationName)
 
     def forward(self, x):
         out = self.convBnReLU1(x)

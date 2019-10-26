@@ -41,58 +41,6 @@ def setup_logging(log_file='log.txt'):
     console.setFormatter(formatter)
     logging.getLogger('').addHandler(console)
 
-def save_checkpoint(state, is_best, path='.', filename='checkpoint.pth.tar', save_all=False):
-    filename = os.path.join(path, filename)
-    torch.save(state, filename)
-    if is_best:
-        shutil.copyfile(filename, os.path.join(path, 'model_best.pth.tar'))
-    if save_all:
-        shutil.copyfile(filename, os.path.join(
-            path, 'checkpoint_epoch_%s.pth.tar' % state['epoch']))
-
-__optimizers = {
-    'SGD': torch.optim.SGD,
-    'ASGD': torch.optim.ASGD,
-    'Adam': torch.optim.Adam,
-    'Adamax': torch.optim.Adamax,
-    'Adagrad': torch.optim.Adagrad,
-    'Adadelta': torch.optim.Adadelta,
-    'Rprop': torch.optim.Rprop,
-    'RMSprop': torch.optim.RMSprop
-}
-
-def adjust_optimizer(optimizer, epoch, config):
-    """Reconfigures the optimizer according to epoch and config dict"""
-    def modify_optimizer(optimizer, setting, e):
-        if 'optimizer' in setting:
-            optimizer = __optimizers[setting['optimizer']](
-                optimizer.param_groups)
-            logging.info('OPTIMIZER - setting method = %s' %
-                          setting['optimizer'])
-        for i_group, param_group in enumerate(optimizer.param_groups):
-            for key in param_group.keys():
-                if key in setting:
-                    if epoch != e and key == 'lr':
-                        continue
-
-                    param_group[key] = setting[key]
-                    if key == 'lr':
-                        param_group[key] = setting[key] * setting['diffRate'][i_group] \
-                            if 'diffRate' in setting else setting[key]
-
-                    logging.info('OPTIMIZER - group %s setting %s = %s' %
-                                  (i_group, key, param_group[key]))
-        return optimizer
-
-    if callable(config):
-        optimizer = modify_optimizer(optimizer, config(epoch), epoch)
-    else:
-        for e in range(epoch + 1):  # run over all epochs - sticky setting
-            if e in config:
-                optimizer = modify_optimizer(optimizer, config[e], e)
-
-    return optimizer
-
 #################################################################################################
 def multiLrMethod(model, hyperparams):
     stopLayer = "data"

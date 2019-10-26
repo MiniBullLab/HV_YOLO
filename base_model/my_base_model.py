@@ -1,8 +1,11 @@
-import os
-import sys
-sys.path.insert(0, os.getcwd() + "/..")
-from .baseModel import *
-from model.createModelList import *
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
+from base_model.base_model import *
+from base_block.block_name import BlockType
+from model.createModelList import CreateModuleList
+
 
 class MyBaseModel(BaseModel):
 
@@ -17,7 +20,7 @@ class MyBaseModel(BaseModel):
         outChannels = []
         self.createTaskList.createOrderedDict(self.modelDefine, outChannels)
         blockDict = self.createTaskList.getBlockList()
-        self.outChannelList = self.getOutChannelList()
+        self.outChannelList = self.createTaskList.getOutChannelList()
         for key, block in blockDict.items():
             name = "base_%s" % key
             self.add_module(name, block)
@@ -37,7 +40,6 @@ class MyBaseModel(BaseModel):
     def forward(self, x):
         base_outputs = []
         layer_outputs = []
-        output = []
         for key, block in self._modules.items():
             if BlockType.Convolutional in key:
                 x = block(x)
@@ -53,10 +55,9 @@ class MyBaseModel(BaseModel):
                 x = block(layer_outputs, base_outputs)
             elif BlockType.ShortcutLayer in key:
                 x = block(layer_outputs)
-            elif LossType.Yolo in key:
-                output.append(x)
-            elif LossType.Softmax in key:
-                output.append(x)
-
+            elif BlockType.GlobalAvgPool in key:
+                x = block(x)
+            elif BlockType.FcLayer in key:
+                x = block(x)
             layer_outputs.append(x)
         return layer_outputs

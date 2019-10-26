@@ -1,12 +1,11 @@
 import os
-import sys
-sys.path.insert(0, os.getcwd() + "/..")
 import random
 import math
 import numpy as np
 import cv2
 import torch
 from helper import DirProcess
+
 
 class DataLoader():
 

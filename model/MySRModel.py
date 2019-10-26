@@ -1,15 +1,17 @@
-import os
-import sys
-sys.path.insert(0, os.getcwd() + "/..")
-from base_model.baseModel import *
-from .modelName import ModelName
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
+
+from base_model.base_model import *
+from model.modelName import ModelName
 import torch.nn.init as init
 
 
 class MySRModel(BaseModel):
     def __init__(self, upscale_factor):
         super().__init__()
-        self.setModelName(ModelName.MySRModel)
+        self.set_name(ModelName.MySRModel)
         self.relu = nn.ReLU()
         self.conv1 = nn.Conv2d(1, 64, (5, 5), (1, 1), (2, 2))
         self.conv2 = nn.Conv2d(64, 64, (3, 3), (1, 1), (1, 1))

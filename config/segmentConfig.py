@@ -12,9 +12,6 @@ latest_weights_file = './snapshot/latest.pt'
 best_weights_file = './snapshot/best.pt'
 maxEpochs = 300
 
-resume = True
-
-optimType = 'poly'
 base_lr = 1e-3
 lr_power = 0.9
 optimizerConfig = {0: {'optimizer': 'SGD',

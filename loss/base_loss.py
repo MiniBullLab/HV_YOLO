@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -8,8 +13,8 @@ class BaseLoss(nn.Module):
         super().__init__()
         self.loss_name = name
 
-    def set_loss_name(self, name):
+    def set_name(self, name):
         self.loss_name = name
 
-    def get_loss_name(self):
+    def get_name(self):
         return self.loss_name

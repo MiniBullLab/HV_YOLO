@@ -1,10 +1,7 @@
-import os
-import sys
-sys.path.insert(0, os.getcwd() + "/..")
 import cv2
 import numpy as np
-
 from helper.dataType import DetectionObject
+
 
 class TrainDataProcess():
 

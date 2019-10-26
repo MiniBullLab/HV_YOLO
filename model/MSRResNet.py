@@ -1,10 +1,12 @@
-import os
-import sys
-sys.path.insert(0, os.getcwd() + "/..")
-from base_model.baseModel import *
-from .modelName import ModelName
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
+from base_model.base_model import *
+from model.modelName import ModelName
 import functools
 import torch.nn.init as init
+
 
 class ResidualBlock_noBN(nn.Module):
     '''Residual block w/o BN
@@ -45,13 +47,14 @@ class ResidualBlock_noBN(nn.Module):
                     init.constant_(m.weight, 1)
                     init.constant_(m.bias.data, 0.0)
 
+
 class MSRResNet(BaseModel):
     ''' modified SRResNet'''
 
 
     def __init__(self, in_nc=3, nf=64, nb=3, upscale_factor=3):
         super().__init__()
-        self.setModelName(ModelName.MSRResNet)
+        self.set_name(ModelName.MSRResNet)
         self.upscale_factor = upscale_factor
 
         self.conv_first = nn.Conv2d(in_nc, nf, 3, 1, 1, bias=True)
@@ -104,6 +107,7 @@ class MSRResNet(BaseModel):
                 elif isinstance(m, nn.BatchNorm2d):
                     init.constant_(m.weight, 1)
                     init.constant_(m.bias.data, 0.0)
+
 
 if __name__ == "__main__":
     pass
