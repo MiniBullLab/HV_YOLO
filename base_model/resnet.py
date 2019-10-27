@@ -88,13 +88,6 @@ class ResNet(BaseModel):
         return output_list
 
 
-def get_resnet(pretrained=False, root='~/.torch/models', **kwargs):
+def resnet_18():
     model = ResNet()
-
-    if pretrained:
-        raise ValueError("Not support pretrained")
     return model
-
-
-def resnet_18(**kwargs):
-    return get_resnet(**kwargs)

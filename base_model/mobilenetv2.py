@@ -103,15 +103,8 @@ class MobileNetV2(BaseModel):
         return output_list
 
 
-def get_mobilenet_v2(pretrained=False, **kwargs):
+def mobilenet_v2_1_0():
     model = MobileNetV2()
-
-    if pretrained:
-        raise ValueError("Not support pretrained")
     return model
-
-
-def mobilenet_v2_1_0(**kwargs):
-    return get_mobilenet_v2(**kwargs)
 
 

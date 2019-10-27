@@ -87,13 +87,6 @@ class ShuffleNetV2(BaseModel):
         return output_list
 
 
-def get_shufflenet_v2(pretrained=False, **kwargs):
+def shufflenet_v2_1_0():
     model = ShuffleNetV2()
-
-    if pretrained:
-        raise ValueError("Not support pretrained")
     return model
-
-
-def shufflenet_v2_1_0(**kwargs):
-    return get_shufflenet_v2(**kwargs)
