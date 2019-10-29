@@ -57,9 +57,9 @@ class TorchModelProcess():
         start_epoch = 0
         value = -1
         if checkpoint:
-            if checkpoint.get('epoch'):
+            if checkpoint.get('epoch') is not None:
                 start_epoch = checkpoint['epoch'] + 1
-            if checkpoint.get('best_value'):
+            if checkpoint.get('best_value') is not None:
                 value = checkpoint['best_value']
         self.setModelBestValue(value)
         return start_epoch, value

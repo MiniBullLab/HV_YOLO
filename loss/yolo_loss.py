@@ -204,7 +204,7 @@ class YoloLoss(BaseLoss):
             self.info['coord_wh'] = (coord_mask* mse(coord_wh, tcoord_wh)).sum().item() / obj_cur
             self.printInfo()
 
-            self.loss_tot = (self.loss_coord + self.loss_conf + self.loss_cls) / obj_cur
+            self.loss_tot = (self.loss_coord + self.loss_conf + self.loss_cls)
             return self.loss_tot
 
         else:

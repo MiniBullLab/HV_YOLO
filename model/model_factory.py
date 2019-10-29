@@ -36,7 +36,7 @@ class ModelFactory():
         model = None
         if modelName == ModelName.MSRResNet:
             model = MSRResNet(in_nc=1, upscale_factor=3)
-        elif model == ModelName.MySRModel:
+        elif modelName == ModelName.MySRModel:
             model = MySRModel(upscale_factor=3)
         elif modelName == ModelName.MobileV2FCN:
             model = MobileV2FCN()

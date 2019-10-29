@@ -33,9 +33,9 @@ class ResNet(BaseModel):
     def create_block_list(self):
         layer1 = ConvBNActivationBlock(in_channels=self.data_channel,
                                        out_channels=self.out_channels[0],
-                                       kernel_size=3,
+                                       kernel_size=7,
                                        stride=2,
-                                       padding=1,
+                                       padding=3,
                                        bnName=self.bnName,
                                        activationName=self.activationName)
         self.addBlockList(layer1.get_name(), layer1, self.out_channels[0])

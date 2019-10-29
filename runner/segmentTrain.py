@@ -40,7 +40,7 @@ class SegmentTrain():
         self.start_epoch, self.bestmIoU = self.torchModelProcess.getLatestModelValue(checkpoint)
 
         self.torchOptimizer.createOptimizer(self.start_epoch, self.model, segmentConfig.base_lr)
-        self.optimizer = self.torchOptimizer.getLatestModelOptimizer(self.model, checkpoint)
+        self.optimizer = self.torchOptimizer.getLatestModelOptimizer(checkpoint)
 
     def update_logger(self, step, value):
         self.lossTrain.update(value)

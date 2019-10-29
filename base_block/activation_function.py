@@ -26,10 +26,10 @@ class ActivationFunction():
         if name == ActivationType.Linear:
             return LinearActivation()
         elif name == ActivationType.ReLU:
-            return nn.ReLU()
+            return nn.ReLU(inplace=True)
         elif name == ActivationType.PReLU:
             return nn.PReLU()
         elif name == ActivationType.ReLU6:
-            return nn.ReLU6()
+            return nn.ReLU6(inplace=True)
         elif name == ActivationType.LeakyReLU:
-            return nn.LeakyReLU(0.1)
+            return nn.LeakyReLU(0.1, inplace=True)
