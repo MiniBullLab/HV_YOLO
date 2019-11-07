@@ -4,8 +4,8 @@
 
 from collections import OrderedDict
 from base_model.base_model import *
-from base_block.block_name import BlockType
-from loss.loss_name import LossType
+from base_name.block_name import BlockType
+from base_name.loss_name import LossType
 from base_model.base_model_factory import BaseModelFactory
 from model.createModelList import CreateModuleList
 
@@ -50,6 +50,8 @@ class MyModel(BaseModel):
         for key, block in taskBlockDict.items():
             if LossType.CrossEntropy2d in key:
                 lossResult.append(block)
+            elif LossType.OhemCrossEntropy2d in key:
+                lossResult.append(block)
             elif LossType.YoloLoss in key:
                 lossResult.append(block)
         return lossResult
@@ -88,6 +90,8 @@ class MyModel(BaseModel):
             elif LossType.YoloLoss in key:
                 output.append(x)
             elif LossType.CrossEntropy2d in key:
+                output.append(x)
+            elif LossType.OhemCrossEntropy2d in key:
                 output.append(x)
 
             layer_outputs.append(x)

@@ -6,6 +6,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from base_name.loss_name import LossType
+
 
 class BaseLoss(nn.Module):
 

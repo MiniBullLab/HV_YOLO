@@ -3,9 +3,10 @@
 # Author:
 
 from base_model.base_model import *
-from base_model.base_model_name import BaseModelName
-from base_block.block_name import BatchNormType, ActivationType
+from base_name.block_name import BatchNormType, ActivationType
+from base_name.base_model_name import BaseModelName
 from base_block.utility_block import ConvBNActivationBlock, InvertedResidual
+
 
 __all__ = ['MobileNetV2']
 

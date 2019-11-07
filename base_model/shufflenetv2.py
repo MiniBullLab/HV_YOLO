@@ -5,11 +5,12 @@
 # See the paper "ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design" for more details.
 
 from base_model.base_model import *
-from base_model.base_model_name import BaseModelName
-from base_block.block_name import BatchNormType, ActivationType, BlockType
+from base_name.base_model_name import BaseModelName
+from base_name.block_name import BatchNormType, ActivationType, BlockType
 from base_block.utility_layer import MyMaxPool2d
 from base_block.utility_block import ConvBNActivationBlock
 from base_block.shufflenet_block import DownBlock, BasicBlock
+
 
 __all__ = ['shufflenet_v2_1_0']
 

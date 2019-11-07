@@ -1,5 +1,5 @@
 from loss.base_loss import *
-from loss.loss_name import LossType
+
 
 class MixSoftmaxCrossEntropyLoss(nn.CrossEntropyLoss):
     def __init__(self, aux=True, aux_weight=0.2, ignore_index=-1):

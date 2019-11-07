@@ -3,7 +3,7 @@
 # Author:
 
 from base_model.base_model import *
-from base_block.block_name import BlockType
+from base_name.block_name import BlockType
 from model.createModelList import CreateModuleList
 
 

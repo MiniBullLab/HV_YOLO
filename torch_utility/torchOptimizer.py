@@ -24,7 +24,23 @@ class TorchOptimizer():
         self.optimizer = self.optimizers[setting['optimizer']](filter(lambda p: p.requires_grad, model.parameters()),
                                                           lr=base_lr)
         self.adjust_param(self.optimizer, setting)
-        self.adjust_lr(self.optimizer, base_lr)
+
+    def freeze_optimizer_layer(self, epoch, base_lr, model, layer_name):
+        self.freeze_layer(model, layer_name)
+        self.createOptimizer(epoch, model, base_lr)
+
+    def freeze_layer(self, model, layer_name):
+        for key, block in model._modules.items():
+            if layer_name in key:
+                for param in block.parameters():
+                    param.requires_grad = True
+
+    def freeze_front_layer(self, model, layer_name):
+        for key, block in model._modules.items():
+            for param in block.parameters():
+                param.requires_grad = True
+            if layer_name in key:
+                break
 
     def adjust_optimizer(self, epoch, lr):
         # select the true epoch to adjust the optimizer
@@ -33,10 +49,9 @@ class TorchOptimizer():
             if epoch >= e:
                 em = e
         setting = self.config[em]
-        optimizer = self.modify_optimizer(self.optimizer, setting)
-        self.adjust_param(optimizer, setting)
-        self.adjust_lr(optimizer, lr)
-        return optimizer
+        self.optimizer = self.modify_optimizer(self.optimizer, setting)
+        self.adjust_param(self.optimizer, setting)
+        return self.optimizer
 
     def getLatestModelOptimizer(self, checkpoint):
         if checkpoint:
@@ -58,10 +73,6 @@ class TorchOptimizer():
                     param_group[key] = setting[key]
                     print('OPTIMIZER - group %s setting %s = %s' %
                           (i_group, key, param_group[key]))
-
-    def adjust_lr(self, optimizer, lr):
-        for param_group in optimizer.param_groups:
-            param_group['lr'] = lr
 
 
 if __name__ == "__main__":

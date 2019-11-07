@@ -2,15 +2,15 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-
-from collections import OrderedDict
 import torch.nn as nn
-from base_block.block_name import BlockType
-from loss.loss_name import LossType
+from collections import OrderedDict
+from base_name.block_name import BlockType
+from base_name.loss_name import LossType
 from base_block.utility_block import ConvBNActivationBlock, ConvActivationBlock
-from base_block.utility_layer import EmptyLayer, RouteLayer, ShortcutLayer
+from base_block.utility_layer import RouteLayer, ShortcutLayer
 from base_block.utility_layer import MyMaxPool2d, Upsample, GlobalAvgPool2d, FcLayer
 from loss.cross_entropy2d import CrossEntropy2d
+from loss.ohem_cross_entropy2d import OhemCrossEntropy2d
 from loss.yolo_loss import YoloLoss
 
 
@@ -123,6 +123,11 @@ class CreateModuleList():
                 ignore_index = int(module_def["ignore_index"])
                 layer = CrossEntropy2d(ignore_index=ignore_index)
                 self.addBlockList(LossType.CrossEntropy2d, layer, filters)
+                input_channels = filters
+            elif module_def["type"] == LossType.OhemCrossEntropy2d:
+                ignore_index = int(module_def["ignore_index"])
+                layer = OhemCrossEntropy2d(ignore_index=ignore_index)
+                self.addBlockList(LossType.OhemCrossEntropy2d, layer, filters)
                 input_channels = filters
 
     def addBlockList(self, blockName, block, out_channel):

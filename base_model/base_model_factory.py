@@ -3,7 +3,7 @@
 # Author:
 
 import os.path
-from base_model.base_model_name import BaseModelName
+from base_name.base_model_name import BaseModelName
 from base_model.mobilenetv2 import MobileNetV2
 from base_model.shufflenetv2 import ShuffleNetV2
 from base_model.resnet import ResNet

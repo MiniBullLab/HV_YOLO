@@ -3,9 +3,10 @@
 # Author:
 
 from base_block.base_block import *
-from base_block.block_name import BatchNormType, ActivationType
+from base_name.block_name import BatchNormType, ActivationType
 from base_block.utility_block import ConvBNActivationBlock, SEBlock
 import numpy as np
+
 
 def channel_shuffle(x, groups):
     batchsize, num_channels, height, width = x.data.size()

@@ -3,7 +3,7 @@
 # Author:
 
 from base_model.base_model import *
-from model.modelName import ModelName
+from base_name.model_name import ModelName
 import functools
 import torch.nn.init as init
 

@@ -1,5 +1,4 @@
 from loss.base_loss import *
-from loss.loss_name import LossType
 import numpy as np
 
 def enet_weighing(labels, num_classes, c=1.02):
@@ -44,7 +43,8 @@ class CrossEntropy2d(BaseLoss):
         self.size_average = size_average
         self.ignore_index = ignore_index
         self.loss_function = nn.CrossEntropyLoss(ignore_index=self.ignore_index,
-                                                 weight=self.weight, size_average=self.size_average)
+                                                 weight=self.weight,
+                                                 size_average=self.size_average)
 
     def segment_resize(self, input, target):
         n, c, h, w = input.size()
