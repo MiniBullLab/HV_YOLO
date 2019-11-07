@@ -4,7 +4,7 @@
 
 import numpy as np
 from base_block.base_block import *
-from base_block.block_name import BlockType, ActivationType
+from base_name.block_name import BlockType, ActivationType
 from base_block.activation_function import ActivationFunction
 
 

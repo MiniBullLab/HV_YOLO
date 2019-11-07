@@ -1,5 +1,4 @@
 from loss.base_loss import *
-from loss.loss_name import LossType
 import numpy as np
 
 

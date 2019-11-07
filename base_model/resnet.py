@@ -3,10 +3,11 @@
 # Author:
 
 from base_model.base_model import *
-from base_model.base_model_name import BaseModelName
-from base_block.block_name import BatchNormType, ActivationType, BlockType
+from base_name.base_model_name import BaseModelName
+from base_name.block_name import BatchNormType, ActivationType, BlockType
 from base_block.utility_block import ConvBNActivationBlock
 from base_block.resnet_block import BasicBlock, Bottleneck
+
 
 __all__ = ['resnet_18']
 

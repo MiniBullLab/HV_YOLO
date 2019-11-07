@@ -2,8 +2,10 @@
 # -*- coding:utf-8 -*-
 # Author:
 
+
 import torch.nn as nn
-from base_block.block_name import BatchNormType
+from base_name.block_name import BatchNormType
+
 
 class BatchNormalizeFunction():
 

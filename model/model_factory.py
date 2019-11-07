@@ -3,8 +3,8 @@
 # Author:
 
 import os
+from base_name.model_name import ModelName
 from model.modelParse import ModelParse
-from model.modelName import ModelName
 from model.myModel import MyModel
 from model.MSRResNet import MSRResNet
 from model.MySRModel import MySRModel

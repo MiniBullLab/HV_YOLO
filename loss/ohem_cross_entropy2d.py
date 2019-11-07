@@ -1,29 +1,28 @@
 from loss.base_loss import *
-from loss.loss_name import LossType
+
 
 class OhemCrossEntropy2d(BaseLoss):
 
-    def __init__(self, ignore_index=-1, thresh=0.7, min_kept=100000, use_weight=True):
+    weight = torch.FloatTensor([0.8373, 0.918, 0.866, 1.0345, 1.0166, 0.9969, 0.9754,
+                                1.0489, 0.8786, 1.0023, 0.9539, 0.9843, 1.1116, 0.9037, 1.0865, 1.0955,
+                                1.0865, 1.1529, 1.0507])
+
+    def __init__(self, ignore_index=-1, thresh=0.7, min_kept=100000):
         super().__init__(LossType.OhemCrossEntropy2d)
         self.ignore_index = ignore_index
         self.thresh = float(thresh)
         self.min_kept = int(min_kept)
-        if use_weight:
-            weight = torch.FloatTensor([0.8373, 0.918, 0.866, 1.0345, 1.0166, 0.9969, 0.9754,
-                                        1.0489, 0.8786, 1.0023, 0.9539, 0.9843, 1.1116, 0.9037, 1.0865, 1.0955,
-                                        1.0865, 1.1529, 1.0507])
-            self.criterion = torch.nn.CrossEntropyLoss(weight=weight, ignore_index=ignore_index)
-        else:
-            self.criterion = torch.nn.CrossEntropyLoss(ignore_index=ignore_index)
+        self.loss_function = torch.nn.CrossEntropyLoss(weight=OhemCrossEntropy2d.weight,
+                                                   ignore_index=ignore_index)
 
-    def forward(self, pred, target):
-        n, c, h, w = pred.size()
+    def segment_resize(self, input, target):
+        n, c, h, w = input.size()
         target = target.view(-1)
         valid_mask = target.ne(self.ignore_index)
         target = target * valid_mask.long()
         num_valid = valid_mask.sum()
 
-        prob = F.softmax(pred, dim=1)
+        prob = F.softmax(input, dim=1)
         prob = prob.transpose(0, 1).reshape(c, -1)
 
         if self.min_kept > num_valid:
@@ -43,8 +42,14 @@ class OhemCrossEntropy2d(BaseLoss):
 
         target = target.masked_fill_(1 - valid_mask, self.ignore_index)
         target = target.view(n, h, w)
+        return input, target
 
-        return self.criterion(pred, target)
+    def forward(self, input, target):
+        if target is not None:
+            loss = self.loss_function(input, target)
+        else:
+            loss = input
+        return loss
 
 class MixSoftmaxCrossEntropyOHEMLoss(OhemCrossEntropy2d):
 

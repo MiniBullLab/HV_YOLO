@@ -4,7 +4,7 @@
 
 from base_block.base_block import *
 from base_block.utility_layer import GlobalAvgPool2d
-from base_block.block_name import BlockType, ActivationType, BatchNormType
+from base_name.block_name import BlockType, ActivationType, BatchNormType
 from base_block.activation_function import ActivationFunction
 from base_block.batchnorm import BatchNormalizeFunction
 

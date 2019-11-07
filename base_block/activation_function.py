@@ -3,7 +3,8 @@
 # Author:
 
 from base_block.base_block import *
-from base_block.block_name import ActivationType, BlockType
+from base_name.block_name import ActivationType
+from base_name.block_name import BlockType
 
 """
 """

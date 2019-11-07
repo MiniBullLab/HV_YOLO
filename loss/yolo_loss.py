@@ -4,10 +4,10 @@
 
 
 from loss.base_loss import *
-from loss.loss_name import LossType
 import math
 from loss.smooth_cross_entropy import SmoothCrossEntropy
 from loss.focal_loss import FocalBinaryLoss
+
 
 __all__ = ['YoloLoss']
 
