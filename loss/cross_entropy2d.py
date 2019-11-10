@@ -70,5 +70,5 @@ class CrossEntropy2d(BaseLoss):
         if target is not None:
             loss = self.loss_function(input, target)
         else:
-            loss = input
+            loss = F.softmax(input)
         return loss

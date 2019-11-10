@@ -46,9 +46,10 @@ class ClassifyTest():
 
         prev_time = time.time()
         for idx, (imgs, labels) in enumerate(dataloader):
-            output = self.model(imgs.to(self.device))
-            if len(output) == 1:
-                prec1, prec5 = accuracy(output[0].data, labels.to(self.device), topk=(1, 5))
+            output_list = self.model(imgs.to(self.device))
+            if len(output_list) == 1:
+                output = self.model.lossList[0](output_list[0])
+                prec1, prec5 = accuracy(output.data, labels.to(self.device), topk=(1, 5))
             self.top1.update(prec1, imgs.size(0))
             self.top5.update(prec5, imgs.size(0))
 

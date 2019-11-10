@@ -32,12 +32,13 @@ class SegmentTest():
         for i, (img, segMap_val) in enumerate(dataloader):
             # Get detections
             with torch.no_grad():
-                output = self.model(img.to(self.device))[0]
-
-                # ------------seg---------------------
-                pred = np.squeeze(output.data.max(1)[1].cpu().numpy(), axis=0)
-                gt = segMap_val[0].data.cpu().numpy()
-                self.running_metrics.update(gt, pred)
+                output_list = self.model(img.to(self.device))
+                if len(output_list) == 1:
+                    output = self.model.lossList[0](output_list[0])
+                    # ------------seg---------------------
+                    pred = np.squeeze(output.data.max(1)[1].cpu().numpy(), axis=0)
+                    gt = segMap_val[0].data.cpu().numpy()
+                    self.running_metrics.update(gt, pred)
 
             print('Batch %d... Done. (%.3fs)' % (i, time.time() - prev_time))
             prev_time = time.time()
