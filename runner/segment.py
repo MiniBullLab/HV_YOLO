@@ -33,7 +33,9 @@ class Segmentation():
         for i, (oriImg, img) in enumerate(dataloader):
             # Get detections
             with torch.no_grad():
-                output = self.model(img.to(self.device))[0]
+                output_list = self.model(img.to(self.device))
+                if len(output_list) == 1:
+                    output = self.model.lossList[0](output_list[0])
 
             print('Batch %d... Done. (%.3fs)' % (i, time.time() - prev_time))
             prev_time = time.time()

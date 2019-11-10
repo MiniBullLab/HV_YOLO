@@ -3,17 +3,12 @@ from loss.base_loss import *
 
 class OhemCrossEntropy2d(BaseLoss):
 
-    weight = torch.FloatTensor([0.8373, 0.918, 0.866, 1.0345, 1.0166, 0.9969, 0.9754,
-                                1.0489, 0.8786, 1.0023, 0.9539, 0.9843, 1.1116, 0.9037, 1.0865, 1.0955,
-                                1.0865, 1.1529, 1.0507])
-
     def __init__(self, ignore_index=-1, thresh=0.7, min_kept=100000):
         super().__init__(LossType.OhemCrossEntropy2d)
         self.ignore_index = ignore_index
         self.thresh = float(thresh)
         self.min_kept = int(min_kept)
-        self.loss_function = torch.nn.CrossEntropyLoss(weight=OhemCrossEntropy2d.weight,
-                                                   ignore_index=ignore_index)
+        self.loss_function = torch.nn.CrossEntropyLoss(ignore_index=ignore_index)
 
     def segment_resize(self, input, target):
         n, c, h, w = input.size()
@@ -48,7 +43,7 @@ class OhemCrossEntropy2d(BaseLoss):
         if target is not None:
             loss = self.loss_function(input, target)
         else:
-            loss = input
+            loss = F.softmax(input)
         return loss
 
 class MixSoftmaxCrossEntropyOHEMLoss(OhemCrossEntropy2d):
