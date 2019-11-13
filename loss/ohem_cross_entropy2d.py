@@ -1,9 +1,10 @@
 from loss.base_loss import *
+import numpy as np
 
 
 class OhemCrossEntropy2d(BaseLoss):
 
-    def __init__(self, ignore_index=-1, thresh=0.7, min_kept=100000):
+    def __init__(self, ignore_index=-1, thresh=0.7, min_kept=int(32 // 1 * 640 * 352 // 16)):
         super().__init__(LossType.OhemCrossEntropy2d)
         self.ignore_index = ignore_index
         self.thresh = float(thresh)
@@ -27,7 +28,8 @@ class OhemCrossEntropy2d(BaseLoss):
             mask_prob = prob[target, torch.arange(len(target), dtype=torch.long)]
             threshold = self.thresh
             if self.min_kept > 0:
-                index = mask_prob.argsort()
+                #index = mask_prob.argsort()
+                index = np.argsort(mask_prob.cpu().detach().numpy())
                 threshold_index = index[min(len(index), self.min_kept) - 1]
                 if mask_prob[threshold_index] > self.thresh:
                     threshold = mask_prob[threshold_index]

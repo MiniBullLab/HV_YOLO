@@ -8,8 +8,8 @@ import sys
 sys.path.insert(0, os.getcwd() + "/.")
 import time
 from data_loader.imageDetectTrainDataLoader import ImageDetectTrainDataLoader
-from torch_utility.torchModelProcess import TorchModelProcess
-from torch_utility.torchOptimizer import TorchOptimizer
+from torch_utility.torch_model_process import TorchModelProcess
+from solver.torch_optimizer import TorchOptimizer
 from solver.lr_scheduler import WarmupMultiStepLR
 from utility.logger import AverageMeter, Logger
 from helper.arguments_parse import ArgumentsParse

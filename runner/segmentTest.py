@@ -4,7 +4,7 @@ sys.path.insert(0, os.getcwd() + "/.")
 import time
 from data_loader.imageSegmentValDataLoader import ImageSegmentValDataLoader
 from utility.utils import *
-from torch_utility.torchModelProcess import TorchModelProcess
+from torch_utility.torch_model_process import TorchModelProcess
 from evaluation.metrics import runningScore
 from config import segmentConfig
 from helper.arguments_parse import ArgumentsParse

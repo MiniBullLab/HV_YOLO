@@ -2,12 +2,12 @@ import torch
 from optparse import OptionParser
 from base_model.base_model_factory import BaseModelFactory
 from model.model_factory import ModelFactory
-from onnx.model_show import ModelShow
+from onnx.torch_to_onnx import TorchConvertOnnx
 
 def parse_arguments():
 
     parser = OptionParser()
-    parser.description = "This program show model net"
+    parser.description = "This program convert model to onnx"
 
     parser.add_option("-m", "--model", dest="model",
                       action="store", type="string", default=None,
@@ -17,48 +17,45 @@ def parse_arguments():
                       action="store", type="string", default=None,
                       help="base model name or cfg file path")
 
-    parser.add_option("-o", "--onnx_path", dest="onnx_path",
-                      action="store", type="string", default=None,
-                      help="onnx file path")
+    parser.add_option("-p", "--weight_path", dest="weight_path",
+                      metavar="PATH", type="string", default=None,
+                      help="path to store weights")
+
+    parser.add_option("-d", "--save_dir", dest="save_dir",
+                      metavar="PATH", type="string", default=".",
+                      help="save onnx dir")
     (options, args) = parser.parse_args()
     return options
 
 
-class ModelNetShow():
+class ModelConverter():
 
     def __init__(self):
         self.base_model_factory = BaseModelFactory()
         self.model_factory = ModelFactory()
-        self.show_process = ModelShow()
+        self.converter = TorchConvertOnnx()
 
-    def model_show(self, model_path):
+    def model_convert(self, model_path, weight_path, save_dir):
         input_x = torch.randn(1, 3, 640, 352)
-        self.show_process.set_input(input_x)
+        self.converter.set_input(input_x)
+        self.converter.set_save_dir(save_dir)
         model = self.model_factory.get_model(model_path)
-        self.show_process.show_from_model(model)
+        self.converter.torch2onnx(model, weight_path)
 
-    def base_model_show(self, base_model_path):
+    def base_model_convert(self, base_model_path, weight_path, save_dir):
         input_x = torch.randn(1, 3, 640, 352)
         self.show_process.set_input(input_x)
+        self.converter.set_save_dir(save_dir)
         model = self.base_model_factory.get_base_model(base_model_path)
-        self.show_process.show_from_model(model)
-
-    def onnx_show(self, onnx_path):
-        input_x = torch.randn(1, 3, 640, 352)
-        self.show_process.set_input(input_x)
-        self.show_process.show_from_onnx(onnx_path)
-
+        self.converter.torch2onnx(model, weight_path)
 
 def main():
     pass
 
-
 if __name__ == '__main__':
     options = parse_arguments()
-    show = ModelNetShow()
+    converter = ModelConverter()
     if options.model is not None:
-        show.model_show(options.model)
+        converter.model_convert(options.model, options.weight_path, options.save_dir)
     elif options.base_model is not None:
-        show.base_model_show(options.base_model)
-    elif options.onnx_path is not None:
-        show.onnx_show(options.onnx_path)
+        converter.base_model_show(options.base_model, options.weight_path, options.save_dir)

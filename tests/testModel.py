@@ -8,17 +8,16 @@ sys.path.insert(0, os.getcwd() + "/..")
 import torch
 import torch.nn as nn
 from model.model_factory import ModelFactory
-from drawing.modelNetShow import ModelNetShow
+from onnx.model_show import ModelShow
 
 
 def test_SR():
     model_factory = ModelFactory()
-    input = torch.randn(1, 1, 72, 72)
-    modelNetShow = ModelNetShow()
+    show = ModelShow()
+    input_x = torch.randn(1, 1, 72, 72)
+    show.set_input(input_x)
     model = model_factory.get_model_from_name("MSRResNet")
-    modelNetShow.setInput(input)
-    modelNetShow.setSaveDir("../onnx")
-    modelNetShow.showNet(model)
+    show.show_from_model(model)
 
 
 def main():

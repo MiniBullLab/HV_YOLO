@@ -13,7 +13,7 @@ from evaluation.evaluatingOfmAp import *
 from data_loader.imageDetectValDataLoader import ImageDetectValDataLoader
 from data_loader.trainDataProcess import TrainDataProcess
 from model.modelResultProcess import ModelResultProcess
-from torch_utility.torchModelProcess import TorchModelProcess
+from torch_utility.torch_model_process import TorchModelProcess
 from base_algorithm.nms import non_max_suppression
 from config import detectConfig
 from helper.arguments_parse import ArgumentsParse

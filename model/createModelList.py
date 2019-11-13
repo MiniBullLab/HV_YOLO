@@ -95,7 +95,7 @@ class CreateModuleList():
                 self.addBlockList(BlockType.FcLayer, block, num_output)
                 input_channels = num_output
             elif module_def['type'] == BlockType.Upsample:
-                upsample = Upsample(scale_factor=int(module_def['stride']), mode='nearest')
+                upsample = Upsample(scale_factor=int(module_def['stride']))
                 self.addBlockList(BlockType.Upsample, upsample, filters)
                 input_channels = filters
             elif module_def['type'] == BlockType.RouteLayer:

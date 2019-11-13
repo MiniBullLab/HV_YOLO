@@ -8,24 +8,6 @@ from base_block.utility_block import ConvBNActivationBlock, SEBlock
 import numpy as np
 
 
-def channel_shuffle(x, groups):
-    batchsize, num_channels, height, width = x.data.size()
-    assert (num_channels % groups == 0)
-    channels_per_group = num_channels // groups
-    # reshape
-    x = x.view(batchsize, groups, channels_per_group, height, width)
-
-    # transpose
-    # - contiguous() required if transpose() is used before view().
-    #   See https://github.com/pytorch/pytorch/issues/764
-    x = torch.transpose(x, 1, 2).contiguous()
-
-    # flatten
-    x = x.view(batchsize, -1, height, width)
-
-    return x
-
-
 class ShuffleNetBlockName():
 
     ShuffleBlock = "shuffleBlock"
@@ -34,6 +16,7 @@ class ShuffleNetBlockName():
     SEBasicBlock = "seBasicBlock"
     DownBlock = "downBlock"
 
+
 class ShuffleBlock(BaseBlock):
     def __init__(self, groups=2):
         super().__init__(ShuffleNetBlockName.ShuffleBlock)
@@ -41,9 +24,21 @@ class ShuffleBlock(BaseBlock):
 
     def forward(self, x):
         '''Channel shuffle: [N,C,H,W] -> [N,g,C/g,H,W] -> [N,C/g,g,H,w] -> [N,C,H,W]'''
-        N, C, H, W = x.size()
-        g = self.groups
-        return x.view(N, g, int(C/g), H, W).permute(0, 2, 1, 3, 4).reshape(N, C, H, W)
+        batchsize, num_channels, height, width = x.data.size()
+        assert (num_channels % self.groups == 0)
+        channels_per_group = num_channels // self.groups
+        # reshape
+        x = x.view(batchsize, self.groups, channels_per_group, height, width)
+
+        # transpose
+        # - contiguous() required if transpose() is used before view().
+        #   See https://github.com/pytorch/pytorch/issues/764
+        x = torch.transpose(x, 1, 2).contiguous()
+
+        # flatten
+        x = x.view(batchsize, -1, height, width)
+        return x
+
 
 class SplitBlock(BaseBlock):
     def __init__(self, ratio):
@@ -57,6 +52,7 @@ class SplitBlock(BaseBlock):
 
         c = int(xChannel * self.ratio)
         return x[:, :c, :, :], x[:, c:, :, :]
+
 
 class BasicBlock(BaseBlock):
     def __init__(self, in_channels, out_channels, stride=1, dilation=1,
@@ -98,6 +94,7 @@ class BasicBlock(BaseBlock):
         out = self.shuffle(out)
         return out
 
+
 class SEBasicBlock(BaseBlock):
     def __init__(self, inplanes, outplanes, c_tag=0.5, BatchNorm=nn.BatchNorm2d, activation=nn.ReLU, SE=False, residual=False, groups=2, dilation=1):
         super().__init__(ShuffleNetBlockName.SEBasicBlock)
@@ -112,6 +109,7 @@ class SEBasicBlock(BaseBlock):
         self.conv3 = nn.Conv2d(self.right_part_out, self.right_part_out, kernel_size=1, bias=False)
         self.bn3 = BatchNorm(self.right_part_out)
         self.activation = activation
+        self.shuffle = ShuffleBlock(self.groups)
 
         self.inplanes = inplanes
         self.outplanes = outplanes
@@ -139,8 +137,9 @@ class SEBasicBlock(BaseBlock):
             out = self.SELayer(out)
         if self.residual and self.inplanes == self.outplanes:
             out += right
+        result = self.shuffle(torch.cat((left, out), 1))
+        return result
 
-        return channel_shuffle(torch.cat((left, out), 1), self.groups)
 
 class DownBlock(BaseBlock):
     def __init__(self, in_channels, out_channels, stride=2,

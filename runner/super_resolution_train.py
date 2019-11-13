@@ -9,8 +9,8 @@ import time
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from torch_utility.torchModelProcess import TorchModelProcess
-from torch_utility.torchOptimizer import TorchOptimizer
+from torch_utility.torch_model_process import TorchModelProcess
+from solver.torch_optimizer import TorchOptimizer
 from solver.lr_scheduler import MultiStageLR
 from utility.logger import AverageMeter, Logger
 

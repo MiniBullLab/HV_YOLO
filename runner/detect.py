@@ -7,7 +7,7 @@ from data_loader.videoLoader import VideoLoader
 from data_loader.trainDataProcess import TrainDataProcess
 from utility.utils import *
 from model.modelResultProcess import ModelResultProcess
-from torch_utility.torchModelProcess import TorchModelProcess
+from torch_utility.torch_model_process import TorchModelProcess
 from drawing.imageDraw import ImageDraw
 from base_algorithm.nms import non_max_suppression
 from config import detectConfig

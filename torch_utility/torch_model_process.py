@@ -1,10 +1,8 @@
-import os
-import sys
-sys.path.insert(0, os.getcwd() + "/..")
+import os.path
 import torch
 from torch import nn
 from collections import OrderedDict
-from .torchDeviceProcess import TorchDeviceProcess
+from torch_utility.torch_device_process import TorchDeviceProcess
 from model.model_factory import ModelFactory
 from model.modeWeightInit import ModelWeightInit
 
@@ -15,10 +13,11 @@ class TorchModelProcess():
         self.torchDeviceProcess = TorchDeviceProcess()
         self.modelFactory = ModelFactory()
         self.modelWeightInit = ModelWeightInit()
+        self.torchDeviceProcess.initTorch()
         self.best_value = 0
 
     def initModel(self, cfgPath, gpuId):
-        self.torchDeviceProcess.initTorch(gpuId)
+        self.torchDeviceProcess.setGpuId(gpuId)
         model = self.modelFactory.get_model(cfgPath)
         self.modelWeightInit.initWeight(model)
         return model
@@ -45,10 +44,10 @@ class TorchModelProcess():
             print("Loading %s fail" % weightPath)
         return checkpoint
 
-    def saveLatestModel(self, latestWeightsFile, model, optimizer, epoch=0, best_mAP=0):
+    def saveLatestModel(self, latestWeightsFile, model, optimizer, epoch=0, best_value=0):
         # Save latest checkpoint
         checkpoint = {'epoch': epoch,
-                      'best_value': best_mAP,
+                      'best_value': best_value,
                       'model': model.state_dict(),
                       'optimizer': optimizer.state_dict()}
         torch.save(checkpoint, latestWeightsFile)

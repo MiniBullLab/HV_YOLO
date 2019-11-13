@@ -1,6 +1,7 @@
-from data_loader import *
 import numpy as np
 import cv2
+from data_loader.imageDetectTrainDataLoader import ImageDetectTrainDataLoader
+
 
 class dataCheck():
     def __init__(self):

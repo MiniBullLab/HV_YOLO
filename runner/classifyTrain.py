@@ -6,8 +6,8 @@ import time
 import torch.nn as nn
 from helper.arguments_parse import ArgumentsParse
 from data_loader.imageClassifyTrainDataLoard import ImageClassifyTrainDataLoader
-from torch_utility.torchModelProcess import TorchModelProcess
-from torch_utility.torchOptimizer import TorchOptimizer
+from torch_utility.torch_model_process import TorchModelProcess
+from solver.torch_optimizer import TorchOptimizer
 from solver.lr_scheduler import MultiStageLR
 from utility.logger import AverageMeter, Logger
 from config import classifyConfig

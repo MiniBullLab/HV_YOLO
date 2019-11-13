@@ -6,7 +6,7 @@ from utility.utils import *
 import scipy.misc as misc
 from data_loader.imagesLoader import ImagesLoader
 from data_loader.videoLoader import VideoLoader
-from torch_utility.torchModelProcess import TorchModelProcess
+from torch_utility.torch_model_process import TorchModelProcess
 from drawing.imageDraw import ImageDraw
 from helper.arguments_parse import ArgumentsParse
 from config import segmentConfig

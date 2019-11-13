@@ -8,7 +8,7 @@ import sys
 sys.path.insert(0, os.getcwd() + "/..")
 from base_block.base_block import *
 from base_block.utility_block import InvertedResidual, SEBlock
-from drawing.modelNetShow import ModelNetShow
+from onnx.model_show import ModelShow
 
 
 class TestBlock(BaseBlock):
@@ -27,9 +27,8 @@ class TestBlock(BaseBlock):
 
 if __name__ == "__main__":
 
-    modelNetShow = ModelNetShow()
-    input = torch.randn(1, 16, 32, 32)
+    show = ModelShow()
+    input_x = torch.randn(1, 16, 32, 32)
     model = TestBlock()
-    modelNetShow.setInput(input)
-    modelNetShow.setSaveDir("../")
-    modelNetShow.showNet(model)
+    show.set_input(input_x)
+    show.show_from_model(model)
