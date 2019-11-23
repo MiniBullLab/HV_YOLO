@@ -25,8 +25,7 @@ class MeanApEvaluating():
             os.mkdir(output_dir)
         for i, cls in enumerate(self.className):
             filename = detpath + cls + '.txt'
-            if cls == '__background__' and \
-                not os.path.exists(filename):
+            if cls == '__background__' :
                 continue
             rec, prec, ap = self.voc_eval(filename, cls, ovthresh=0.5,
                                      use_07_metric=False)  # , avg_iou
@@ -52,6 +51,8 @@ class MeanApEvaluating():
                  classname,
                  ovthresh=0.5,
                  use_07_metric=False):
+        if not os.path.exists(detpath):
+            return 0, 0, 0
         recs = {}
         for imagePath, annotationPath in self.imageAndAnnotationList:
             path, fileNameAndPost = os.path.split(imagePath)

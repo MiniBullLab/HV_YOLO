@@ -2,17 +2,21 @@
 # -*- coding:utf-8 -*-
 # Author:
 
+
 class ActivationType():
 
+    Mish = "mish"
     Linear = "linear"
     ReLU = "relu"
     PReLU = "prelu"
     ReLU6 = "relu6"
     LeakyReLU = "leaky"
 
+
 class BatchNormType():
 
     BatchNormalize = "bn2d"
+
 
 class BlockType():
 
@@ -27,10 +31,13 @@ class BlockType():
     Upsample = "upsample"
     GlobalAvgPool = "globalavgpool"
     FcLayer = "fcLayer"
+    Dropout = "dropout"
 
     ConvBNActivationBlock = "convBNActivationBlock"
     ConvActivationBlock = "convActivationBlock"
     Convolutional = "convolutional"
+    BNActivationConvBlock = "bnActivationConvBlock"
+    BNActivationBlock = "bnActivationBlock"
 
     InvertedResidual = "invertedResidual"
     SEBlock = "seBlock"

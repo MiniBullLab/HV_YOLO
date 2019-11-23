@@ -6,6 +6,7 @@
 class ModelName():
 
     MobileV2FCN = "MobileV2FCN"
+    ComplexYOLO = "ComplexYOLO"
     MSRResNet = "MSRResNet"
     MySRModel = "MySRModel"
 

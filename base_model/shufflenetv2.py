@@ -12,24 +12,26 @@ from base_block.utility_block import ConvBNActivationBlock
 from base_block.shufflenet_block import DownBlock, BasicBlock
 
 
-__all__ = ['shufflenet_v2_1_0']
+__all__ = ['shufflenetv2_1_0']
 
 
 class ShuffleNetV2(BaseModel):
 
-    def __init__(self, data_channel=3, num_blocks=[3, 7, 3], out_channels=(24, 24, 116, 232, 464),
-                 stride=[2, 2, 2], dilation=[1, 1, 1], bnName=BatchNormType.BatchNormalize,
-                 activationName=ActivationType.ReLU):
+    def __init__(self, data_channel=3, num_blocks=[3, 7, 3], out_channels=(116, 232, 464),
+                 strides=[2, 2, 2], dilations=[1, 1, 1], bnName=BatchNormType.BatchNormalize,
+                 activationName=ActivationType.LeakyReLU):
         super().__init__()
         # init param
-        self.set_name(BaseModelName.ShuffleNetV2)
+        self.set_name(BaseModelName.ShuffleNetV2_1_0)
         self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.out_channels = out_channels
-        self.stride = stride
-        self.dilation = dilation
+        self.strides = strides
+        self.dilations = dilations
         self.activationName = activationName
         self.bnName = bnName
+        self.first_output = 24
+
         self.outChannelList = []
         self.index = 0
 
@@ -37,28 +39,26 @@ class ShuffleNetV2(BaseModel):
 
     def createBlockList(self):
         layer1 = ConvBNActivationBlock(in_channels=self.data_channel,
-                                       out_channels=self.out_channels[0],
+                                       out_channels=self.first_output,
                                        kernel_size=3,
                                        stride=2,
                                        padding=1,
                                        bnName=self.bnName,
                                        activationName=self.activationName)
-        self.addBlockList(layer1.get_name(), layer1, self.out_channels[0])
+        self.addBlockList(layer1.get_name(), layer1, self.first_output)
 
         layer2 = MyMaxPool2d(kernel_size=3, stride=2)
-        self.addBlockList(BlockType.MyMaxPool2d, layer2, self.out_channels[0])
+        self.addBlockList(BlockType.MyMaxPool2d, layer2, self.first_output)
 
-        self.in_channels = self.out_channels[1]
-        self.makeSuffleBlock(self.out_channels[2], self.num_blocks[0], self.stride[0], self.dilation[0],
-                             self.bnName, self.activationName)
-        self.in_channels = self.out_channels[2]
-        self.makeSuffleBlock(self.out_channels[3], self.num_blocks[1], self.stride[0], self.dilation[1],
-                             self.bnName, self.activationName)
-        self.in_channels = self.out_channels[3]
-        self.makeSuffleBlock(self.out_channels[4], self.num_blocks[2], self.stride[0], self.dilation[2],
-                             self.bnName, self.activationName)
+        self.in_channels = self.first_output
+        for index, num_block in enumerate(self.num_blocks):
+            self.make_suffle_block(self.out_channels[index], self.num_blocks[index],
+                                 self.strides[index], self.dilations[index],
+                                 self.bnName, self.activationName)
+            self.in_channels = self.outChannelList[-1]
 
-    def makeSuffleBlock(self, out_channels, num_blocks, stride, dilation, bnName, activationName):
+    def make_suffle_block(self, out_channels, num_blocks, stride, dilation,
+                          bnName, activationName):
         downLayer = DownBlock(self.in_channels, out_channels, stride=stride,
                             bnName=bnName, activationName=activationName)
         self.addBlockList(downLayer.get_name(), downLayer, out_channels)
@@ -88,6 +88,31 @@ class ShuffleNetV2(BaseModel):
         return output_list
 
 
-def shufflenet_v2_1_0():
-    model = ShuffleNetV2()
+def shufflenetv2_1_0():
+    model = ShuffleNetV2(num_blocks=[3, 7, 3])
+    model.set_name(BaseModelName.ShuffleNetV2_1_0)
+    return model
+
+
+def shufflenet_v2_x0_5():
+    model = ShuffleNetV2(num_blocks=[4, 8, 4], out_channels=(48, 96, 192))
+    model.set_name(BaseModelName.ShuffleNetV2_1_0)
+    return model
+
+
+def shufflenet_v2_x1_0():
+    model = ShuffleNetV2(num_blocks=[4, 8, 4], out_channels=(116, 232, 464))
+    model.set_name(BaseModelName.ShuffleNetV2_1_0)
+    return model
+
+
+def shufflenet_v2_x1_5():
+    model = ShuffleNetV2(num_blocks=[4, 8, 4], out_channels=(176, 352, 704))
+    model.set_name(BaseModelName.ShuffleNetV2_1_0)
+    return model
+
+
+def shufflenet_v2_x1_5():
+    model = ShuffleNetV2(num_blocks=[4, 8, 4], out_channels=(244, 488, 976))
+    model.set_name(BaseModelName.ShuffleNetV2_1_0)
     return model

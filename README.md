@@ -11,4 +11,4 @@ Please see [wiki](https://github.com/MiniBullLab/HV_YOLO/wiki) for the basic usa
 # Annotations
   * [annotations](https://github.com/lpj0822/auto_sample_mark)
 # model convert
-  * [modelConvert](https://github.com/MiniBullLab/HV_model_convert)
+  * [modelConvert](https://github.com/lpj0822/ML_model_convert)

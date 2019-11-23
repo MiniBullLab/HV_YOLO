@@ -8,7 +8,7 @@ from base_name.block_name import BatchNormType, ActivationType
 from base_block.utility_block import ConvBNActivationBlock
 
 
-class ResnetNetBlockName():
+class ResnetBlockName():
 
     BasicBlock = "basicBlock"
     Bottleneck = "bottleneck"
@@ -19,7 +19,7 @@ class BasicBlock(BaseBlock):
 
     def __init__(self, in_channels, planes, stride=1, dilation=1,
                  bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
-        super().__init__(ResnetNetBlockName.BasicBlock)
+        super().__init__(ResnetBlockName.BasicBlock)
 
         self.convBnReLU1 = ConvBNActivationBlock(in_channels=in_channels,
                                           out_channels=planes,
@@ -63,7 +63,7 @@ class Bottleneck(BaseBlock):
 
     def __init__(self, in_channels, planes, stride=1, dilation=1,
                  bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
-        super(Bottleneck, self).__init__(ResnetNetBlockName.Bottleneck)
+        super().__init__(ResnetBlockName.Bottleneck)
 
         self.convBnReLU1 = ConvBNActivationBlock(in_channels=in_channels,
                                           out_channels=planes,
@@ -74,7 +74,7 @@ class Bottleneck(BaseBlock):
         self.convBnReLU2 = ConvBNActivationBlock(in_channels=planes,
                                           out_channels=planes,
                                           kernel_size=3,
-                                          stride=1,
+                                          stride=stride,
                                           padding=dilation,
                                           dilation=dilation,
                                           bnName=bnName,

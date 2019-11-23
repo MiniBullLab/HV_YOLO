@@ -73,7 +73,8 @@ class YoloLoss(BaseLoss):
         else:
             self.reduction = 8
 
-        self.anchors = torch.Tensor(anchors) / float(self.reduction)
+        if len(anchors_mask) != len(anchors):
+            self.anchors = torch.Tensor(anchors) / float(self.reduction)
         self.seen = 0
 
         self.coord_scale = coord_scale

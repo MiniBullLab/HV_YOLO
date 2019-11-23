@@ -9,6 +9,7 @@ from model.myModel import MyModel
 from model.MSRResNet import MSRResNet
 from model.MySRModel import MySRModel
 from model.mobileV2FCN import MobileV2FCN
+from model.complex_yolo import ComplexYOLO
 
 
 class ModelFactory():
@@ -40,4 +41,6 @@ class ModelFactory():
             model = MySRModel(upscale_factor=3)
         elif modelName == ModelName.MobileV2FCN:
             model = MobileV2FCN()
+        elif modelName == ModelName.ComplexYOLO:
+            model = ComplexYOLO()
         return model

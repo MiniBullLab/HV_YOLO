@@ -5,6 +5,7 @@
 from collections import OrderedDict
 from base_model.base_model import *
 from base_name.block_name import BlockType
+from base_block.darknet_block import DarknetBlockName
 from base_name.loss_name import LossType
 from base_model.base_model_factory import BaseModelFactory
 from model.createModelList import CreateModuleList
@@ -66,6 +67,7 @@ class MyModel(BaseModel):
         layer_outputs = []
         output = []
         for key, block in self._modules.items():
+            print(x.shape)
             if BlockType.BaseNet in key:
                 base_outputs = block(x)
                 x = base_outputs[-1]
@@ -87,12 +89,14 @@ class MyModel(BaseModel):
                 x = block(x)
             elif BlockType.FcLayer in key:
                 x = block(x)
+            elif DarknetBlockName in key:
+                x = block(x)
             elif LossType.YoloLoss in key:
                 output.append(x)
             elif LossType.CrossEntropy2d in key:
                 output.append(x)
             elif LossType.OhemCrossEntropy2d in key:
                 output.append(x)
-
+            print(key, x.shape)
             layer_outputs.append(x)
         return output

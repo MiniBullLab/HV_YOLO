@@ -48,6 +48,44 @@ class ConvBNActivationBlock(BaseBlock):
         return x
 
 
+class BNActivationConvBlock(BaseBlock):
+
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
+                 dilation=1, groups=1, bnName=BatchNormType.BatchNormalize,
+                 activationName=ActivationType.ReLU):
+        super().__init__(BlockType.BNActivationConvBlock)
+        bn = BatchNormalizeFunction.get_function(bnName, in_channels)
+        activation = ActivationFunction.get_function(activationName)
+        conv = nn.Conv2d(in_channels, out_channels, kernel_size,
+                         stride, padding, dilation, groups, bias=False)
+        self.block = nn.Sequential(OrderedDict([
+            (bnName, bn),
+            (activationName, activation),
+            (BlockType.Convolutional, conv)
+        ]))
+
+    def forward(self, x):
+        x = self.block(x)
+        return x
+
+
+class BNActivationBlock(BaseBlock):
+
+    def __init__(self, in_channels, bnName=BatchNormType.BatchNormalize,
+                 activationName=ActivationType.ReLU):
+        super().__init__(BlockType.BNActivationBlock)
+        bn = BatchNormalizeFunction.get_function(bnName, in_channels)
+        activation = ActivationFunction.get_function(activationName)
+        self.block = nn.Sequential(OrderedDict([
+            (bnName, bn),
+            (activationName, activation)
+        ]))
+
+    def forward(self, x):
+        x = self.block(x)
+        return x
+
+
 class InvertedResidual(BaseBlock):
     def __init__(self, in_channels, out_channels, stride=1, expand_ratio=1, dilation=1,
                  bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU6):
@@ -97,6 +135,7 @@ class InvertedResidual(BaseBlock):
 
 
 class SEBlock(BaseBlock):
+
     def __init__(self, channel, reduction=16):
         super().__init__(BlockType.SEBlock)
         self.avg_pool = GlobalAvgPool2d()

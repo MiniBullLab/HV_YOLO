@@ -9,6 +9,7 @@ from base_name.loss_name import LossType
 from base_block.utility_block import ConvBNActivationBlock, ConvActivationBlock
 from base_block.utility_layer import RouteLayer, ShortcutLayer
 from base_block.utility_layer import MyMaxPool2d, Upsample, GlobalAvgPool2d, FcLayer
+from base_block.darknet_block import ReorgBlock, DarknetBlockName
 from loss.cross_entropy2d import CrossEntropy2d
 from loss.ohem_cross_entropy2d import OhemCrossEntropy2d
 from loss.yolo_loss import YoloLoss
@@ -107,6 +108,17 @@ class CreateModuleList():
                 block = ShortcutLayer(module_def['from'], module_def['activation'])
                 filters = self.outChannelList[block.layer_from]
                 self.addBlockList(BlockType.ShortcutLayer, block, filters)
+                input_channels = filters
+            elif module_def['type'] == BlockType.Dropout:
+                probability = float(module_def['probability'])
+                block = nn.Dropout(p=probability, inplace=True)
+                self.addBlockList(BlockType.Dropout, block, filters)
+                input_channels = filters
+            elif module_def['type'] == DarknetBlockName.ReorgBlock:
+                stride = int(module_def['stride'])
+                block = ReorgBlock(stride=stride)
+                filters = block.stride * block.stride * self.outChannelList[-1]
+                self.addBlockList(DarknetBlockName.ReorgBlock, block, filters)
                 input_channels = filters
             elif module_def['type'] == LossType.YoloLoss:
                 anchor_idxs = [int(x) for x in module_def['mask'].split(',')]
