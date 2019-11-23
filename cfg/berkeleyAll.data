@@ -1,6 +1,0 @@
-classes=7
-train = /home/wfw/HASCO/yolov3-det2_bigbatch_nobalance/data/imglist/train.txt
-valid = /home/wfw/HASCO/yolov3-det2_bigbatch_nobalance/imglist/test.txt
-names = ./data/berkeley.names
-backup = backup
-

@@ -1,6 +1,0 @@
-classes=7
-train = /home/sugon/yolov3-det/data/imglist/train_2000.txt
-valid = /home/sugon/yolov3-det/data/imglist/test_3000.txt
-names = ./data/berkeley.names
-backup = backup
-
