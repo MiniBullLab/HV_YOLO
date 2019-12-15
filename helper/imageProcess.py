@@ -27,6 +27,10 @@ class ImageProcess():
             rgbImage = cv2.cvtColor(srcImage, cv2.COLOR_BGR2RGB)
         return srcImage, rgbImage
 
+    def read_gray_image(self, image_path):
+        gray_image = cv2.imread(image_path, cv2.COLOR_BGR2GRAY)
+        return gray_image
+
     def opencvImageRead(self, imagePath):
         img = cv2.imread(imagePath)  # BGR
         return img

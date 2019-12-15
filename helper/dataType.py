@@ -13,6 +13,7 @@ class MyObject():
 
     def __init__(self):
         self.name = ""
+        self.class_id = -1
         self.difficult = 0
 
 class Rect2D(MyObject):
@@ -31,6 +32,11 @@ class Rect2D(MyObject):
         b.min_corner = self.min_corner
         b.max_corner = self.max_corner
         return b
+
+    def center(self):
+        x = (self.max_corner.x + self.min_corner.x) / 2
+        y = (self.max_corner.y + self.min_corner.y) / 2
+        return x, y
 
     def width(self):
         return self.max_corner.x - self.min_corner.x

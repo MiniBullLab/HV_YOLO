@@ -12,6 +12,10 @@ class ArgumentsParse():
         parser = OptionParser()
         parser.description = "This program test model"
 
+        parser.add_option("-t", "--task", dest="task_name",
+                          metavar="PATH", type="string", default="",
+                          help="path to data config file")
+
         parser.add_option("-i", "--valPath", dest="valPath",
                           metavar="PATH", type="string", default="./val.txt",
                           help="path to data config file")
@@ -40,6 +44,10 @@ class ArgumentsParse():
     def train_input_parse(cls):
         parser = OptionParser()
         parser.description = "This program train model"
+
+        parser.add_option("-t", "--task", dest="task_name",
+                          metavar="PATH", type="string", default="",
+                          help="path to data config file")
 
         parser.add_option("-i", "--trainPath", dest="trainPath",
                           metavar="PATH", type="string", default="./train.txt",
@@ -73,7 +81,11 @@ class ArgumentsParse():
     def parse_arguments(cls):
 
         parser = OptionParser()
-        parser.description = "This program detect"
+        parser.description = "This program task"
+
+        parser.add_option("-t", "--task", dest="task_name",
+                          metavar="PATH", type="string", default="",
+                          help="path to data config file")
 
         parser.add_option("-i", "--input", dest="inputPath",
                           metavar="PATH", type="string", default=None,

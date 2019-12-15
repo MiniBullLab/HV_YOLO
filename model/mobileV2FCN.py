@@ -16,7 +16,7 @@ class MobileV2FCN(BaseModel):
         self.set_name(ModelName.MobileV2FCN)
         self.class_number = class_num
         self.bn_name = BatchNormType.BatchNormalize
-        self.activation_name = ActivationType.ReLU6
+        self.activation_name = ActivationType.ReLU
         self.lossList = []
         self.out_channels = []
         self.index = 0
@@ -35,7 +35,8 @@ class MobileV2FCN(BaseModel):
         self.add_block_list(layer1.get_name(), layer1, self.out_channels[-1])
 
         layer2 = RouteLayer('13')
-        output_channel = sum([base_out_channels[i] if i >= 0 else self.out_channels[i] for i in layer2.layers])
+        output_channel = sum([base_out_channels[i] if i >= 0
+                              else self.out_channels[i] for i in layer2.layers])
         self.add_block_list(layer2.get_name(), layer2, output_channel)
 
         input_channel = self.out_channels[-1]
@@ -46,18 +47,20 @@ class MobileV2FCN(BaseModel):
         self.add_block_list(conv1.get_name(), conv1, output_channel)
 
         layer3 = RouteLayer('-1,-3')
-        output_channel = sum([base_out_channels[i] if i >= 0 else self.out_channels[i] for i in layer3.layers])
+        output_channel = sum([base_out_channels[i] if i >= 0 else
+                              self.out_channels[i] for i in layer3.layers])
         self.add_block_list(layer3.get_name(), layer3, output_channel)
-
-        layer4 = Upsample(scale_factor=2, mode='bilinear')
-        self.add_block_list(layer4.get_name(), layer4, self.out_channels[-1])
 
         input_channel = self.out_channels[-1]
         output_channel = base_out_channels[-1] // 4
         self.make_block(input_channel, output_channel)
 
+        layer4 = Upsample(scale_factor=2, mode='bilinear')
+        self.add_block_list(layer4.get_name(), layer4, self.out_channels[-1])
+
         layer5 = RouteLayer('6')
-        output_channel = sum([base_out_channels[i] if i >= 0 else self.out_channels[i] for i in layer5.layers])
+        output_channel = sum([base_out_channels[i] if i >= 0 else
+                              self.out_channels[i] for i in layer5.layers])
         self.add_block_list(layer5.get_name(), layer5, output_channel)
 
         input_channel = self.out_channels[-1]
@@ -68,22 +71,47 @@ class MobileV2FCN(BaseModel):
         self.add_block_list(conv2.get_name(), conv2, output_channel)
 
         layer6 = RouteLayer('-1,-3')
-        output_channel = sum([base_out_channels[i] if i >= 0 else self.out_channels[i] for i in layer6.layers])
+        output_channel = sum([base_out_channels[i] if i >= 0 else
+                              self.out_channels[i] for i in layer6.layers])
         self.add_block_list(layer6.get_name(), layer6, output_channel)
 
         input_channel = self.out_channels[-1]
         output_channel = base_out_channels[-1] // 8
         self.make_block(input_channel, output_channel)
 
+        layer7 = Upsample(scale_factor=2, mode='bilinear')
+        self.add_block_list(layer7.get_name(), layer7, self.out_channels[-1])
+
+        layer8 = RouteLayer('3')
+        output_channel = sum([base_out_channels[i] if i >= 0 else
+                              self.out_channels[i] for i in layer8.layers])
+        self.add_block_list(layer8.get_name(), layer8, output_channel)
+
         input_channel = self.out_channels[-1]
-        output_channel = self.class_number
+        output_channel = base_out_channels[-1] // 8
         conv3 = ConvActivationBlock(input_channel, output_channel,
                                     kernel_size=1, stride=1, padding=0,
                                     activationName=ActivationType.Linear)
         self.add_block_list(conv3.get_name(), conv3, output_channel)
 
-        layer7 = Upsample(scale_factor=8, mode='bilinear')
-        self.add_block_list(layer1.get_name(), layer7, self.out_channels[-1])
+        layer9 = RouteLayer('-1,-3')
+        output_channel = sum([base_out_channels[i] if i >= 0 else
+                              self.out_channels[i] for i in layer9.layers])
+        self.add_block_list(layer9.get_name(), layer9, output_channel)
+
+        input_channel = self.out_channels[-1]
+        output_channel = base_out_channels[-1] // 16
+        self.make_block(input_channel, output_channel)
+
+        input_channel = self.out_channels[-1]
+        output_channel = self.class_number
+        conv4 = ConvActivationBlock(input_channel, output_channel,
+                                    kernel_size=1, stride=1, padding=0,
+                                    activationName=ActivationType.Linear)
+        self.add_block_list(conv4.get_name(), conv4, output_channel)
+
+        layer10 = Upsample(scale_factor=4, mode='bilinear')
+        self.add_block_list(layer10.get_name(), layer10, self.out_channels[-1])
 
         loss = CrossEntropy2d(ignore_index=250, size_average=True)
         self.add_block_list(LossType.CrossEntropy2d, loss, self.out_channels[-1])
@@ -128,27 +156,15 @@ class MobileV2FCN(BaseModel):
             if BlockType.BaseNet in key:
                 base_outputs = block(x)
                 x = base_outputs[-1]
-            elif BlockType.Convolutional in key:
-                x = block(x)
-            elif BlockType.ConvActivationBlock in key:
-                x = block(x)
-            elif BlockType.ConvBNActivationBlock in key:
-                x = block(x)
-            elif BlockType.Upsample in key:
-                x = block(x)
-            elif BlockType.MyMaxPool2d in key:
-                x = block(x)
             elif BlockType.RouteLayer in key:
                 x = block(layer_outputs, base_outputs)
             elif BlockType.ShortcutLayer in key:
                 x = block(layer_outputs)
-            elif BlockType.GlobalAvgPool in key:
-                x = block(x)
-            elif BlockType.FcLayer in key:
-                x = block(x)
             elif LossType.YoloLoss in key:
                 output.append(x)
             elif LossType.CrossEntropy2d in key:
                 output.append(x)
+            else:
+                x = block(x)
             layer_outputs.append(x)
         return output

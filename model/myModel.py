@@ -67,36 +67,20 @@ class MyModel(BaseModel):
         layer_outputs = []
         output = []
         for key, block in self._modules.items():
-            print(x.shape)
             if BlockType.BaseNet in key:
                 base_outputs = block(x)
                 x = base_outputs[-1]
-            elif BlockType.Convolutional in key:
-                x = block(x)
-            elif BlockType.ConvActivationBlock in key:
-                x = block(x)
-            elif BlockType.ConvBNActivationBlock in key:
-                x = block(x)
-            elif BlockType.Upsample in key:
-                x = block(x)
-            elif BlockType.MyMaxPool2d in key:
-                x = block(x)
             elif BlockType.RouteLayer in key:
                 x = block(layer_outputs, base_outputs)
             elif BlockType.ShortcutLayer in key:
                 x = block(layer_outputs)
-            elif BlockType.GlobalAvgPool in key:
-                x = block(x)
-            elif BlockType.FcLayer in key:
-                x = block(x)
-            elif DarknetBlockName in key:
-                x = block(x)
             elif LossType.YoloLoss in key:
                 output.append(x)
             elif LossType.CrossEntropy2d in key:
                 output.append(x)
             elif LossType.OhemCrossEntropy2d in key:
                 output.append(x)
-            print(key, x.shape)
+            else:
+                x = block(x)
             layer_outputs.append(x)
         return output

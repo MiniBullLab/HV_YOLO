@@ -41,23 +41,11 @@ class MyBaseModel(BaseModel):
         base_outputs = []
         layer_outputs = []
         for key, block in self._modules.items():
-            if BlockType.Convolutional in key:
-                x = block(x)
-            elif BlockType.ConvActivationBlock in key:
-                x = block(x)
-            elif BlockType.ConvBNActivationBlock in key:
-                x = block(x)
-            elif BlockType.Upsample in key:
-                x = block(x)
-            elif BlockType.MyMaxPool2d in key:
-                x = block(x)
-            elif BlockType.RouteLayer in key:
+            if BlockType.RouteLayer in key:
                 x = block(layer_outputs, base_outputs)
             elif BlockType.ShortcutLayer in key:
                 x = block(layer_outputs)
-            elif BlockType.GlobalAvgPool in key:
-                x = block(x)
-            elif BlockType.FcLayer in key:
+            else:
                 x = block(x)
             layer_outputs.append(x)
         return layer_outputs

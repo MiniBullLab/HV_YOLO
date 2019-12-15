@@ -21,24 +21,24 @@ class TorchOptimizer():
             if epoch >= e:
                 em = e
         setting = self.config[em]
-        self.optimizer = self.optimizers[setting['optimizer']](filter(lambda p: p.requires_grad, model.parameters()),
-                                                          lr=base_lr)
+        self.optimizer = self.optimizers[setting['optimizer']](
+            filter(lambda p: p.requires_grad, model.parameters()), lr=base_lr)
         self.adjust_param(self.optimizer, setting)
 
     def freeze_optimizer_layer(self, epoch, base_lr, model, layer_name):
-        self.freeze_layer(model, layer_name)
+        self.freeze_front_layer(model, layer_name)
         self.createOptimizer(epoch, model, base_lr)
 
     def freeze_layer(self, model, layer_name):
         for key, block in model._modules.items():
             if layer_name in key:
                 for param in block.parameters():
-                    param.requires_grad = True
+                    param.requires_grad = False
 
     def freeze_front_layer(self, model, layer_name):
         for key, block in model._modules.items():
             for param in block.parameters():
-                param.requires_grad = True
+                param.requires_grad = False
             if layer_name in key:
                 break
 
