@@ -2,9 +2,16 @@
 # -*- coding:utf-8 -*-
 # Author:
 
+from tasks.cls.classify_test import ClassifyTest
 from tasks.det.detect_test import DetectionTest
-from tasks.seg.segmentTest import SegmentTest
+from tasks.seg.segment_test import SegmentionTest
 from helper.arguments_parse import ArgumentsParse
+
+
+def classify_task(options):
+    test = ClassifyTest(options.cfg, 0)
+    test.load_weights(options.weights)
+    test.test(options.valPath)
 
 
 def detect_task(options):
@@ -14,7 +21,7 @@ def detect_task(options):
 
 
 def segment_task(options):
-    test = SegmentTest(options.cfg, 0)
+    test = SegmentionTest(options.cfg, 0)
     test.load_weights(options.weights)
     test.test(options.valPath)
 
@@ -22,7 +29,9 @@ def segment_task(options):
 def main():
     print("process start...")
     options = ArgumentsParse.test_input_parse()
-    if options.task_name == "detect":
+    if options.task_name == "classify":
+        classify_task(options)
+    elif options.task_name == "detect":
         detect_task(options)
     elif options.task_name == "segment":
         segment_task(options)

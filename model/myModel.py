@@ -5,7 +5,6 @@
 from collections import OrderedDict
 from base_model.base_model import *
 from base_name.block_name import BlockType
-from base_block.darknet_block import DarknetBlockName
 from base_name.loss_name import LossType
 from base_model.base_model_factory import BaseModelFactory
 from model.createModelList import CreateModuleList
@@ -53,6 +52,8 @@ class MyModel(BaseModel):
                 lossResult.append(block)
             elif LossType.OhemCrossEntropy2d in key:
                 lossResult.append(block)
+            elif LossType.BinaryCrossEntropy2d in key:
+                lossResult.append(block)
             elif LossType.YoloLoss in key:
                 lossResult.append(block)
         return lossResult
@@ -70,8 +71,14 @@ class MyModel(BaseModel):
             if BlockType.BaseNet in key:
                 base_outputs = block(x)
                 x = base_outputs[-1]
+            elif BlockType.MultiplyLayer in key:
+                x = block(layer_outputs, base_outputs)
+            elif BlockType.AddLayer in key:
+                x = block(layer_outputs, base_outputs)
             elif BlockType.RouteLayer in key:
                 x = block(layer_outputs, base_outputs)
+            elif BlockType.ShortRouteLayer in key:
+                x = block(layer_outputs)
             elif BlockType.ShortcutLayer in key:
                 x = block(layer_outputs)
             elif LossType.YoloLoss in key:
@@ -79,6 +86,8 @@ class MyModel(BaseModel):
             elif LossType.CrossEntropy2d in key:
                 output.append(x)
             elif LossType.OhemCrossEntropy2d in key:
+                output.append(x)
+            elif LossType.BinaryCrossEntropy2d in key:
                 output.append(x)
             else:
                 x = block(x)

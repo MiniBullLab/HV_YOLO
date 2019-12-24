@@ -72,3 +72,4 @@ class CrossEntropy2d(BaseLoss):
         else:
             loss = F.softmax(input)
         return loss
+

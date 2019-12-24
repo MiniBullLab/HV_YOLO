@@ -6,6 +6,7 @@ from base_block.base_block import *
 from base_name.block_name import ActivationType
 from base_name.block_name import BlockType
 
+
 """
 """
 class LinearActivation(BaseBlock):
@@ -44,3 +45,5 @@ class ActivationFunction():
             return nn.ReLU6(inplace=True)
         elif name == ActivationType.LeakyReLU:
             return nn.LeakyReLU(0.1, inplace=True)
+        elif name == ActivationType.Sigmoid:
+            return nn.Sigmoid()

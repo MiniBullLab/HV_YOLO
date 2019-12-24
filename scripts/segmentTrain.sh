@@ -1,1 +1,0 @@
-python3 ./runner/segmentTrain.py -i /home/wfw/data/VOCdevkit/CULane/ImageSets/train.txt -v /home/wfw/data/VOCdevkit/CULane/ImageSets/val.txt -c ./cfg/mobileFCN.cfg

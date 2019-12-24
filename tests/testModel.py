@@ -22,7 +22,7 @@ def test_SR():
 
 def main():
     model_factory = ModelFactory()
-    model = model_factory.get_model_from_cfg('../cfg/shufflenetV2-0.5_spp_BerkeleyAll.cfg')
+    model = model_factory.get_model('../cfg/fgsegv2.cfg')
     for m in model.named_parameters():
         print(m)
 

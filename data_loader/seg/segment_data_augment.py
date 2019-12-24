@@ -23,9 +23,9 @@ class SegmentDataAugment():
         if self.is_augment_hsv:
             image = self.image_augment.augment_hsv(image_rgb)
         if self.is_augment_affine:
-            self.augment_affine(image, target)
+            image, target = self.augment_affine(image, target)
         if self.is_lr_flip:
-            self.augment_lr_flip(image, target)
+            image, target = self.augment_lr_flip(image, target)
         return image, target
 
     def augment_affine(self, src_image, label):

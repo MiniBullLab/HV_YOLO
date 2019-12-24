@@ -41,8 +41,14 @@ class MyBaseModel(BaseModel):
         base_outputs = []
         layer_outputs = []
         for key, block in self._modules.items():
-            if BlockType.RouteLayer in key:
+            if BlockType.MultiplyLayer in key:
                 x = block(layer_outputs, base_outputs)
+            elif BlockType.AddLayer in key:
+                x = block(layer_outputs, base_outputs)
+            elif BlockType.RouteLayer in key:
+                x = block(layer_outputs, base_outputs)
+            elif BlockType.ShortRouteLayer in key:
+                x = block(layer_outputs)
             elif BlockType.ShortcutLayer in key:
                 x = block(layer_outputs)
             else:

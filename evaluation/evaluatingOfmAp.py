@@ -1,8 +1,7 @@
 import os.path
 import numpy as np
 from helper import XMLProcess
-from helper import DirProcess
-from data_loader.dataLoader import DataLoader
+from data_loader.det.detection_sample import DetectionSample
 
 
 class MeanApEvaluating():
@@ -11,9 +10,9 @@ class MeanApEvaluating():
         path, _ = os.path.split(valPath)
         self.annotationDir = os.path.join(path, "../Annotations")
         self.xmlProcess = XMLProcess()
-        self.dataLoader = DataLoader(path)
         self.className = className
-        self.imageAndAnnotationList = self.dataLoader.getImageAndAnnotationList(valPath)
+        self.detection_samples = DetectionSample(valPath, className)
+        self.imageAndAnnotationList = self.detection_samples.get_image_and_label_list(valPath)
 
     def do_python_eval(self, output_dir, detection_path):
         detpath = detection_path  # the format and the address where the ./darknet detector valid .. results are stored

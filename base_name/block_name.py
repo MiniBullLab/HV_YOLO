@@ -11,6 +11,7 @@ class ActivationType():
     PReLU = "prelu"
     ReLU6 = "relu6"
     LeakyReLU = "leaky"
+    Sigmoid = "sigmoid"
 
 
 class BatchNormType():
@@ -24,8 +25,14 @@ class BlockType():
     BaseNet = "baseNet"
 
     LinearActivation = "linearActivation"
+
     EmptyLayer = "emptyLayer"
+
+    MultiplyLayer = "multiply"
+    AddLayer = "add"
+
     RouteLayer = "route"
+    ShortRouteLayer = "shortRoute"
     ShortcutLayer = "shortcut"
     MyMaxPool2d = "maxpool"
     Upsample = "upsample"

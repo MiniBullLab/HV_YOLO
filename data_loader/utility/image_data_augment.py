@@ -13,7 +13,6 @@ class ImageDataAugment():
         pass
 
     def augment_hsv(self, rgb_image):
-        result = None
         # SV augmentation by 50%
         fraction = 0.50
         img_hsv = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2HSV)
@@ -32,5 +31,5 @@ class ImageDataAugment():
 
         img_hsv[:, :, 1] = S.astype(np.uint8)
         img_hsv[:, :, 2] = V.astype(np.uint8)
-        cv2.cvtColor(img_hsv, cv2.COLOR_HSV2RGB, dst=result)
+        result = cv2.cvtColor(img_hsv, cv2.COLOR_HSV2RGB)
         return result

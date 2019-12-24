@@ -18,6 +18,40 @@ class EmptyLayer(BaseBlock):
         pass
 
 
+class MultiplyLayer(BaseBlock):
+
+    def __init__(self, layers):
+        super().__init__(BlockType.MultiplyLayer)
+        self.layers = [int(x) for x in layers.split(',') if x]
+        if len(self.layers) <= 1:
+            print("% input error" % BlockType.MultiplyLayer)
+
+    def forward(self, layer_outputs, base_outputs):
+        temp_layer_outputs = [layer_outputs[i] if i < 0 else base_outputs[i]
+                              for i in self.layers]
+        x = temp_layer_outputs[0]
+        for layer in temp_layer_outputs:
+             x = x * layer
+        return x
+
+
+class AddLayer(BaseBlock):
+
+    def __init__(self, layers):
+        super().__init__(BlockType.AddLayer)
+        self.layers = [int(x) for x in layers.split(',') if x]
+        if len(self.layers) <= 1:
+            print("% input error" % BlockType.AddLayer)
+
+    def forward(self, layer_outputs, base_outputs):
+        temp_layer_outputs = [layer_outputs[i] if i < 0 else base_outputs[i]
+                              for i in self.layers]
+        x = temp_layer_outputs[0]
+        for layer in temp_layer_outputs:
+             x = x + layer
+        return x
+
+
 class RouteLayer(BaseBlock):
 
     def __init__(self, layers):
@@ -26,8 +60,23 @@ class RouteLayer(BaseBlock):
 
     def forward(self, layer_outputs, base_outputs):
         #print(self.layers)
-        temp_layer_outputs = [layer_outputs[i] if i < 0 else base_outputs[i] for i in self.layers]
+        temp_layer_outputs = [layer_outputs[i] if i < 0 else base_outputs[i]
+                              for i in self.layers]
         x = torch.cat(temp_layer_outputs, 1)
+        return x
+
+
+class ShortRouteLayer(BaseBlock):
+
+    def __init__(self, layer_from, activationName=ActivationType.Linear):
+        super().__init__(BlockType.ShortRouteLayer)
+        self.layer_from = int(layer_from)
+        self.activation = ActivationFunction.get_function(activationName)
+
+    def forward(self, layer_outputs):
+        x = torch.cat([layer_outputs[self.layer_from],
+                       layer_outputs[-1]], 1)
+        x = self.activation(x)
         return x
 
 

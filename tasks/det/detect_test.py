@@ -8,8 +8,8 @@ from evaluation.evaluatingOfmAp import *
 from data_loader.det.detection_val_dataloader import get_detection_val_dataloader
 from torch_utility.torch_model_process import TorchModelProcess
 from base_algorithm.non_max_suppression import NonMaxSuppression
-from config import detectConfig
 from tasks.det.detect_result_process import DetectResultProcess
+from config import detect_config
 
 
 class DetectionTest():
@@ -30,8 +30,8 @@ class DetectionTest():
         os.system('rm -rf ' + 'results')
         os.makedirs('results', exist_ok=True)
         dataloader = get_detection_val_dataloader(val_Path, batch_size=1,
-                                                  image_size=detectConfig.imgSize)
-        evaluator = MeanApEvaluating(val_Path, detectConfig.className)
+                                                  image_size=detect_config.imgSize)
+        evaluator = MeanApEvaluating(val_Path, detect_config.className)
 
         prev_time = time.time()
         for i, (image_path, src_image, input_image) in enumerate(dataloader):
@@ -42,11 +42,11 @@ class DetectionTest():
                 output_list = self.model(input_image.to(self.device))
                 output = self.compute_output(output_list)
                 result = self.result_process.get_detection_result(output, 5e-3)
-            detection_objects = self.nms_process.multi_class_nms(result, detectConfig.nmsThresh)
+            detection_objects = self.nms_process.multi_class_nms(result, detect_config.nmsThresh)
             detection_objects = self.result_process.resize_detection_objects(src_image,
-                                                                             detectConfig.imgSize,
+                                                                             detect_config.imgSize,
                                                                              detection_objects,
-                                                                             detectConfig.className)
+                                                                             detect_config.className)
             print('Batch %d... Done. (%.3fs)' % (i, time.time() - prev_time))
             prev_time = time.time()
 
@@ -81,5 +81,5 @@ class DetectionTest():
             # file.write('%11.3g' * 2 % (mAP, aps[0]) + '\n')
             file.write("Epoch: {} | mAP: {:.3f} | ".format(epoch, mAP))
             for i, ap in enumerate(aps):
-                file.write(detectConfig.className[i] + ": {:.3f} ".format(ap))
+                file.write(detect_config.className[i] + ": {:.3f} ".format(ap))
             file.write("\n")

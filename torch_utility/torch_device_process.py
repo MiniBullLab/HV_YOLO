@@ -24,7 +24,7 @@ class TorchDeviceProcess():
         if TorchDeviceProcess.cuda:
             count = self.getCUDACount()
             if id >= 0 and id < count:
-                os.environ["CUDA_VISIBLE_DEVICES"] = id
+                os.environ["CUDA_VISIBLE_DEVICES"] = str(id)
                 self.device = "cuda:%d" % id
             else:
                 print("GPU %d error" % id)

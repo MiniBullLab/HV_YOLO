@@ -14,7 +14,7 @@ def main():
     print("process start...")
     base_model_factory = BaseModelFactory()
     #model = base_model_factory.get_base_model_from_cfg("../cfg/darknet-tiny.cfg")
-    model = base_model_factory.get_base_model("../cfg/darknet19.cfg")
+    model = base_model_factory.get_base_model("../cfg/vgg16.cfg")
     model.printBlockName()
     print("process end!")
 
