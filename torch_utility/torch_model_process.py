@@ -3,8 +3,8 @@ import torch
 from torch import nn
 from collections import OrderedDict
 from torch_utility.torch_device_process import TorchDeviceProcess
-from model.model_factory import ModelFactory
-from model.modeWeightInit import ModelWeightInit
+from model.utility.model_factory import ModelFactory
+from model.utility.modeWeightInit import ModelWeightInit
 
 
 class TorchModelProcess():

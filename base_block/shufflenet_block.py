@@ -56,7 +56,7 @@ class SplitBlock(BaseBlock):
 
 class BasicBlock(BaseBlock):
     def __init__(self, in_channels, out_channels, stride=1, dilation=1,
-                 bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU, split_ratio=0.5):
+                 bnName=BatchNormType.BatchNormalize2d, activationName=ActivationType.ReLU, split_ratio=0.5):
         super().__init__(ShuffleNetBlockName.BasicBlock)
         self.split = SplitBlock(split_ratio)
         in_channels = int(in_channels * split_ratio)
@@ -143,7 +143,7 @@ class SEBasicBlock(BaseBlock):
 
 class DownBlock(BaseBlock):
     def __init__(self, in_channels, out_channels, stride=2,
-                 bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
+                 bnName=BatchNormType.BatchNormalize2d, activationName=ActivationType.ReLU):
         super().__init__(ShuffleNetBlockName.DownBlock)
         mid_channels = out_channels // 2
         # left

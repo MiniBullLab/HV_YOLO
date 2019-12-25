@@ -16,7 +16,8 @@ class ActivationType():
 
 class BatchNormType():
 
-    BatchNormalize = "bn2d"
+    BatchNormalize2d = "bn2d"
+    BatchNormalize1d = "bn1d"
 
 
 class BlockType():
@@ -40,11 +41,19 @@ class BlockType():
     FcLayer = "fcLayer"
     Dropout = "dropout"
 
+    FcLinear = "fcLinear"
+
+    Convolutional1d = "convolutional1d"
+    ConvBNBlock1d = "convBN1d"
+    ConvBNActivationBlock1d = "convBNActivationBlock1d"
+
+    Convolutional = "convolutional"
     ConvBNActivationBlock = "convBNActivationBlock"
     ConvActivationBlock = "convActivationBlock"
-    Convolutional = "convolutional"
     BNActivationConvBlock = "bnActivationConvBlock"
     BNActivationBlock = "bnActivationBlock"
+
+    FcBNActivationBlock = "fcBNActivationBlock"
 
     InvertedResidual = "invertedResidual"
     SEBlock = "seBlock"

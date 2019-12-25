@@ -38,7 +38,7 @@ class ReorgBlock(BaseBlock):
 
 class BasicBlock(BaseBlock):
     def __init__(self, in_channels, planes, stride=1, dilation=1,
-                 bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
+                 bnName=BatchNormType.BatchNormalize2d, activationName=ActivationType.ReLU):
         super().__init__(DarknetBlockName.BasicBlock)
 
         self.conv1 = ConvBNActivationBlock(in_channels=in_channels,

@@ -11,7 +11,7 @@ from data_loader.det.detection_dataset_process import DetectionDataSetProcess
 from data_loader.det.detection_sample import DetectionSample
 from helper import XMLProcess
 from helper import ImageProcess
-from config import detectConfig
+from config import detect_config
 
 
 class CreateAnchors():
@@ -20,7 +20,7 @@ class CreateAnchors():
         self.xmlProcess = XMLProcess()
         self.image_process = ImageProcess()
         self.detection_sample = DetectionSample(train_path,
-                                                detectConfig.className)
+                                                detect_config.className)
         self.detection_sample.read_sample()
         self.dataset_process = DetectionDataSetProcess()
 
@@ -36,7 +36,7 @@ class CreateAnchors():
 
         # Print
         print('kmeans anchors (n=%g, img_size=%g, IoU=%.2f/%.2f/%.2f-min/mean/best): ' %
-              (number, detectConfig.imgSize, biou.min(), iou.mean(), biou.mean()), end='')
+              (number, detect_config.imgSize, biou.min(), iou.mean(), biou.mean()), end='')
         for i, x in enumerate(k):
             print('%i,%i' % (round(x[0]), round(x[1])), end=',  ' if i < len(k) - 1 else '\n')
 
@@ -49,7 +49,7 @@ class CreateAnchors():
             src_image, rgb_image = self.image_process.readRgbImage(img_path)
             _, _, boxes = self.xmlProcess.parseRectData(label_path)
             rgb_image, labels = self.dataset_process.resize_dataset(rgb_image,
-                                                                    detectConfig.imgSize,
+                                                                    detect_config.imgSize,
                                                                     boxes,
                                                                     self.className)
             temp = np.zeros((len(labels), 2), dtype=np.float32)

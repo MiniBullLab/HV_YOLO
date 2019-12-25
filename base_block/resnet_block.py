@@ -18,7 +18,7 @@ class BasicBlock(BaseBlock):
     expansion = 1
 
     def __init__(self, in_channels, planes, stride=1, dilation=1,
-                 bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
+                 bnName=BatchNormType.BatchNormalize2d, activationName=ActivationType.ReLU):
         super().__init__(ResnetBlockName.BasicBlock)
 
         self.convBnReLU1 = ConvBNActivationBlock(in_channels=in_channels,
@@ -62,7 +62,7 @@ class Bottleneck(BaseBlock):
     expansion = 4
 
     def __init__(self, in_channels, planes, stride=1, dilation=1,
-                 bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
+                 bnName=BatchNormType.BatchNormalize2d, activationName=ActivationType.ReLU):
         super().__init__(ResnetBlockName.Bottleneck)
 
         self.convBnReLU1 = ConvBNActivationBlock(in_channels=in_channels,

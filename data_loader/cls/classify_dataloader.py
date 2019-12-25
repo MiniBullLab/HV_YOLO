@@ -14,7 +14,7 @@ class ClassifyDataloader(data.Dataset):
     def __init__(self, train_path, image_size=(416, 416)):
         self.image_size = image_size
         self.classify_sample = ClassifySample(train_path)
-        self.classify_sample.read_sample()
+        self.classify_sample.read_sample(flag=0)
         self.image_process = ImageProcess()
         self.dataset_process = ClassifyDatasetProcess()
 
@@ -34,6 +34,7 @@ def get_classify_train_dataloader(train_path, image_size, batch_size, num_worker
     result = data.DataLoader(dataset=dataloader, num_workers=num_workers,
                              batch_size=batch_size, shuffle=True)
     return result
+
 
 def get_classify_val_dataloader(val_path, image_size, batch_size, num_workers=8):
     dataloader = ClassifyDataloader(val_path, image_size)

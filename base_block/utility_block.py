@@ -9,6 +9,45 @@ from base_block.activation_function import ActivationFunction
 from base_block.batchnorm import BatchNormalizeFunction
 
 
+class ConvBNActivationBlock1d(BaseBlock):
+
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
+                 dilation=1, groups=1, bnName=BatchNormType.BatchNormalize1d,
+                 activationName=ActivationType.ReLU):
+        super().__init__(BlockType.ConvBNActivationBlock1d)
+        conv = nn.Conv1d(in_channels, out_channels, kernel_size,
+                         stride, padding, dilation, groups, bias=True)
+        bn = BatchNormalizeFunction.get_function(bnName, out_channels)
+        activation = ActivationFunction.get_function(activationName)
+        self.block = nn.Sequential(OrderedDict([
+            (BlockType.Convolutional1d, conv),
+            (bnName, bn),
+            (activationName, activation)
+        ]))
+
+    def forward(self, x):
+        x = self.block(x)
+        return x
+
+
+class ConvBNBlock1d(BaseBlock):
+
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
+                 dilation=1, groups=1, bnName=BatchNormType.BatchNormalize1d):
+        super().__init__(BlockType.ConvBNBlock1d)
+        conv = nn.Conv1d(in_channels, out_channels, kernel_size,
+                         stride, padding, dilation, groups, bias=True)
+        bn = BatchNormalizeFunction.get_function(bnName, out_channels)
+        self.block = nn.Sequential(OrderedDict([
+            (BlockType.Convolutional1d, conv),
+            (bnName, bn)
+        ]))
+
+    def forward(self, x):
+        x = self.block(x)
+        return x
+
+
 class ConvActivationBlock(BaseBlock):
 
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
@@ -30,7 +69,7 @@ class ConvActivationBlock(BaseBlock):
 class ConvBNActivationBlock(BaseBlock):
 
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
-                 dilation=1, groups=1, bnName=BatchNormType.BatchNormalize,
+                 dilation=1, groups=1, bnName=BatchNormType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__(BlockType.ConvBNActivationBlock)
         conv = nn.Conv2d(in_channels, out_channels, kernel_size,
@@ -51,7 +90,7 @@ class ConvBNActivationBlock(BaseBlock):
 class BNActivationConvBlock(BaseBlock):
 
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
-                 dilation=1, groups=1, bnName=BatchNormType.BatchNormalize,
+                 dilation=1, groups=1, bnName=BatchNormType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__(BlockType.BNActivationConvBlock)
         bn = BatchNormalizeFunction.get_function(bnName, in_channels)
@@ -71,7 +110,7 @@ class BNActivationConvBlock(BaseBlock):
 
 class BNActivationBlock(BaseBlock):
 
-    def __init__(self, in_channels, bnName=BatchNormType.BatchNormalize,
+    def __init__(self, in_channels, bnName=BatchNormType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__(BlockType.BNActivationBlock)
         bn = BatchNormalizeFunction.get_function(bnName, in_channels)
@@ -86,9 +125,27 @@ class BNActivationBlock(BaseBlock):
         return x
 
 
+class FcBNActivationBlock(BaseBlock):
+
+    def __init__(self, in_features, out_features, bnName=BatchNormType.BatchNormalize1d,
+                 activationName=ActivationType.ReLU):
+        super().__init__(BlockType.FcBNActivationBlock)
+        fc = nn.Linear(in_features, out_features)
+        bn = BatchNormalizeFunction.get_function(bnName, out_features)
+        activation = ActivationFunction.get_function(activationName)
+        self.block = nn.Sequential(OrderedDict([
+            (BlockType.FcLinear, fc),
+            (bnName, bn),
+            (activationName, activation)
+        ]))
+
+    def forward(self, x):
+        x = self.block(x)
+        return x
+
 class InvertedResidual(BaseBlock):
     def __init__(self, in_channels, out_channels, stride=1, expand_ratio=1, dilation=1,
-                 bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU6):
+                 bnName=BatchNormType.BatchNormalize2d, activationName=ActivationType.ReLU6):
         super().__init__(BlockType.InvertedResidual)
         assert stride in [1, 2]
         self.use_res_connect = stride == 1 and in_channels == out_channels

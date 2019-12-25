@@ -16,7 +16,7 @@ class DenseNetBlockName():
 class DenseBlock(BaseBlock):
 
     def __init__(self, in_channel, growth_rate, bn_size, drop_rate, stride=1, dilation=1,
-                 bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
+                 bnName=BatchNormType.BatchNormalize2d, activationName=ActivationType.ReLU):
         super().__init__(DenseNetBlockName.DenseBlock)
         self.layer1 = BNActivationConvBlock(in_channels=in_channel,
                                             out_channels=bn_size*growth_rate,

@@ -1,6 +1,7 @@
 import os
 import cv2
 
+
 class VideoProcess():
 
     def __init__(self):

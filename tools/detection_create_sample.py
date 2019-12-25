@@ -5,7 +5,7 @@ import random
 import cv2
 import numpy as np
 from helper import DirProcess, XMLProcess
-from config import detectConfig
+from config import detect_config
 
 
 class DetectionCreateSample():
@@ -63,7 +63,7 @@ class DetectionCreateSample():
 
     def createWriteFile(self, outputPath):
         result = {}
-        for className in detectConfig.className:
+        for className in detect_config.className:
             classImagePath = os.path.join(outputPath, className + ".txt")
             result[className] = open(classImagePath, "w")
         return result

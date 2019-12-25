@@ -14,7 +14,7 @@ class GoogelnetBlockName():
 
 class InceptionBlock(BaseBlock):
     def __init__(self, in_channels, planes, stride=1, dilation=1,
-                 bnName = BatchNormType.BatchNormalize, activationName = ActivationType.ReLU):
+                 bnName = BatchNormType.BatchNormalize2d, activationName = ActivationType.ReLU):
         super().__init__(GoogelnetBlockName.InceptionBlock)
         # 1x1 conv branch
         self.conv1 = ConvBNActivationBlock(in_channels=in_channels,

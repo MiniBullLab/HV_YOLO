@@ -15,7 +15,7 @@ class ImageProcess():
         else:
             return False
 
-    def loadYUVImage(filepath):
+    def loadYUVImage(self, filepath):
         img = Image.open(filepath).convert('YCbCr')
         y, _, _ = img.split()
         return y

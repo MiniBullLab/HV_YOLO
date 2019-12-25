@@ -1,8 +1,9 @@
 import torch
 from optparse import OptionParser
-from base_model.base_model_factory import BaseModelFactory
-from model.model_factory import ModelFactory
+from base_model.utility.base_model_factory import BaseModelFactory
+from model.utility.model_factory import ModelFactory
 from onnx.torch_to_onnx import TorchConvertOnnx
+
 
 def parse_arguments():
 
@@ -44,13 +45,15 @@ class ModelConverter():
 
     def base_model_convert(self, base_model_path, weight_path, save_dir):
         input_x = torch.randn(1, 3, 640, 352)
-        self.show_process.set_input(input_x)
+        self.converter.set_input(input_x)
         self.converter.set_save_dir(save_dir)
         model = self.base_model_factory.get_base_model(base_model_path)
         self.converter.torch2onnx(model, weight_path)
 
+
 def main():
     pass
+
 
 if __name__ == '__main__':
     options = parse_arguments()
@@ -58,4 +61,4 @@ if __name__ == '__main__':
     if options.model is not None:
         converter.model_convert(options.model, options.weight_path, options.save_dir)
     elif options.base_model is not None:
-        converter.base_model_show(options.base_model, options.weight_path, options.save_dir)
+        converter.base_model_convert(options.base_model, options.weight_path, options.save_dir)
