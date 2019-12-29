@@ -16,4 +16,4 @@ shufflenet yolo detection architecture
  * [HV_ARM](https://github.com/MiniBullLab/HV_model_convert.git)
 
 # Project
-* [HV_Project](https://github.com/MiniBullLab/HV_model_convert.git)
+* [HV_Project](https://github.com/MiniBullLab/HV_Project)
