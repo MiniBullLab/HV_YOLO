@@ -3,11 +3,7 @@
 # Author:
 
 from torch_utility.torch_summary import summary
-<<<<<<< HEAD
 from model.utility.model_factory import ModelFactory
-=======
-from model.model_factory import ModelFactory
->>>>>>> e909c5896721a8536401dcdecbc87088f1d77f04
 
 
 def main():

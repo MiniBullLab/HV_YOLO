@@ -3,6 +3,7 @@
 *.workspace
 *.log
 .idea/
+.vscode/
 log/
 build/
 result/

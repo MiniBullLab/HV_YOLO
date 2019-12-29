@@ -47,7 +47,7 @@ class DenseBlock(BaseBlock):
 class TransitionBlock(BaseBlock):
 
     def __init__(self, in_channel, output_channel, stride=1,
-                 bnName=BatchNormType.BatchNormalize, activationName=ActivationType.ReLU):
+                 bnName=BatchNormType.BatchNormalize2d, activationName=ActivationType.ReLU):
         super().__init__(DenseNetBlockName.TransitionBlock)
         self.block = BNActivationConvBlock(in_channels=in_channel,
                                            out_channels=output_channel,

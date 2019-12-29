@@ -109,7 +109,7 @@ class SqueezeNet(BaseModel):
 
 
 class DilatedSqueezeNet(BaseModel):
-    def __init__(self, data_channel=3, bnName=BatchNormType.BatchNormalize,
+    def __init__(self, data_channel=3, bnName=BatchNormType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
         self.set_name(BaseModelName.DilatedSqueezeNet)

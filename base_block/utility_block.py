@@ -143,6 +143,7 @@ class FcBNActivationBlock(BaseBlock):
         x = self.block(x)
         return x
 
+
 class InvertedResidual(BaseBlock):
     def __init__(self, in_channels, out_channels, stride=1, expand_ratio=1, dilation=1,
                  bnName=BatchNormType.BatchNormalize2d, activationName=ActivationType.ReLU6):

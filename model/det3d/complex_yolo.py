@@ -72,6 +72,9 @@ class ComplexYOLO(BaseModel):
                           bias=True)
         self.add_block_list(BlockType.Convolutional, conv4, output_channel)
 
+    def create_loss(self):
+        pass
+
     def add_block_list(self, block_name, block, output_channel):
         block_name = "%s_%d" % (block_name, self.index)
         self.add_module(block_name, block)

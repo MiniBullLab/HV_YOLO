@@ -117,6 +117,9 @@ class MobileV2FCN(BaseModel):
         layer10 = Upsample(scale_factor=4, mode='bilinear')
         self.add_block_list(layer10.get_name(), layer10, self.out_channels[-1])
 
+        self.create_loss()
+
+    def create_loss(self):
         loss = CrossEntropy2d(ignore_index=250, size_average=True)
         self.add_block_list(LossType.CrossEntropy2d, loss, self.out_channels[-1])
         self.lossList.append(loss)
