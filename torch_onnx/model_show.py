@@ -1,5 +1,5 @@
 import netron
-from onnx.torch_to_onnx import TorchConvertOnnx
+from torch_onnx.torch_to_onnx import TorchConvertOnnx
 
 
 class ModelShow():

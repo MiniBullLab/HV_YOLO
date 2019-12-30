@@ -2,7 +2,7 @@ import torch
 from optparse import OptionParser
 from base_model.utility.base_model_factory import BaseModelFactory
 from model.utility.model_factory import ModelFactory
-from onnx.model_show import ModelShow
+from torch_onnx.model_show import ModelShow
 
 
 def parse_arguments():
