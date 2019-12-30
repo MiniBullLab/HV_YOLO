@@ -16,7 +16,7 @@ class MobileNetV2(BaseModel):
     def __init__(self, data_channel=3, num_blocks=[1,2,3,4,3,3,1],
                  out_channels=[16,24,32,64,96,160,320], stride=[1,2,2,2,1,2,1],
                  dilation=[1,1,1,1,1,1,1], bnName=BatchNormType.BatchNormalize,
-                 activationName=ActivationType.ReLU6, expand_ratios=[1,6,6,6,6,6,6]):
+                 activationName=ActivationType.LeakyReLU, expand_ratios=[1,6,6,6,6,6,6]):
         super().__init__()
         self.set_name(BaseModelName.MobileNetV2)
         self.data_channel = data_channel

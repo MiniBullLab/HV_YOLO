@@ -12,7 +12,7 @@ from base_block.utility_block import ConvBNActivationBlock
 from base_block.shufflenet_block import DownBlock, BasicBlock
 
 
-__all__ = ['shufflenet_v2_1_0']
+__all__ = ['shufflenet_v2_1_0', 'ShuffleNetV2']
 
 
 class ShuffleNetV2(BaseModel):

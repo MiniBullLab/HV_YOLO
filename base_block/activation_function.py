@@ -6,8 +6,7 @@ from base_block.base_block import *
 from base_name.block_name import ActivationType
 from base_name.block_name import BlockType
 
-"""
-"""
+
 class LinearActivation(BaseBlock):
 
     def __init__(self):

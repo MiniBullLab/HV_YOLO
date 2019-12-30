@@ -23,7 +23,7 @@ class DetectionTrain():
         if not os.path.exists(detectConfig.snapshotPath):
             os.makedirs(detectConfig.snapshotPath, exist_ok=True)
 
-        self.logger = Logger(os.path.join("./log", "logs"))
+        self.logger = Logger(os.path.join(detectConfig.root_save_dir, "logs"))
         self.lossTrain = AverageMeter()
 
         self.torchModelProcess = TorchModelProcess()
@@ -66,7 +66,8 @@ class DetectionTrain():
         return loss
 
     def test(self, val_path, epoch):
-        save_model_path = os.path.join(detectConfig.snapshotPath, "model_epoch_%d.pt" % epoch)
+        # save_model_path = os.path.join(detectConfig.snapshotPath, "model_epoch_%d.pt" % epoch)
+        save_model_path = detectConfig.latest_weights_file
         self.torchModelProcess.saveLatestModel(save_model_path, self.model,
                                                self.optimizer, epoch, self.best_mAP)
         self.detect_test.load_weights(save_model_path)
@@ -78,7 +79,7 @@ class DetectionTrain():
     def train(self, train_path, val_path):
         dataloader = ImageDetectTrainDataLoader(train_path, detectConfig.className,
                                                 detectConfig.train_batch_size, detectConfig.imgSize,
-                                                multi_scale=False, augment=True, balancedSample=True)
+                                                multi_scale=False, augment=True, balancedSample=False)
         total_images = len(dataloader)
         self.load_param(detectConfig.latest_weights_file)
 
@@ -120,7 +121,7 @@ class DetectionTrain():
 def main():
     print("process start...")
     options = ArgumentsParse.train_input_parse()
-    detect_train = DetectionTrain(options.cfg, 0)
+    detect_train = DetectionTrain(options.cfg, options.gpu_id)
     detect_train.train(options.trainPath, options.valPath)
     print("process end!")
 

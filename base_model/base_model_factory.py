@@ -6,7 +6,6 @@ import os.path
 from base_name.base_model_name import BaseModelName
 from base_model.mobilenetv2 import MobileNetV2
 from base_model.shufflenetv2 import ShuffleNetV2
-from base_model.resnet import ResNet
 from base_model.my_base_model import MyBaseModel
 from model.modelParse import ModelParse
 
@@ -38,6 +37,4 @@ class BaseModelFactory():
             result = ShuffleNetV2()
         elif net_name == BaseModelName.MobileNetV2:
             result = MobileNetV2()
-        elif net_name == BaseModelName.ResNet:
-            result = ResNet()
         return result

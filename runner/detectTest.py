@@ -33,8 +33,9 @@ class DetectionTest():
         self.torchModelProcess.modelTestInit(self.model)
 
     def test(self, val_Path):
-        os.system('rm -rf ' + 'results')
-        os.makedirs('results', exist_ok=True)
+        save_result_dir = os.path.join(detectConfig.root_save_dir, 'results')
+        os.system('rm -rf ' + save_result_dir)
+        os.makedirs(save_result_dir, exist_ok=True)
         dataloader = ImageDetectValDataLoader(val_Path, batch_size=1, img_size=detectConfig.imgSize)
         evaluator = MeanApEvaluating(val_Path, detectConfig.className)
 
@@ -69,13 +70,14 @@ class DetectionTest():
                     file.write(
                         "{} {} {} {} {} {}\n".format(fileName, confidence, x1, y1, x2, y2))
 
-        mAP, aps = evaluator.do_python_eval("./results/", "./results/comp4_det_test_")
+        mAP, aps = evaluator.do_python_eval(save_result_dir, "./results/comp4_det_test_")
 
         return mAP, aps
 
     def save_test_result(self, epoch, mAP, aps):
         # Write epoch results
-        with open('results.txt', 'a') as file:
+        save_result_path = os.path.join(detectConfig.root_save_dir, 'results.txt')
+        with open(save_result_path, 'a') as file:
             # file.write('%11.3g' * 2 % (mAP, aps[0]) + '\n')
             file.write("Epoch: {} | mAP: {:.3f} | ".format(epoch, mAP))
             for i, ap in enumerate(aps):

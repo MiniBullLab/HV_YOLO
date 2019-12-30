@@ -16,6 +16,10 @@ class ArgumentsParse():
                           metavar="PATH", type="string", default="./val.txt",
                           help="path to data config file")
 
+        parser.add_option("-g", "--gpu", dest="gpu_id",
+                          type="int", default=0,
+                          help="gpu id")
+
         parser.add_option("-c", "--cfg", dest="cfg",
                           metavar="PATH", type="string", default="cfg/cifar100.cfg",
                           help="cfg file path")
@@ -49,6 +53,10 @@ class ArgumentsParse():
                           metavar="PATH", type="string", default="./val.txt",
                           help="path to data config file")
 
+        parser.add_option("-g", "--gpu", dest="gpu_id",
+                          type="int", default=0,
+                          help="gpu id")
+
         parser.add_option("-c", "--cfg", dest="cfg",
                           metavar="PATH", type="string", default="cfg/cifar100.cfg",
                           help="cfg file path")
@@ -78,6 +86,10 @@ class ArgumentsParse():
         parser.add_option("-i", "--input", dest="inputPath",
                           metavar="PATH", type="string", default=None,
                           help="images path or video path")
+
+        parser.add_option("-g", "--gpu", dest="gpu_id",
+                          type="int", default=0,
+                          help="gpu id")
 
         parser.add_option("-c", "--cfg", dest="cfg",
                           metavar="PATH", type="string", default="cfg/yolov3.cfg",
