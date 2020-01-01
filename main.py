@@ -16,6 +16,8 @@ from config import base_config
 from config import detectConfig
 from config import fgseg_config
 
+__all__ = ['parse_arguments', 'MainProcess']
+
 
 def parse_arguments():
     parser = OptionParser()
@@ -61,7 +63,7 @@ def parse_arguments():
 class MainProcess():
 
     def __init__(self, task_name, cfg_path, gpu_id):
-        os.environ["CUDA_VISIBLE_DEVICES"] = gpu_id
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
         if not os.path.exists(base_config.root_save_dir):
             os.makedirs(base_config.root_save_dir, exist_ok=True)
         self.task_name = task_name.strip()
@@ -74,7 +76,7 @@ class MainProcess():
         self.seg_train = FgSegV2Train()
 
     def process(self, train_path, val_path=None, vgg_weights_path=None):
-        if self.task_name == "DNET":
+        if self.task_name == "DeNET":
             self.detect_train.train(train_path, val_path)
             onnx_converter = ModelConverter()
             save_onnx_path = onnx_converter.model_convert(self.cfg_path,
@@ -82,7 +84,7 @@ class MainProcess():
                                          detectConfig.snapshotPath)
             caffe_converter = OnnxConvertCaffe(save_onnx_path)
             caffe_converter.convert_caffe()
-        elif self.task_name == "SEGNET":
+        elif self.task_name == "SegNET":
             self.seg_train.train(train_path, vgg_weights_path)
             pb_converter = KerasConvertTensorflow(fgseg_config.best_weights_file,
                                                   KerasModelName.MyFgSegNetV2)

@@ -2,7 +2,7 @@ from config.base_config import *
 
 # data
 imgSize = (640, 352)
-train_batch_size = 2
+train_batch_size = 1
 test_batch_size = 1
 className = ['bike', 'bus', 'car', 'motor', 'person', 'rider', 'truck']
 

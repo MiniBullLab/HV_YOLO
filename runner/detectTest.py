@@ -59,18 +59,19 @@ class DetectionTest():
 
             detectObjects = self.trainDataProcess.resizeDetectObjects(img, detectConfig.imgSize, detections,
                                                                  detectConfig.className)
-
+            test_save_path = os.path.join(save_result_dir, 'comp4_det_test_')
             for object in detectObjects:
                 confidence = object.classConfidence * object.objectConfidence
                 x1 = object.min_corner.x
                 y1 = object.min_corner.y
                 x2 = object.max_corner.x
                 y2 = object.max_corner.y
-                with open("./results/comp4_det_test_" + object.name + ".txt", 'a') as file:
+                temp_save_path = test_save_path + object.name + '.txt'
+                with open(temp_save_path, 'a') as file:
                     file.write(
                         "{} {} {} {} {} {}\n".format(fileName, confidence, x1, y1, x2, y2))
 
-        mAP, aps = evaluator.do_python_eval(save_result_dir, "./results/comp4_det_test_")
+        mAP, aps = evaluator.do_python_eval(save_result_dir, test_save_path)
 
         return mAP, aps
 
