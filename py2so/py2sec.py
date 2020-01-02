@@ -42,7 +42,6 @@ Example:
         self.m_list = ''
         self.nthread = '1'
 
-
     def getOpt(self):       
         try:
             options,_ = getopt.getopt(sys.argv[1:],"vhp:d:f:m:x:",["version","help","py=","directory=","file=","maintain=", "nthread="])
@@ -119,7 +118,8 @@ Example:
                                     continue
 
                         if fi.endswith(".py"):
-                            encrypt_fi_list.append("%s/%s" % (root,fi))
+                            temp_path = os.path.join(root, fi)
+                            encrypt_fi_list.append("%s" % temp_path)
             except Exception as err:
                 print(err)
         if self.file_name != '':
@@ -154,7 +154,6 @@ Example:
             else:
                 p = subprocess.Popen("python2 setup.py build_ext > log.log", shell=True, stderr=subprocess.PIPE)
                 p.wait()
-    
 
     def genProject(self):
         if not os.path.exists("result/"):
@@ -174,8 +173,12 @@ Example:
                         tmp = fi.split(".")
                         pre_fi = "%s.py" % tmp[0]
                         pure_fi = "%s.%s" % (tmp[0],tmp[-1])
-                        os.remove("%s/%s" % (pure_root, pre_fi))
-                        shutil.copy("%s/%s"%(root, fi), "%s/%s"%(pure_root, pure_fi))
+                        temp_path = os.path.join(pure_root, pre_fi)
+                        if os.path.exists(temp_path):
+                            os.remove(temp_path)
+                        old_path = os.path.join(root, fi)
+                        new_path = os.path.join(pure_root, pure_fi)
+                        shutil.copy(old_path, new_path)
         if self.file_name:
             for root, _, files in os.walk("build/"):
                 for fi in files:

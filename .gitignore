@@ -4,6 +4,6 @@
 *.log
 .idea/
 log/
+tmp_build/
 build/
-devel/
 result/
