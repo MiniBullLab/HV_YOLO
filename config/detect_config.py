@@ -1,3 +1,4 @@
+from config.base_config import *
 # data
 imgSize = (640, 352)
 train_batch_size = 2
@@ -6,9 +7,9 @@ className = ['bike', 'bus', 'car', 'motor', 'person', 'rider', 'truck']
 
 # detect
 log_name = "detect"
-snapshotPath = "./snapshot/"
-latest_weights_file = './snapshot/model_epoch_62.pt'
-best_weights_file = './snapshot/best.pt'
+snapshotPath = os.path.join(root_save_dir, model_save_dir)
+latest_weights_file = os.path.join(snapshotPath, 'latest.pt')
+best_weights_file = os.path.join(snapshotPath, 'best.pt')
 maxEpochs = 300
 
 base_lr = 2e-4

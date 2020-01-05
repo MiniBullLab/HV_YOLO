@@ -1,5 +1,5 @@
 import torch
-from prune_slim_utils import *
+from prune.prune_slim_utils import *
 
 
 class ModelPrune():

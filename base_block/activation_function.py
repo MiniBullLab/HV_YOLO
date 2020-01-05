@@ -4,13 +4,12 @@
 
 from base_block.base_block import *
 from base_name.block_name import ActivationType
-from base_name.block_name import BlockType
 
 
 class LinearActivation(BaseBlock):
 
     def __init__(self):
-        super().__init__(BlockType.LinearActivation)
+        super().__init__(ActivationType.Linear)
 
     def forward(self, x):
         return x

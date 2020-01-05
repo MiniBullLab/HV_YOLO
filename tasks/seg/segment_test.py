@@ -63,7 +63,8 @@ class SegmentionTest():
 
     def save_test_result(self, epoch, score, class_iou):
         # Write epoch results
-        with open('results.txt', 'a') as file:
+        save_result_path = os.path.join(segment_config.root_save_dir, 'results.txt')
+        with open(save_result_path, 'a') as file:
             # file.write('%11.3g' * 2 % (mAP, aps[0]) + '\n')
             file.write("Epoch: {} | mIoU: {:.3f} | ".format(epoch, score['Mean IoU : \t']))
             for i, iou in enumerate(class_iou):

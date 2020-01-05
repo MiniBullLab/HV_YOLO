@@ -51,12 +51,12 @@ class DetectionDataAugment():
                 xy = np.ones((4, 3))
                 # x1y1, x2y2, x1y2, x2y1
                 xy[:, :2] = points[[0, 1, 2, 3, 0, 3, 2, 1]].reshape(4, 2)
-                xy = (xy @ matrix.T)[:, :2].reshape(1, 8)
+                xy = np.squeeze((xy @ matrix.T)[:, :2].reshape(1, 8))
 
                 # create new boxes
                 x = xy[[0, 2, 4, 6]]
                 y = xy[[1, 3, 5, 7]]
-                xy = np.concatenate((x.min(1), y.min(1), x.max(1), y.max(1))).reshape(4, 1).T
+                xy = np.array([x.min(), y.min(), x.max(), y.max()])
 
                 # apply angle-based reduction
                 radians = degree * math.pi / 180
@@ -65,7 +65,7 @@ class DetectionDataAugment():
                 y = (xy[3] + xy[1]) / 2
                 w = (xy[2] - xy[0]) * reduction
                 h = (xy[3] - xy[1]) * reduction
-                xy = np.concatenate((x - w / 2, y - h / 2, x + w / 2, y + h / 2)).reshape(4, 1).T
+                xy = np.array([x - w / 2, y - h / 2, x + w / 2, y + h / 2])
 
                 # reject warped points outside of image
                 np.clip(xy, 0, image_size[0], out=xy)

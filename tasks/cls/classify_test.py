@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 # Author:
 
+import os
 from data_loader.cls.classify_dataloader import get_classify_val_dataloader
 from torch_utility.torch_model_process import TorchModelProcess
 from evaluation.classify_accuracy import ClassifyAccuracy
@@ -36,15 +37,16 @@ class ClassifyTest():
 
     def save_test_result(self, epoch):
         # Write epoch results
+        save_result_path = os.path.join(classify_config.root_save_dir, 'result.txt')
         if max(self.topK) > 1:
-            with open('results.txt', 'a') as file:
+            with open(save_result_path, 'a') as file:
                 file.write("Epoch: {} | prec{}: {:.3f} | prec{}: {:.3f}\n".format(epoch,
                                                                                   self.topK[0],
                                                                                   self.topK[1],
                                                                                   self.evaluation.get_top1(),
                                                                                   self.evaluation.get_topK()))
         else:
-            with open('results.txt', 'a') as file:
+            with open(save_result_path, 'a') as file:
                 file.write("Epoch: {} | prec1: {:.3f}\n".format(epoch, self.evaluation.get_top1()))
 
     def compute_output(self, output_list):

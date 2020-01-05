@@ -8,6 +8,7 @@ import numpy as np
 import torchvision.utils as vutils
 from tensorboardX import SummaryWriter
 from helper.average_meter import AverageMeter
+from config import base_config
 
 
 class TrainLogger():
@@ -15,7 +16,7 @@ class TrainLogger():
     def __init__(self, log_name):
         current_time = time.strftime("%Y-%m-%dT%H_%M", time.localtime())
         log_name = "%s_%s" % (log_name, current_time)
-        self.log_dir = os.path.join("./log", log_name)
+        self.log_dir = os.path.join(base_config.root_save_dir, log_name)
         if not os.path.exists(self.log_dir):
             os.makedirs(self.log_dir)
         self.writer = SummaryWriter(self.log_dir)

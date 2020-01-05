@@ -27,8 +27,9 @@ class DetectionTest():
         self.torchModelProcess.modelTestInit(self.model)
 
     def test(self, val_Path):
-        os.system('rm -rf ' + 'results')
-        os.makedirs('results', exist_ok=True)
+        save_result_dir = os.path.join(detect_config.root_save_dir, 'results')
+        os.system('rm -rf ' + save_result_dir)
+        os.makedirs(save_result_dir, exist_ok=True)
         dataloader = get_detection_val_dataloader(val_Path, batch_size=1,
                                                   image_size=detect_config.imgSize)
         evaluator = MeanApEvaluating(val_Path, detect_config.className)
@@ -52,16 +53,18 @@ class DetectionTest():
 
             path, fileNameAndPost = os.path.split(image_path)
             fileName, post = os.path.splitext(fileNameAndPost)
+            test_save_path = os.path.join(save_result_dir, 'comp4_det_test_')
             for object in detection_objects:
                 confidence = object.classConfidence * object.objectConfidence
                 x1 = object.min_corner.x
                 y1 = object.min_corner.y
                 x2 = object.max_corner.x
                 y2 = object.max_corner.y
-                with open("./results/comp4_det_test_" + object.name + ".txt", 'a') as file:
+                temp_save_path = test_save_path + object.name + '.txt'
+                with open(temp_save_path, 'a') as file:
                     file.write("{} {} {} {} {} {}\n".format(fileName, confidence, x1, y1, x2, y2))
 
-        mAP, aps = evaluator.do_python_eval("./results/", "./results/comp4_det_test_")
+        mAP, aps = evaluator.do_python_eval(save_result_dir, test_save_path)
 
         return mAP, aps
 
@@ -77,7 +80,8 @@ class DetectionTest():
 
     def save_test_result(self, epoch, mAP, aps):
         # Write epoch results
-        with open('results.txt', 'a') as file:
+        save_result_path = os.path.join(detect_config.root_save_dir, 'results.txt')
+        with open(save_result_path, 'a') as file:
             # file.write('%11.3g' * 2 % (mAP, aps[0]) + '\n')
             file.write("Epoch: {} | mAP: {:.3f} | ".format(epoch, mAP))
             for i, ap in enumerate(aps):

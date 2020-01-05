@@ -1,3 +1,5 @@
+from config.base_config import *
+
 # data
 imgSize = (224, 224)
 train_batch_size = 8
@@ -5,9 +7,9 @@ test_batch_size = 1
 
 # classify
 log_name = "classify"
-snapshotPath = "./snapshot/"
-latest_weights_file = './snapshot/latest.pt'
-best_weights_file = './snapshot/best.pt'
+snapshotPath = os.path.join(root_save_dir, model_save_dir)
+latest_weights_file = os.path.join(snapshotPath, 'latest.pt')
+best_weights_file = os.path.join(snapshotPath, 'best.pt')
 maxEpochs = 100
 
 base_lr = 2e-4

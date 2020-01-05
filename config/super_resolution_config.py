@@ -1,4 +1,5 @@
-## data
+from config.base_config import *
+# data
 train_set = "/home/lpj/github/data/super/train"
 val_set = "/home/lpj/github/data/super/test"
 train_batch_size = 2
@@ -8,11 +9,10 @@ in_nc=1
 crop_size = 72
 upscale_factor = 3
 
-## detect
-net_config_path = " "
-snapshotPath = "./snapshot/"
-latest_weights_file = './snapshot/latest.pt'
-best_weights_file = './snapshot/best.pt'
+# detect
+snapshotPath = os.path.join(root_save_dir, model_save_dir)
+latest_weights_file = os.path.join(snapshotPath, 'latest.pt')
+best_weights_file = os.path.join(snapshotPath, 'best.pt')
 maxEpochs = 100
 
 base_lr = 1e-3
@@ -22,7 +22,7 @@ accumulated_batches = 1
 
 display = 20
 
-## speed
+# speed
 runType = "video"
 testImageFolder = "/home/wfw/HASCO/data/image/"
 testVideoFile = "/home/wfw/HASCO/data/video/VIDEO-5.MPG"

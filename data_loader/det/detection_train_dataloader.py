@@ -73,14 +73,12 @@ class DetectionTrainDataloader(DataLoader):
             labels = self.dataset_process.change_outside_labels(labels)
 
             numpy_images.append(rgb_image)
-            numpy_labels.append(labels)
+            numpy_labels.append(torch.from_numpy(labels))
 
         numpy_images = np.stack(numpy_images)
-        numpy_labels = np.stack(numpy_labels)
         torch_images = self.numpy_to_tensor(numpy_images)
-        torch_labels = self.numpy_to_tensor(numpy_labels)
 
-        return torch_images, torch_labels
+        return torch_images, numpy_labels
 
     def __len__(self):
         return self.nB  # number of batches

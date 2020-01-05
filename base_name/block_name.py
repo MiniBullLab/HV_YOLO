@@ -25,12 +25,13 @@ class BlockType():
     InputData = "inputData"
     BaseNet = "baseNet"
 
-    LinearActivation = "linearActivation"
-
     EmptyLayer = "emptyLayer"
 
     MultiplyLayer = "multiply"
     AddLayer = "add"
+
+    NormalizeLayer = "normalize"
+    ActivationLayer = "activation"
 
     RouteLayer = "route"
     ShortRouteLayer = "shortRoute"
@@ -51,7 +52,6 @@ class BlockType():
     ConvBNActivationBlock = "convBNActivationBlock"
     ConvActivationBlock = "convActivationBlock"
     BNActivationConvBlock = "bnActivationConvBlock"
-    BNActivationBlock = "bnActivationBlock"
 
     FcBNActivationBlock = "fcBNActivationBlock"
 

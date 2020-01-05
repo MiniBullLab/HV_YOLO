@@ -1,7 +1,7 @@
 import os
 import torch
 import numpy as np
-from config import detectConfig
+from config import detect_config
 from copy import deepcopy
 import torch.nn.functional as F
 

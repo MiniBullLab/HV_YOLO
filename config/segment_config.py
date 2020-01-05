@@ -1,3 +1,4 @@
+from config.base_config import *
 # data
 imgSize = (440, 512)
 # class_path = "./data/berkeley.names"
@@ -7,9 +8,9 @@ className = ['background', 'lane']
 
 # segment
 log_name = "segment"
-snapshotPath = "./snapshot/"
-latest_weights_file = './snapshot/latest.pt'
-best_weights_file = './snapshot/best.pt'
+snapshotPath = os.path.join(root_save_dir, model_save_dir)
+latest_weights_file = os.path.join(snapshotPath, 'latest.pt')
+best_weights_file = os.path.join(snapshotPath, 'best.pt')
 maxEpochs = 300
 
 base_lr = 1e-3

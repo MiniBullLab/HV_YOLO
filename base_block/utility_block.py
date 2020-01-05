@@ -108,23 +108,6 @@ class BNActivationConvBlock(BaseBlock):
         return x
 
 
-class BNActivationBlock(BaseBlock):
-
-    def __init__(self, in_channels, bnName=BatchNormType.BatchNormalize2d,
-                 activationName=ActivationType.ReLU):
-        super().__init__(BlockType.BNActivationBlock)
-        bn = BatchNormalizeFunction.get_function(bnName, in_channels)
-        activation = ActivationFunction.get_function(activationName)
-        self.block = nn.Sequential(OrderedDict([
-            (bnName, bn),
-            (activationName, activation)
-        ]))
-
-    def forward(self, x):
-        x = self.block(x)
-        return x
-
-
 class FcBNActivationBlock(BaseBlock):
 
     def __init__(self, in_features, out_features, bnName=BatchNormType.BatchNormalize1d,

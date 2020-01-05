@@ -4,8 +4,9 @@
 
 import numpy as np
 from base_block.base_block import *
-from base_name.block_name import BlockType, ActivationType
+from base_name.block_name import BlockType, ActivationType, BatchNormType
 from base_block.activation_function import ActivationFunction
+from base_block.batchnorm import BatchNormalizeFunction
 
 
 class EmptyLayer(BaseBlock):
@@ -49,6 +50,28 @@ class AddLayer(BaseBlock):
         x = temp_layer_outputs[0]
         for layer in temp_layer_outputs:
              x = x + layer
+        return x
+
+
+class NormalizeLayer(BaseBlock):
+
+    def __init__(self, bn_name, out_channel):
+        super().__init__(BlockType.NormalizeLayer)
+        self.normalize = BatchNormalizeFunction.get_function(bn_name, out_channel)
+
+    def forward(self, x):
+        x = self.normalize(x)
+        return x
+
+
+class ActivationLayer(BaseBlock):
+
+    def __init__(self, activation_name):
+        super().__init__(BlockType.ActivationLayer)
+        self.activation = ActivationFunction.get_function(activation_name)
+
+    def forward(self, x):
+        x = self.activation(x)
         return x
 
 

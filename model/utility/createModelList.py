@@ -7,7 +7,7 @@ from collections import OrderedDict
 from base_name.block_name import BlockType
 from base_name.loss_name import LossType
 from base_block.utility_block import ConvBNActivationBlock, ConvActivationBlock
-from base_block.utility_block import BNActivationBlock
+from base_block.utility_layer import NormalizeLayer, ActivationLayer
 from base_block.utility_layer import MultiplyLayer, AddLayer
 from base_block.utility_layer import RouteLayer, ShortRouteLayer
 from base_block.utility_layer import ShortcutLayer
@@ -46,26 +46,6 @@ class CreateModuleList():
             if module_def['type'] == BlockType.InputData:
                 data_channel = int(module_def['data_channel'])
                 self.input_channels = data_channel
-            elif module_def['type'] == BlockType.MyMaxPool2d:
-                kernel_size = int(module_def['size'])
-                stride = int(module_def['stride'])
-                maxpool = MyMaxPool2d(kernel_size, stride)
-                self.addBlockList(BlockType.MyMaxPool2d, maxpool, self.filters)
-                self.input_channels = self.filters
-            elif module_def['type'] == BlockType.GlobalAvgPool:
-                globalAvgPool = GlobalAvgPool2d()
-                self.addBlockList(BlockType.GlobalAvgPool, globalAvgPool, self.filters)
-                self.input_channels = self.filters
-            elif module_def['type'] == BlockType.FcLayer:
-                num_output = int(module_def['num_output'])
-                self.filters = num_output
-                block = FcLayer(self.input_channels, num_output)
-                self.addBlockList(BlockType.FcLayer, block, num_output)
-                self.input_channels = num_output
-            elif module_def['type'] == BlockType.Upsample:
-                upsample = Upsample(scale_factor=int(module_def['stride']))
-                self.addBlockList(BlockType.Upsample, upsample, self.filters)
-                self.input_channels = self.filters
             elif module_def['type'] == BlockType.RouteLayer:
                 block = RouteLayer(module_def['layers'])
                 self.filters = sum([inputChannels[i] if i >= 0 else self.outChannelList[i]
@@ -83,19 +63,6 @@ class CreateModuleList():
                 self.filters = self.outChannelList[block.layer_from]
                 self.addBlockList(BlockType.ShortcutLayer, block, self.filters)
                 self.input_channels = self.filters
-            elif module_def['type'] == BlockType.MultiplyLayer:
-                block = MultiplyLayer(module_def['layers'])
-                self.addBlockList(BlockType.MultiplyLayer, block, self.filters)
-                self.input_channels = self.filters
-            elif module_def['type'] == BlockType.AddLayer:
-                block = AddLayer(module_def['layers'])
-                self.addBlockList(BlockType.AddLayer, block, self.filters)
-                self.input_channels = self.filters
-            elif module_def['type'] == BlockType.Dropout:
-                probability = float(module_def['probability'])
-                block = nn.Dropout(p=probability, inplace=True)
-                self.addBlockList(BlockType.Dropout, block, self.filters)
-                self.input_channels = self.filters
             elif module_def['type'] == DarknetBlockName.ReorgBlock:
                 stride = int(module_def['stride'])
                 block = ReorgBlock(stride=stride)
@@ -103,8 +70,54 @@ class CreateModuleList():
                 self.addBlockList(DarknetBlockName.ReorgBlock, block, self.filters)
                 self.input_channels = self.filters
             else:
+                self.create_layer(module_def)
                 self.create_convolutional(module_def)
                 self.create_loss(module_def)
+
+    def create_layer(self, module_def):
+        if module_def['type'] == BlockType.MyMaxPool2d:
+            kernel_size = int(module_def['size'])
+            stride = int(module_def['stride'])
+            maxpool = MyMaxPool2d(kernel_size, stride)
+            self.addBlockList(BlockType.MyMaxPool2d, maxpool, self.filters)
+            self.input_channels = self.filters
+        elif module_def['type'] == BlockType.GlobalAvgPool:
+            globalAvgPool = GlobalAvgPool2d()
+            self.addBlockList(BlockType.GlobalAvgPool, globalAvgPool, self.filters)
+            self.input_channels = self.filters
+        elif module_def['type'] == BlockType.FcLayer:
+            num_output = int(module_def['num_output'])
+            self.filters = num_output
+            layer = FcLayer(self.input_channels, num_output)
+            self.addBlockList(BlockType.FcLayer, layer, num_output)
+            self.input_channels = num_output
+        elif module_def['type'] == BlockType.Upsample:
+            upsample = Upsample(scale_factor=int(module_def['stride']))
+            self.addBlockList(BlockType.Upsample, upsample, self.filters)
+            self.input_channels = self.filters
+        elif module_def['type'] == BlockType.MultiplyLayer:
+            layer = MultiplyLayer(module_def['layers'])
+            self.addBlockList(BlockType.MultiplyLayer, layer, self.filters)
+            self.input_channels = self.filters
+        elif module_def['type'] == BlockType.AddLayer:
+            layer = AddLayer(module_def['layers'])
+            self.addBlockList(BlockType.AddLayer, layer, self.filters)
+            self.input_channels = self.filters
+        elif module_def['type'] == BlockType.Dropout:
+            probability = float(module_def['probability'])
+            layer = nn.Dropout(p=probability, inplace=True)
+            self.addBlockList(BlockType.Dropout, layer, self.filters)
+            self.input_channels = self.filters
+        elif module_def['type'] == BlockType.NormalizeLayer:
+            bn_name = module_def['batch_normalize'].strip()
+            layer = NormalizeLayer(bn_name, self.filters)
+            self.addBlockList(BlockType.NormalizeLayer, layer, self.filters)
+            self.input_channels = self.filters
+        elif module_def['type'] == BlockType.ActivationLayer:
+            activation_name = module_def['activation'].stip()
+            layer = ActivationLayer(activation_name)
+            self.addBlockList(BlockType.ActivationLayer, layer, self.filters)
+            self.input_channels = self.filters
 
     def create_convolutional(self, module_def):
         if module_def['type'] == BlockType.Convolutional:
@@ -160,14 +173,6 @@ class CreateModuleList():
                                           bnName=bnName,
                                           dilation=dilation,
                                           activationName=activationName)
-            self.addBlockList(BlockType.ConvBNActivationBlock, block, self.filters)
-            self.input_channels = self.filters
-        elif module_def['type'] == BlockType.BNActivationBlock:
-            bnName = module_def['batch_normalize']
-            activationName = module_def['activation']
-            block = BNActivationBlock(in_channels=self.filters,
-                                      bnName=bnName,
-                                      activationName=activationName)
             self.addBlockList(BlockType.ConvBNActivationBlock, block, self.filters)
             self.input_channels = self.filters
 
