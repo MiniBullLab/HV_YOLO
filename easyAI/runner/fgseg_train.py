@@ -42,6 +42,8 @@ class FgSegV2Train():
         self.max_epoch = fgseg_config.maxEpochs
         self.batch_size = fgseg_config.train_batch_size
 
+        self.log_path = os.path.join(fgseg_config.root_save_dir, "seg_logs")
+
         save_model_dir = fgseg_config.snapshotPath
         if not os.path.exists(save_model_dir):
             os.makedirs(save_model_dir)
@@ -49,7 +51,7 @@ class FgSegV2Train():
 
     def train(self, train_val_path, vgg_weights_path):
 
-        data = self.get_train_data(train_val_path)
+        data = self.get_train_data(train_val_path, fgseg_config.image_size)
         img_shape = data[0][0].shape  # (height, width, channel)
         # model = FgSegNetV2(self.lr, img_shape, vgg_weights_path)
         model = MyFgSegNetV2(self.lr, img_shape, vgg_weights_path)
@@ -61,6 +63,11 @@ class FgSegV2Train():
         assert input_shape == output_shape, 'Given input shape:' + str(
             input_shape) + ', but your model outputs shape:' + str(output_shape)
 
+        show_callback = keras.callbacks.TensorBoard(log_dir=self.log_path,
+                                                    histogram_freq=0,
+                                                    write_graph=False,
+                                                    write_images=False)
+
         checkpoints = keras.callbacks.ModelCheckpoint(self.mdl_path + '-weights-{epoch:02d}-{val_acc:.5f}-{val_loss:.5f}.h5',
                                                       monitor='val_loss', verbose=0, save_best_only=False,
                                                       save_weights_only=False, mode='auto', period=1)
@@ -69,22 +76,26 @@ class FgSegV2Train():
         model.fit(data[0], data[1],
                   validation_split=self.val_split,
                   epochs=self.max_epoch, batch_size=self.batch_size,
-                  callbacks=[redu, early, checkpoints], verbose=1, class_weight=data[2],
+                  callbacks=[redu, early, checkpoints, show_callback],
+                  verbose=1, class_weight=data[2],
                   shuffle=True)
         model.save(fgseg_config.best_weights_file)
         del model, data, early, redu
 
-    def get_train_data(self, train_path):
+    def get_train_data(self, train_path, image_size):
         train_datas = self.get_image_and_label_list(train_path)
         images = []
         labels = []
         for image_path, label_path in train_datas:
-            x = image.load_img(image_path)
+            x = image.load_img(image_path, target_size=image_size,
+                               interpolation='bilinear')
             x = image.img_to_array(x)
             x /= 255.0
             images.append(x)
 
-            y = image.load_img(label_path, grayscale=True)
+            y = image.load_img(label_path, grayscale=True,
+                               target_size=image_size,
+                               interpolation='bilinear')
             y = 255 - image.img_to_array(y)
             y /= 255.0
             y = np.floor(y)

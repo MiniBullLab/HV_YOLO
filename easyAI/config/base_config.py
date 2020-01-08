@@ -4,5 +4,5 @@
 
 import os
 
-root_save_dir = "./log"
+root_save_dir = "./.log"
 model_save_dir = "model"

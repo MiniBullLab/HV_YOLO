@@ -16,7 +16,7 @@ from easyAI.config import base_config
 from easyAI.config import detectConfig
 from easyAI.config import fgseg_config
 
-__all__ = ['parse_arguments', 'MainProcess']
+__all__ = ['MainProcess']
 
 
 def parse_arguments():

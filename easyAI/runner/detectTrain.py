@@ -22,7 +22,7 @@ class DetectionTrain():
         if not os.path.exists(detectConfig.snapshotPath):
             os.makedirs(detectConfig.snapshotPath, exist_ok=True)
 
-        self.logger = Logger(os.path.join(detectConfig.root_save_dir, "logs"))
+        self.logger = Logger(os.path.join(detectConfig.root_save_dir, "det_logs"))
         self.lossTrain = AverageMeter()
 
         self.torchModelProcess = TorchModelProcess()

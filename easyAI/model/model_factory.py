@@ -26,7 +26,7 @@ class ModelFactory():
         path, file_name_and_post = os.path.split(cfg_path)
         file_name, post = os.path.splitext(file_name_and_post)
         model_define = self.modelParse.readCfgFile(cfg_path)
-        model = MyModel(model_define)
+        model = MyModel(model_define, path)
         model.set_name(file_name)
         return model
 
@@ -34,4 +34,6 @@ class ModelFactory():
         model = None
         if modelName == ModelName.MobileV2FCN:
             model = MobileV2FCN()
+        else:
+            print("%s error" % modelName)
         return model
