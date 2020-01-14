@@ -17,6 +17,7 @@ np.random.seed(42)
 rn.seed(12345)
 session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1,
                               gpu_options=tf.GPUOptions(allow_growth=True))
+
 from keras import backend as K
 tf.set_random_seed(1234)
 sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
@@ -155,8 +156,8 @@ class FgSegV2Train():
 def main():
     print("process start...")
     train_process = FgSegV2Train()
-    train_process.train("/home/lpj/github/data/LED_detect/ImageSets/train_val.txt",
-                        "./tests/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5")
+    train_process.train("/home/minibull/lipeijie/dataset/LED_segment/ImageSets/train_val.txt",
+                        "./easyAI/data/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5")
     print("process end!")
 
 

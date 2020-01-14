@@ -6,8 +6,8 @@ import onnx
 from caffe.proto import caffe_pb2
 from easyAI.converter.onnx2caffe.transformers import ConvAddFuser,ConstantsToInitializers
 from easyAI.converter.onnx2caffe.graph import Graph
-from easyAI.converter.onnx2caffe import operators as cvt
-from easyAI.converter.onnx2caffe import weightloader as wlr
+import easyAI.converter.onnx2caffe.operators as cvt
+import easyAI.converter.onnx2caffe.weightloader as wlr
 from easyAI.converter.onnx2caffe.error_utils import ErrorHandling
 from onnx import shape_inference
 
@@ -104,6 +104,10 @@ class OnnxConvertCaffe():
         graph = Graph.from_onnx(model_graph)
         #graph = graph.transformed(OnnxConvertCaffe.transformers)
         graph.channel_dims = {}
+        for id, node in enumerate(graph.nodes):
+            if node.op_type == "Upsample":
+                del node.inputs[1]
+
         return graph
 
     def get_layers(self, graph):
@@ -124,6 +128,12 @@ class OnnxConvertCaffe():
             inputs = node.inputs
             inputs_tensor = node.input_tensors
             input_non_exist_flag = False
+
+            if node.op_type == "Constant":
+                continue
+            if node.op_type == "Upsample":
+                node.attrs["height_scale"] = 2
+                node.attrs["width_scale"] = 2
 
             for inp in inputs:
                 if inp not in exist_edges and inp not in inputs_tensor:

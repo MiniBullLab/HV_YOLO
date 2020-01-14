@@ -10,7 +10,9 @@ className = ['bike', 'bus', 'car', 'motor', 'person', 'rider', 'truck']
 snapshotPath = os.path.join(root_save_dir, model_save_dir)
 latest_weights_file = os.path.join(snapshotPath, "det_latest.pt")
 best_weights_file = os.path.join(snapshotPath, "det_best.pt")
-maxEpochs = 300
+save_onnx_path = os.path.join(snapshotPath, "detection.onnx")
+save_image_dir = os.path.join(root_save_dir, "det_img")
+maxEpochs = 5
 
 base_lr = 2e-4
 lr_power = 0.9

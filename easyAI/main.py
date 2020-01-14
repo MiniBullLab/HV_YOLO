@@ -6,7 +6,6 @@ import os
 from optparse import OptionParser
 from easyAI.runner.detectTrain import DetectionTrain
 from easyAI.tools.model_to_onnx import ModelConverter
-from easyAI.tools.onnx_convert_caffe import OnnxConvertCaffe
 
 from easyAI.converter.keras_models.model_name import KerasModelName
 from easyAI.runner.fgseg_train import FgSegV2Train
@@ -67,35 +66,36 @@ class MainProcess():
         if not os.path.exists(base_config.root_save_dir):
             os.makedirs(base_config.root_save_dir, exist_ok=True)
         self.task_name = task_name.strip()
+        self.gpu_id = gpu_id
         self.cfg_path = cfg_path
-        if os.path.exists(cfg_path):
-            self.detect_train = DetectionTrain(cfg_path, gpu_id)
-        else:
-            self.detect_train = None
+        self.save_onnx_path = None
 
-        self.seg_train = FgSegV2Train()
-
-    def process(self, train_path, val_path=None, vgg_weights_path=None):
+    def process_train(self, train_path, val_path=None, vgg_weights_path=None):
         if self.task_name == "DeNET":
-            self.detect_train.train(train_path, val_path)
+            if os.path.exists(self.cfg_path):
+                detect_train = DetectionTrain(self.cfg_path, self.gpu_id)
+            else:
+                detect_train = None
+            detect_train.train(train_path, val_path)
             onnx_converter = ModelConverter()
-            save_onnx_path = onnx_converter.model_convert(self.cfg_path,
-                                         detectConfig.best_weights_file,
-                                         detectConfig.snapshotPath)
-            caffe_converter = OnnxConvertCaffe(save_onnx_path)
-            caffe_converter.convert_caffe()
+            self.save_onnx_path = onnx_converter.model_convert(self.cfg_path,
+                                                               detectConfig.best_weights_file,
+                                                               detectConfig.snapshotPath)
         elif self.task_name == "SegNET":
-            self.seg_train.train(train_path, vgg_weights_path)
+            seg_train = FgSegV2Train()
+            seg_train.train(train_path, vgg_weights_path)
             pb_converter = KerasConvertTensorflow(fgseg_config.best_weights_file,
                                                   KerasModelName.MyFgSegNetV2)
             pb_converter.keras_convert_tensorflow()
+        else:
+            print("error input")
 
 
 def main():
     print("process start...")
     options = parse_arguments()
     my_main = MainProcess(options.task_name, options.cfg, options.gpu_id)
-    my_main.process(options.trainPath, options.valPath, options.pretrainModel)
+    my_main.process_train(options.trainPath, options.valPath, options.pretrainModel)
     print("process end!")
 
 

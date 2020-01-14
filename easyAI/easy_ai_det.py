@@ -4,17 +4,16 @@
 
 import os
 import inspect
+import torch
 from optparse import OptionParser
+from easyAI.copy_image import CopyImage
 from easyAI.main import MainProcess
+from easyAI.config import detectConfig
 
 
 def parse_arguments():
     parser = OptionParser()
     parser.description = "This program train model"
-
-    parser.add_option("-t", "--task", dest="task_name",
-                      type="string", default=None,
-                      help="task name")
 
     parser.add_option("-g", "--gpu", dest="gpu_id",
                       type="int", default=0,
@@ -43,13 +42,16 @@ def parse_arguments():
 
 def main():
     print("process start...")
+    copy_process = CopyImage()
     current_path = inspect.getfile(inspect.currentframe())
     dir_name = os.path.dirname(current_path)
     cfg_path = os.path.join(dir_name, "./data/detection.cfg")
     pretrain_model_path = os.path.join(dir_name, "./data/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5")
     options = parse_arguments()
-    my_main = MainProcess(options.task_name, cfg_path, options.gpu_id)
-    my_main.process(options.trainPath, options.valPath, pretrain_model_path)
+    my_main = MainProcess("DeNET", cfg_path, options.gpu_id)
+    my_main.process_train(options.trainPath, options.valPath, pretrain_model_path)
+    torch.cuda.empty_cache()
+    copy_process.copy(options.trainPath, detectConfig.save_image_dir)
     print("process end!")
 
 

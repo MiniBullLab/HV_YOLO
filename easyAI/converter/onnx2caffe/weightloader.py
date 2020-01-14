@@ -126,6 +126,9 @@ def _convert_conv_transpose(net, node, graph, err):
     if bias_flag:
         np.copyto(net.params[node_name][1].data, bias, casting='same_kind')
 
+def _convert_Constant(net, node, graph, err):
+    pass
+
 _ONNX_NODE_REGISTRY = {
     "Conv": _convert_conv,
     "Relu": _convert_relu,
@@ -143,6 +146,7 @@ _ONNX_NODE_REGISTRY = {
     "ConvTranspose": _convert_conv_transpose,
     "Sigmoid": _convert_sigmoid,
     "Flatten": _convert_Flatten,
+    "Constant": _convert_Constant,
 }
 
 

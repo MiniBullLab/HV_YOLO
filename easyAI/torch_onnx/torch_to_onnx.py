@@ -23,5 +23,5 @@ class TorchConvertOnnx():
         if weight_path is not None:
             self.model_process.loadLatestModelWeight(weight_path, model)
         save_onnx_path = os.path.join(self.save_dir, "%s.onnx" % model.get_name())
-        onnx.export(model, self.input, save_onnx_path)
+        onnx.export(model, self.input, save_onnx_path, verbose=True)
         return save_onnx_path

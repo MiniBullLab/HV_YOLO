@@ -1,9 +1,10 @@
-torch==0.4.1
-numpy==1.16.0
-scipy>=1.4.1
+torch==1.0.1
+torchvision==0.2.2
 keras==2.2.4
 tensorflow-gpu==1.13.1
 onnx==1.6.0
+numpy
+scipy
 tqdm
 opencv-python 
 matplotlib
@@ -15,4 +16,4 @@ pillow
 scikit-image
 sklearn
 netron
-cython
+cython==0.29.14
