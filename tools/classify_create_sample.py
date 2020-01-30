@@ -84,7 +84,7 @@ class ClassifyCreateSample():
                 file_path = os.path.join(data_dir, name)
                 if os.path.isdir(file_path):
                     result.append(name)
-        return result
+        return sorted(result)
 
     def write_data_class(self, data_class, output_dir):
         class_define = {}
@@ -100,8 +100,8 @@ class ClassifyCreateSample():
 def main():
     print("start...")
     test = ClassifyCreateSample()
-    test.process_sample("/home/lpj/github/data/animals_detect/JPEGImages",
-                        "/home/lpj/github/data/animals_detect/ImageSets",
+    test.process_sample("/home/lpj/github/data/cifar100/JPEGImages",
+                        "/home/lpj/github/data/cifar100/ImageSets",
                         "train_val",
                         10)
     print("End of game, have a nice day!")

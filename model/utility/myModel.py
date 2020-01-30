@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 # Author:
 
+import os
 from collections import OrderedDict
 from base_model.utility.base_model import *
 from base_name.block_name import BlockType
@@ -12,11 +13,12 @@ from model.utility.createModelList import CreateModuleList
 
 class MyModel(BaseModel):
 
-    def __init__(self, modelDefine):
+    def __init__(self, modelDefine, cfg_dir):
         super().__init__()
         self.baseModelFactory = BaseModelFactory()
         self.createTaskList = CreateModuleList()
         self.modelDefine = modelDefine
+        self.cfg_dir = cfg_dir
         self.lossList = []
         self.createModel()
 
@@ -30,11 +32,14 @@ class MyModel(BaseModel):
 
     def creatBaseModel(self):
         result = None
-        baseNet = self.modelDefine[0]
-        if baseNet["type"] == BlockType.BaseNet:
-            baseNetName = baseNet["name"]
+        base_net = self.modelDefine[0]
+        if base_net["type"] == BlockType.BaseNet:
+            base_net_name = base_net["name"]
             self.modelDefine.pop(0)
-            result = self.baseModelFactory.get_base_model(baseNetName)
+            input_name = base_net_name.strip()
+            if input_name.endswith("cfg"):
+                input_name = os.path.join(self.cfg_dir, input_name)
+            result = self.baseModelFactory.get_base_model(input_name)
         return result
 
     def createTask(self, basicModel):
