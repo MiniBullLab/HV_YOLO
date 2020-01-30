@@ -3,7 +3,6 @@
 # Author:
 
 import numpy as np
-import scipy.misc as misc
 from data_loader.utility.image_dataset_process import ImageDataSetProcess
 
 
@@ -17,7 +16,8 @@ class SegmentResultProcess():
         if prediction.ndim == 2:
             result = prediction
         elif prediction.ndim == 3:
-            result = np.max(prediction, axis=1)
+            result = np.max(prediction, axis=0)
+
         return result
 
     def resize_segmention_result(self, src_image, image_size,
@@ -30,6 +30,5 @@ class SegmentResultProcess():
         stop_w = image_size[0] - (pad[0] - (pad[0] // 2))
         result = segmention_result[start_h:stop_h, start_w:stop_w]
         result = result.astype(np.float32)
-        result = misc.imresize(result, src_image.shape(), 'nearest',
-                               mode='F')  # float32 with F mode
+        result = self.dataset_process.image_resize(result, src_image.shape())
         return result

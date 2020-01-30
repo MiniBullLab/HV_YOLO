@@ -11,10 +11,12 @@ from data_loader.det.detection_dataset_process import DetectionDataSetProcess
 
 class DetectionValDataLoader(data.Dataset):
 
-    def __init__(self, val_path, image_size=(416, 416)):
+    def __init__(self, val_path, class_name, image_size=(416, 416)):
         super().__init__()
         self.image_size = image_size
-        self.detection_sample = DetectionSample(False, val_path, None)
+        self.detection_sample = DetectionSample(val_path,
+                                                class_name,
+                                                False)
         self.detection_sample.read_sample()
         self.image_process = ImageProcess()
         self.dataset_process = DetectionDataSetProcess()
@@ -32,8 +34,8 @@ class DetectionValDataLoader(data.Dataset):
         return self.detection_sample.get_sample_count()
 
 
-def get_detection_val_dataloader(val_path, image_size, batch_size, num_workers=8):
-    dataloader = DetectionValDataLoader(val_path, image_size)
+def get_detection_val_dataloader(val_path, class_name, image_size, batch_size, num_workers=8):
+    dataloader = DetectionValDataLoader(val_path, class_name, image_size)
     result = data.DataLoader(dataset=dataloader, num_workers=num_workers,
                              batch_size=batch_size, shuffle=False)
     return result

@@ -29,10 +29,10 @@ class ImageDataSetProcess():
         return result
 
     def image_resize(self, src_image, image_size):
-        image = cv2.resize(src_image, image_size)
+        image = cv2.resize(src_image, image_size, interpolation=cv2.INTER_NEAREST)
         return image
 
-    def image_resize_square(self, src_image, image_size, color=(0, 0, 0)):
+    def image_resize_square(self, src_image, image_size, color=(0, 0, 0)): # src_image h, w, c
         shape = src_image.shape[:2]  # shape = [height, width]
         ratio = min(float(image_size[0]) / shape[1], float(image_size[1]) / shape[0])  # ratio  = old / new
         new_shape = (round(shape[0] * ratio), round(shape[1] * ratio))

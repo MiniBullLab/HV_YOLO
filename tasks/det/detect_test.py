@@ -30,7 +30,7 @@ class DetectionTest():
         save_result_dir = os.path.join(detect_config.root_save_dir, 'results')
         os.system('rm -rf ' + save_result_dir)
         os.makedirs(save_result_dir, exist_ok=True)
-        dataloader = get_detection_val_dataloader(val_Path, batch_size=1,
+        dataloader = get_detection_val_dataloader(val_Path, detect_config.className, batch_size=1,
                                                   image_size=detect_config.imgSize)
         evaluator = MeanApEvaluating(val_Path, detect_config.className)
 
@@ -44,14 +44,13 @@ class DetectionTest():
                 output = self.compute_output(output_list)
                 result = self.result_process.get_detection_result(output, 5e-3)
             detection_objects = self.nms_process.multi_class_nms(result, detect_config.nmsThresh)
-            detection_objects = self.result_process.resize_detection_objects(src_image,
+            detection_objects = self.result_process.resize_detection_objects(src_image.numpy()[0], # error tensor error not numpy
                                                                              detect_config.imgSize,
                                                                              detection_objects,
                                                                              detect_config.className)
             print('Batch %d... Done. (%.3fs)' % (i, time.time() - prev_time))
             prev_time = time.time()
-
-            path, fileNameAndPost = os.path.split(image_path)
+            path, fileNameAndPost = os.path.split(image_path[0]) # error 'tuple' object has no attribute 'rfind'
             fileName, post = os.path.splitext(fileNameAndPost)
             test_save_path = os.path.join(save_result_dir, 'comp4_det_test_')
             for object in detection_objects:

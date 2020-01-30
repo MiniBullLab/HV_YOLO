@@ -10,7 +10,7 @@ class VideoProcess():
 
     def isVideoFile(self, videoPath):
         if os.path.exists(videoPath):
-            return any(videoPath.endswith(extension) for extension in [".avi", ".mp4", ".mov"])
+            return any(videoPath.endswith(extension) for extension in [".avi", ".mp4", ".mov", ".MPG"])
         else:
             return False
 

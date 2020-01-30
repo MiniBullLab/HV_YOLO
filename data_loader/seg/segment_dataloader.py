@@ -39,7 +39,7 @@ class SegmentDataLoader(data.Dataset):
         target = self.dataset_process.change_label(target, self.valid_label_seg)
         rgb_image = self.dataset_process.normaliza_dataset(rgb_image)
         torch_image = torch.from_numpy(rgb_image)
-        torch_target = torch.from_numpy(target)
+        torch_target = torch.from_numpy(target).long()
         return torch_image, torch_target
 
     def __len__(self):

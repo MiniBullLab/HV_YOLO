@@ -5,7 +5,8 @@
 from base_model.utility.base_model import *
 from base_name.base_model_name import BaseModelName
 from base_name.block_name import BatchNormType, ActivationType, BlockType
-from base_block.utility_block import ConvBNActivationBlock, BNActivationBlock
+from base_block.utility_layer import NormalizeLayer, ActivationLayer
+from base_block.utility_block import ConvBNActivationBlock
 from base_block.densenet_block import DenseBlock, TransitionBlock
 
 
@@ -75,11 +76,12 @@ class DenseNet(BaseModel):
                 avg_pool = nn.AvgPool2d(kernel_size=2, stride=2)
                 self.addBlockList(BlockType.GlobalAvgPool, avg_pool, self.outChannelList[-1])
                 self.in_channels = self.outChannelList[-1]
-
-        layer3 = BNActivationBlock(in_channels=self.in_channels,
-                                   bnName=self.bnName,
-                                   activationName=self.activationName)
+        layer3 = NormalizeLayer(bn_name=self.bnName,
+                                out_channel=self.in_channels)
         self.addBlockList(layer3.get_name(), layer3, self.in_channels)
+
+        layer4 = ActivationLayer(self.activationName)
+        self.addBlockList(layer4.get_name(), layer4, self.in_channels)
 
     def make_densenet_layer(self, num_block, dilation,
                             bn_size, growth_rate, drop_rate,

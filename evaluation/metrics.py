@@ -17,6 +17,7 @@ class runningScore(object):
         return hist
 
     def update(self, label_trues, label_preds):
+        label_preds = label_preds.astype(label_trues.dtype)
         for lt, lp in zip(label_trues, label_preds):
             self.confusion_matrix += self._fast_hist(lt.flatten(), lp.flatten(), self.n_classes)
 
