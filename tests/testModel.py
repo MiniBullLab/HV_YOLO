@@ -6,8 +6,7 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 import torch
-import torch.nn as nn
-from model.model_factory import ModelFactory
+from easy_ai.model import ModelFactory
 from onnx.model_show import ModelShow
 
 

@@ -6,8 +6,8 @@
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
-from torch_utility.torch_summary import summary
-from model.model_factory import ModelFactory
+from easy_ai.torch_utility import summary
+from easy_ai.model import ModelFactory
 
 
 def main():

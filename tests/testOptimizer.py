@@ -5,8 +5,8 @@
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
-from model.model_factory import ModelFactory
-from solver.torch_optimizer import TorchOptimizer
+from easy_ai.model import ModelFactory
+from easy_ai.solver.torch_optimizer import TorchOptimizer
 
 
 def main():

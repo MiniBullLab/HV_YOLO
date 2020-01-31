@@ -3,10 +3,7 @@ import torch.nn as nn
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
-from solver.lr_scheduler import MultiStageLR, WarmupMultiStepLR
-from solver.lr_scheduler import PolyLR, WarmupPolyLR
-from solver.lr_scheduler import CosineLR, WarmupCosineLR
-from solver.lr_scheduler import LinearIncreaseLR, WarmupLinearIncreaseLR
+from easy_ai.solver.lr_scheduler import PolyLR
 import matplotlib.pyplot as plt
 
 
