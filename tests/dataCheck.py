@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from easy_ai.data_loader import ImageDetectTrainDataLoader
+from easyai.data_loader import ImageDetectTrainDataLoader
 
 
 class dataCheck():

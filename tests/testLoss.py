@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from easy_ai.loss import FocalLoss, FocalBinaryLoss
+from easyai.loss import FocalLoss, FocalBinaryLoss
 
 if __name__ == "__main__":
     # N = 4

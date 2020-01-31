@@ -1,6 +1,6 @@
 import numpy as np
-from easy_ai.data_loader import ImageClassifyTrainDataLoader
-from easy_ai.config import classifyConfig
+from easyai.data_loader import ImageClassifyTrainDataLoader
+from easyai.config import classifyConfig
 
 imageList = open("/home/wfw/data/VOCdevkit/cifar10/train_data.txt", "r")
 batch_size = len(imageList.readlines())
