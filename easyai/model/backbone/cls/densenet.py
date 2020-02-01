@@ -4,9 +4,10 @@
 
 from easyai.base_name.base_model_name import BaseModelName
 from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
-from easyai.model.base_block import NormalizeLayer, ActivationLayer
+from easyai.model.backbone.utility.base_model import *
+from easyai.model.base_block.utility_layer import NormalizeLayer, ActivationLayer
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block import DenseBlock, TransitionBlock
+from easyai.model.base_block.densenet_block import DenseBlock, TransitionBlock
 
 
 __all__ = ['densenet121', 'densenet169', 'densenet201', 'densenet161',

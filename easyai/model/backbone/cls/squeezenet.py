@@ -4,8 +4,9 @@
 
 from easyai.base_name.base_model_name import BaseModelName
 from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
+from easyai.model.backbone.utility.base_model import *
 from easyai.model.base_block.utility_block import ConvActivationBlock
-from easyai.model.base_block import FireBlock
+from easyai.model.base_block.squeezenet_block import FireBlock
 
 
 __all__ = ['SqueezeNet', 'DilatedSqueezeNet']

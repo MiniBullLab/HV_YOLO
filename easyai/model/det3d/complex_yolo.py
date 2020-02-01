@@ -4,10 +4,11 @@
 
 from easyai.base_name.model_name import ModelName
 from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
-from easyai.model.base_block import RouteLayer
+from easyai.model.base_block.utility_layer import RouteLayer
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block import ReorgBlock
-from easyai.model.backbone.utility import BaseModelFactory
+from easyai.model.base_block.darknet_block import ReorgBlock
+from easyai.model.backbone.utility.base_model_factory import BaseModelFactory
+from easyai.model.backbone.utility.base_model import *
 
 
 class ComplexYOLO(BaseModel):

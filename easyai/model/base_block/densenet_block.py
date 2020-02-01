@@ -3,6 +3,7 @@
 # Author:
 
 from easyai.base_name.block_name import ActivationType, BatchNormType
+from easyai.model.base_block.base_block import *
 from easyai.model.base_block.utility_block import BNActivationConvBlock
 
 

@@ -6,9 +6,10 @@
 
 from easyai.base_name.base_model_name import BaseModelName
 from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
-from easyai.model.base_block import MyMaxPool2d
+from easyai.model.backbone.utility.base_model import *
+from easyai.model.base_block.utility_layer import MyMaxPool2d
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block import DownBlock, BasicBlock
+from easyai.model.base_block.shufflenet_block import DownBlock, BasicBlock
 
 
 __all__ = ['shufflenetv2_1_0']

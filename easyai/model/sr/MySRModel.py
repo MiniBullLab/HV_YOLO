@@ -3,6 +3,7 @@
 # Author:
 
 from easyai.base_name.model_name import ModelName
+from easyai.model.backbone.utility.base_model import *
 import torch.nn.init as init
 
 

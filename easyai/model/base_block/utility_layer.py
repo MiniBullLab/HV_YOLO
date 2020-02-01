@@ -4,8 +4,9 @@
 
 import numpy as np
 from easyai.base_name.block_name import BlockType, ActivationType
-from easyai.model.base_block import ActivationFunction
-from easyai.model.base_block import BatchNormalizeFunction
+from easyai.model.base_block.base_block import *
+from easyai.model.base_block.activation_function import ActivationFunction
+from easyai.model.base_block.batchnorm import BatchNormalizeFunction
 
 
 class EmptyLayer(BaseBlock):

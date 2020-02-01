@@ -2,7 +2,8 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.base_name import ActivationType
+from easyai.base_name.block_name import ActivationType
+from easyai.model.base_block.base_block import *
 
 
 class LinearActivation(BaseBlock):

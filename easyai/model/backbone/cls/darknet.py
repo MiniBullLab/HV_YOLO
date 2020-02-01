@@ -4,8 +4,9 @@
 
 from easyai.base_name.block_name import BatchNormType, ActivationType
 from easyai.base_name.base_model_name import BaseModelName
+from easyai.model.backbone.utility.base_model import *
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block import BasicBlock
+from easyai.model.base_block.darknet_block import BasicBlock
 
 __all__ = ['darknet21', 'darknet53',
            'darknet21_dilated8', 'darknet21_dilated16',

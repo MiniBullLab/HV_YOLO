@@ -4,20 +4,20 @@
 
 import os.path
 from easyai.base_name.base_model_name import BaseModelName
-from easyai.model.backbone.cls import mobilenetv2_1_0
-from easyai.model.backbone.cls import shufflenetv2_1_0
-from easyai.model.backbone.cls import resnet18, resnet34
-from easyai.model.backbone.cls import resnet50, resnet101, resnet152
-from easyai.model.backbone.cls import darknet21, darknet53
-from easyai.model.backbone.cls import darknet21_dilated8, darknet21_dilated16
-from easyai.model.backbone.cls import darknet53_dilated8, darknet53_dilated16
-from easyai.model.backbone.cls import GoogleNet
-from easyai.model.backbone.cls import vgg13, vgg16, vgg19
-from easyai.model.backbone.cls import SqueezeNet, DilatedSqueezeNet
+from easyai.model.backbone.cls.mobilenetv2 import mobilenetv2_1_0
+from easyai.model.backbone.cls.shufflenetv2 import shufflenetv2_1_0
+from easyai.model.backbone.cls.resnet import resnet18, resnet34
+from easyai.model.backbone.cls.resnet import resnet50, resnet101, resnet152
+from easyai.model.backbone.cls.darknet import darknet21, darknet53
+from easyai.model.backbone.cls.darknet import darknet21_dilated8, darknet21_dilated16
+from easyai.model.backbone.cls.darknet import darknet53_dilated8, darknet53_dilated16
+from easyai.model.backbone.cls.googlenet import GoogleNet
+from easyai.model.backbone.cls.vgg import vgg13, vgg16, vgg19
+from easyai.model.backbone.cls.squeezenet import SqueezeNet, DilatedSqueezeNet
 from easyai.model.backbone.cls.densenet import densenet121, densenet201, densenet169, densenet161
 from easyai.model.backbone.cls.densenet import densenet121_dilated8, densenet121_dilated16
-from easyai.model.backbone.utility import MyBaseModel
-from easyai.model.utility import ModelParse
+from easyai.model.backbone.utility.my_base_model import MyBaseModel
+from easyai.model.utility.model_parse import ModelParse
 
 
 class BaseModelFactory():

@@ -4,8 +4,9 @@
 
 from easyai.base_name.base_model_name import BaseModelName
 from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
+from easyai.model.backbone.utility.base_model import *
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block import BasicBlock, Bottleneck
+from easyai.model.base_block.resnet_block import BasicBlock, Bottleneck
 
 
 __all__ = ['resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152']
