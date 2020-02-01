@@ -4,6 +4,6 @@
 *.log
 .idea/
 .vscode/
-log/
+log_temp/
 build/
 result/
