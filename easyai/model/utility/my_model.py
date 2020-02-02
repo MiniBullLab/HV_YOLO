@@ -6,9 +6,9 @@ import os
 from collections import OrderedDict
 from easyai.base_name.block_name import BlockType
 from easyai.base_name.loss_name import LossType
-from easyai.model.backbone.utility.base_model import *
 from easyai.model.backbone.utility.base_model_factory import BaseModelFactory
 from easyai.model.utility.create_model_list import CreateModuleList
+from easyai.model.utility.base_model import *
 
 
 class MyModel(BaseModel):

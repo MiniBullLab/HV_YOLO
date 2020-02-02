@@ -2,23 +2,23 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.base_name.base_model_name import BaseModelName
+from easyai.base_name.backbone_name import BackboneName
 from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
-from easyai.model.backbone.utility.base_model import *
+from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
 
 
 __all__ = ['vgg13', 'vgg16', 'vgg19']
 
 
-class VGG(BaseModel):
+class VGG(BaseBackbone):
 
     CONFIG_DICT = {
-        BaseModelName.Vgg13: [64, 64, 'M', 128, 128, 'M',
+        BackboneName.Vgg13: [64, 64, 'M', 128, 128, 'M',
                               256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
-        BaseModelName.Vgg16: [64, 64, 'M', 128, 128, 'M',
+        BackboneName.Vgg16: [64, 64, 'M', 128, 128, 'M',
                               256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
-        BaseModelName.Vgg19: [64, 64, 'M', 128, 128, 'M',
+        BackboneName.Vgg19: [64, 64, 'M', 128, 128, 'M',
                               256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M',
                               512, 512, 512, 512, 'M'],
         'vgg13_dilated8': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512],
@@ -29,10 +29,10 @@ class VGG(BaseModel):
         'vgg19_dilated16': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512],
     }
 
-    def __init__(self, vgg_name=BaseModelName.Vgg19, data_channel=3,
+    def __init__(self, vgg_name=BackboneName.Vgg19, data_channel=3,
                  bnName=BatchNormType.BatchNormalize2d, activationName=ActivationType.ReLU):
         super().__init__()
-        self.set_name(BaseModelName.Vgg19)
+        self.set_name(BackboneName.Vgg19)
         self.data_channel = data_channel
         self.activationName = activationName
         self.bnName = bnName
@@ -83,19 +83,19 @@ class VGG(BaseModel):
 
 
 def vgg13():
-    model = VGG(BaseModelName.Vgg13)
-    model.set_name(BaseModelName.Vgg13)
+    model = VGG(BackboneName.Vgg13)
+    model.set_name(BackboneName.Vgg13)
     return model
 
 
 def vgg16():
-    model = VGG(BaseModelName.Vgg16)
-    model.set_name(BaseModelName.Vgg16)
+    model = VGG(BackboneName.Vgg16)
+    model.set_name(BackboneName.Vgg16)
     return model
 
 
 def vgg19():
-    model = VGG(BaseModelName.Vgg19)
-    model.set_name(BaseModelName.Vgg19)
+    model = VGG(BackboneName.Vgg19)
+    model.set_name(BackboneName.Vgg19)
     return model
 

@@ -2,9 +2,9 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.base_name.base_model_name import BaseModelName
+from easyai.base_name.backbone_name import BackboneName
 from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
-from easyai.model.backbone.utility.base_model import *
+from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility_layer import NormalizeLayer, ActivationLayer
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.densenet_block import DenseBlock, TransitionBlock
@@ -14,7 +14,7 @@ __all__ = ['densenet121', 'densenet169', 'densenet201', 'densenet161',
            'densenet121_dilated8', 'densenet121_dilated16']
 
 
-class DenseNet(BaseModel):
+class DenseNet(BaseBackbone):
     r"""Densenet-BC model class, based on
     `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
     Args:
@@ -32,7 +32,7 @@ class DenseNet(BaseModel):
                  bnName=BatchNormType.BatchNormalize2d, activationName=ActivationType.ReLU):
 
         super().__init__()
-        self.set_name(BaseModelName.Densenet121)
+        self.set_name(BackboneName.Densenet121)
         self.data_channel = data_channel
         self.num_init_features = num_init_features
         self.growth_rate = growth_rate
@@ -126,7 +126,7 @@ class DenseNet(BaseModel):
 def densenet121():
     model = DenseNet(num_init_features=64, growth_rate=32,
                      num_blocks=(6, 12, 24, 16))
-    model.set_name(BaseModelName.Densenet121)
+    model.set_name(BackboneName.Densenet121)
     return model
 
 
@@ -134,7 +134,7 @@ def densenet121_dilated8():
     model = DenseNet(num_init_features=64, growth_rate=32,
                      num_blocks=(6, 12, 24, 16),
                      dilations=(1, 1, 2, 4))
-    model.set_name(BaseModelName.Densenet121_Dilated8)
+    model.set_name(BackboneName.Densenet121_Dilated8)
     return model
 
 
@@ -142,14 +142,14 @@ def densenet121_dilated16():
     model = DenseNet(num_init_features=64, growth_rate=32,
                      num_blocks=(6, 12, 24, 16),
                      dilations=(1, 1, 1, 2))
-    model.set_name(BaseModelName.Densenet121_Dilated16)
+    model.set_name(BackboneName.Densenet121_Dilated16)
     return model
 
 
 def densenet169():
     model = DenseNet(num_init_features=64, growth_rate=32,
                      num_blocks=(6, 12, 32, 32))
-    model.set_name(BaseModelName.Densenet169)
+    model.set_name(BackboneName.Densenet169)
     return model
 
 
@@ -157,7 +157,7 @@ def densenet169_dilated8():
     model = DenseNet(num_init_features=64, growth_rate=32,
                      num_blocks=(6, 12, 32, 32),
                      dilations=(1, 1, 2, 4))
-    model.set_name(BaseModelName.Densenet169)
+    model.set_name(BackboneName.Densenet169)
     return model
 
 
@@ -165,19 +165,19 @@ def densenet169_dilated16():
     model = DenseNet(num_init_features=64, growth_rate=32,
                      num_blocks=(6, 12, 32, 32),
                      dilations=(1, 1, 1, 2))
-    model.set_name(BaseModelName.Densenet169)
+    model.set_name(BackboneName.Densenet169)
     return model
 
 
 def densenet201():
     model = DenseNet(num_init_features=64, growth_rate=32,
                      num_blocks=(6, 12, 48, 32))
-    model.set_name(BaseModelName.Densenet201)
+    model.set_name(BackboneName.Densenet201)
     return model
 
 
 def densenet161():
     model = DenseNet(num_init_features=96, growth_rate=48,
                      num_blocks=(6, 12, 36, 24))
-    model.set_name(BaseModelName.Densenet161)
+    model.set_name(BackboneName.Densenet161)
     return model

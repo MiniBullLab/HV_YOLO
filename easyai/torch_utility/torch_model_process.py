@@ -15,8 +15,10 @@ class TorchModelProcess():
         self.modelWeightInit = ModelWeightInit()
         self.torchDeviceProcess.initTorch()
         self.best_value = 0
+        self.is_multi_gpu = False
 
-    def initModel(self, cfgPath, gpuId):
+    def initModel(self, cfgPath, gpuId, is_multi_gpu=False):
+        self.is_multi_gpu = is_multi_gpu
         self.torchDeviceProcess.setGpuId(gpuId)
         model = self.modelFactory.get_model(cfgPath)
         self.modelWeightInit.initWeight(model)
@@ -77,7 +79,7 @@ class TorchModelProcess():
 
     def modelTrainInit(self, model):
         count = self.torchDeviceProcess.getCUDACount()
-        if count > 1:
+        if count > 1 and self.is_multi_gpu:
             print('Using ', count, ' GPUs')
             model = nn.DataParallel(model)
         model = model.to(self.torchDeviceProcess.device)

@@ -2,9 +2,9 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.base_name.base_model_name import BaseModelName
+from easyai.base_name.backbone_name import BackboneName
 from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
-from easyai.model.backbone.utility.base_model import *
+from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility_block import ConvActivationBlock
 from easyai.model.base_block.squeezenet_block import FireBlock
 
@@ -12,12 +12,12 @@ from easyai.model.base_block.squeezenet_block import FireBlock
 __all__ = ['SqueezeNet', 'DilatedSqueezeNet']
 
 
-class SqueezeNet(BaseModel):
+class SqueezeNet(BaseBackbone):
 
     def __init__(self, data_channel=3, bnName=BatchNormType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super(SqueezeNet, self).__init__()
-        self.set_name(BaseModelName.SqueezeNet)
+        self.set_name(BackboneName.SqueezeNet)
         self.data_channel = data_channel
         self.activationName = activationName
         self.bnName = bnName
@@ -108,11 +108,11 @@ class SqueezeNet(BaseModel):
         return output_list
 
 
-class DilatedSqueezeNet(BaseModel):
+class DilatedSqueezeNet(BaseBackbone):
     def __init__(self, data_channel=3, bnName=BatchNormType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
-        self.set_name(BaseModelName.DilatedSqueezeNet)
+        self.set_name(BackboneName.DilatedSqueezeNet)
         self.data_channel = data_channel
         self.activationName = activationName
         self.bnName = bnName

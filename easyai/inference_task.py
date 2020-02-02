@@ -3,7 +3,7 @@
 # Author:
 
 from easyai.helper.arguments_parse import ArgumentsParse
-from easyai.tasks.det.detect import Detection
+from easyai.tasks.det2d.detect import Detection
 from easyai.tasks.seg.segment import Segmentation
 
 

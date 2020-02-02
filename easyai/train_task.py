@@ -4,7 +4,7 @@
 
 from easyai.helper.arguments_parse import ArgumentsParse
 from easyai.tasks.cls.classify_train import ClassifyTrain
-from easyai.tasks.det.detect_train import DetectionTrain
+from easyai.tasks.det2d.detect_train import DetectionTrain
 from easyai.tasks.seg.segment_train import SegmentionTrain
 
 

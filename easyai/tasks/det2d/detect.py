@@ -5,7 +5,7 @@
 import torch
 from easyai.tasks.utility.base_inference import BaseInference
 from easyai.torch_utility.torch_model_process import TorchModelProcess
-from easyai.tasks.det.detect_result_process import DetectResultProcess
+from easyai.tasks.det2d.detect_result_process import DetectResultProcess
 from easyai.base_algorithm.non_max_suppression import NonMaxSuppression
 from easyai.drawing.detect_show import DetectionShow
 from easyai.config import detect_config

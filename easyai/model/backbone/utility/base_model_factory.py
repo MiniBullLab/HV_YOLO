@@ -3,7 +3,7 @@
 # Author:
 
 import os.path
-from easyai.base_name.base_model_name import BaseModelName
+from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.cls.mobilenetv2 import mobilenetv2_1_0
 from easyai.model.backbone.cls.shufflenetv2 import shufflenetv2_1_0
 from easyai.model.backbone.cls.resnet import resnet18, resnet34
@@ -43,55 +43,55 @@ class BaseModelFactory():
 
     def get_base_model_from_name(self, net_name):
         result = None
-        if net_name == BaseModelName.ShuffleNetV2_1_0:
+        if net_name == BackboneName.ShuffleNetV2_1_0:
             result = shufflenetv2_1_0()
-        elif net_name == BaseModelName.MobileNetV2_1_0:
+        elif net_name == BackboneName.MobileNetV2_1_0:
             result = mobilenetv2_1_0()
-        elif net_name == BaseModelName.ResNet18:
+        elif net_name == BackboneName.ResNet18:
             result = resnet18()
-        elif net_name == BaseModelName.ResNet34:
+        elif net_name == BackboneName.ResNet34:
             result = resnet34()
-        elif net_name == BaseModelName.ResNet50:
+        elif net_name == BackboneName.ResNet50:
             result = resnet50()
-        elif net_name == BaseModelName.ResNet101:
+        elif net_name == BackboneName.ResNet101:
             result = resnet101()
-        elif net_name == BaseModelName.ResNet152:
+        elif net_name == BackboneName.ResNet152:
             result = resnet152()
-        elif net_name == BaseModelName.Darknet53:
+        elif net_name == BackboneName.Darknet53:
             result = darknet53()
-        elif net_name == BaseModelName.Darknet21:
+        elif net_name == BackboneName.Darknet21:
             result = darknet21()
-        elif net_name == BaseModelName.Darknet21_Dilated8:
+        elif net_name == BackboneName.Darknet21_Dilated8:
             result = darknet21_dilated8()
-        elif net_name == BaseModelName.Darknet21_Dilated16:
+        elif net_name == BackboneName.Darknet21_Dilated16:
             result = darknet21_dilated16()
-        elif net_name == BaseModelName.Darknet53_Dilated8:
+        elif net_name == BackboneName.Darknet53_Dilated8:
             result = darknet53_dilated8()
-        elif net_name == BaseModelName.Darknet53_Dilated16:
+        elif net_name == BackboneName.Darknet53_Dilated16:
             result = darknet53_dilated16()
-        elif net_name == BaseModelName.GoogleNet:
+        elif net_name == BackboneName.GoogleNet:
             result = GoogleNet()
-        elif net_name == BaseModelName.Vgg13:
+        elif net_name == BackboneName.Vgg13:
             result = vgg13()
-        elif net_name == BaseModelName.Vgg16:
+        elif net_name == BackboneName.Vgg16:
             result = vgg16()
-        elif net_name == BaseModelName.Vgg19:
+        elif net_name == BackboneName.Vgg19:
             result = vgg19()
-        elif net_name == BaseModelName.SqueezeNet:
+        elif net_name == BackboneName.SqueezeNet:
             result = SqueezeNet()
-        elif net_name == BaseModelName.DilatedSqueezeNet:
+        elif net_name == BackboneName.DilatedSqueezeNet:
             result = DilatedSqueezeNet()
-        elif net_name == BaseModelName.Densenet121:
+        elif net_name == BackboneName.Densenet121:
             result = densenet121()
-        elif net_name == BaseModelName.Densenet121_Dilated8:
+        elif net_name == BackboneName.Densenet121_Dilated8:
             result = densenet121_dilated8()
-        elif net_name == BaseModelName.Densenet121_Dilated16:
+        elif net_name == BackboneName.Densenet121_Dilated16:
             result = densenet121_dilated16()
-        elif net_name == BaseModelName.Densenet169:
+        elif net_name == BackboneName.Densenet169:
             result = densenet169()
-        elif net_name == BaseModelName.Densenet201:
+        elif net_name == BackboneName.Densenet201:
             result = densenet201()
-        elif net_name == BaseModelName.Densenet161:
+        elif net_name == BackboneName.Densenet161:
             result = densenet161()
         else:
             print("base model:%s error" % net_name)

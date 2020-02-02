@@ -3,7 +3,7 @@
 # Author:
 
 
-class BaseModelName():
+class BackboneName():
 
     ResNet18 = "resnet18"
     ResNet34 = "resnet34"

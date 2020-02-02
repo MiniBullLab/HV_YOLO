@@ -10,7 +10,7 @@ from easyai.model.base_block.utility_layer import RouteLayer, Upsample
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.utility_block import ConvActivationBlock
 from easyai.model.backbone.cls.mobilenetv2 import MobileNetV2
-from easyai.model.backbone.utility.base_model import *
+from easyai.model.utility.base_model import *
 
 
 class MobileV2FCN(BaseModel):

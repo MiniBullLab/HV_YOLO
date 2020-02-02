@@ -3,8 +3,8 @@
 # Author:
 
 from easyai.base_name.block_name import BatchNormType, ActivationType
-from easyai.base_name.base_model_name import BaseModelName
-from easyai.model.backbone.utility.base_model import *
+from easyai.base_name.backbone_name import BackboneName
+from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.darknet_block import BasicBlock
 
@@ -13,13 +13,13 @@ __all__ = ['darknet21', 'darknet53',
            'darknet53_dilated8', 'darknet53_dilated16']
 
 
-class DarkNet(BaseModel):
+class DarkNet(BaseBackbone):
     def __init__(self, data_channel=3, num_blocks=[1, 2, 8, 8, 4],
                  out_channels=[64, 128, 256, 512, 1024], strides=[2, 2, 2, 2, 2],
                  dilations=[1, 1, 1, 1, 1], bnName=BatchNormType.BatchNormalize2d,
                  activationName=ActivationType.LeakyReLU):
         super().__init__()
-        self.set_name(BaseModelName.Darknet53)
+        self.set_name(BackboneName.Darknet53)
         self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.out_channels = out_channels
@@ -99,35 +99,35 @@ class DarkNet(BaseModel):
 
 def darknet21():
     model = DarkNet(num_blocks=[1, 1, 2, 2, 1])
-    model.set_name(BaseModelName.Darknet21)
+    model.set_name(BackboneName.Darknet21)
     return model
 
 
 def darknet21_dilated8():
     model = DarkNet(num_blocks=[1, 1, 2, 2, 1], dilations=[1, 1, 1, 2, 4])
-    model.set_name(BaseModelName.Darknet21_Dilated8)
+    model.set_name(BackboneName.Darknet21_Dilated8)
     return model
 
 
 def darknet21_dilated16():
     model = DarkNet(num_blocks=[1, 1, 2, 2, 1], dilations=[1, 1, 1, 1, 2])
-    model.set_name(BaseModelName.Darknet21_Dilated16)
+    model.set_name(BackboneName.Darknet21_Dilated16)
     return model
 
 
 def darknet53():
     model = DarkNet(num_blocks=[1, 2, 8, 8, 4])
-    model.set_name(BaseModelName.Darknet53)
+    model.set_name(BackboneName.Darknet53)
     return model
 
 
 def darknet53_dilated8():
     model = DarkNet(num_blocks=[1, 2, 8, 8, 4], dilations=[1, 1, 1, 2, 4])
-    model.set_name(BaseModelName.Darknet53_Dilated8)
+    model.set_name(BackboneName.Darknet53_Dilated8)
     return model
 
 
 def darknet53_dilated16():
     model = DarkNet(num_blocks=[1, 2, 8, 8, 4], dilations=[1, 1, 1, 1, 2])
-    model.set_name(BaseModelName.Darknet53_Dilated16)
+    model.set_name(BackboneName.Darknet53_Dilated16)
     return model

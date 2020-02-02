@@ -2,7 +2,7 @@ import torch
 from optparse import OptionParser
 from easyai.model.backbone.utility.base_model_factory import BaseModelFactory
 from easyai.model.utility.model_factory import ModelFactory
-from easyai.torch_onnx.model_show import ModelShow
+from easyai.torch_utility.torch_onnx.model_show import ModelShow
 
 
 def parse_arguments():

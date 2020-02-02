@@ -70,7 +70,7 @@ class MeanApEvaluating():
             npos = npos + sum(~difficult)
             class_recs[imageName] = {'bbox': bbox,
                                      'difficult': difficult,
-                                     'det': det}
+                                     'det2d': det}
 
         # read dets
         with open(detpath, 'r') as f:
@@ -120,9 +120,9 @@ class MeanApEvaluating():
 
             if ovmax > ovthresh:
                 if not R['difficult'][jmax]:
-                    if not R['det'][jmax]:
+                    if not R['det2d'][jmax]:
                         tp[d] = 1.
-                        R['det'][jmax] = 1
+                        R['det2d'][jmax] = 1
                         iou.append(ovmax)
                     else:
                         fp[d] = 1.

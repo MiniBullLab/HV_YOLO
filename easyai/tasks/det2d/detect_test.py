@@ -8,7 +8,7 @@ from easyai.evaluation.evaluatingOfmAp import *
 from easyai.data_loader.det.detection_val_dataloader import get_detection_val_dataloader
 from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.base_algorithm .non_max_suppression import NonMaxSuppression
-from easyai.tasks.det.detect_result_process import DetectResultProcess
+from easyai.tasks.det2d.detect_result_process import DetectResultProcess
 from easyai.config import detect_config
 
 

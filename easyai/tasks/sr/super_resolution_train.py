@@ -10,7 +10,7 @@ import torch
 import torch.nn as nn
 from easyai.data_loader.sr.super_resolution_dataloader import get_sr_dataloader
 from easyai.torch_utility.torch_model_process import TorchModelProcess
-from easyai.torch_utility.torchvision_process import TorchVisionProcess
+from easyai.torch_utility.torch_vision.torchvision_process import TorchVisionProcess
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.solver.lr_scheduler import MultiStageLR
 from easyai.utility import AverageMeter, Logger

@@ -4,7 +4,7 @@
 
 from easyai.helper.arguments_parse import ArgumentsParse
 from easyai.tasks.cls.classify_test import ClassifyTest
-from easyai.tasks.det.detect_test import DetectionTest
+from easyai.tasks.det2d.detect_test import DetectionTest
 from easyai.tasks.seg.segment_test import SegmentionTest
 
 

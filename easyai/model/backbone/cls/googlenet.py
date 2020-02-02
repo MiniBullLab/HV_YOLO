@@ -3,8 +3,8 @@
 # Author:
 
 from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
-from easyai.base_name.base_model_name import BaseModelName
-from easyai.model.backbone.utility.base_model import *
+from easyai.base_name.backbone_name import BackboneName
+from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.googlenet_block import InceptionBlock
 
@@ -12,12 +12,12 @@ from easyai.model.base_block.googlenet_block import InceptionBlock
 __all__ = ['GoogleNet']
 
 
-class GoogleNet(BaseModel):
+class GoogleNet(BaseBackbone):
 
     def __init__(self, data_channel=3, bnName=BatchNormType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
-        self.set_name(BaseModelName.GoogleNet)
+        self.set_name(BackboneName.GoogleNet)
         self.data_channel = data_channel
         self.activationName = activationName
         self.bnName = bnName

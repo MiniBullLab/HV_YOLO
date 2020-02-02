@@ -10,7 +10,7 @@ class TorchDeviceProcess():
     cuda = None
 
     def __init__(self):
-        self.device = "cpu"
+        self.device = torch.device("cpu")
 
     @classmethod
     def hasCUDA(cls):
@@ -25,11 +25,11 @@ class TorchDeviceProcess():
             count = self.getCUDACount()
             if id >= 0 and id < count:
                 os.environ["CUDA_VISIBLE_DEVICES"] = str(id)
-                self.device = "cuda:%d" % id
             else:
                 print("GPU %d error" % id)
+            self.device = torch.device("cuda")
         else:
-            self.device = "cpu"
+            self.device = torch.device("cpu")
         print("Using device: \"{}\"".format(self.device))
 
     def getCUDACount(self):

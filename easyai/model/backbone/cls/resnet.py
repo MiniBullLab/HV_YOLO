@@ -2,9 +2,9 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.base_name.base_model_name import BaseModelName
+from easyai.base_name.backbone_name import BackboneName
 from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
-from easyai.model.backbone.utility.base_model import *
+from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.resnet_block import BasicBlock, Bottleneck
 
@@ -12,12 +12,12 @@ from easyai.model.base_block.resnet_block import BasicBlock, Bottleneck
 __all__ = ['resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152']
 
 
-class ResNet(BaseModel):
+class ResNet(BaseBackbone):
     def __init__(self, data_channel=3, num_blocks=[2, 2, 2, 2], out_channels=[64, 128, 256, 512],
                  strides=[1, 2, 2, 2], dilations=[1, 1, 1, 1], bnName=BatchNormType.BatchNormalize2d,
                  activationName=ActivationType.ReLU, block=BasicBlock):
         super().__init__()
-        self.set_name(BaseModelName.ResNet18)
+        self.set_name(BackboneName.ResNet18)
         self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.out_channels = out_channels
@@ -119,29 +119,29 @@ class ResNet(BaseModel):
 
 def resnet18():
     model = ResNet(num_blocks=[2, 2, 2, 2], block=BasicBlock)
-    model.set_name(BaseModelName.ResNet18)
+    model.set_name(BackboneName.ResNet18)
     return model
 
 
 def resnet34():
     model = ResNet(num_blocks=[3, 4, 6, 3], block=BasicBlock)
-    model.set_name(BaseModelName.ResNet34)
+    model.set_name(BackboneName.ResNet34)
     return model
 
 
 def resnet50():
     model = ResNet(num_blocks=[3, 4, 6, 3], block=Bottleneck)
-    model.set_name(BaseModelName.ResNet50)
+    model.set_name(BackboneName.ResNet50)
     return model
 
 
 def resnet101():
     model = ResNet(num_blocks=[3, 4, 23, 3], block=Bottleneck)
-    model.set_name(BaseModelName.ResNet101)
+    model.set_name(BackboneName.ResNet101)
     return model
 
 
 def resnet152():
     model = ResNet(num_blocks=[3, 8, 36, 3], block=Bottleneck)
-    model.set_name(BaseModelName.ResNet152)
+    model.set_name(BackboneName.ResNet152)
     return model

@@ -8,7 +8,7 @@ from easyai.model.base_block.utility_layer import RouteLayer
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.darknet_block import ReorgBlock
 from easyai.model.backbone.utility.base_model_factory import BaseModelFactory
-from easyai.model.backbone.utility.base_model import *
+from easyai.model.utility.base_model import *
 
 
 class ComplexYOLO(BaseModel):

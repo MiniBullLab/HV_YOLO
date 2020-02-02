@@ -9,7 +9,7 @@ from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.solver.lr_scheduler import WarmupMultiStepLR
 from easyai.utility.train_log import TrainLogger
-from easyai.tasks.det.detect_test import DetectionTest
+from easyai.tasks.det2d.detect_test import DetectionTest
 from easyai.config import detect_config
 
 

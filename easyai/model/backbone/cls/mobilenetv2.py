@@ -3,22 +3,22 @@
 # Author:
 
 from easyai.base_name.block_name import BatchNormType, ActivationType
-from easyai.base_name.base_model_name import BaseModelName
-from easyai.model.backbone.utility.base_model import *
+from easyai.base_name.backbone_name import BackboneName
+from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility_block import ConvBNActivationBlock, InvertedResidual
 
 
 __all__ = ['mobilenetv2_1_0', 'MobileNetV2']
 
 
-class MobileNetV2(BaseModel):
+class MobileNetV2(BaseBackbone):
 
     def __init__(self, data_channel=3, num_blocks=[1, 2, 3, 4, 3, 3, 1],
                  out_channels=[16, 24, 32, 64, 96, 160, 320], strides=[1, 2, 2, 2, 1, 2, 1],
                  dilations=[1, 1, 1, 1, 1, 1, 1], bnName=BatchNormType.BatchNormalize2d,
                  activationName=ActivationType.ReLU, expand_ratios=[1, 6, 6, 6, 6, 6, 6]):
         super().__init__()
-        self.set_name(BaseModelName.MobileNetV2_1_0)
+        self.set_name(BackboneName.MobileNetV2_1_0)
         self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.out_channels = out_channels
@@ -89,14 +89,14 @@ class MobileNetV2(BaseModel):
 
 def mobilenetv2_1_0():
     model = MobileNetV2(num_blocks=[1, 2, 3, 4, 3, 3, 1])
-    model.set_name(BaseModelName.MobileNetV2_1_0)
+    model.set_name(BackboneName.MobileNetV2_1_0)
     return model
 
 
 def mobilenetv2_1_0_dilated8():
     model = MobileNetV2(num_blocks=[1, 2, 3, 4, 3, 3, 1],
                         dilations=[1, 1, 1, 2, 2, 4, 4])
-    model.set_name(BaseModelName.MobileNetV2_1_0)
+    model.set_name(BackboneName.MobileNetV2_1_0)
     return model
 
 

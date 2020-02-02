@@ -1,5 +1,5 @@
 import netron
-from easyai.torch_onnx.torch_to_onnx import TorchConvertOnnx
+from easyai.torch_utility.torch_onnx.torch_to_onnx import TorchConvertOnnx
 
 
 class ModelShow():

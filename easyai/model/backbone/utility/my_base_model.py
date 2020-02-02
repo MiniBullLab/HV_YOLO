@@ -3,11 +3,11 @@
 # Author:
 
 from easyai.base_name.block_name import BlockType
-from easyai.model.backbone.utility.base_model import *
+from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.utility.create_model_list import CreateModuleList
 
 
-class MyBaseModel(BaseModel):
+class MyBaseModel(BaseBackbone):
 
     def __init__(self, modelDefine):
         super().__init__()
