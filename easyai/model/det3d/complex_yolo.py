@@ -3,11 +3,12 @@
 # Author:
 
 from easyai.base_name.model_name import ModelName
-from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
+from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import LayerType, BlockType
 from easyai.model.base_block.utility_layer import RouteLayer
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.darknet_block import ReorgBlock
-from easyai.model.backbone.utility.base_model_factory import BaseModelFactory
+from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 from easyai.model.utility.base_model import *
 
 
@@ -18,7 +19,7 @@ class ComplexYOLO(BaseModel):
         self.set_name(ModelName.ComplexYOLO)
         self.bn_name = BatchNormType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
-        self.factory = BaseModelFactory()
+        self.factory = BackboneFactory()
         self.lossList = []
         self.out_channels = []
         self.index = 0
@@ -70,7 +71,7 @@ class ComplexYOLO(BaseModel):
                           stride=1,
                           padding=0,
                           bias=True)
-        self.add_block_list(BlockType.Convolutional, conv4, output_channel)
+        self.add_block_list(LayerType.Convolutional, conv4, output_channel)
 
     def create_loss(self):
         pass
@@ -94,9 +95,9 @@ class ComplexYOLO(BaseModel):
             if BlockType.BaseNet in key:
                 base_outputs = block(x)
                 x = base_outputs[-1]
-            elif BlockType.RouteLayer in key:
+            elif LayerType.RouteLayer in key:
                 x = block(layer_outputs, base_outputs)
-            elif BlockType.ShortcutLayer in key:
+            elif LayerType.ShortcutLayer in key:
                 x = block(layer_outputs)
             else:
                 x = block(x)

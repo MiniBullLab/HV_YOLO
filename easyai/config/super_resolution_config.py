@@ -21,6 +21,8 @@ optimizerConfig = {0: {'optimizer': 'Adam'}
                   }
 accumulated_batches = 1
 
+enable_mixed_precision = False
+
 display = 20
 
 # speed

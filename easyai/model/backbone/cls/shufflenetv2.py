@@ -5,7 +5,8 @@
 # See the paper "ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design" for more details.
 
 from easyai.base_name.backbone_name import BackboneName
-from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
+from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import LayerType
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility_layer import MyMaxPool2d
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
@@ -48,7 +49,7 @@ class ShuffleNetV2(BaseBackbone):
         self.addBlockList(layer1.get_name(), layer1, self.first_output)
 
         layer2 = MyMaxPool2d(kernel_size=3, stride=2)
-        self.addBlockList(BlockType.MyMaxPool2d, layer2, self.first_output)
+        self.addBlockList(LayerType.MyMaxPool2d, layer2, self.first_output)
 
         self.in_channels = self.first_output
         for index, num_block in enumerate(self.num_blocks):

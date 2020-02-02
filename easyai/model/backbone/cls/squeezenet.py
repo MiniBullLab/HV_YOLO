@@ -3,7 +3,8 @@
 # Author:
 
 from easyai.base_name.backbone_name import BackboneName
-from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
+from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import LayerType
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility_block import ConvActivationBlock
 from easyai.model.base_block.squeezenet_block import FireBlock
@@ -39,7 +40,7 @@ class SqueezeNet(BaseBackbone):
         self.addBlockList(layer1.get_name(), layer1, self.first_output)
 
         layer2 = nn.MaxPool2d(kernel_size=3, stride=2, ceil_mode=False)
-        self.addBlockList(BlockType.MyMaxPool2d, layer2, self.first_output)
+        self.addBlockList(LayerType.MyMaxPool2d, layer2, self.first_output)
 
         planes = (16, 64, 64)
         fire1 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
@@ -52,7 +53,7 @@ class SqueezeNet(BaseBackbone):
         self.addBlockList(fire2.get_name(), fire2, output_channle)
 
         layer3 = nn.MaxPool2d(kernel_size=3, stride=2, ceil_mode=False)
-        self.addBlockList(BlockType.MyMaxPool2d, layer3, output_channle)
+        self.addBlockList(LayerType.MyMaxPool2d, layer3, output_channle)
 
         planes = (32, 128, 128)
         fire3 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
@@ -65,7 +66,7 @@ class SqueezeNet(BaseBackbone):
         self.addBlockList(fire4.get_name(), fire4, output_channle)
 
         layer4 = nn.MaxPool2d(kernel_size=3, stride=2, ceil_mode=False)
-        self.addBlockList(BlockType.MyMaxPool2d, layer4, output_channle)
+        self.addBlockList(LayerType.MyMaxPool2d, layer4, output_channle)
 
         planes = (48, 192, 192)
         fire5 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
@@ -134,7 +135,7 @@ class DilatedSqueezeNet(BaseBackbone):
         self.addBlockList(layer1.get_name(), layer1, self.first_output)
 
         layer2 = nn.MaxPool2d(kernel_size=3, stride=2, ceil_mode=False)
-        self.addBlockList(BlockType.MyMaxPool2d, layer2, self.first_output)
+        self.addBlockList(LayerType.MyMaxPool2d, layer2, self.first_output)
 
         planes = (16, 64, 64)
         fire1 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
@@ -147,7 +148,7 @@ class DilatedSqueezeNet(BaseBackbone):
         self.addBlockList(fire2.get_name(), fire2, output_channle)
 
         layer3 = nn.MaxPool2d(kernel_size=3, stride=2, ceil_mode=False)
-        self.addBlockList(BlockType.MyMaxPool2d, layer3, output_channle)
+        self.addBlockList(LayerType.MyMaxPool2d, layer3, output_channle)
 
         planes = (32, 128, 128)
         fire3 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
@@ -160,7 +161,7 @@ class DilatedSqueezeNet(BaseBackbone):
         self.addBlockList(fire4.get_name(), fire4, output_channle)
 
         layer4 = nn.MaxPool2d(kernel_size=3, stride=1, ceil_mode=False)
-        self.addBlockList(BlockType.MyMaxPool2d, layer4, output_channle)
+        self.addBlockList(LayerType.MyMaxPool2d, layer4, output_channle)
 
         planes = (48, 192, 192)
         fire5 = FireBlock(self.outChannelList[-1], planes, dilation=2,

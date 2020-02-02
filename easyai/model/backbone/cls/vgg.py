@@ -3,7 +3,8 @@
 # Author:
 
 from easyai.base_name.backbone_name import BackboneName
-from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
+from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import LayerType
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
 
@@ -48,7 +49,7 @@ class VGG(BaseBackbone):
         for v in cfg:
             if v == 'M':
                 temp_layer = nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=False)
-                self.addBlockList(BlockType.MyMaxPool2d, temp_layer, in_channels)
+                self.addBlockList(LayerType.MyMaxPool2d, temp_layer, in_channels)
             else:
                 conv2d = ConvBNActivationBlock(in_channels=in_channels,
                                                out_channels=v,

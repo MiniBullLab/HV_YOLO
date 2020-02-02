@@ -3,7 +3,8 @@
 # Author:
 
 from easyai.base_name.backbone_name import BackboneName
-from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
+from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import LayerType
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.resnet_block import BasicBlock, Bottleneck
@@ -72,7 +73,7 @@ class ResNet(BaseBackbone):
         # self.addBlockList(layer12.get_name(), layer12, self.first_output)
 
         layer2 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.addBlockList(BlockType.MyMaxPool2d, layer2, self.first_output)
+        self.addBlockList(LayerType.MyMaxPool2d, layer2, self.first_output)
 
         self.in_channels = self.first_output
         for index, num_block in enumerate(self.num_blocks):

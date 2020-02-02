@@ -2,12 +2,12 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.base_name.block_name import BlockType
+from easyai.base_name.block_name import LayerType
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.utility.create_model_list import CreateModuleList
 
 
-class MyBaseModel(BaseBackbone):
+class MyBackbone(BaseBackbone):
 
     def __init__(self, modelDefine):
         super().__init__()
@@ -41,15 +41,15 @@ class MyBaseModel(BaseBackbone):
         base_outputs = []
         layer_outputs = []
         for key, block in self._modules.items():
-            if BlockType.MultiplyLayer in key:
+            if LayerType.MultiplyLayer in key:
                 x = block(layer_outputs, base_outputs)
-            elif BlockType.AddLayer in key:
+            elif LayerType.AddLayer in key:
                 x = block(layer_outputs, base_outputs)
-            elif BlockType.RouteLayer in key:
+            elif LayerType.RouteLayer in key:
                 x = block(layer_outputs, base_outputs)
-            elif BlockType.ShortRouteLayer in key:
+            elif LayerType.ShortRouteLayer in key:
                 x = block(layer_outputs)
-            elif BlockType.ShortcutLayer in key:
+            elif LayerType.ShortcutLayer in key:
                 x = block(layer_outputs)
             else:
                 x = block(x)

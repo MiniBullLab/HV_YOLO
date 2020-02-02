@@ -2,7 +2,8 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.base_name.block_name import BlockType, ActivationType, BatchNormType
+from easyai.base_name.block_name import ActivationType, BatchNormType
+from easyai.base_name.block_name import LayerType, BlockType
 from easyai.model.base_block.base_block import *
 from easyai.model.base_block.utility_layer import GlobalAvgPool2d
 from easyai.model.base_block.activation_function import ActivationFunction
@@ -20,7 +21,7 @@ class ConvBNActivationBlock1d(BaseBlock):
         bn = BatchNormalizeFunction.get_function(bnName, out_channels)
         activation = ActivationFunction.get_function(activationName)
         self.block = nn.Sequential(OrderedDict([
-            (BlockType.Convolutional1d, conv),
+            (LayerType.Convolutional1d, conv),
             (bnName, bn),
             (activationName, activation)
         ]))
@@ -39,7 +40,7 @@ class ConvBNBlock1d(BaseBlock):
                          stride, padding, dilation, groups, bias=True)
         bn = BatchNormalizeFunction.get_function(bnName, out_channels)
         self.block = nn.Sequential(OrderedDict([
-            (BlockType.Convolutional1d, conv),
+            (LayerType.Convolutional1d, conv),
             (bnName, bn)
         ]))
 
@@ -57,7 +58,7 @@ class ConvActivationBlock(BaseBlock):
                          stride, padding, dilation, groups, bias=True)
         activation = ActivationFunction.get_function(activationName)
         self.block = nn.Sequential(OrderedDict([
-            (BlockType.Convolutional, conv),
+            (LayerType.Convolutional, conv),
             (activationName, activation)
         ]))
 
@@ -77,7 +78,7 @@ class ConvBNActivationBlock(BaseBlock):
         bn = BatchNormalizeFunction.get_function(bnName, out_channels)
         activation = ActivationFunction.get_function(activationName)
         self.block = nn.Sequential(OrderedDict([
-            (BlockType.Convolutional, conv),
+            (LayerType.Convolutional, conv),
             (bnName, bn),
             (activationName, activation)
         ]))
@@ -100,7 +101,7 @@ class BNActivationConvBlock(BaseBlock):
         self.block = nn.Sequential(OrderedDict([
             (bnName, bn),
             (activationName, activation),
-            (BlockType.Convolutional, conv)
+            (LayerType.Convolutional, conv)
         ]))
 
     def forward(self, x):
@@ -117,7 +118,7 @@ class FcBNActivationBlock(BaseBlock):
         bn = BatchNormalizeFunction.get_function(bnName, out_features)
         activation = ActivationFunction.get_function(activationName)
         self.block = nn.Sequential(OrderedDict([
-            (BlockType.FcLinear, fc),
+            (LayerType.FcLinear, fc),
             (bnName, bn),
             (activationName, activation)
         ]))

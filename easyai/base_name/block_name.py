@@ -20,10 +20,7 @@ class BatchNormType():
     BatchNormalize1d = "bn1d"
 
 
-class BlockType():
-
-    InputData = "inputData"
-    BaseNet = "baseNet"
+class LayerType():
 
     EmptyLayer = "emptyLayer"
 
@@ -45,10 +42,18 @@ class BlockType():
     FcLinear = "fcLinear"
 
     Convolutional1d = "convolutional1d"
+
+    Convolutional = "convolutional"
+
+
+class BlockType():
+
+    InputData = "inputData"
+    BaseNet = "baseNet"
+
     ConvBNBlock1d = "convBN1d"
     ConvBNActivationBlock1d = "convBNActivationBlock1d"
 
-    Convolutional = "convolutional"
     ConvBNActivationBlock = "convBNActivationBlock"
     ConvActivationBlock = "convActivationBlock"
     BNActivationConvBlock = "bnActivationConvBlock"

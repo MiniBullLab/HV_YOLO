@@ -1,6 +1,6 @@
 import torch
 from optparse import OptionParser
-from easyai.model.backbone.utility.base_model_factory import BaseModelFactory
+from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 from easyai.model.utility.model_factory import ModelFactory
 from easyai.torch_utility.torch_onnx.torch_to_onnx import TorchConvertOnnx
 
@@ -32,7 +32,7 @@ def parse_arguments():
 class ModelConverter():
 
     def __init__(self):
-        self.base_model_factory = BaseModelFactory()
+        self.backbone_factory = BackboneFactory()
         self.model_factory = ModelFactory()
         self.converter = TorchConvertOnnx()
 
@@ -47,7 +47,7 @@ class ModelConverter():
         input_x = torch.randn(1, 3, 640, 352)
         self.converter.set_input(input_x)
         self.converter.set_save_dir(save_dir)
-        model = self.base_model_factory.get_base_model(base_model_path)
+        model = self.backbone_factory.get_base_model(base_model_path)
         self.converter.torch2onnx(model, weight_path)
 
 

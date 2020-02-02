@@ -2,7 +2,8 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
+from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import LayerType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
@@ -54,7 +55,7 @@ class GoogleNet(BaseBackbone):
         self.addBlockList(layer3.get_name(), layer3, output_channel)
 
         maxpool1 = nn.MaxPool2d(2, stride=2, padding=0)
-        self.addBlockList(BlockType.MyMaxPool2d, maxpool1, self.outChannelList[-1])
+        self.addBlockList(LayerType.MyMaxPool2d, maxpool1, self.outChannelList[-1])
 
         self.input_channel = self.outChannelList[-1]
         planes = (192, 96, 208, 16, 48, 64)
@@ -92,7 +93,7 @@ class GoogleNet(BaseBackbone):
         self.addBlockList(layer8.get_name(), layer8, output_channel)
 
         maxpool2 = nn.MaxPool2d(2, stride=2, padding=0)
-        self.addBlockList(BlockType.MyMaxPool2d, maxpool2, self.outChannelList[-1])
+        self.addBlockList(LayerType.MyMaxPool2d, maxpool2, self.outChannelList[-1])
 
         self.input_channel = self.outChannelList[-1]
         planes = (256, 160, 320, 32, 128, 128)

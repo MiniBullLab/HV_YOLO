@@ -1,6 +1,6 @@
 import torch
 from optparse import OptionParser
-from easyai.model.backbone.utility.base_model_factory import BaseModelFactory
+from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 from easyai.model.utility.model_factory import ModelFactory
 from easyai.torch_utility.torch_onnx.model_show import ModelShow
 
@@ -28,7 +28,7 @@ def parse_arguments():
 class ModelNetShow():
 
     def __init__(self):
-        self.base_model_factory = BaseModelFactory()
+        self.backbone_factory = BackboneFactory()
         self.model_factory = ModelFactory()
         self.show_process = ModelShow()
 
@@ -41,7 +41,7 @@ class ModelNetShow():
     def base_model_show(self, base_model_path):
         input_x = torch.randn(1, 3, 224, 224)
         self.show_process.set_input(input_x)
-        model = self.base_model_factory.get_base_model(base_model_path)
+        model = self.backbone_factory.get_base_model(base_model_path)
         self.show_process.show_from_model(model)
 
     def onnx_show(self, onnx_path):

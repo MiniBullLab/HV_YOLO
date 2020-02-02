@@ -16,11 +16,11 @@ from easyai.model.backbone.cls.vgg import vgg13, vgg16, vgg19
 from easyai.model.backbone.cls.squeezenet import SqueezeNet, DilatedSqueezeNet
 from easyai.model.backbone.cls.densenet import densenet121, densenet201, densenet169, densenet161
 from easyai.model.backbone.cls.densenet import densenet121_dilated8, densenet121_dilated16
-from easyai.model.backbone.utility.my_base_model import MyBaseModel
+from easyai.model.backbone.utility.my_backbone import MyBackbone
 from easyai.model.utility.model_parse import ModelParse
 
 
-class BaseModelFactory():
+class BackboneFactory():
 
     def __init__(self):
         self.cfgReader = ModelParse()
@@ -37,7 +37,7 @@ class BaseModelFactory():
         path, file_name_and_post = os.path.split(cfg_path)
         file_name, post = os.path.splitext(file_name_and_post)
         model_define = self.cfgReader.readCfgFile(cfg_path)
-        model = MyBaseModel(model_define)
+        model = MyBackbone(model_define)
         model.set_name(file_name)
         return model
 

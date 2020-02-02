@@ -3,7 +3,8 @@
 # Author:
 
 from easyai.base_name.backbone_name import BackboneName
-from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
+from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import LayerType
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility_layer import NormalizeLayer, ActivationLayer
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
@@ -58,7 +59,7 @@ class DenseNet(BaseBackbone):
         self.addBlockList(layer1.get_name(), layer1, self.num_init_features)
 
         layer2 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.addBlockList(BlockType.MyMaxPool2d, layer2, self.num_init_features)
+        self.addBlockList(LayerType.MyMaxPool2d, layer2, self.num_init_features)
 
         self.in_channels = self.num_init_features
         for index, num_block in enumerate(self.num_blocks):
@@ -74,7 +75,7 @@ class DenseNet(BaseBackbone):
                                         activationName=self.activationName)
                 self.addBlockList(trans.get_name(), trans, self.in_channels // 2)
                 avg_pool = nn.AvgPool2d(kernel_size=2, stride=2)
-                self.addBlockList(BlockType.GlobalAvgPool, avg_pool, self.outChannelList[-1])
+                self.addBlockList(LayerType.GlobalAvgPool, avg_pool, self.outChannelList[-1])
                 self.in_channels = self.outChannelList[-1]
         layer3 = NormalizeLayer(bn_name=self.bnName,
                                 out_channel=self.in_channels)

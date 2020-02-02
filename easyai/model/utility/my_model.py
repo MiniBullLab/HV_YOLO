@@ -4,9 +4,9 @@
 
 import os
 from collections import OrderedDict
-from easyai.base_name.block_name import BlockType
+from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
-from easyai.model.backbone.utility.base_model_factory import BaseModelFactory
+from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 from easyai.model.utility.create_model_list import CreateModuleList
 from easyai.model.utility.base_model import *
 
@@ -15,7 +15,7 @@ class MyModel(BaseModel):
 
     def __init__(self, modelDefine, cfg_dir):
         super().__init__()
-        self.baseModelFactory = BaseModelFactory()
+        self.backbone_factory = BackboneFactory()
         self.createTaskList = CreateModuleList()
         self.modelDefine = modelDefine
         self.cfg_dir = cfg_dir
@@ -39,7 +39,7 @@ class MyModel(BaseModel):
             input_name = base_net_name.strip()
             if input_name.endswith("cfg"):
                 input_name = os.path.join(self.cfg_dir, input_name)
-            result = self.baseModelFactory.get_base_model(input_name)
+            result = self.backbone_factory.get_base_model(input_name)
         return result
 
     def createTask(self, basicModel):
@@ -76,15 +76,15 @@ class MyModel(BaseModel):
             if BlockType.BaseNet in key:
                 base_outputs = block(x)
                 x = base_outputs[-1]
-            elif BlockType.MultiplyLayer in key:
+            elif LayerType.MultiplyLayer in key:
                 x = block(layer_outputs, base_outputs)
-            elif BlockType.AddLayer in key:
+            elif LayerType.AddLayer in key:
                 x = block(layer_outputs, base_outputs)
-            elif BlockType.RouteLayer in key:
+            elif LayerType.RouteLayer in key:
                 x = block(layer_outputs, base_outputs)
-            elif BlockType.ShortRouteLayer in key:
+            elif LayerType.ShortRouteLayer in key:
                 x = block(layer_outputs)
-            elif BlockType.ShortcutLayer in key:
+            elif LayerType.ShortcutLayer in key:
                 x = block(layer_outputs)
             elif LossType.YoloLoss in key:
                 output.append(x)

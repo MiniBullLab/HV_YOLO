@@ -3,7 +3,7 @@
 # Author:
 
 import numpy as np
-from easyai.base_name.block_name import BlockType, ActivationType
+from easyai.base_name.block_name import LayerType, ActivationType
 from easyai.model.base_block.base_block import *
 from easyai.model.base_block.activation_function import ActivationFunction
 from easyai.model.base_block.batchnorm import BatchNormalizeFunction
@@ -13,7 +13,7 @@ class EmptyLayer(BaseBlock):
     """Placeholder for 'route' and 'shortcut' layers"""
 
     def __init__(self):
-        super().__init__(BlockType.EmptyLayer)
+        super().__init__(LayerType.EmptyLayer)
 
     def forward(self, x):
         pass
@@ -22,10 +22,10 @@ class EmptyLayer(BaseBlock):
 class MultiplyLayer(BaseBlock):
 
     def __init__(self, layers):
-        super().__init__(BlockType.MultiplyLayer)
+        super().__init__(LayerType.MultiplyLayer)
         self.layers = [int(x) for x in layers.split(',') if x]
         if len(self.layers) <= 1:
-            print("% input error" % BlockType.MultiplyLayer)
+            print("% input error" % LayerType.MultiplyLayer)
 
     def forward(self, layer_outputs, base_outputs):
         temp_layer_outputs = [layer_outputs[i] if i < 0 else base_outputs[i]
@@ -39,10 +39,10 @@ class MultiplyLayer(BaseBlock):
 class AddLayer(BaseBlock):
 
     def __init__(self, layers):
-        super().__init__(BlockType.AddLayer)
+        super().__init__(LayerType.AddLayer)
         self.layers = [int(x) for x in layers.split(',') if x]
         if len(self.layers) <= 1:
-            print("% input error" % BlockType.AddLayer)
+            print("% input error" % LayerType.AddLayer)
 
     def forward(self, layer_outputs, base_outputs):
         temp_layer_outputs = [layer_outputs[i] if i < 0 else base_outputs[i]
@@ -56,7 +56,7 @@ class AddLayer(BaseBlock):
 class NormalizeLayer(BaseBlock):
 
     def __init__(self, bn_name, out_channel):
-        super().__init__(BlockType.NormalizeLayer)
+        super().__init__(LayerType.NormalizeLayer)
         self.normalize = BatchNormalizeFunction.get_function(bn_name, out_channel)
 
     def forward(self, x):
@@ -67,7 +67,7 @@ class NormalizeLayer(BaseBlock):
 class ActivationLayer(BaseBlock):
 
     def __init__(self, activation_name):
-        super().__init__(BlockType.ActivationLayer)
+        super().__init__(LayerType.ActivationLayer)
         self.activation = ActivationFunction.get_function(activation_name)
 
     def forward(self, x):
@@ -78,7 +78,7 @@ class ActivationLayer(BaseBlock):
 class RouteLayer(BaseBlock):
 
     def __init__(self, layers):
-        super().__init__(BlockType.RouteLayer)
+        super().__init__(LayerType.RouteLayer)
         self.layers = [int(x) for x in layers.split(',') if x]
 
     def forward(self, layer_outputs, base_outputs):
@@ -92,7 +92,7 @@ class RouteLayer(BaseBlock):
 class ShortRouteLayer(BaseBlock):
 
     def __init__(self, layer_from, activationName=ActivationType.Linear):
-        super().__init__(BlockType.ShortRouteLayer)
+        super().__init__(LayerType.ShortRouteLayer)
         self.layer_from = int(layer_from)
         self.activation = ActivationFunction.get_function(activationName)
 
@@ -106,7 +106,7 @@ class ShortRouteLayer(BaseBlock):
 class ShortcutLayer(BaseBlock):
 
     def __init__(self, layer_from, activationName=ActivationType.Linear):
-        super().__init__(BlockType.ShortcutLayer)
+        super().__init__(LayerType.ShortcutLayer)
         self.layer_from = int(layer_from)
         self.activation = ActivationFunction.get_function(activationName)
 
@@ -120,7 +120,7 @@ class Upsample(BaseBlock):
     # Custom Upsample layer (nn.Upsample gives deprecated warning message)
 
     def __init__(self, scale_factor=1, mode='bilinear'):
-        super().__init__(BlockType.Upsample)
+        super().__init__(LayerType.Upsample)
         self.scale_factor = scale_factor
         self.mode = mode
 
@@ -131,15 +131,15 @@ class Upsample(BaseBlock):
 class MyMaxPool2d(BaseBlock):
 
     def __init__(self, kernel_size, stride):
-        super().__init__(BlockType.MyMaxPool2d)
+        super().__init__(LayerType.MyMaxPool2d)
         layers = OrderedDict()
         maxpool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride, padding=int((kernel_size - 1) // 2))
         if kernel_size == 2 and stride == 1:
             layer1 = nn.ZeroPad2d((0, 1, 0, 1))
             layers["pad2d"] = layer1
-            layers[BlockType.MyMaxPool2d] = maxpool
+            layers[LayerType.MyMaxPool2d] = maxpool
         else:
-            layers[BlockType.MyMaxPool2d] = maxpool
+            layers[LayerType.MyMaxPool2d] = maxpool
         self.layer = nn.Sequential(layers)
 
     def forward(self, x):
@@ -149,7 +149,7 @@ class MyMaxPool2d(BaseBlock):
 
 class GlobalAvgPool2d(BaseBlock):
     def __init__(self):
-        super().__init__(BlockType.GlobalAvgPool)
+        super().__init__(LayerType.GlobalAvgPool)
 
     def forward(self, x):
         h, w = x.shape[2:]
@@ -164,7 +164,7 @@ class GlobalAvgPool2d(BaseBlock):
 
 class FcLayer(BaseBlock):
     def __init__(self, in_channels, out_channels):
-        super().__init__(BlockType.FcLayer)
+        super().__init__(LayerType.FcLayer)
         self.linear = nn.Linear(in_channels, out_channels)
 
     def forward(self, x):

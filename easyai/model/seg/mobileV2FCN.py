@@ -3,7 +3,8 @@
 # Author:
 
 from easyai.base_name.model_name import ModelName
-from easyai.base_name.block_name import BatchNormType, ActivationType, BlockType
+from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
 from easyai.loss.cross_entropy2d import CrossEntropy2d
 from easyai.model.base_block.utility_layer import RouteLayer, Upsample
@@ -163,9 +164,9 @@ class MobileV2FCN(BaseModel):
             if BlockType.BaseNet in key:
                 base_outputs = block(x)
                 x = base_outputs[-1]
-            elif BlockType.RouteLayer in key:
+            elif LayerType.RouteLayer in key:
                 x = block(layer_outputs, base_outputs)
-            elif BlockType.ShortcutLayer in key:
+            elif LayerType.ShortcutLayer in key:
                 x = block(layer_outputs)
             elif LossType.YoloLoss in key:
                 output.append(x)
