@@ -29,11 +29,12 @@ class ResNet(BaseBackbone):
         self.block = block
         self.first_output = 64
 
-        self.outChannelList = []
-        self.index = 0
         self.create_block_list()
 
     def create_block_list(self):
+        self.out_channels = []
+        self.index = 0
+
         layer1 = ConvBNActivationBlock(in_channels=self.data_channel,
                                        out_channels=self.first_output,
                                        kernel_size=7,
@@ -41,7 +42,7 @@ class ResNet(BaseBackbone):
                                        padding=3,
                                        bnName=self.bnName,
                                        activationName=self.activationName)
-        self.addBlockList(layer1.get_name(), layer1, self.first_output)
+        self.add_block_list(layer1.get_name(), layer1, self.first_output)
 
         # layer1 = ConvBNActivationBlock(in_channels=self.data_channel,
         #                                out_channels=self.first_output,
@@ -50,7 +51,7 @@ class ResNet(BaseBackbone):
         #                                padding=1,
         #                                bnName=self.bnName,
         #                                activationName=self.activationName)
-        # self.addBlockList(layer1.get_name(), layer1, self.first_output)
+        # self.add_block_list(layer1.get_name(), layer1, self.first_output)
         # self.in_channels = self.first_output
         # self.first_output = 64
         # layer11 = ConvBNActivationBlock(in_channels=self.data_channel,
@@ -60,7 +61,7 @@ class ResNet(BaseBackbone):
         #                                padding=1,
         #                                bnName=self.bnName,
         #                                activationName=self.activationName)
-        # self.addBlockList(layer11.get_name(), layer11, self.first_output)
+        # self.add_block_list(layer11.get_name(), layer11, self.first_output)
         # self.in_channels = self.first_output
         # self.first_output = 128
         # layer12 = ConvBNActivationBlock(in_channels=self.data_channel,
@@ -70,10 +71,10 @@ class ResNet(BaseBackbone):
         #                                padding=1,
         #                                bnName=self.bnName,
         #                                activationName=self.activationName)
-        # self.addBlockList(layer12.get_name(), layer12, self.first_output)
+        # self.add_block_list(layer12.get_name(), layer12, self.first_output)
 
         layer2 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.addBlockList(LayerType.MyMaxPool2d, layer2, self.first_output)
+        self.add_block_list(LayerType.MyMaxPool2d, layer2, self.first_output)
 
         self.in_channels = self.first_output
         for index, num_block in enumerate(self.num_blocks):
@@ -90,25 +91,12 @@ class ResNet(BaseBackbone):
                             activationName=activation)
         name = "down_%s" % down_layers.get_name()
         temp_output_channel = out_channels * block.expansion
-        self.addBlockList(name, down_layers, temp_output_channel)
+        self.add_block_list(name, down_layers, temp_output_channel)
         for i in range(num_block - 1):
             layer = block(temp_output_channel, out_channels, 1,
                           bnName=bnName, activationName=activation)
             temp_output_channel = out_channels * block.expansion
-            self.addBlockList(layer.get_name(), layer, temp_output_channel)
-
-    def addBlockList(self, blockName, block, out_channel):
-        blockName = "base_%s_%d" % (blockName, self.index)
-        self.add_module(blockName, block)
-        self.outChannelList.append(out_channel)
-        self.index += 1
-
-    def getOutChannelList(self):
-        return self.outChannelList
-
-    def printBlockName(self):
-        for key in self._modules.keys():
-            print(key)
+            self.add_block_list(layer.get_name(), layer, temp_output_channel)
 
     def forward(self, x):
         output_list = []

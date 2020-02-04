@@ -44,11 +44,12 @@ class DenseNet(BaseBackbone):
         self.activationName = activationName
         self.bnName = bnName
 
-        self.outChannelList = []
-        self.index = 0
         self.create_block_list()
 
     def create_block_list(self):
+        self.out_channels = []
+        self.index = 0
+
         layer1 = ConvBNActivationBlock(in_channels=self.data_channel,
                                        out_channels=self.num_init_features,
                                        kernel_size=7,
@@ -56,10 +57,10 @@ class DenseNet(BaseBackbone):
                                        padding=3,
                                        bnName=self.bnName,
                                        activationName=self.activationName)
-        self.addBlockList(layer1.get_name(), layer1, self.num_init_features)
+        self.add_block_list(layer1.get_name(), layer1, self.num_init_features)
 
         layer2 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.addBlockList(LayerType.MyMaxPool2d, layer2, self.num_init_features)
+        self.add_block_list(LayerType.MyMaxPool2d, layer2, self.num_init_features)
 
         self.in_channels = self.num_init_features
         for index, num_block in enumerate(self.num_blocks):
@@ -73,16 +74,16 @@ class DenseNet(BaseBackbone):
                                         stride=1,
                                         bnName=self.bnName,
                                         activationName=self.activationName)
-                self.addBlockList(trans.get_name(), trans, self.in_channels // 2)
+                self.add_block_list(trans.get_name(), trans, self.in_channels // 2)
                 avg_pool = nn.AvgPool2d(kernel_size=2, stride=2)
-                self.addBlockList(LayerType.GlobalAvgPool, avg_pool, self.outChannelList[-1])
+                self.add_block_list(LayerType.GlobalAvgPool, avg_pool, self.outChannelList[-1])
                 self.in_channels = self.outChannelList[-1]
         layer3 = NormalizeLayer(bn_name=self.bnName,
                                 out_channel=self.in_channels)
-        self.addBlockList(layer3.get_name(), layer3, self.in_channels)
+        self.add_block_list(layer3.get_name(), layer3, self.in_channels)
 
         layer4 = ActivationLayer(self.activationName)
-        self.addBlockList(layer4.get_name(), layer4, self.in_channels)
+        self.add_block_list(layer4.get_name(), layer4, self.in_channels)
 
     def make_densenet_layer(self, num_block, dilation,
                             bn_size, growth_rate, drop_rate,
@@ -99,20 +100,7 @@ class DenseNet(BaseBackbone):
                                bnName=bnName,
                                activationName=activation)
             temp_output_channel = temp_input_channel + growth_rate
-            self.addBlockList(layer.get_name(), layer, temp_output_channel)
-
-    def addBlockList(self, blockName, block, out_channel):
-        blockName = "base_%s_%d" % (blockName, self.index)
-        self.add_module(blockName, block)
-        self.outChannelList.append(out_channel)
-        self.index += 1
-
-    def getOutChannelList(self):
-        return self.outChannelList
-
-    def printBlockName(self):
-        for key in self._modules.keys():
-            print(key)
+            self.add_block_list(layer.get_name(), layer, temp_output_channel)
 
     def forward(self, x):
         output_list = []

@@ -9,6 +9,7 @@ class ModelName():
     ComplexYOLO = "ComplexYOLO"
 
     VggNetCls = "VggNetCls"
+    Inceptionv4Cls = "Inceptionv4Cls"
 
     MSRResNet = "MSRResNet"
     MySRModel = "MySRModel"

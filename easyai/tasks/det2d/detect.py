@@ -37,7 +37,7 @@ class Detection(BaseInference):
                 output_list = self.model(img.to(self.device))
                 output = self.compute_output(output_list)
                 result = self.result_process.get_detection_result(output, detect_config.confThresh)
-            detection_objects = self.nms_process.multi_class_nms(result, detect_config.nmsThresh)
+            detection_objects = self.nms_process.fast_multi_class_nms(result, detect_config.nmsThresh)
             detection_objects = self.result_process.resize_detection_objects(src_image,
                                                                              detect_config.imgSize,
                                                                              detection_objects,

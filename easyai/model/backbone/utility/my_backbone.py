@@ -13,29 +13,20 @@ class MyBackbone(BaseBackbone):
         super().__init__()
         self.createTaskList = CreateModuleList()
         self.modelDefine = modelDefine
-        self.outChannelList = []
-        self.createModel()
+        self.create_block_list()
 
-    def createModel(self):
+    def create_block_list(self):
+        self.out_channels = []
+        self.index = 0
+
         outChannels = []
         self.createTaskList.createOrderedDict(self.modelDefine, outChannels)
         blockDict = self.createTaskList.getBlockList()
-        self.outChannelList = self.createTaskList.getOutChannelList()
+
+        self.out_channels = self.createTaskList.getOutChannelList()
         for key, block in blockDict.items():
             name = "base_%s" % key
             self.add_module(name, block)
-
-    def getOutChannelList(self):
-        return self.outChannelList
-
-    def setFreezeBn(self, freezeBn):
-        for m in self.modules():
-            if freezeBn and isinstance(m, nn.BatchNorm2d):
-                m.eval()
-
-    def printBlockName(self):
-        for key in self._modules.keys():
-            print(key)
 
     def forward(self, x):
         base_outputs = []

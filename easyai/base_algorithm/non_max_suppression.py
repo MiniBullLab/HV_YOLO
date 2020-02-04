@@ -3,6 +3,7 @@
 # Author:
 
 import numpy as np
+from easyai.helper.dataType import DetectionObject
 
 
 class NonMaxSuppression():
@@ -13,6 +14,8 @@ class NonMaxSuppression():
 
     def multi_class_nms(self, input_objects, threshold):
         result = []
+        if len(input_objects) == 0:
+            return result
         class_index_list = self.get_class_name(input_objects)
         sort_inputs = self.numpy_sort_objects(input_objects)
         for class_index in class_index_list:
@@ -34,6 +37,49 @@ class NonMaxSuppression():
             pass
         elif self.nms_style == 'SOFT_Gaussian':
             pass
+        return result
+
+    def fast_multi_class_nms(self, input_objects, threshold):
+        result = []
+        if len(input_objects) == 0:
+            return result
+
+        inputs = self.objects_to_numpy(input_objects)
+        indexs = np.argsort((-inputs[:, 4]))
+        inputs = inputs[indexs]
+        class_index_list = inputs[:, -1].unique()
+
+        temp_result = []
+        for class_index in class_index_list:
+            class_objects = inputs[inputs[:, -1] == class_index]
+            temp = self.fast_nms(class_objects, threshold)
+            temp_result.extend(temp)
+
+        for value in temp_result:
+            temp_object = DetectionObject()
+            temp_object.min_corner.x = value[0]
+            temp_object.min_corner.y = value[1]
+            temp_object.max_corner.x = value[2]
+            temp_object.max_corner.y = value[3]
+            temp_object.objectConfidence = value[4]
+            temp_object.classConfidence = value[5]
+            temp_object.classIndex = value[6]
+            result.append(temp_object)
+        return result
+
+    def fast_nms(self, numpy_objects, threshold):
+        result = []
+        count = len(numpy_objects)
+        if count == 1:
+            result.append(numpy_objects)
+            return result
+        if self.nms_style == 'OR':
+            while numpy_objects.shape[0]:
+                result.append(numpy_objects[:1])  # save highest conf detection
+                if len(numpy_objects) == 1:  # Stop if we're at the last detection
+                    break
+                iou = self.bbox_iou(numpy_objects[0], dc[1:])  # iou with other boxes
+                dc = dc[1:][iou < threshold]  # remove ious > threshold
         return result
 
     def or_nms(self, input_objects, threshold):
@@ -153,4 +199,42 @@ class NonMaxSuppression():
                 convex_area = (max_x - min_x) * (max_y - min_y)
                 iou = iou - (convex_area - union_area) / convex_area  # GIoU
         return iou
+
+    def bbox_iou(self, box1, box2):
+        # Returns the IoU of box1 to box2. box1 is 4, box2 is nx4
+        box2 = box2.t()
+
+        # Get the coordinates of bounding boxes
+        # x1, y1, x2, y2 = box1
+        b1_x1, b1_y1, b1_x2, b1_y2 = box1[0], box1[1], box1[2], box1[3]
+        b2_x1, b2_y1, b2_x2, b2_y2 = box2[0], box2[1], box2[2], box2[3]
+
+        # Intersection area
+        inter_area = (np.min(b1_x2, b2_x2) - np.max(b1_x1, b2_x1)).clamp(0) * \
+                     (np.min(b1_y2, b2_y2) - np.max(b1_y1, b2_y1)).clamp(0)
+
+        # Union Area
+        union_area = ((b1_x2 - b1_x1) * (b1_y2 - b1_y1) + 1e-16) + \
+                     (b2_x2 - b2_x1) * (b2_y2 - b2_y1) - inter_area
+
+        iou = inter_area / union_area  # iou
+        if self.is_GIoU:  # Generalized IoU https://arxiv.org/pdf/1902.09630.pdf
+            c_x1, c_x2 = np.min(b1_x1, b2_x1), np.max(b1_x2, b2_x2)
+            c_y1, c_y2 = np.min(b1_y1, b2_y1), np.max(b1_y2, b2_y2)
+            c_area = (c_x2 - c_x1) * (c_y2 - c_y1)  # convex area
+            return iou - (c_area - union_area) / c_area  # GIoU
+        return iou
+
+    def objects_to_numpy(self, input_objects):
+        result = np.zeros((len(input_objects), 7), dtype=np.float32)
+        for index, temp_object in enumerate(input_objects):
+            result[index, :] = np.array([temp_object.min_corner.x,
+                                         temp_object.min_corner.y,
+                                         temp_object.max_corner.x,
+                                         temp_object.max_corner.y,
+                                         temp_object.objectConfidence,
+                                         temp_object.classConfidence,
+                                         temp_object.classIndex])
+        return result
+
 

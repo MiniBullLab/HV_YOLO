@@ -6,6 +6,8 @@ import os
 from easyai.base_name.model_name import ModelName
 from easyai.model.utility.model_parse import ModelParse
 from easyai.model.utility.my_model import MyModel
+from easyai.model.cls.vgg_cls import VggNetCls
+from easyai.model.cls.inceptionv4_cls import Inceptionv4Cls
 from easyai.model.sr.MSRResNet import MSRResNet
 from easyai.model.sr.MySRModel import MySRModel
 from easyai.model.seg.mobileV2FCN import MobileV2FCN
@@ -35,7 +37,11 @@ class ModelFactory():
 
     def get_model_from_name(self, modelName):
         model = None
-        if modelName == ModelName.MSRResNet:
+        if modelName == ModelName.VggNetCls:
+            model = VggNetCls()
+        elif modelName == ModelName.Inceptionv4Cls:
+            model = Inceptionv4Cls()
+        elif modelName == ModelName.MSRResNet:
             model = MSRResNet(in_nc=1, upscale_factor=3)
         elif modelName == ModelName.MySRModel:
             model = MySRModel(upscale_factor=3)
@@ -43,4 +49,6 @@ class ModelFactory():
             model = MobileV2FCN()
         elif modelName == ModelName.ComplexYOLO:
             model = ComplexYOLO()
+        else:
+            print("model error!")
         return model

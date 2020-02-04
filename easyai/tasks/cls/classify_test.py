@@ -25,7 +25,10 @@ class ClassifyTest():
         self.torchModelProcess.modelTestInit(self.model)
 
     def test(self, val_path):
-        dataloader = get_classify_val_dataloader(val_path, classify_config.imgSize, 1)
+        dataloader = get_classify_val_dataloader(val_path,
+                                                 classify_config.TRAIN_MEAN,
+                                                 classify_config.TRAIN_STD,
+                                                 classify_config.imgSize, 1)
         for index, (images, labels) in enumerate(dataloader):
             output_list = self.model(images.to(self.device))
             output = self.compute_output(output_list)

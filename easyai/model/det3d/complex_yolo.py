@@ -19,13 +19,14 @@ class ComplexYOLO(BaseModel):
         self.set_name(ModelName.ComplexYOLO)
         self.bn_name = BatchNormType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
+
         self.factory = BackboneFactory()
-        self.lossList = []
+        self.create_block_list()
+
+    def create_block_list(self):
         self.out_channels = []
         self.index = 0
-        self.create_model()
 
-    def create_model(self):
         basic_model = self.factory.get_base_model("./cfg/complex-darknet19.cfg")
         base_out_channels = basic_model.getOutChannelList()
         self.add_block_list(BlockType.BaseNet, basic_model, base_out_channels[-1])
@@ -73,19 +74,8 @@ class ComplexYOLO(BaseModel):
                           bias=True)
         self.add_block_list(LayerType.Convolutional, conv4, output_channel)
 
-    def create_loss(self):
-        pass
-
-    def add_block_list(self, block_name, block, output_channel):
-        block_name = "%s_%d" % (block_name, self.index)
-        self.add_module(block_name, block)
-        self.index += 1
-        self.out_channels.append(output_channel)
-
-    def freeze_bn(self, is_freeze):
-        for m in self.modules():
-            if is_freeze and isinstance(m, nn.BatchNorm2d):
-                m.eval()
+    def create_loss(self, input_dict=None):
+        self.lossList = []
 
     def forward(self, x):
         base_outputs = []

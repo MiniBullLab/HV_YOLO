@@ -12,6 +12,7 @@ from easyai.model.backbone.cls.darknet import darknet21, darknet53
 from easyai.model.backbone.cls.darknet import darknet21_dilated8, darknet21_dilated16
 from easyai.model.backbone.cls.darknet import darknet53_dilated8, darknet53_dilated16
 from easyai.model.backbone.cls.googlenet import GoogleNet
+from easyai.model.backbone.cls.inceptionv4 import inceptionv4, inception_resnetv2
 from easyai.model.backbone.cls.vgg import vgg13, vgg16, vgg19
 from easyai.model.backbone.cls.squeezenet import SqueezeNet, DilatedSqueezeNet
 from easyai.model.backbone.cls.densenet import densenet121, densenet201, densenet169, densenet161
@@ -71,6 +72,10 @@ class BackboneFactory():
             result = darknet53_dilated16()
         elif net_name == BackboneName.GoogleNet:
             result = GoogleNet()
+        elif net_name == BackboneName.InceptionV4:
+            result = inceptionv4()
+        elif net_name == BackboneName.InceptionResNetV2:
+            result = inception_resnetv2()
         elif net_name == BackboneName.Vgg13:
             result = vgg13()
         elif net_name == BackboneName.Vgg16:

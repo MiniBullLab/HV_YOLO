@@ -50,7 +50,10 @@ class ClassifyTrain():
 
     def train(self, train_path, val_path):
 
-        dataloader = get_classify_train_dataloader(train_path, classify_config.imgSize,
+        dataloader = get_classify_train_dataloader(train_path,
+                                                   classify_config.TRAIN_MEAN,
+                                                   classify_config.TRAIN_STD,
+                                                   classify_config.imgSize,
                                                    classify_config.train_batch_size)
 
         total_images = len(dataloader)

@@ -33,12 +33,12 @@ class ShuffleNetV2(BaseBackbone):
         self.bnName = bnName
         self.first_output = 24
 
-        self.outChannelList = []
+        self.create_block_list()
+
+    def create_block_list(self):
+        self.out_channels = []
         self.index = 0
 
-        self.createBlockList()
-
-    def createBlockList(self):
         layer1 = ConvBNActivationBlock(in_channels=self.data_channel,
                                        out_channels=self.first_output,
                                        kernel_size=3,
@@ -46,10 +46,10 @@ class ShuffleNetV2(BaseBackbone):
                                        padding=1,
                                        bnName=self.bnName,
                                        activationName=self.activationName)
-        self.addBlockList(layer1.get_name(), layer1, self.first_output)
+        self.add_block_list(layer1.get_name(), layer1, self.first_output)
 
         layer2 = MyMaxPool2d(kernel_size=3, stride=2)
-        self.addBlockList(LayerType.MyMaxPool2d, layer2, self.first_output)
+        self.add_block_list(LayerType.MyMaxPool2d, layer2, self.first_output)
 
         self.in_channels = self.first_output
         for index, num_block in enumerate(self.num_blocks):
@@ -62,24 +62,11 @@ class ShuffleNetV2(BaseBackbone):
                           bnName, activationName):
         downLayer = DownBlock(self.in_channels, out_channels, stride=stride,
                             bnName=bnName, activationName=activationName)
-        self.addBlockList(downLayer.get_name(), downLayer, out_channels)
+        self.add_block_list(downLayer.get_name(), downLayer, out_channels)
         for _ in range(num_blocks):
             tempLayer = BasicBlock(out_channels, out_channels, stride=1, dilation=dilation,
                  bnName=bnName, activationName=activationName)
-            self.addBlockList(tempLayer.get_name(), tempLayer, out_channels)
-
-    def addBlockList(self, blockName, block, out_channel):
-        blockName = "base_%s_%d" % (blockName, self.index)
-        self.add_module(blockName, block)
-        self.outChannelList.append(out_channel)
-        self.index += 1
-
-    def getOutChannelList(self):
-        return self.outChannelList
-
-    def printBlockName(self):
-        for key in self._modules.keys():
-            print(key)
+            self.add_block_list(tempLayer.get_name(), tempLayer, out_channels)
 
     def forward(self, x):
         output_list = []

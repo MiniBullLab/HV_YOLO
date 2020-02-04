@@ -16,6 +16,10 @@ class ImageDataSetProcess():
     def image_normaliza(self, image):
         return image / 255.0
 
+    def numpy_normaliza(self, input_data, mean, std):
+        result = (input_data - mean) / std
+        return result
+
     def image_transpose(self, images):
         result = None
         if images is None:

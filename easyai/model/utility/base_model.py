@@ -2,19 +2,15 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+from easyai.model.utility.abstract_model import *
 
 
-class BaseModel(nn.Module):
+class BaseModel(AbstractModel):
 
     def __init__(self):
         super().__init__()
-        self.model_name = "None"
+        self.lossList = []
 
-    def set_name(self, name):
-        self.model_name = name
-
-    def get_name(self):
-        return self.model_name
+    @abc.abstractmethod
+    def create_loss(self, input_dict=None):
+        pass

@@ -8,6 +8,7 @@ from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.darknet_block import BasicBlock
 
+
 __all__ = ['darknet21', 'darknet53',
            'darknet21_dilated8', 'darknet21_dilated16',
            'darknet53_dilated8', 'darknet53_dilated16']
@@ -29,12 +30,12 @@ class DarkNet(BaseBackbone):
         self.bnName = bnName
         self.first_output = 32
 
-        self.outChannelList = []
-        self.index = 0
-
         self.create_block_list()
 
     def create_block_list(self):
+        self.out_channels = []
+        self.index = 0
+
         layer1 = ConvBNActivationBlock(in_channels=self.data_channel,
                                        out_channels=self.first_output,
                                        kernel_size=3,
@@ -42,7 +43,7 @@ class DarkNet(BaseBackbone):
                                        padding=1,
                                        bnName=self.bnName,
                                        activationName=self.activationName)
-        self.addBlockList(layer1.get_name(), layer1, self.first_output)
+        self.add_block_list(layer1.get_name(), layer1, self.first_output)
 
         self.in_channel = self.first_output
         for index, num_block in enumerate(self.num_blocks):
@@ -68,26 +69,13 @@ class DarkNet(BaseBackbone):
                                             bnName=bnName,
                                             activationName=activationName)
         name = "down_%s" % down_layers.get_name()
-        self.addBlockList(name, down_layers, out_channel)
+        self.add_block_list(name, down_layers, out_channel)
 
         planes = [self.in_channel, out_channel]
         for _ in range(0, num_block):
             layer = BasicBlock(out_channel, planes, stride=1, dilation=dilation,
                                bnName=bnName, activationName=activationName)
-            self.addBlockList(layer.get_name(), layer, out_channel)
-
-    def addBlockList(self, blockName, block, out_channel):
-        blockName = "base_%s_%d" % (blockName, self.index)
-        self.add_module(blockName, block)
-        self.outChannelList.append(out_channel)
-        self.index += 1
-
-    def getOutChannelList(self):
-        return self.outChannelList
-
-    def printBlockName(self):
-        for key in self._modules.keys():
-            print(key)
+            self.add_block_list(layer.get_name(), layer, out_channel)
 
     def forward(self, x):
         output_list = []

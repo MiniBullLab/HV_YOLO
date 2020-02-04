@@ -19,6 +19,8 @@ class BackboneName():
     ShuffleNetV2_1_0 = "shufflenetv2_1_0"
     MobileNetV2_1_0 = "mobilenetv2_1_0"
     GoogleNet = "googlenet"
+    InceptionV4 = "inceptionv4"
+    InceptionResNetV2 = "inception_resnetv2"
     Vgg13 = "vgg13"
     Vgg16 = "vgg16"
     Vgg19 = "vgg19"

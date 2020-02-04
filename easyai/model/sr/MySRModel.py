@@ -20,6 +20,12 @@ class MySRModel(BaseModel):
 
         self._initialize_weights()
 
+    def create_block_list(self):
+        pass
+
+    def create_loss(self, input_dict=None):
+        pass
+
     def forward(self, x):
         x = self.relu(self.conv1(x))
         x = self.relu(self.conv2(x))

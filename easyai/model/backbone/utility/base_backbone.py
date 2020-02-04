@@ -2,19 +2,17 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+from easyai.model.utility.abstract_model import *
 
 
-class BaseBackbone(nn.Module):
+class BaseBackbone(AbstractModel):
 
     def __init__(self):
         super().__init__()
-        self.model_name = "None"
 
-    def set_name(self, name):
-        self.model_name = name
+    def get_outchannel_list(self):
+        return self.out_channels
 
-    def get_name(self):
-        return self.model_name
+    def print_block_name(self):
+        for key in self._modules.keys():
+            print(key)

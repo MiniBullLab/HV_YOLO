@@ -19,16 +19,28 @@ class MyModel(BaseModel):
         self.createTaskList = CreateModuleList()
         self.modelDefine = modelDefine
         self.cfg_dir = cfg_dir
-        self.lossList = []
-        self.createModel()
 
-    def createModel(self):
+        self.create_block_list()
+
+    def create_block_list(self):
         basicModel = self.creatBaseModel()
         self.add_module(BlockType.BaseNet, basicModel)
         taskBlockDict = self.createTask(basicModel)
         for key, block in taskBlockDict.items():
             self.add_module(key, block)
-        self.lossList = self.createLoss(taskBlockDict)
+        self.create_loss(input_dict=taskBlockDict)
+
+    def create_loss(self, input_dict=None):
+        self.lossList = []
+        for key, block in input_dict.items():
+            if LossType.CrossEntropy2d in key:
+                self.lossList.append(block)
+            elif LossType.OhemCrossEntropy2d in key:
+                self.lossList.append(block)
+            elif LossType.BinaryCrossEntropy2d in key:
+                self.lossList.append(block)
+            elif LossType.YoloLoss in key:
+                self.lossList.append(block)
 
     def creatBaseModel(self):
         result = None
@@ -49,24 +61,6 @@ class MyModel(BaseModel):
             self.createTaskList.createOrderedDict(self.modelDefine, outChannels)
             blockDict = self.createTaskList.getBlockList()
         return blockDict
-
-    def createLoss(self, taskBlockDict):
-        lossResult = []
-        for key, block in taskBlockDict.items():
-            if LossType.CrossEntropy2d in key:
-                lossResult.append(block)
-            elif LossType.OhemCrossEntropy2d in key:
-                lossResult.append(block)
-            elif LossType.BinaryCrossEntropy2d in key:
-                lossResult.append(block)
-            elif LossType.YoloLoss in key:
-                lossResult.append(block)
-        return lossResult
-
-    def setFreezeBn(self, freezeBn):
-        for m in self.modules():
-            if freezeBn and isinstance(m, nn.BatchNorm2d):
-                m.eval()
 
     def forward(self, x):
         base_outputs = []

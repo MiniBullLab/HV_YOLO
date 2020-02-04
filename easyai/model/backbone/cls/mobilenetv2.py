@@ -29,12 +29,12 @@ class MobileNetV2(BaseBackbone):
         self.expand_ratios = expand_ratios
         self.first_output = 32
 
-        self.outChannelList = []
-        self.index = 0
-
         self.create_block_list()
 
     def create_block_list(self):
+        self.out_channels = []
+        self.index = 0
+
         layer1 = ConvBNActivationBlock(in_channels=self.data_channel,
                                        out_channels=self.first_output,
                                        kernel_size=3,
@@ -42,7 +42,7 @@ class MobileNetV2(BaseBackbone):
                                        padding=1,
                                        bnName=self.bnName,
                                        activationName=self.activationName)
-        self.addBlockList(layer1.get_name(), layer1, self.first_output)
+        self.add_block_list(layer1.get_name(), layer1, self.first_output)
 
         self.in_channels = self.first_output
         for index, num_block in enumerate(self.num_blocks):
@@ -60,24 +60,11 @@ class MobileNetV2(BaseBackbone):
                                        expand_ratio=expand_ratio, dilation=dilation,
                                        bnName=bnName, activationName=activationName)
         name = "down_%s" % down_layers.get_name()
-        self.addBlockList(name, down_layers, out_channels)
+        self.add_block_list(name, down_layers, out_channels)
         for _ in range(num_blocks - 1):
             layer = InvertedResidual(out_channels, out_channels, stride=1, expand_ratio=expand_ratio,
                                      dilation=dilation, bnName=bnName, activationName=activationName)
-            self.addBlockList(layer.get_name(), layer, out_channels)
-
-    def addBlockList(self, blockName, block, out_channel):
-        blockName = "base_%s_%d" % (blockName, self.index)
-        self.add_module(blockName, block)
-        self.outChannelList.append(out_channel)
-        self.index += 1
-
-    def getOutChannelList(self):
-        return self.outChannelList
-
-    def printBlockName(self):
-        for key in self._modules.keys():
-            print(key)
+            self.add_block_list(layer.get_name(), layer, out_channels)
 
     def forward(self, x):
         output_list = []

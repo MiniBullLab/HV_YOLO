@@ -38,8 +38,10 @@ class VGG(BaseBackbone):
         self.activationName = activationName
         self.bnName = bnName
         self.vgg_cfg = VGG.CONFIG_DICT.get(vgg_name, None)
+        self.create_block_list()
 
-        self.outChannelList = []
+    def create_block_list(self):
+        self.out_channels = []
         self.index = 0
 
         self.make_layers(self.vgg_cfg)
@@ -49,7 +51,7 @@ class VGG(BaseBackbone):
         for v in cfg:
             if v == 'M':
                 temp_layer = nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=False)
-                self.addBlockList(LayerType.MyMaxPool2d, temp_layer, in_channels)
+                self.add_block_list(LayerType.MyMaxPool2d, temp_layer, in_channels)
             else:
                 conv2d = ConvBNActivationBlock(in_channels=in_channels,
                                                out_channels=v,
@@ -59,21 +61,8 @@ class VGG(BaseBackbone):
                                                dilation=1,
                                                bnName=self.bnName,
                                                activationName=self.activationName)
-                self.addBlockList(conv2d.get_name(), conv2d, v)
+                self.add_block_list(conv2d.get_name(), conv2d, v)
                 in_channels = v
-
-    def addBlockList(self, blockName, block, out_channel):
-        blockName = "base_%s_%d" % (blockName, self.index)
-        self.add_module(blockName, block)
-        self.outChannelList.append(out_channel)
-        self.index += 1
-
-    def getOutChannelList(self):
-        return self.outChannelList
-
-    def printBlockName(self):
-        for key in self._modules.keys():
-            print(key)
 
     def forward(self, x):
         output_list = []

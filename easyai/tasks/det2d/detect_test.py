@@ -43,7 +43,7 @@ class DetectionTest():
                 output_list = self.model(input_image.to(self.device))
                 output = self.compute_output(output_list)
                 result = self.result_process.get_detection_result(output, 5e-3)
-            detection_objects = self.nms_process.multi_class_nms(result, detect_config.nmsThresh)
+            detection_objects = self.nms_process.fast_multi_class_nms(result, detect_config.nmsThresh)
             detection_objects = self.result_process.resize_detection_objects(src_image.numpy()[0],  # error tensor error not numpy
                                                                              detect_config.imgSize,
                                                                              detection_objects,

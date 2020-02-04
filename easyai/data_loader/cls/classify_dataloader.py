@@ -10,12 +10,12 @@ from easyai.data_loader.cls.classify_dataset_process import ClassifyDatasetProce
 
 class ClassifyDataloader(data.Dataset):
 
-    def __init__(self, train_path, image_size=(416, 416)):
+    def __init__(self, train_path, mean=0, std=1, image_size=(416, 416)):
         self.image_size = image_size
         self.classify_sample = ClassifySample(train_path)
         self.classify_sample.read_sample(flag=0)
         self.image_process = ImageProcess()
-        self.dataset_process = ClassifyDatasetProcess()
+        self.dataset_process = ClassifyDatasetProcess(mean, std)
 
     def __getitem__(self, index):
         img_path, label = self.classify_sample.get_sample_path(index)
@@ -28,15 +28,17 @@ class ClassifyDataloader(data.Dataset):
         return self.classify_sample.get_sample_count()
 
 
-def get_classify_train_dataloader(train_path, image_size, batch_size, num_workers=8):
-    dataloader = ClassifyDataloader(train_path, image_size)
+def get_classify_train_dataloader(train_path, mean, std, image_size,
+                                  batch_size, num_workers=8):
+    dataloader = ClassifyDataloader(train_path, mean, std, image_size)
     result = data.DataLoader(dataset=dataloader, num_workers=num_workers,
                              batch_size=batch_size, shuffle=True)
     return result
 
 
-def get_classify_val_dataloader(val_path, image_size, batch_size, num_workers=8):
-    dataloader = ClassifyDataloader(val_path, image_size)
+def get_classify_val_dataloader(val_path, mean, std, image_size,
+                                batch_size, num_workers=8):
+    dataloader = ClassifyDataloader(val_path, mean, std, image_size)
     result = data.DataLoader(dataset=dataloader, num_workers=num_workers,
                              batch_size=batch_size, shuffle=True)
     return result

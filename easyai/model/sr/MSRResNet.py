@@ -74,6 +74,12 @@ class MSRResNet(BaseModel):
         if self.upscale_factor == 4:
             self.initialize_weights(self.upconv2, 0.1)
 
+    def create_block_list(self):
+        pass
+
+    def create_loss(self, input_dict=None):
+        pass
+
     def forward(self, x):
         fea = self.lrelu(self.conv_first(x))
         out = self.recon_trunk(fea)
