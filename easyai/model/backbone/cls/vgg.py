@@ -41,7 +41,7 @@ class VGG(BaseBackbone):
         self.create_block_list()
 
     def create_block_list(self):
-        self.out_channels = []
+        self.block_out_channels = []
         self.index = 0
 
         self.make_layers(self.vgg_cfg)

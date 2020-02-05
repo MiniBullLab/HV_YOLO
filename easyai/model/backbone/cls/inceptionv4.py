@@ -43,7 +43,7 @@ class InceptionV4(BaseBackbone):
         self.create_block_list()
 
     def create_block_list(self):
-        self.out_channels = []
+        self.block_out_channels = []
         self.index = 0
 
         stem_block = InceptionStem(self.data_channel, bn_name=self.bn_name,
@@ -107,7 +107,7 @@ class InceptionResNetV2(BaseBackbone):
         self.create_block_list()
 
     def create_block_list(self):
-        self.out_channels = []
+        self.block_out_channels = []
         self.index = 0
 
         stem_block = InceptionStem(self.data_channel, bn_name=self.bn_name,
@@ -151,8 +151,12 @@ class InceptionResNetV2(BaseBackbone):
 
 
 def inceptionv4():
-    return InceptionV4(num_blocks=(4, 7, 3))
+    model = InceptionV4(num_blocks=(4, 7, 3))
+    model.set_name(BackboneName.InceptionV4)
+    return model
 
 
 def inception_resnetv2():
-    return InceptionResNetV2(num_blocks=(5, 10, 5))
+    model = InceptionResNetV2(num_blocks=(5, 10, 5))
+    model.set_name(BackboneName.InceptionResNetV2)
+    return model

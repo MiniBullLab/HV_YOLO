@@ -30,7 +30,7 @@ class Inceptionv4Cls(BaseModel):
         self.index = 0
 
         backbone = self.factory.get_base_model(BackboneName.InceptionV4)
-        base_out_channels = backbone.getOutChannelList()
+        base_out_channels = backbone.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])
 
         avgpool = nn.AvgPool2d(7)

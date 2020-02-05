@@ -13,7 +13,7 @@ class AbstractModel(nn.Module):
     def __init__(self):
         super().__init__()
         self.model_name = "None"
-        self.out_channels = []
+        self.block_out_channels = []
         self.index = 0
 
     @abc.abstractmethod
@@ -30,7 +30,7 @@ class AbstractModel(nn.Module):
         block_name = "%s_%d" % (block_name, self.index)
         self.add_module(block_name, block)
         self.index += 1
-        self.out_channels.append(output_channel)
+        self.block_out_channels.append(output_channel)
 
     def freeze_bn(self, is_freeze):
         for m in self.modules():

@@ -10,6 +10,7 @@ class ModelName():
 
     VggNetCls = "VggNetCls"
     Inceptionv4Cls = "Inceptionv4Cls"
+    SENetCls = "SENetCls"
 
     MSRResNet = "MSRResNet"
     MySRModel = "MySRModel"

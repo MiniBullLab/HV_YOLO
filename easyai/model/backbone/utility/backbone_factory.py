@@ -17,6 +17,13 @@ from easyai.model.backbone.cls.vgg import vgg13, vgg16, vgg19
 from easyai.model.backbone.cls.squeezenet import SqueezeNet, DilatedSqueezeNet
 from easyai.model.backbone.cls.densenet import densenet121, densenet201, densenet169, densenet161
 from easyai.model.backbone.cls.densenet import densenet121_dilated8, densenet121_dilated16
+from easyai.model.backbone.cls.senet import se_resnet18, se_resnet34, se_resnet50, se_resnet101, se_resnet152
+from easyai.model.backbone.cls.resnext import resnext50, resnext101, resnext152
+from easyai.model.backbone.cls.nasnet import nasnet
+from easyai.model.backbone.cls.preactresnet import preactresnet18, preactresnet34, preactresnet50
+from easyai.model.backbone.cls.preactresnet import preactresnet101, preactresnet152
+from easyai.model.backbone.cls.xception import xception
+from easyai.model.backbone.cls.attention import attention56, attention92
 from easyai.model.backbone.utility.my_backbone import MyBackbone
 from easyai.model.utility.model_parse import ModelParse
 
@@ -98,6 +105,40 @@ class BackboneFactory():
             result = densenet201()
         elif net_name == BackboneName.Densenet161:
             result = densenet161()
+        elif net_name == BackboneName.SEResNet18:
+            result = se_resnet18()
+        elif net_name == BackboneName.SEResNet34:
+            result = se_resnet34()
+        elif net_name == BackboneName.SEResNet50:
+            result = se_resnet50()
+        elif net_name == BackboneName.SEResNet101:
+            result = se_resnet101()
+        elif net_name == BackboneName.SEResNet152:
+            result = se_resnet152()
+        elif net_name == BackboneName.ResNext50:
+            result = resnext50()
+        elif net_name == BackboneName.ResNext101:
+            result = resnext101()
+        elif net_name == BackboneName.ResNext152:
+            result = resnext152()
+        elif net_name == BackboneName.NasNet:
+            result = nasnet()
+        elif net_name == BackboneName.PreActResNet18:
+            result = preactresnet18()
+        elif net_name == BackboneName.PreActResNet34:
+            result = preactresnet34()
+        elif net_name == BackboneName.PreActResNet50:
+            result = preactresnet50()
+        elif net_name == BackboneName.PreActResNet101:
+            result = preactresnet101()
+        elif net_name == BackboneName.PreActResNet152:
+            result = preactresnet152()
+        elif net_name == BackboneName.Xception:
+            result = xception()
+        elif net_name == BackboneName.Attention56:
+            result = attention56()
+        elif net_name == BackboneName.Attention92:
+            result = attention92()
         else:
             print("base model:%s error" % net_name)
         return result

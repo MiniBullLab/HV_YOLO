@@ -55,8 +55,11 @@ class BlockType():
     ConvBNActivationBlock1d = "convBNActivationBlock1d"
 
     ConvBNActivationBlock = "convBNActivationBlock"
-    ConvActivationBlock = "convActivationBlock"
     BNActivationConvBlock = "bnActivationConvBlock"
+    ActivationConvBNBlock = "activationConvBNBlock"
+
+    SeperableConv2dBlock = "seperableConv2dBlock"
+    ConvActivationBlock = "convActivationBlock"
 
     FcBNActivationBlock = "fcBNActivationBlock"
 

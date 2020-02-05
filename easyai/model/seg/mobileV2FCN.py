@@ -30,7 +30,7 @@ class MobileV2FCN(BaseModel):
         self.index = 0
 
         basic_model = MobileNetV2(bnName=self.bn_name, activationName=self.activation_name)
-        base_out_channels = basic_model.getOutChannelList()
+        base_out_channels = basic_model.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, basic_model, base_out_channels[-1])
 
         input_channel = self.out_channels[-1]

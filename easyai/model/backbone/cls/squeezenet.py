@@ -27,7 +27,7 @@ class SqueezeNet(BaseBackbone):
         self.create_block_list()
 
     def create_block_list(self):
-        self.out_channels = []
+        self.block_out_channels = []
         self.index = 0
 
         layer1 = ConvActivationBlock(in_channels=self.data_channel,
@@ -109,7 +109,7 @@ class DilatedSqueezeNet(BaseBackbone):
         self.create_block_list()
 
     def create_block_list(self):
-        self.out_channels = []
+        self.block_out_channels = []
         self.index = 0
 
         layer1 = ConvActivationBlock(in_channels=self.data_channel,

@@ -13,11 +13,11 @@ from easyai.model.base_block.batchnorm import BatchNormalizeFunction
 class ConvBNActivationBlock1d(BaseBlock):
 
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
-                 dilation=1, groups=1, bnName=BatchNormType.BatchNormalize1d,
+                 dilation=1, groups=1, bias=True, bnName=BatchNormType.BatchNormalize1d,
                  activationName=ActivationType.ReLU):
         super().__init__(BlockType.ConvBNActivationBlock1d)
         conv = nn.Conv1d(in_channels, out_channels, kernel_size,
-                         stride, padding, dilation, groups, bias=True)
+                         stride, padding, dilation, groups, bias=bias)
         bn = BatchNormalizeFunction.get_function(bnName, out_channels)
         activation = ActivationFunction.get_function(activationName)
         self.block = nn.Sequential(OrderedDict([
@@ -34,10 +34,10 @@ class ConvBNActivationBlock1d(BaseBlock):
 class ConvBNBlock1d(BaseBlock):
 
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
-                 dilation=1, groups=1, bnName=BatchNormType.BatchNormalize1d):
+                 dilation=1, groups=1, bias=True, bnName=BatchNormType.BatchNormalize1d):
         super().__init__(BlockType.ConvBNBlock1d)
         conv = nn.Conv1d(in_channels, out_channels, kernel_size,
-                         stride, padding, dilation, groups, bias=True)
+                         stride, padding, dilation, groups, bias=bias)
         bn = BatchNormalizeFunction.get_function(bnName, out_channels)
         self.block = nn.Sequential(OrderedDict([
             (LayerType.Convolutional1d, conv),
@@ -49,13 +49,28 @@ class ConvBNBlock1d(BaseBlock):
         return x
 
 
+class SeperableConv2dBlock(BaseBlock):
+
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
+                 dilation=1, bias=True):
+        super().__init__(BlockType.SeperableConv2dBlock)
+        self.depthwise = nn.Conv2d(in_channels, in_channels, kernel_size,
+                         stride, padding, dilation, in_channels, bias=bias)
+        self.pointwise = nn.Conv2d(in_channels, out_channels, 1, bias=bias)
+
+    def forward(self, x):
+        x = self.depthwise(x)
+        x = self.pointwise(x)
+        return x
+
+
 class ConvActivationBlock(BaseBlock):
 
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
-                 dilation=1, groups=1, activationName=ActivationType.ReLU):
+                 dilation=1, groups=1, bias=True, activationName=ActivationType.ReLU):
         super().__init__(BlockType.ConvActivationBlock)
         conv = nn.Conv2d(in_channels, out_channels, kernel_size,
-                         stride, padding, dilation, groups, bias=True)
+                         stride, padding, dilation, groups, bias=bias)
         activation = ActivationFunction.get_function(activationName)
         self.block = nn.Sequential(OrderedDict([
             (LayerType.Convolutional, conv),
@@ -70,11 +85,11 @@ class ConvActivationBlock(BaseBlock):
 class ConvBNActivationBlock(BaseBlock):
 
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
-                 dilation=1, groups=1, bnName=BatchNormType.BatchNormalize2d,
+                 dilation=1, groups=1, bias=False, bnName=BatchNormType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__(BlockType.ConvBNActivationBlock)
         conv = nn.Conv2d(in_channels, out_channels, kernel_size,
-                         stride, padding, dilation, groups, bias=False)
+                         stride, padding, dilation, groups, bias=bias)
         bn = BatchNormalizeFunction.get_function(bnName, out_channels)
         activation = ActivationFunction.get_function(activationName)
         self.block = nn.Sequential(OrderedDict([
@@ -85,19 +100,20 @@ class ConvBNActivationBlock(BaseBlock):
 
     def forward(self, x):
         x = self.block(x)
+        # print(self, x.shape)
         return x
 
 
 class BNActivationConvBlock(BaseBlock):
 
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
-                 dilation=1, groups=1, bnName=BatchNormType.BatchNormalize2d,
+                 dilation=1, groups=1, bias=False, bnName=BatchNormType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__(BlockType.BNActivationConvBlock)
         bn = BatchNormalizeFunction.get_function(bnName, in_channels)
         activation = ActivationFunction.get_function(activationName)
         conv = nn.Conv2d(in_channels, out_channels, kernel_size,
-                         stride, padding, dilation, groups, bias=False)
+                         stride, padding, dilation, groups, bias=bias)
         self.block = nn.Sequential(OrderedDict([
             (bnName, bn),
             (activationName, activation),
@@ -109,12 +125,34 @@ class BNActivationConvBlock(BaseBlock):
         return x
 
 
+class ActivationConvBNBlock(BaseBlock):
+
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
+                 dilation=1, groups=1, bias=True, bnName=BatchNormType.BatchNormalize2d,
+                 activationName=ActivationType.ReLU):
+        super().__init__(BlockType.ActivationConvBNBlock)
+        activation = ActivationFunction.get_function(activationName)
+        conv = nn.Conv2d(in_channels, out_channels, kernel_size,
+                         stride, padding, dilation, groups, bias=bias)
+        bn = BatchNormalizeFunction.get_function(bnName, out_channels)
+        self.block = nn.Sequential(OrderedDict([
+            (activationName, activation),
+            (LayerType.Convolutional, conv),
+            (bnName, bn)
+        ]))
+
+    def forward(self, x):
+        x = self.block(x)
+        return x
+
+
 class FcBNActivationBlock(BaseBlock):
 
-    def __init__(self, in_features, out_features, bnName=BatchNormType.BatchNormalize1d,
+    def __init__(self, in_features, out_features, bias=True,
+                 bnName=BatchNormType.BatchNormalize1d,
                  activationName=ActivationType.ReLU):
         super().__init__(BlockType.FcBNActivationBlock)
-        fc = nn.Linear(in_features, out_features)
+        fc = nn.Linear(in_features, out_features, bias=bias)
         bn = BatchNormalizeFunction.get_function(bnName, out_features)
         activation = ActivationFunction.get_function(activationName)
         self.block = nn.Sequential(OrderedDict([
@@ -178,19 +216,22 @@ class InvertedResidual(BaseBlock):
 
 class SEBlock(BaseBlock):
 
-    def __init__(self, channel, reduction=16):
+    def __init__(self, in_channel, reduction=16):
         super().__init__(BlockType.SEBlock)
-        self.avg_pool = GlobalAvgPool2d()
+        # self.avg_pool = GlobalAvgPool2d()
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Sequential(
-            nn.Linear(channel, channel // reduction),
+            nn.Linear(in_channel, in_channel // reduction),
             nn.ReLU(inplace=True),
-            nn.Linear(channel // reduction, channel),
+            nn.Linear(in_channel // reduction, in_channel),
             nn.Sigmoid())
 
     def forward(self, x):
         b, c, _, _ = x.size()
-        y = self.avg_pool(x).view(b, c)
-        y = self.fc(y).view(b, c, 1, 1)
+        y = self.avg_pool(x)
+        y = y.view(b, c)
+        y = self.fc(y)
+        y = y.view(b, c, 1, 1)
         return x * y
 
 

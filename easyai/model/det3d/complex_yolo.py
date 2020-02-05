@@ -28,7 +28,7 @@ class ComplexYOLO(BaseModel):
         self.index = 0
 
         basic_model = self.factory.get_base_model("./cfg/complex-darknet19.cfg")
-        base_out_channels = basic_model.getOutChannelList()
+        base_out_channels = basic_model.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, basic_model, base_out_channels[-1])
 
         input_channel = self.out_channels[-1]

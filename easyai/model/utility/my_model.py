@@ -56,7 +56,7 @@ class MyModel(BaseModel):
 
     def createTask(self, basicModel):
         blockDict = OrderedDict()
-        outChannels = basicModel.getOutChannelList()
+        outChannels = basicModel.get_outchannel_list()
         if basicModel:
             self.createTaskList.createOrderedDict(self.modelDefine, outChannels)
             blockDict = self.createTaskList.getBlockList()
