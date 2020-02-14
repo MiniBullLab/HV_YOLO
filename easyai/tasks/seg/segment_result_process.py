@@ -17,7 +17,8 @@ class SegmentResultProcess():
             result = prediction
         elif prediction.ndim == 3:
             result = np.max(prediction, axis=0)
-
+        elif prediction.ndim == 4:
+            result = np.max(prediction, axis=1)
         return result
 
     def resize_segmention_result(self, src_size, image_size,

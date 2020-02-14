@@ -15,8 +15,7 @@ class ClassifyTest(BaseTest):
     def __init__(self, cfg_path, gpu_id):
         super().__init__()
         self.classify_inference = Classify(cfg_path, gpu_id)
-        self.evaluation = ClassifyAccuracy()
-        self.topK = (1, )
+        self.evaluation = ClassifyAccuracy(top_k=(1,))
 
     def load_weights(self, weights_path):
         self.classify_inference.load_weights(weights_path)
@@ -28,9 +27,7 @@ class ClassifyTest(BaseTest):
                                                  classify_config.imgSize, 1)
         for index, (images, labels) in enumerate(dataloader):
             output = self.classify_inference.infer(images)
-            self.evaluation.compute_topk(output.data,
-                                         labels.to(output.device),
-                                         self.topK)
+            self.evaluation.torch_eval(output.data, labels.to(output.device))
         self.print_evaluation()
         return self.evaluation.get_top1()
 
