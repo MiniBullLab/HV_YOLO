@@ -38,20 +38,27 @@ class ImageDataSetProcess():
 
     def image_resize_square(self, src_image, image_size, color=(0, 0, 0)): # src_image h, w, c
         shape = src_image.shape[:2]  # shape = [height, width]
-        ratio = min(float(image_size[0]) / shape[1], float(image_size[1]) / shape[0])  # ratio  = old / new
+        src_size = (shape[1], shape[0])
+        ratio, pad_size = self.resize_square_size(src_size, image_size)
         new_shape = (round(shape[0] * ratio), round(shape[1] * ratio))
-        dw = image_size[0] - new_shape[1]  # width padding
-        dh = image_size[1] - new_shape[0]  # height padding
-        top = dh // 2
-        bottom = dh - (dh // 2)
-        left = dw // 2
-        right = dw - (dw // 2)
+        top = pad_size[1] // 2
+        bottom = pad_size[1] - (pad_size[1] // 2)
+        left = pad_size[0] // 2
+        right = pad_size[0] - (pad_size[0] // 2)
         image = cv2.resize(src_image, (new_shape[1], new_shape[0]),
                            interpolation=cv2.INTER_AREA)  # resized, no border
         image = cv2.copyMakeBorder(image, top, bottom, left, right,
                                    cv2.BORDER_CONSTANT, value=color)
-        pad_size = (dw, dh)
         return image, ratio, pad_size
+
+    def resize_square_size(self, src_size, dst_size):
+        # ratio  = old / new
+        ratio = min(float(dst_size[0]) / src_size[0], float(dst_size[1]) / src_size[1])
+        new_shape = (round(src_size[0] * ratio), round(src_size[1] * ratio))
+        dw = dst_size[0] - new_shape[0]  # width padding
+        dh = dst_size[1] - new_shape[1]  # height padding
+        pad_size = (dw, dh)
+        return ratio, pad_size
 
     def image_affine(self, src_image, matrix, border_value=250):
         result = None

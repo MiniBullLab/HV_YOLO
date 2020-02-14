@@ -4,8 +4,10 @@
 
 from easyai.base_name.block_name import BatchNormType, ActivationType
 from easyai.model.base_block.base_block import *
+from easyai.model.base_block.utility_layer import ActivationLayer, NormalizeLayer
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.utility_block import SeperableConv2dBlock
+from easyai.model.base_block.utility_block import SeparableConv2dBNActivation
 
 
 class XceptionBlockName():
@@ -13,6 +15,15 @@ class XceptionBlockName():
     EntryFlow = "entryFlow"
     MiddleFLowBlock = "middleFLowBlock"
     ExitFLow = "exitFLow"
+
+    DoubleSeparableConv2dBlock = "doubleSeparableConv2dBlock"
+    XceptionConvBlock = "xceptionConvBlock"
+    XceptionSumBlock = "xceptionSumBlock"
+    XceptionBlock = "xceptionBlock"
+
+    BlockA = "blockA"
+    FCAttention = "fcAttention"
+    Enc = "enc"
 
 
 class EntryFlow(BaseBlock):
@@ -187,6 +198,7 @@ class ExitFLow(BaseBlock):
                                  bias=False),
             nn.BatchNorm2d(728),
             nn.ReLU(),
+
             SeperableConv2dBlock(in_channels=728,
                                  out_channels=1024,
                                  kernel_size=3,
@@ -227,3 +239,176 @@ class ExitFLow(BaseBlock):
         output = shortcut + residual
         output = self.conv(output)
         return output
+
+
+class DoubleSeparableConv2dBlock(BaseBlock):
+
+    def __init__(self, channel_list, stride=1, dilation=1, relu_first=True,
+                 bn_name=BatchNormType.BatchNormalize2d,
+                 activation_name=ActivationType.ReLU):
+        super().__init__(XceptionBlockName.DoubleSeparableConv2dBlock)
+        self.sep_conv1 = SeparableConv2dBNActivation(inplanes=channel_list[0],
+                                                     planes=channel_list[1],
+                                                     stride=stride,
+                                                     dilation=dilation,
+                                                     relu_first=relu_first,
+                                                     bn_name=bn_name,
+                                                     activation_name=activation_name)
+        self.sep_conv2 = SeparableConv2dBNActivation(inplanes=channel_list[1],
+                                                     planes=channel_list[2],
+                                                     stride=stride,
+                                                     dilation=dilation,
+                                                     relu_first=relu_first,
+                                                     bn_name=bn_name,
+                                                     activation_name=activation_name)
+
+    def forward(self, x):
+        sc1 = self.sep_conv1(x)
+        sc2 = self.sep_conv2(sc1)
+        return sc2
+
+
+class XceptionConvBlock(BaseBlock):
+
+    def __init__(self, channel_list, stride=1, dilation=1, relu_first=True,
+                 bn_name=BatchNormType.BatchNormalize2d,
+                 activation_name=ActivationType.ReLU):
+        super().__init__(XceptionBlockName.XceptionConvBlock)
+        assert len(channel_list) == 4
+
+        self.conv = ConvBNActivationBlock(in_channels=channel_list[0],
+                                          out_channels=channel_list[-1],
+                                          kernel_size=1,
+                                          stride=stride,
+                                          bias=False,
+                                          bnName=bn_name,
+                                          activationName=ActivationType.Linear)
+        self.double_sep_conv = DoubleSeparableConv2dBlock(channel_list=channel_list[:3],
+                                                          dilation=dilation,
+                                                          relu_first=relu_first,
+                                                          bn_name=bn_name,
+                                                          activation_name=activation_name)
+        self.sep_conv = SeparableConv2dBNActivation(inplanes=channel_list[2],
+                                                    planes=channel_list[3],
+                                                    dilation=dilation,
+                                                    stride=stride,
+                                                    relu_first=relu_first,
+                                                    bn_name=bn_name,
+                                                    activation_name=activation_name)
+        self.last_inp_channels = channel_list[3]
+
+    def forward(self, inputs):
+        sc = self.double_sep_conv(inputs)
+        residual = self.sep_conv(sc)
+        shortcut = self.conv(inputs)
+        outputs = residual + shortcut
+        return outputs
+
+
+class XceptionSumBlock(BaseBlock):
+    def __init__(self, channel_list, stride=1, dilation=1, relu_first=True,
+                 bn_name=BatchNormType.BatchNormalize2d,
+                 activation_name=ActivationType.ReLU):
+        super().__init__(XceptionBlockName.XceptionSumBlock)
+        assert len(channel_list) == 4
+
+        self.double_sep_conv = DoubleSeparableConv2dBlock(channel_list=channel_list[:3],
+                                                          dilation=dilation,
+                                                          relu_first=relu_first,
+                                                          bn_name=bn_name,
+                                                          activation_name=activation_name)
+        self.sep_conv = SeparableConv2dBNActivation(inplanes=channel_list[2],
+                                                    planes=channel_list[3],
+                                                    dilation=dilation,
+                                                    stride=stride,
+                                                    relu_first=relu_first,
+                                                    bn_name=bn_name,
+                                                    activation_name=activation_name)
+        self.last_inp_channels = channel_list[3]
+
+    def forward(self, inputs):
+        sc = self.double_sep_conv(inputs)
+        residual = self.sep_conv(sc)
+        outputs = residual + inputs
+        return outputs
+
+
+# -------------------------------------------------
+#                   For DFANet
+# -------------------------------------------------
+class BlockA(BaseBlock):
+    def __init__(self, in_channels, out_channels, stride=1, dilation=1,
+                 start_with_relu=True, bn_name=BatchNormType.BatchNormalize2d,
+                 activation_name=ActivationType.ReLU):
+        super().__init__(XceptionBlockName.BlockA)
+        if out_channels != in_channels or stride != 1:
+            self.skip = ConvBNActivationBlock(in_channels=in_channels,
+                                              out_channels=out_channels,
+                                              kernel_size=1,
+                                              stride=stride,
+                                              bias=False,
+                                              bnName=bn_name,
+                                              activationName=ActivationType.Linear)
+        else:
+            self.skip = None
+
+        self.relu = ActivationLayer(activation_name)
+        rep = list()
+        inter_channels = out_channels // 4
+
+        if start_with_relu:
+            rep.append(self.relu)
+        rep.append(SeparableConv2dBNActivation(in_channels, inter_channels, 3, 1,
+                                               dilation, bn_name=bn_name,
+                                               activation_name=activation_name))
+        rep.append(NormalizeLayer(bn_name, inter_channels))
+
+        rep.append(self.relu)
+        rep.append(SeparableConv2dBNActivation(inter_channels, inter_channels, 3, 1,
+                                               dilation, bn_name=bn_name,
+                                               activation_name=activation_name))
+        rep.append(NormalizeLayer(bn_name, inter_channels))
+
+        if stride != 1:
+            rep.append(self.relu)
+            rep.append(SeparableConv2dBNActivation(inter_channels, out_channels, 3, stride,
+                                                   bn_name=bn_name,
+                                                   activation_name=activation_name))
+            rep.append(NormalizeLayer(bn_name, out_channels))
+        else:
+            rep.append(self.relu)
+            rep.append(SeparableConv2dBNActivation(inter_channels, out_channels, 3, 1,
+                                                   bn_name=bn_name,
+                                                   activation_name=activation_name))
+            rep.append(NormalizeLayer(bn_name, out_channels))
+        self.rep = nn.Sequential(*rep)
+
+    def forward(self, x):
+        out = self.rep(x)
+        if self.skip is not None:
+            skip = self.skip(x)
+        else:
+            skip = x
+        out = out + skip
+        return out
+
+
+class FCAttention(BaseBlock):
+    def __init__(self, in_channels, bn_name=BatchNormType.BatchNormalize2d,
+                 activation_name=ActivationType.ReLU):
+        super().__init__(XceptionBlockName.FCAttention)
+        self.avgpool = nn.AdaptiveAvgPool2d(1)
+        self.fc = nn.Linear(in_channels, 1000)
+        self.conv = ConvBNActivationBlock(in_channels=1000,
+                                          out_channels=in_channels,
+                                          kernel_size=1,
+                                          bias=False,
+                                          bnName=bn_name,
+                                          activationName=activation_name)
+
+    def forward(self, x):
+        n, c, _, _ = x.size()
+        att = self.avgpool(x).view(n, c)
+        att = self.fc(att).view(n, 1000, 1, 1)
+        att = self.conv(att)
+        return x * att.expand_as(x)

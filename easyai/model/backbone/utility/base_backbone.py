@@ -11,7 +11,7 @@ class BaseBackbone(AbstractModel):
         super().__init__()
 
     def get_outchannel_list(self):
-        return self.out_channels
+        return self.block_out_channels
 
     def print_block_name(self):
         for key in self._modules.keys():

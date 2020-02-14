@@ -20,10 +20,14 @@ from easyai.model.backbone.cls.densenet import densenet121_dilated8, densenet121
 from easyai.model.backbone.cls.senet import se_resnet18, se_resnet34, se_resnet50, se_resnet101, se_resnet152
 from easyai.model.backbone.cls.resnext import resnext50, resnext101, resnext152
 from easyai.model.backbone.cls.nasnet import nasnet
-from easyai.model.backbone.cls.preactresnet import preactresnet18, preactresnet34, preactresnet50
-from easyai.model.backbone.cls.preactresnet import preactresnet101, preactresnet152
+from easyai.model.backbone.cls.preact_resnet import preactresnet18, preactresnet34, preactresnet50
+from easyai.model.backbone.cls.preact_resnet import preactresnet101, preactresnet152
 from easyai.model.backbone.cls.xception import xception
+from easyai.model.backbone.cls.xception1 import Xception65, XceptionA
 from easyai.model.backbone.cls.attention import attention56, attention92
+from easyai.model.backbone.cls.efficientnet import EfficientNet
+from easyai.model.backbone.cls.dpn import dpn26, dpn92
+from easyai.model.backbone.cls.pnasnet import pnasnet_A, pnasnet_B
 from easyai.model.backbone.utility.my_backbone import MyBackbone
 from easyai.model.utility.model_parse import ModelParse
 
@@ -135,10 +139,24 @@ class BackboneFactory():
             result = preactresnet152()
         elif net_name == BackboneName.Xception:
             result = xception()
+        elif net_name == BackboneName.Xception65:
+            result = Xception65()
+        elif net_name == BackboneName.XceptionA:
+            result = XceptionA()
         elif net_name == BackboneName.Attention56:
             result = attention56()
         elif net_name == BackboneName.Attention92:
             result = attention92()
+        elif net_name == BackboneName.EfficientNet:
+            result = EfficientNet()
+        elif net_name == BackboneName.DPN26:
+            result = dpn26()
+        elif net_name == BackboneName.DPN92:
+            result = dpn92()
+        elif net_name == BackboneName.PNASNetA:
+            result = pnasnet_A()
+        elif net_name == BackboneName.PNASNetB:
+            result = pnasnet_B()
         else:
             print("base model:%s error" % net_name)
         return result

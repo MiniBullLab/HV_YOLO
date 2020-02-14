@@ -47,6 +47,13 @@ class BackboneName():
     PreActResNet101 = "preactresnet101"
     PreActResNet152 = "preactresnet152"
     Xception = "xception"
+    Xception65 = "xception65"
+    XceptionA = "xceptionA"
     Attention56 = "attention56"
     Attention92 = "attention92"
+    EfficientNet = "efficientnet"
+    DPN26 = "dpn26"
+    DPN92 = "dpn92"
+    PNASNetA = "pnasnet_A"
+    PNASNetB = "pnasnet_B"
 

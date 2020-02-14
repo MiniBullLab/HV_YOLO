@@ -78,7 +78,17 @@ class SegmentionTrain():
                 self.update_logger(idx, total_images, epoch, loss.data, t0)
                 t0 = time.time()
 
-            self.test(val_path, epoch)
+            save_model_path = self.save_train_model(epoch)
+            self.test(val_path, epoch, save_model_path)
+
+    def compute_loss(self, output_list, targets):
+        loss = 0
+        loss_count = len(self.model.lossList)
+        targets = targets.to(self.device)
+        for k in range(0, loss_count):
+            output, target = self.model.lossList[k].segment_resize(output_list[k], targets)
+            loss += self.model.lossList[k](output, target)
+        return loss
 
     def update_logger(self, index, total, epoch, loss_value, time_value):
         step = epoch * total + index
@@ -93,23 +103,18 @@ class SegmentionTrain():
                                                                             '%.7f' % lr,
                                                                             time.time() - time_value))
 
-    def compute_loss(self, output_list, targets):
-        loss = 0
-        loss_count = len(self.model.lossList)
-        targets = targets.to(self.device)
-        for k in range(0, loss_count):
-            output, target = self.model.lossList[k].segment_resize(output_list[k], targets)
-            loss += self.model.lossList[k](output, target)
-        return loss
-
-    def test(self, val_path, epoch):
+    def save_train_model(self, epoch):
         self.train_logger.epoch_train_log(epoch)
         save_model_path = os.path.join(segment_config.snapshotPath, "model_epoch_%d.pt" % epoch)
         self.torchModelProcess.saveLatestModel(save_model_path, self.model,
                                                self.optimizer, epoch, self.bestmIoU)
+        return save_model_path
+
+    def test(self, val_path, epoch, save_model_path):
         self.segment_test.load_weights(save_model_path)
         score, class_iou = self.segment_test.test(val_path)
-        self.segment_test.save_test_result(epoch, score, class_iou)
+        self.segment_test.save_test_value(epoch, score, class_iou)
+
         self.bestmIoU = self.torchModelProcess.saveBestModel(score['Mean IoU : \t'],
                                                              save_model_path,
                                                              segment_config.best_weights_file)

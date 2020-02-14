@@ -79,7 +79,8 @@ class DetectionTrain():
                 self.update_logger(i, total_images, epoch, loss, t0)
                 t0 = time.time()
 
-            self.test(val_path, epoch)
+            save_model_path = self.save_train_model(epoch)
+            self.test(val_path, epoch, save_model_path)
 
     def update_logger(self, index, total, epoch, loss, time_value):
         step = epoch * total + index
@@ -106,13 +107,17 @@ class DetectionTrain():
             loss += self.model.lossList[k](output_list[k], targets)
         return loss
 
-    def test(self, val_path, epoch):
+    def save_train_model(self, epoch):
         self.train_logger.epoch_train_log(epoch)
         save_model_path = os.path.join(detect_config.snapshotPath, "model_epoch_%d.pt" % epoch)
         self.torchModelProcess.saveLatestModel(save_model_path, self.model,
                                                self.optimizer, epoch, self.best_mAP)
+        return save_model_path
+
+    def test(self, val_path, epoch, save_model_path):
         self.detect_test.load_weights(save_model_path)
         mAP, aps = self.detect_test.test(val_path)
-        self.detect_test.save_test_result(epoch, mAP, aps)
+        self.detect_test.save_test_value(epoch, mAP, aps)
+
         self.best_mAP = self.torchModelProcess.saveBestModel(mAP, save_model_path,
                                                              detect_config.best_weights_file)

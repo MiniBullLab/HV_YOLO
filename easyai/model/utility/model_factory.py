@@ -11,7 +11,15 @@ from easyai.model.cls.inceptionv4_cls import Inceptionv4Cls
 from easyai.model.cls.senet_cls import SENetCls
 from easyai.model.sr.MSRResNet import MSRResNet
 from easyai.model.sr.MySRModel import MySRModel
-from easyai.model.seg.mobileV2FCN import MobileV2FCN
+from easyai.model.seg.fcn_seg import FCN8sSeg
+from easyai.model.seg.unet_seg import UNetSeg
+from easyai.model.seg.refinenet_seg import RefineNetSeg
+from easyai.model.seg.pspnet_seg import PSPNetSeg
+from easyai.model.seg.bisenet_seg import BiSeNet
+from easyai.model.seg.fast_scnn_seg import FastSCNN
+from easyai.model.seg.deeplabv3_plus import DeepLabV3Plus
+from easyai.model.seg.mobilenet_deeplabv3_plus import MobilenetDeepLabV3Plus
+from easyai.model.seg.mobilev2_fcn_seg import MobileV2FCN
 from easyai.model.det3d.complex_yolo import ComplexYOLO
 
 
@@ -48,6 +56,22 @@ class ModelFactory():
             model = MSRResNet(in_nc=1, upscale_factor=3)
         elif modelName == ModelName.MySRModel:
             model = MySRModel(upscale_factor=3)
+        elif modelName == ModelName.FCNSeg:
+            model = FCN8sSeg()
+        elif modelName == ModelName.UNetSeg:
+            model = UNetSeg()
+        elif modelName == ModelName.RefineNetSeg:
+            model = RefineNetSeg()
+        elif modelName == ModelName.PSPNetSeg:
+            model = PSPNetSeg()
+        elif modelName == ModelName.BiSeNet:
+            model = BiSeNet()
+        elif modelName == ModelName.FastSCNN:
+            model = FastSCNN()
+        elif modelName == ModelName.DeepLabV3Plus:
+            model = DeepLabV3Plus()
+        elif modelName == ModelName.MobilenetDeepLabV3Plus:
+            model = MobilenetDeepLabV3Plus()
         elif modelName == ModelName.MobileV2FCN:
             model = MobileV2FCN()
         elif modelName == ModelName.ComplexYOLO:

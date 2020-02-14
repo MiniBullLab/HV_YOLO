@@ -8,6 +8,9 @@ className = ['bike', 'bus', 'car', 'motor', 'person', 'rider', 'truck']
 
 # detect
 log_name = "detect"
+save_result_dir = os.path.join(root_save_dir, 'det_results')
+save_evaluation_path = os.path.join(root_save_dir, 'det2d_evaluation.txt')
+
 snapshotPath = os.path.join(root_save_dir, model_save_dir)
 latest_weights_file = os.path.join(snapshotPath, 'latest.pt')
 best_weights_file = os.path.join(snapshotPath, 'best.pt')

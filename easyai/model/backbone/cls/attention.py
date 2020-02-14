@@ -12,7 +12,7 @@ from easyai.base_name.block_name import BatchNormType, ActivationType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.preactresnet_block import PreActBottleNeck
+from easyai.model.base_block.preact_resnet_block import PreActBottleNeck
 from easyai.model.base_block.attention_block import AttentionModule1
 from easyai.model.base_block.attention_block import AttentionModule2
 from easyai.model.base_block.attention_block import AttentionModule3

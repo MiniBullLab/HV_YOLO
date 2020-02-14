@@ -43,11 +43,11 @@ class DetectResultProcess():
             result.append(temp_object)
         return result
 
-    def resize_detection_objects(self, src_image, image_size,
+    def resize_detection_objects(self, src_size, image_size,
                                  detection_objects, class_name):
         result = []
-        image, ratio, pad = self.dataset_process.image_resize_square(src_image,
-                                                                     image_size)
+        ratio, pad = self.dataset_process.resize_square_size(src_size,
+                                                             image_size)
         for obj in detection_objects:
             temp_object = DetectionObject()
             x1 = (obj.min_corner.x - pad[0] // 2) / ratio

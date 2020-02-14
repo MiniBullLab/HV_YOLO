@@ -146,6 +146,55 @@ class ActivationConvBNBlock(BaseBlock):
         return x
 
 
+class SeparableConv2dBNActivation(BaseBlock):
+    def __init__(self, inplanes, planes, kernel_size=3, stride=1, dilation=1, relu_first=True,
+                 bias=False, bn_name=BatchNormType.BatchNormalize2d,
+                 activation_name=ActivationType.ReLU):
+        super().__init__(BlockType.SeparableConv2dBNActivation)
+
+        if relu_first:
+            depthwise = ActivationConvBNBlock(in_channels=inplanes,
+                                              out_channels=inplanes,
+                                              kernel_size=kernel_size,
+                                              stride=stride,
+                                              padding=dilation,
+                                              dilation=dilation,
+                                              groups=inplanes,
+                                              bias=bias,
+                                              bnName=bn_name,
+                                              activationName=activation_name)
+            pointwise = ConvBNActivationBlock(in_channels=inplanes,
+                                              out_channels=planes,
+                                              kernel_size=1,
+                                              bias=bias,
+                                              bnName=bn_name,
+                                              activationName=ActivationType.Linear)
+        else:
+            depthwise = ConvBNActivationBlock(in_channels=inplanes,
+                                              out_channels=inplanes,
+                                              kernel_size=kernel_size,
+                                              stride=stride,
+                                              padding=dilation,
+                                              dilation=dilation,
+                                              groups=inplanes,
+                                              bias=bias,
+                                              bnName=bn_name,
+                                              activationName=activation_name)
+            pointwise = ConvBNActivationBlock(in_channels=inplanes,
+                                              out_channels=planes,
+                                              kernel_size=1,
+                                              bias=bias,
+                                              bnName=bn_name,
+                                              activationName=activation_name)
+
+        self.block = nn.Sequential(OrderedDict([('depthwise', depthwise),
+                                                ('pointwise', pointwise)
+                                                ]))
+
+    def forward(self, x):
+        return self.block(x)
+
+
 class FcBNActivationBlock(BaseBlock):
 
     def __init__(self, in_features, out_features, bias=True,
@@ -233,6 +282,20 @@ class SEBlock(BaseBlock):
         y = self.fc(y)
         y = y.view(b, c, 1, 1)
         return x * y
+
+
+class SEConvBlock(BaseBlock):
+
+    def __init__(self, in_channel, reduction=16):
+        super().__init__(BlockType.SEBlock)
+        self.fc1 = nn.Conv2d(in_channel, in_channel // reduction, kernel_size=1)
+        self.fc2 = nn.Conv2d(in_channel // reduction, in_channel, kernel_size=1)
+
+    def forward(self, x):
+        w = F.adaptive_avg_pool2d(x, 1)
+        w = F.relu(self.fc1(w))
+        w = self.fc2(w).sigmoid()
+        return w
 
 
 if __name__ == "__main__":

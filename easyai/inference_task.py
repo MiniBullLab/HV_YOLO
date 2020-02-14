@@ -10,13 +10,13 @@ from easyai.tasks.seg.segment import Segmentation
 def detect_task(options):
     detect = Detection(options.cfg, 0)
     detect.load_weights(options.weights)
-    detect.detect(options.inputPath)
+    detect.process(options.inputPath)
 
 
 def segment_task(options):
     segment = Segmentation(options.cfg, 0)
     segment.load_weights(options.weights)
-    segment.segment(options.inputPath)
+    segment.process(options.inputPath)
 
 
 def main():

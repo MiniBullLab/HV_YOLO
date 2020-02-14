@@ -28,6 +28,7 @@ class ResNet(BaseBackbone):
         self.bnName = bnName
         self.block = block
         self.first_output = 64
+        self.in_channels = self.first_output
 
         self.create_block_list()
 
@@ -82,7 +83,7 @@ class ResNet(BaseBackbone):
                                    self.strides[index], self.dilations[index],
                                    self.bnName, self.activationName,
                                    self.block)
-            self.in_channels = self.outChannelList[-1]
+            self.in_channels = self.block_out_channels[-1]
 
     def make_resnet_layer(self, out_channels, num_block, stride, dilation,
                           bnName, activation, block):

@@ -50,7 +50,7 @@ class MobileNetV2(BaseBackbone):
                                    self.strides[index], self.dilations[index],
                                    self.bnName, self.activationName,
                                    self.expand_ratios[index])
-            self.in_channels = self.outChannelList[-1]
+            self.in_channels = self.block_out_channels[-1]
 
     def make_mobile_layer(self, out_channels, num_blocks, stride, dilation,
                           bnName, activationName, expand_ratio):

@@ -58,6 +58,8 @@ class BlockType():
     BNActivationConvBlock = "bnActivationConvBlock"
     ActivationConvBNBlock = "activationConvBNBlock"
 
+    SeparableConv2dBNActivation = "separableConv2dBNActivation"
+
     SeperableConv2dBlock = "seperableConv2dBlock"
     ConvActivationBlock = "convActivationBlock"
 
@@ -65,3 +67,4 @@ class BlockType():
 
     InvertedResidual = "invertedResidual"
     SEBlock = "seBlock"
+    SEConvBlock = "seConvBlock"

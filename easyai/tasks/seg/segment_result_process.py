@@ -20,15 +20,15 @@ class SegmentResultProcess():
 
         return result
 
-    def resize_segmention_result(self, src_image, image_size,
+    def resize_segmention_result(self, src_size, image_size,
                                  segmention_result):
-        image, ratio, pad = self.dataset_process.image_resize_square(src_image,
-                                                                     image_size)
+        ratio, pad = self.dataset_process.resize_square_size(src_size,
+                                                             image_size)
         start_h = pad[1] // 2
         stop_h = image_size[1] - (pad[1] - (pad[1] // 2))
         start_w = pad[0] // 2
         stop_w = image_size[0] - (pad[0] - (pad[0] // 2))
         result = segmention_result[start_h:stop_h, start_w:stop_w]
         result = result.astype(np.float32)
-        result = self.dataset_process.image_resize(result, src_image.shape())
+        result = self.dataset_process.image_resize(result, src_size)
         return result

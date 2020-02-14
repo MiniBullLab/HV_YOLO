@@ -5,7 +5,7 @@
 from easyai.base_name.block_name import BatchNormType, ActivationType
 from easyai.model.base_block.base_block import *
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.preactresnet_block import PreActBottleNeck
+from easyai.model.base_block.preact_resnet_block import PreActBottleNeck
 
 
 class AttentionBlockName():
