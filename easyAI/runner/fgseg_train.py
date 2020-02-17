@@ -48,7 +48,7 @@ class FgSegV2Train():
         save_model_dir = fgseg_config.snapshotPath
         if not os.path.exists(save_model_dir):
             os.makedirs(save_model_dir)
-        self.mdl_path = os.path.join(save_model_dir, 'seg')
+        self.mdl_path = os.path.join(save_model_dir, 'seg_best_weights.h5')
 
     def train(self, train_val_path, vgg_weights_path):
 
@@ -57,6 +57,10 @@ class FgSegV2Train():
         # model = FgSegNetV2(self.lr, img_shape, vgg_weights_path)
         model = MyFgSegNetV2(self.lr, img_shape, vgg_weights_path)
         model = model.init_model()
+
+        if os.path.exists(self.mdl_path):
+            model.load_weights(self.mdl_path)
+            print("checkpoint_loaded")
 
         # make sure that training input shape equals to model output
         input_shape = (img_shape[0], img_shape[1])
@@ -69,8 +73,8 @@ class FgSegV2Train():
                                                     write_graph=False,
                                                     write_images=False)
 
-        checkpoints = keras.callbacks.ModelCheckpoint(self.mdl_path + '-weights-{epoch:02d}-{val_acc:.5f}-{val_loss:.5f}.h5',
-                                                      monitor='val_loss', verbose=0, save_best_only=False,
+        checkpoints = keras.callbacks.ModelCheckpoint(self.mdl_path,
+                                                      monitor='val_loss', verbose=0, save_best_only=True,
                                                       save_weights_only=False, mode='auto', period=1)
         early = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=1e-4, patience=10, verbose=0, mode='auto')
         redu = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, verbose=0, mode='auto')
