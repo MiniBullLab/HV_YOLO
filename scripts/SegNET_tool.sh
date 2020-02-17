@@ -102,4 +102,5 @@ cavalry_gen -d $outDir/out_parser/vas_output/ \
             -v > $outDir/cavalry/cavalry_info.txt
 
 rm -rf vas_output
-cp $outDir/cavalry/$outNetName.bin ${root_path}/${outNetName}.bin
+
+python3 -m easyAI.easy_encrypt -i $outDir/cavalry/$outNetName.bin -o ${root_path}/${outNetName}.bin
