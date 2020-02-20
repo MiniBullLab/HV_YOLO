@@ -9,20 +9,23 @@ from easyai.helper.dataType import DetectionObject
 from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
 
 
-class DetectResultProcess():
+class Detect2dResultProcess():
 
     def __init__(self):
         self.min_width = 2  # (pixels)
         self.min_height = 2  # (pixels)
-        self.use_new_conf = False
+        self.use_new_confidence = False
         self.dataset_process = ImageDataSetProcess()
 
     def get_detection_result(self, prediction, conf_thresh):
         result = []
         class_confidence, class_index = prediction[:, 5:].max(1)
-        if self.use_new_conf:
-            prediction[:, 4] *= class_confidence
-        temp1_indexs = prediction[:, 4] > conf_thresh
+        if self.use_new_confidence:
+            object_confidence = prediction[:, 4]
+            object_confidence *= class_confidence
+            temp1_indexs = object_confidence > conf_thresh
+        else:
+            temp1_indexs = prediction[:, 4] > conf_thresh
         temp2_indexs = (prediction[:, 2:4] > self.min_width).all(1)
         temp3_indexs = torch.isfinite(prediction).all(1)
         index_list = temp1_indexs & temp2_indexs & temp3_indexs

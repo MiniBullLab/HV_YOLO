@@ -20,6 +20,10 @@ class BaseTrain():
         pass
 
     @abc.abstractmethod
+    def compute_backward(self, input_datas, targets, setp_index):
+        pass
+
+    @abc.abstractmethod
     def compute_loss(self, output_list, targets):
         pass
 

@@ -15,7 +15,8 @@ class ClassifyTest(BaseTest):
     def __init__(self, cfg_path, gpu_id):
         super().__init__()
         self.classify_inference = Classify(cfg_path, gpu_id)
-        self.evaluation = ClassifyAccuracy(top_k=(1,))
+        self.topK = (1,)
+        self.evaluation = ClassifyAccuracy(top_k=self.topK)
 
     def load_weights(self, weights_path):
         self.classify_inference.load_weights(weights_path)

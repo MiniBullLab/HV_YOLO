@@ -21,14 +21,12 @@ class CalculateMeanAp():
         aps = []
         ious = []
         for i, name in enumerate(self.class_names):
-            if name == '__background__' :
+            if name == '__background__':
                 continue
             file_path = os.path.join(result_dir, "%s.txt" % name)
             recall, precision, ap = self.calculate_ap(file_path, name, 0.5)
             aps += [ap]
             # ious += [avg_iou]
-            # with open(os.path.join(output_dir, cls + '_pr.pkl'), 'w') as f:
-            #     cPickle.dump({'rec': rec, 'prec': prec, 'ap': ap}, f)
 
         self.print_evaluation(aps)
         return np.mean(aps), aps
@@ -153,7 +151,8 @@ class CalculateMeanAp():
         return tp, fp, iou
 
     def get_ap(self, recall, precision):
-        """ ap = voc_ap(rec, prec, [use_07_metric])
+        """
+        ap = voc_ap(rec, prec, [use_07_metric])
                 Compute VOC AP given precision and recall.
                 If use_07_metric is true, uses the
                 VOC 07 11 point method (default:False).

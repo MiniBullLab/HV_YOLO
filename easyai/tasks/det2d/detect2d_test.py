@@ -6,15 +6,15 @@ import os
 from easyai.tasks.utility.base_test import BaseTest
 from easyai.evaluation.calculate_mAp import CalculateMeanAp
 from easyai.data_loader.det.detection_val_dataloader import get_detection_val_dataloader
-from easyai.tasks.det2d.detect import Detection
+from easyai.tasks.det2d.detect2d import Detection2d
 from easyai.config import detect_config
 
 
-class DetectionTest(BaseTest):
+class Detection2dTest(BaseTest):
 
     def __init__(self, cfg_path, gpu_id):
         super().__init__()
-        self.detect_inference = Detection(cfg_path, gpu_id)
+        self.detect_inference = Detection2d(cfg_path, gpu_id)
 
     def load_weights(self, weights_path):
         self.detect_inference.load_weights(weights_path)

@@ -3,19 +3,20 @@
 # Author:
 
 import os
-import time
 from easyai.data_loader.det.detection_train_dataloader import DetectionTrainDataloader
 from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.solver.lr_scheduler import WarmupMultiStepLR
 from easyai.utility.train_log import TrainLogger
-from easyai.tasks.det2d.detect_test import DetectionTest
+from easyai.tasks.utility.base_train import BaseTrain
+from easyai.tasks.det2d.detect2d_test import Detection2dTest
 from easyai.config import detect_config
 
 
-class DetectionTrain():
+class Detection2dTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id):
+        super().__init__()
         if not os.path.exists(detect_config.snapshotPath):
             os.makedirs(detect_config.snapshotPath, exist_ok=True)
 
@@ -28,8 +29,9 @@ class DetectionTrain():
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
-        self.detect_test = DetectionTest(cfg_path, gpu_id)
+        self.detect_test = Detection2dTest(cfg_path, gpu_id)
 
+        self.total_images = 0
         self.optimizer = None
         self.avg_loss = -1
         self.start_epoch = 0
@@ -51,38 +53,46 @@ class DetectionTrain():
         dataloader = DetectionTrainDataloader(train_path, detect_config.className,
                                               detect_config.train_batch_size, detect_config.imgSize,
                                               multi_scale=False, augment=True, balanced_sample=True)
-        total_images = len(dataloader)
+        self.total_images = len(dataloader)
         self.load_param(detect_config.latest_weights_file)
 
-        t0 = time.time()
+        self.timer.tic()
         for epoch in range(self.start_epoch, detect_config.maxEpochs):
             # self.optimizer = self.torchOptimizer.adjust_optimizer(epoch, lr)
             self.optimizer.zero_grad()
             for i, (images, targets) in enumerate(dataloader):
-                current_iter = epoch * total_images + i
+                current_iter = epoch * self.total_images + i
                 lr = self.multi_lr.get_lr(epoch, current_iter)
                 self.multi_lr.adjust_learning_rate(self.optimizer, lr)
                 if sum([len(x) for x in targets]) < 1:  # if no targets continue
                     continue
-
-                # Compute loss, compute gradient, update parameters
-                output_list = self.model(images.to(self.device))
-                loss = self.compute_loss(output_list, targets)
-                loss.backward()
-
-                # accumulate gradient for x batches before optimizing
-                if ((i + 1) % detect_config.accumulated_batches == 0) \
-                        or (i == len(dataloader) - 1):
-                    self.optimizer.step()
-                    self.optimizer.zero_grad()
-
-                self.update_logger(i, total_images, epoch, loss, t0)
-                t0 = time.time()
+                loss = self.compute_backward(images, targets, i)
+                self.update_logger(i, self.total_images, epoch, loss)
 
             save_model_path = self.save_train_model(epoch)
             self.test(val_path, epoch, save_model_path)
 
-    def update_logger(self, index, total, epoch, loss, time_value):
+    def compute_backward(self, input_datas, targets, setp_index):
+        # Compute loss, compute gradient, update parameters
+        output_list = self.model(input_datas.to(self.device))
+        loss = self.compute_loss(output_list, targets)
+        loss.backward()
+
+        # accumulate gradient for x batches before optimizing
+        if ((setp_index + 1) % detect_config.accumulated_batches == 0) \
+                or (setp_index == self.total_images - 1):
+            self.optimizer.step()
+            self.optimizer.zero_grad()
+        return loss
+
+    def compute_loss(self, output_list, targets):
+        loss = 0
+        loss_count = len(self.model.lossList)
+        for k in range(0, loss_count):
+            loss += self.model.lossList[k](output_list[k], targets)
+        return loss
+
+    def update_logger(self, index, total, epoch, loss):
         step = epoch * total + index
         lr = self.optimizer.param_groups[0]['lr']
         loss_value = loss.data
@@ -98,14 +108,7 @@ class DetectionTrain():
                                                                             total,
                                                                             '%.3f' % self.avg_loss,
                                                                             '%.7f' % lr,
-                                                                            time.time() - time_value))
-
-    def compute_loss(self, output_list, targets):
-        loss = 0
-        loss_count = len(self.model.lossList)
-        for k in range(0, loss_count):
-            loss += self.model.lossList[k](output_list[k], targets)
-        return loss
+                                                                            self.timer.toc(True)))
 
     def save_train_model(self, epoch):
         self.train_logger.epoch_train_log(epoch)

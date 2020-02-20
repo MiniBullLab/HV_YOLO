@@ -26,6 +26,10 @@ class AbstractModel(nn.Module):
     def get_name(self):
         return self.model_name
 
+    def clear_list(self):
+        self.block_out_channels = []
+        self.index = 0
+
     def add_block_list(self, block_name, block, output_channel):
         block_name = "%s_%d" % (block_name, self.index)
         self.add_module(block_name, block)

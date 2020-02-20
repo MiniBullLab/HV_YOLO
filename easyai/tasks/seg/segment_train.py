@@ -9,13 +9,15 @@ from easyai.solver.lr_scheduler import PolyLR
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.utility.train_log import TrainLogger
+from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.seg.segment_test import SegmentionTest
 from easyai.config import segment_config
 
 
-class SegmentionTrain():
+class SegmentionTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id):
+        super().__init__()
         if not os.path.exists(segment_config.snapshotPath):
             os.makedirs(segment_config.snapshotPath, exist_ok=True)
 
@@ -28,6 +30,7 @@ class SegmentionTrain():
 
         self.segment_test = SegmentionTest(cfg_path, gpu_id)
 
+        self.total_images = 0
         self.optimizer = None
         self.start_epoch = 0
         self.bestmIoU = 0
@@ -47,39 +50,39 @@ class SegmentionTrain():
     def train(self, train_path, val_path):
         dataloader = get_segment_train_dataloader(train_path, segment_config.imgSize,
                                                   segment_config.train_batch_size)
-        total_images = len(dataloader)
+        self.total_images = len(dataloader)
         self.load_param(segment_config.latest_weights_file)
 
         # set learning policy
         total_iteration = segment_config.maxEpochs * len(dataloader)
         polyLR = PolyLR(segment_config.base_lr, total_iteration, segment_config.lr_power)
 
-        t0 = time.time()
+        self.timer.tic()
         for epoch in range(self.start_epoch, segment_config.maxEpochs):
             # self.optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
             self.optimizer.zero_grad()
             for idx, (images, segments) in enumerate(dataloader):
-
-                current_idx = epoch * total_images + idx
+                current_idx = epoch * self.total_images + idx
                 lr = polyLR.get_lr(epoch, current_idx)
                 polyLR.adjust_learning_rate(self.optimizer, lr)
-
-                # Compute loss, compute gradient, update parameters
-                output_list = self.model(images.to(self.device))
-                loss = self.compute_loss(output_list, segments)
-                loss.backward()
-
-                # accumulate gradient for x batches before optimizing
-                if ((idx + 1) % segment_config.accumulated_batches == 0) \
-                        or (idx == total_images - 1):
-                    self.optimizer.step()
-                    self.optimizer.zero_grad()
-
-                self.update_logger(idx, total_images, epoch, loss.data, t0)
-                t0 = time.time()
+                loss = self.compute_backward(images, segments, idx)
+                self.update_logger(idx, self.total_images, epoch, loss.data)
 
             save_model_path = self.save_train_model(epoch)
             self.test(val_path, epoch, save_model_path)
+
+    def compute_backward(self, input_datas, targets, setp_index):
+        # Compute loss, compute gradient, update parameters
+        output_list = self.model(input_datas.to(self.device))
+        loss = self.compute_loss(output_list, targets)
+        loss.backward()
+
+        # accumulate gradient for x batches before optimizing
+        if ((setp_index + 1) % segment_config.accumulated_batches == 0) \
+                or (setp_index == self.total_images - 1):
+            self.optimizer.step()
+            self.optimizer.zero_grad()
+        return loss
 
     def compute_loss(self, output_list, targets):
         loss = 0
@@ -90,7 +93,7 @@ class SegmentionTrain():
             loss += self.model.lossList[k](output, target)
         return loss
 
-    def update_logger(self, index, total, epoch, loss_value, time_value):
+    def update_logger(self, index, total, epoch, loss_value):
         step = epoch * total + index
         lr = self.optimizer.param_groups[0]['lr']
         self.train_logger.train_log(step, loss_value, segment_config.display)
@@ -101,7 +104,7 @@ class SegmentionTrain():
                                                                             total,
                                                                             '%.3f' % loss_value,
                                                                             '%.7f' % lr,
-                                                                            time.time() - time_value))
+                                                                            self.timer.toc(True)))
 
     def save_train_model(self, epoch):
         self.train_logger.epoch_train_log(epoch)

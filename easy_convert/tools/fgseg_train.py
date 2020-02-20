@@ -17,6 +17,9 @@ np.random.seed(42)
 rn.seed(12345)
 session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1,
                               gpu_options=tf.GPUOptions(allow_growth=True))
+# session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1,
+#                               gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.2))
+
 from keras import backend as K
 tf.set_random_seed(1234)
 sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
@@ -49,8 +52,8 @@ class FgSegV2Train():
 
         data = self.get_train_data(train_val_path)
         img_shape = data[0][0].shape  # (height, width, channel)
-        model = FgSegNetV2(self.lr, img_shape, vgg_weights_path)
-        #model = MyFgSegNetV2(self.lr, img_shape, vgg_weights_path)
+        # model = FgSegNetV2(self.lr, img_shape, vgg_weights_path)
+        model = MyFgSegNetV2(self.lr, img_shape, vgg_weights_path)
         model = model.init_model()
 
         # make sure that training input shape equals to model output
@@ -78,6 +81,7 @@ class FgSegV2Train():
         for image_path, label_path in train_datas:
             x = image.load_img(image_path)
             x = image.img_to_array(x)
+            # x /= 255.0
             images.append(x)
 
             y = image.load_img(label_path, grayscale=True)
@@ -141,7 +145,7 @@ def main():
     print("process start...")
     train_process = FgSegV2Train()
     train_process.train("/home/lpj/github/data/LED_detect/ImageSets/train_val.txt",
-                        "./tests/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5")
+                        "./data/keras/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5")
     print("process end!")
 
 

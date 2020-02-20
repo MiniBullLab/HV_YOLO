@@ -1,4 +1,7 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
 
 class Point2d():
     """
@@ -9,12 +12,14 @@ class Point2d():
         self.y = y
         return
 
+
 class MyObject():
 
     def __init__(self):
         self.name = ""
         self.class_id = -1
         self.difficult = 0
+
 
 class Rect2D(MyObject):
     """
@@ -54,6 +59,7 @@ class Rect2D(MyObject):
 
     def __str__(self):
         return '%s:%d %d %d %d' % (self.name, self.min_corner.x, self.min_corner.y, self.max_corner.x, self.max_corner.y)
+
 
 class DetectionObject(Rect2D):
 

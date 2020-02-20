@@ -24,21 +24,21 @@ class ComplexYOLO(BaseModel):
         self.create_block_list()
 
     def create_block_list(self):
-        self.out_channels = []
+        self.block_out_channels = []
         self.index = 0
 
-        basic_model = self.factory.get_base_model("./cfg/complex-darknet19.cfg")
+        basic_model = self.factory.get_base_model("./cfg/det3d/complex-darknet19.cfg")
         base_out_channels = basic_model.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, basic_model, base_out_channels[-1])
 
-        input_channel = self.out_channels[-1]
+        input_channel = self.block_out_channels[-1]
         output_channel = 1024
         conv1 = ConvBNActivationBlock(input_channel, output_channel,
                                       kernel_size=3, stride=1, padding=1,
                                       bnName=self.bn_name, activationName=self.activation_name)
         self.add_block_list(conv1.get_name(), conv1, output_channel)
 
-        input_channel = self.out_channels[-1]
+        input_channel = self.block_out_channels[-1]
         output_channel = 1024
         conv2 = ConvBNActivationBlock(input_channel, output_channel,
                                       kernel_size=3, stride=1, padding=1,
@@ -46,7 +46,7 @@ class ComplexYOLO(BaseModel):
         self.add_block_list(conv2.get_name(), conv2, output_channel)
 
         layer1 = RouteLayer('12')
-        output_channel = sum([base_out_channels[i] if i >= 0 else self.out_channels[i] for i in layer1.layers])
+        output_channel = sum([base_out_channels[i] if i >= 0 else self.block_out_channels[i] for i in layer1.layers])
         self.add_block_list(layer1.get_name(), layer1, output_channel)
 
         reorg = ReorgBlock()
@@ -54,17 +54,17 @@ class ComplexYOLO(BaseModel):
         self.add_block_list(reorg.get_name(), reorg, output_channel)
 
         layer2 = RouteLayer('-3,-1')
-        output_channel = sum([base_out_channels[i] if i >= 0 else self.out_channels[i] for i in layer2.layers])
+        output_channel = sum([base_out_channels[i] if i >= 0 else self.block_out_channels[i] for i in layer2.layers])
         self.add_block_list(layer2.get_name(), layer2, output_channel)
 
-        input_channel = self.out_channels[-1]
+        input_channel = self.block_out_channels[-1]
         output_channel = 1024
         conv3 = ConvBNActivationBlock(input_channel, output_channel,
                                       kernel_size=3, stride=1, padding=1,
                                       bnName=self.bn_name, activationName=self.activation_name)
         self.add_block_list(conv3.get_name(), conv3, output_channel)
 
-        input_channel = self.out_channels[-1]
+        input_channel = self.block_out_channels[-1]
         output_channel = 75
         conv4 = nn.Conv2d(in_channels=input_channel,
                           out_channels=output_channel,

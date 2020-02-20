@@ -6,19 +6,20 @@ import os
 import torch
 from easyai.tasks.utility.base_inference import BaseInference
 from easyai.torch_utility.torch_model_process import TorchModelProcess
-from easyai.tasks.det2d.detect_result_process import DetectResultProcess
+from easyai.tasks.det2d.detect2d_result_process import Detect2dResultProcess
 from easyai.base_algorithm.non_max_suppression import NonMaxSuppression
+from easyai.base_algorithm.fast_non_max_suppression import FastNonMaxSuppression
 from easyai.drawing.detect_show import DetectionShow
 from easyai.config import detect_config
 
 
-class Detection(BaseInference):
+class Detection2d(BaseInference):
 
     def __init__(self, cfg_path, gpu_id):
         super().__init__()
         self.torchModelProcess = TorchModelProcess()
-        self.result_process = DetectResultProcess()
-        self.nms_process = NonMaxSuppression()
+        self.result_process = Detect2dResultProcess()
+        self.nms_process = FastNonMaxSuppression()
         self.result_show = DetectionShow()
 
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
@@ -64,7 +65,7 @@ class Detection(BaseInference):
         return result
 
     def postprocess(self, result):
-        detection_objects = self.nms_process.fast_multi_class_nms(result, detect_config.nmsThresh)
+        detection_objects = self.nms_process.multi_class_nms(result, detect_config.nmsThresh)
         detection_objects = self.result_process.resize_detection_objects(self.src_size,
                                                                          detect_config.imgSize,
                                                                          detection_objects,
