@@ -12,7 +12,7 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.base_name.block_name import BatchNormType, ActivationType
 from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
-from easyai.loss.cross_entropy2d import CrossEntropy2d
+from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
 from easyai.model.base_block.utility_layer import Upsample, RouteLayer
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.utility_block import SeparableConv2dBNActivation
@@ -90,7 +90,7 @@ class MobilenetDeepLabV3Plus(BaseModel):
 
     def create_loss(self, input_dict=None):
         self.lossList = []
-        loss = CrossEntropy2d(ignore_index=250, size_average=True)
+        loss = CrossEntropy2d(ignore_index=250)
         self.add_block_list(LossType.CrossEntropy2d, loss, self.block_out_channels[-1])
         self.lossList.append(loss)
 

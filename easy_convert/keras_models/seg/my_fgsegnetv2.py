@@ -21,7 +21,7 @@ class MyFgSegNetV2(BaseModel):
         self.lr = lr
         self.img_shape = img_shape
         self.vgg_weights_path = vgg_weights_path
-        self.set_name(KerasModelName.FgSegNetV2)
+        self.set_name(KerasModelName.MyFgSegNetV2)
 
     def VGG16(self, x):
 

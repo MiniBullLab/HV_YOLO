@@ -81,7 +81,7 @@ class FgSegV2Train():
         for image_path, label_path in train_datas:
             x = image.load_img(image_path)
             x = image.img_to_array(x)
-            # x /= 255.0
+            x /= 255.0
             images.append(x)
 
             y = image.load_img(label_path, grayscale=True)

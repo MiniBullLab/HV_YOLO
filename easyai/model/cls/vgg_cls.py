@@ -7,7 +7,7 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.base_name.block_name import BatchNormType, ActivationType
 from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
-from easyai.loss.cross_entropy2d import CrossEntropy2d
+from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
 from easyai.model.base_block.utility_layer import FcLayer, ActivationLayer
 from easyai.model.utility.base_model import *
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
@@ -26,8 +26,7 @@ class VggNetCls(BaseModel):
         self.create_block_list()
 
     def create_block_list(self):
-        self.out_channels = []
-        self.index = 0
+        self.clear_list()
 
         backbone = self.factory.get_base_model(BackboneName.Vgg19)
         base_out_channels = backbone.get_outchannel_list()
@@ -58,8 +57,8 @@ class VggNetCls(BaseModel):
 
     def create_loss(self, input_dict=None):
         self.lossList = []
-        loss = CrossEntropy2d(ignore_index=250, size_average=True)
-        self.add_block_list(LossType.CrossEntropy2d, loss, self.out_channels[-1])
+        loss = CrossEntropy2d(ignore_index=250)
+        self.add_block_list(LossType.CrossEntropy2d, loss, self.block_out_channels[-1])
         self.lossList.append(loss)
 
     def forward(self, x):

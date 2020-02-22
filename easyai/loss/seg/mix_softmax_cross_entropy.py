@@ -1,4 +1,4 @@
-from easyai.loss.base_loss import *
+from easyai.loss.utility.base_loss import *
 
 
 class MixSoftmaxCrossEntropyLoss(nn.CrossEntropyLoss):

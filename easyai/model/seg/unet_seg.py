@@ -6,8 +6,8 @@ from easyai.base_name.model_name import ModelName
 from easyai.base_name.block_name import BatchNormType, ActivationType
 from easyai.base_name.block_name import LayerType
 from easyai.base_name.loss_name import LossType
-from easyai.loss.cross_entropy2d import CrossEntropy2d
-from easyai.model.base_block.utility_layer import RouteLayer, Upsample
+from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
+from easyai.model.base_block.utility_layer import Upsample
 from easyai.model.base_block.unet_blcok import UNetBlockName
 from easyai.model.base_block.unet_blcok import DoubleConv2d, DownBlock, UpBlock
 from easyai.model.utility.base_model import *
@@ -45,10 +45,9 @@ class UNetSeg(BaseModel):
 
     def create_loss(self, input_dict=None):
         self.lossList = []
-        loss = CrossEntropy2d(ignore_index=250, size_average=True)
+        loss = CrossEntropy2d(ignore_index=250)
         self.add_block_list(LossType.CrossEntropy2d, loss, self.block_out_channels[-1])
         self.lossList.append(loss)
-
 
     def down_layers(self):
         down1 = DownBlock(in_channels=64, out_channels=128,
@@ -114,6 +113,5 @@ class UNetSeg(BaseModel):
             else:
                 x = block(x)
             layer_outputs.append(x)
-            print(key, x.shape)
         return output
 

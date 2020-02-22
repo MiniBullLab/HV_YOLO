@@ -1,4 +1,4 @@
-from easyai.loss.base_loss import *
+from easyai.loss.utility.base_loss import *
 import numpy as np
 
 
@@ -11,14 +11,14 @@ class OhemCrossEntropy2d(BaseLoss):
         self.min_kept = int(min_kept)
         self.loss_function = torch.nn.CrossEntropyLoss(ignore_index=ignore_index)
 
-    def segment_resize(self, input, target):
-        n, c, h, w = input.size()
+    def compute_ohem_loss(self, input_data, target):
+        n, c, h, w = input_data.size()
         target = target.view(-1)
         valid_mask = target.ne(self.ignore_index)
         target = target * valid_mask.long()
         num_valid = valid_mask.sum()
 
-        prob = F.softmax(input, dim=1)
+        prob = F.softmax(input_data, dim=1)
         prob = prob.transpose(0, 1).reshape(c, -1)
 
         if self.min_kept > num_valid:
@@ -28,7 +28,7 @@ class OhemCrossEntropy2d(BaseLoss):
             mask_prob = prob[target, torch.arange(len(target), dtype=torch.long)]
             threshold = self.thresh
             if self.min_kept > 0:
-                #index = mask_prob.argsort()
+                # index = mask_prob.argsort()
                 index = np.argsort(mask_prob.cpu().detach().numpy())
                 threshold_index = index[min(len(index), self.min_kept) - 1]
                 if mask_prob[threshold_index] > self.thresh:
@@ -39,14 +39,16 @@ class OhemCrossEntropy2d(BaseLoss):
 
         target = target.masked_fill_(1 - valid_mask, self.ignore_index)
         target = target.view(n, h, w)
-        return input, target
+        return input_data, target
 
-    def forward(self, input, target):
+    def forward(self, input_data, target):
         if target is not None:
-            loss = self.loss_function(input, target)
+            input_data, target = self.compute_ohem_loss(input_data, target)
+            loss = self.loss_function(input_data, target)
         else:
-            loss = F.softmax(input)
+            loss = F.softmax(input_data)
         return loss
+
 
 class MixSoftmaxCrossEntropyOHEMLoss(OhemCrossEntropy2d):
 

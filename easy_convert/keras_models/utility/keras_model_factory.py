@@ -34,6 +34,7 @@ class KerasModelFactory():
         result = None
         if net_name is None:
             result = models.load_model(h5_model_path)
+            print(net_name)
         else:
             net_name = net_name.strip()
             if net_name in KerasModelName.FgSegNetV2:

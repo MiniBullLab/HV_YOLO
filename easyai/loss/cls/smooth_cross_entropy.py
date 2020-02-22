@@ -1,4 +1,4 @@
-from easyai.loss.base_loss import *
+from easyai.loss.utility.base_loss import *
 import numpy as np
 
 

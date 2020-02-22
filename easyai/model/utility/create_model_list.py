@@ -14,10 +14,10 @@ from easyai.model.base_block.utility_layer import ShortcutLayer
 from easyai.model.base_block.utility_layer import MyMaxPool2d, Upsample
 from easyai.model.base_block.utility_layer import GlobalAvgPool2d, FcLayer
 from easyai.model.base_block.darknet_block import ReorgBlock, DarknetBlockName
-from easyai.loss.cross_entropy2d import CrossEntropy2d
-from easyai.loss.bce_loss import BinaryCrossEntropy2d
-from easyai.loss.ohem_cross_entropy2d import OhemCrossEntropy2d
-from easyai.loss.yolo_loss import YoloLoss
+from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
+from easyai.loss.utility.bce_loss import BinaryCrossEntropy2d
+from easyai.loss.seg.ohem_cross_entropy2d import OhemCrossEntropy2d
+from easyai.loss.det2d.yolo_loss import YoloLoss
 
 
 class CreateModuleList():
@@ -191,18 +191,32 @@ class CreateModuleList():
             self.addBlockList(LossType.YoloLoss, yolo_layer, self.filters)
             self.input_channels = self.filters
         elif module_def["type"] == LossType.CrossEntropy2d:
-            ignore_index = int(module_def["ignore_index"])
-            layer = CrossEntropy2d(ignore_index=ignore_index)
+            weight_type = int(module_def.get("weight_type", 0))
+            weight = module_def.get("weight", None)
+            reduce = module_def.get("reduce", None)
+            reduction = module_def.get("reduction", 'mean')
+            ignore_index = int(module_def.get("ignore_index", 250))
+            layer = CrossEntropy2d(weight_type=weight_type,
+                                   weight=weight,
+                                   reduce=reduce,
+                                   reduction=reduction,
+                                   ignore_index=ignore_index)
             self.addBlockList(LossType.CrossEntropy2d, layer, self.filters)
             self.input_channels = self.filters
         elif module_def["type"] == LossType.OhemCrossEntropy2d:
-            ignore_index = int(module_def["ignore_index"])
+            ignore_index = int(module_def.get("ignore_index", 250))
             layer = OhemCrossEntropy2d(ignore_index=ignore_index)
             self.addBlockList(LossType.OhemCrossEntropy2d, layer, self.filters)
             self.input_channels = self.filters
         elif module_def["type"] == LossType.BinaryCrossEntropy2d:
-            weight = [float(x) for x in module_def["weight"].split(',') if x]
-            layer = BinaryCrossEntropy2d(weight=weight)
+            weight_type = int(module_def.get("weight_type", 0))
+            weight = module_def.get("weight", None)
+            reduce = module_def.get("reduce", None)
+            reduction = module_def.get("reduction", 'mean')
+            layer = BinaryCrossEntropy2d(weight_type=weight_type,
+                                         weight=weight,
+                                         reduce=reduce,
+                                         reduction=reduction)
             self.addBlockList(LossType.BinaryCrossEntropy2d, layer, self.filters)
             self.input_channels = self.filters
 

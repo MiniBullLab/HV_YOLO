@@ -3,7 +3,7 @@
 # Author:
 
 import os
-import time
+import torch
 from easyai.data_loader.seg.segment_dataloader import get_segment_train_dataloader
 from easyai.solver.lr_scheduler import PolyLR
 from easyai.solver.torch_optimizer import TorchOptimizer
@@ -89,9 +89,26 @@ class SegmentionTrain(BaseTrain):
         loss_count = len(self.model.lossList)
         targets = targets.to(self.device)
         for k in range(0, loss_count):
-            output, target = self.model.lossList[k].segment_resize(output_list[k], targets)
+            output, target = self.segment_data_resize(output_list[k], targets)
             loss += self.model.lossList[k](output, target)
         return loss
+
+    def segment_data_resize(self, input_data, target):
+        target = target.type(input.dtype)
+        n, c, h, w = input_data.size()
+        nt, ht, wt = target.size()
+        # Handle inconsistent size between input and target
+        if h > ht and w > wt:  # upsample labels
+            target = target.unsequeeze(1)
+            target = torch.nn.functional.upsample(target, size=(h, w), mode='nearest')
+            target = target.sequeeze(1)
+        elif h < ht and w < wt:  # upsample images
+            input_data = torch.nn.functional.upsample(input_data, size=(ht, wt), mode='bilinear')
+        else:
+            print("input_data: (%d,%d) and target: (%d,%d) error "
+                  % (h, w, ht, wt))
+            raise Exception("segment_data_resize error")
+        return input_data, target
 
     def update_logger(self, index, total, epoch, loss_value):
         step = epoch * total + index

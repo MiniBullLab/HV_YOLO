@@ -3,10 +3,10 @@
 # Author:
 
 
-from easyai.loss.base_loss import *
+from easyai.loss.utility.base_loss import *
 import math
-from easyai.loss.smooth_cross_entropy import SmoothCrossEntropy
-from easyai.loss.focal_loss import FocalBinaryLoss
+from easyai.loss.cls.smooth_cross_entropy import SmoothCrossEntropy
+from easyai.loss.det2d.focal_loss import FocalBinaryLoss
 
 
 __all__ = ['YoloLoss']
