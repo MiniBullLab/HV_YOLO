@@ -94,7 +94,7 @@ class SegmentionTrain(BaseTrain):
         return loss
 
     def segment_data_resize(self, input_data, target):
-        target = target.type(input.dtype)
+        target = target.type(input_data.dtype)
         n, c, h, w = input_data.size()
         nt, ht, wt = target.size()
         # Handle inconsistent size between input and target
@@ -104,6 +104,8 @@ class SegmentionTrain(BaseTrain):
             target = target.sequeeze(1)
         elif h < ht and w < wt:  # upsample images
             input_data = torch.nn.functional.upsample(input_data, size=(ht, wt), mode='bilinear')
+        elif h == ht and w == wt:
+            pass
         else:
             print("input_data: (%d,%d) and target: (%d,%d) error "
                   % (h, w, ht, wt))

@@ -16,14 +16,13 @@ class MyBackbone(BaseBackbone):
         self.create_block_list()
 
     def create_block_list(self):
-        self.out_channels = []
-        self.index = 0
+        self.clear_list()
 
         outChannels = []
         self.createTaskList.createOrderedDict(self.modelDefine, outChannels)
         blockDict = self.createTaskList.getBlockList()
 
-        self.out_channels = self.createTaskList.getOutChannelList()
+        self.block_out_channels = self.createTaskList.getOutChannelList()
         for key, block in blockDict.items():
             name = "base_%s" % key
             self.add_module(name, block)
