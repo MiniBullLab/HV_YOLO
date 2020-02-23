@@ -11,10 +11,10 @@ class SegmentResultProcess():
     def __init__(self):
         self.dataset_process = ImageDataSetProcess()
 
-    def get_detection_result(self, prediction):
+    def get_detection_result(self, prediction, threshold=0):
         result = None
         if prediction.ndim == 2:
-            result = prediction
+            result = (prediction >= threshold).astype(int)
         elif prediction.ndim == 3:
             result = np.argmax(prediction, axis=0)
         elif prediction.ndim == 4:
