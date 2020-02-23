@@ -22,6 +22,7 @@ class Segmentation(BaseInference):
         self.result_process = SegmentResultProcess()
         self.result_show = SegmentionShow()
 
+        self.threshold = 0.5
         self.src_size = (0, 0)
 
     def load_weights(self, weights_path):
@@ -34,18 +35,18 @@ class Segmentation(BaseInference):
         for index, (src_image, image) in enumerate(dataloader):
             self.timer.tic()
             self.set_src_size(src_image)
-            prediction = self.infer(image)
+            prediction = self.infer(image, self.threshold)
             result = self.postprocess(prediction)
             print('Batch %d... Done. (%.3fs)' % (index, self.timer.toc()))
             if not self.result_show.show(src_image, result,
                                          segment_config.className):
                 break
 
-    def infer(self, input_data, threshold=0):
+    def infer(self, input_data, threshold=0.0):
         with torch.no_grad():
             output_list = self.model(input_data.to(self.device))
             output = self.compute_output(output_list)
-            prediction = self.result_process.get_detection_result(output)
+            prediction = self.result_process.get_detection_result(output, threshold)
         return prediction
 
     def postprocess(self, result):

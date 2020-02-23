@@ -57,7 +57,7 @@ class Detection2d(BaseInference):
             with open(temp_save_path, 'a') as file:
                 file.write("{} {} {} {} {} {}\n".format(filename, confidence, x1, y1, x2, y2))
 
-    def infer(self, input_data, threshold=0):
+    def infer(self, input_data, threshold=0.0):
         with torch.no_grad():
             output_list = self.model(input_data.to(self.device))
             output = self.compute_output(output_list)

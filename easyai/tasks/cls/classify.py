@@ -24,7 +24,7 @@ class Classify(BaseInference):
         dataloader = self.get_image_data_lodaer(input_path,
                                                 classify_config.imgSize)
 
-    def infer(self, input_data, threshold=0):
+    def infer(self, input_data, threshold=0.0):
         with torch.no_grad():
             output_list = self.model(input_data.to(self.device))
             output = self.compute_output(output_list)

@@ -23,7 +23,7 @@ class BaseInference():
         pass
 
     @abc.abstractmethod
-    def infer(self, input_data, threshold=0):
+    def infer(self, input_data, threshold=0.0):
         pass
 
     @abc.abstractmethod

@@ -15,6 +15,7 @@ class SegmentionTest(BaseTest):
         super().__init__()
         self.segment_inference = Segmentation(cfg_path, gpu_id)
         self.metric = SegmentionMetric(len(segment_config.className))
+        self.threshold = 0.5
 
     def load_weights(self, weights_path):
         self.segment_inference.load_weights(weights_path)
@@ -25,7 +26,7 @@ class SegmentionTest(BaseTest):
         self.timer.tic()
         self.metric.reset()
         for i, (images, segment_targets) in enumerate(dataloader):
-            prediction = self.segment_inference.infer(images)
+            prediction = self.segment_inference.infer(images, self.threshold)
             gt = segment_targets[0].data.cpu().numpy()
             self.metric.eval(prediction, gt)
             print('Batch %d... Done. (%.3fs)' % (i, self.timer.toc(True)))
