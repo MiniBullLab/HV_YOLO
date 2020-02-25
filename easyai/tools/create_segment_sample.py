@@ -39,21 +39,6 @@ class CreateSegmentionSample():
         saveTrainFilePath.close()
         saveTestFilePath.close()
 
-    def create_train_label_from_gray(self, label_dir, class_color):
-        output_dir = os.path.join(label_dir, "../SegmentLabel")
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        label_list = list(self.dirProcess.getDirFiles(label_dir, "*.*"))
-        for label_path in label_list:
-            path, file_name_and_post = os.path.split(label_path)
-            print(label_path)
-            mask = cv2.imdecode(np.fromfile(label_path, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
-            if mask is not None:
-                for key, value in class_color.items():
-                    mask[mask == key] = value
-                save_path = os.path.join(output_dir, file_name_and_post)
-                cv2.imwrite(save_path, mask)
-
 
 def test():
     print("start...")

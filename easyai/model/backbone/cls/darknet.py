@@ -29,12 +29,12 @@ class DarkNet(BaseBackbone):
         self.activationName = activationName
         self.bnName = bnName
         self.first_output = 32
+        self.in_channel = self.first_output
 
         self.create_block_list()
 
     def create_block_list(self):
-        self.block_out_channels = []
-        self.index = 0
+        self.clear_list()
 
         layer1 = ConvBNActivationBlock(in_channels=self.data_channel,
                                        out_channels=self.first_output,
@@ -45,12 +45,11 @@ class DarkNet(BaseBackbone):
                                        activationName=self.activationName)
         self.add_block_list(layer1.get_name(), layer1, self.first_output)
 
-        self.in_channel = self.first_output
         for index, num_block in enumerate(self.num_blocks):
             self.make_darknet_layer(self.out_channels[index], self.num_blocks[index],
                                     self.strides[index], self.dilations[index],
                                     self.bnName, self.activationName)
-            self.in_channel = self.outChannelList[-1]
+            self.in_channel = self.block_out_channels[-1]
 
     def make_darknet_layer(self, out_channel, num_block, stride, dilation,
                           bnName, activationName):

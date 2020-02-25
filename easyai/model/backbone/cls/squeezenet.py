@@ -27,8 +27,7 @@ class SqueezeNet(BaseBackbone):
         self.create_block_list()
 
     def create_block_list(self):
-        self.block_out_channels = []
-        self.index = 0
+        self.clear_list()
 
         layer1 = ConvActivationBlock(in_channels=self.data_channel,
                                      out_channels=self.first_output,
@@ -43,12 +42,12 @@ class SqueezeNet(BaseBackbone):
         self.add_block_list(LayerType.MyMaxPool2d, layer2, self.first_output)
 
         planes = (16, 64, 64)
-        fire1 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
+        fire1 = FireBlock(self.block_out_channels[-1], planes, activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire1.get_name(), fire1, output_channle)
 
         planes = (16, 64, 64)
-        fire2 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
+        fire2 = FireBlock(self.block_out_channels[-1], planes, activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire2.get_name(), fire2, output_channle)
 
@@ -56,12 +55,12 @@ class SqueezeNet(BaseBackbone):
         self.add_block_list(LayerType.MyMaxPool2d, layer3, output_channle)
 
         planes = (32, 128, 128)
-        fire3 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
+        fire3 = FireBlock(self.block_out_channels[-1], planes, activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire3.get_name(), fire3, output_channle)
 
         planes = (32, 128, 128)
-        fire4 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
+        fire4 = FireBlock(self.block_out_channels[-1], planes, activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire4.get_name(), fire4, output_channle)
 
@@ -69,22 +68,22 @@ class SqueezeNet(BaseBackbone):
         self.add_block_list(LayerType.MyMaxPool2d, layer4, output_channle)
 
         planes = (48, 192, 192)
-        fire5 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
+        fire5 = FireBlock(self.block_out_channels[-1], planes, activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire5.get_name(), fire5, output_channle)
 
         planes = (48, 192, 192)
-        fire6 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
+        fire6 = FireBlock(self.block_out_channels[-1], planes, activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire6.get_name(), fire6, output_channle)
 
         planes = (64, 256, 256)
-        fire7 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
+        fire7 = FireBlock(self.block_out_channels[-1], planes, activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire7.get_name(), fire7, output_channle)
 
         planes = (64, 256, 256)
-        fire8 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
+        fire8 = FireBlock(self.block_out_channels[-1], planes, activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire8.get_name(), fire8, output_channle)
 
@@ -109,8 +108,7 @@ class DilatedSqueezeNet(BaseBackbone):
         self.create_block_list()
 
     def create_block_list(self):
-        self.block_out_channels = []
-        self.index = 0
+        self.clear_list()
 
         layer1 = ConvActivationBlock(in_channels=self.data_channel,
                                      out_channels=self.first_output,
@@ -125,12 +123,12 @@ class DilatedSqueezeNet(BaseBackbone):
         self.add_block_list(LayerType.MyMaxPool2d, layer2, self.first_output)
 
         planes = (16, 64, 64)
-        fire1 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
+        fire1 = FireBlock(self.block_out_channels[-1], planes, activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire1.get_name(), fire1, output_channle)
 
         planes = (16, 64, 64)
-        fire2 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
+        fire2 = FireBlock(self.block_out_channels[-1], planes, activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire2.get_name(), fire2, output_channle)
 
@@ -138,12 +136,12 @@ class DilatedSqueezeNet(BaseBackbone):
         self.add_block_list(LayerType.MyMaxPool2d, layer3, output_channle)
 
         planes = (32, 128, 128)
-        fire3 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
+        fire3 = FireBlock(self.block_out_channels[-1], planes, activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire3.get_name(), fire3, output_channle)
 
         planes = (32, 128, 128)
-        fire4 = FireBlock(self.outChannelList[-1], planes, activationName=self.activationName)
+        fire4 = FireBlock(self.block_out_channels[-1], planes, activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire4.get_name(), fire4, output_channle)
 
@@ -151,25 +149,25 @@ class DilatedSqueezeNet(BaseBackbone):
         self.add_block_list(LayerType.MyMaxPool2d, layer4, output_channle)
 
         planes = (48, 192, 192)
-        fire5 = FireBlock(self.outChannelList[-1], planes, dilation=2,
+        fire5 = FireBlock(self.block_out_channels[-1], planes, dilation=2,
                           activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire5.get_name(), fire5, output_channle)
 
         planes = (48, 192, 192)
-        fire6 = FireBlock(self.outChannelList[-1], planes, dilation=2,
+        fire6 = FireBlock(self.block_out_channels[-1], planes, dilation=2,
                           activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire6.get_name(), fire6, output_channle)
 
         planes = (64, 256, 256)
-        fire7 = FireBlock(self.outChannelList[-1], planes, dilation=2,
+        fire7 = FireBlock(self.block_out_channels[-1], planes, dilation=2,
                           activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire7.get_name(), fire7, output_channle)
 
         planes = (64, 256, 256)
-        fire8 = FireBlock(self.outChannelList[-1], planes, dilation=2,
+        fire8 = FireBlock(self.block_out_channels[-1], planes, dilation=2,
                           activationName=self.activationName)
         output_channle = planes[1] + planes[2]
         self.add_block_list(fire8.get_name(), fire8, output_channle)

@@ -47,8 +47,7 @@ class DenseNet(BaseBackbone):
         self.create_block_list()
 
     def create_block_list(self):
-        self.block_out_channels = []
-        self.index = 0
+        self.clear_list()
 
         layer1 = ConvBNActivationBlock(in_channels=self.data_channel,
                                        out_channels=self.num_init_features,
@@ -67,7 +66,7 @@ class DenseNet(BaseBackbone):
             self.make_densenet_layer(num_block, self.dilations[index],
                                      self.bn_size, self.growth_rate,
                                      self.drop_rate, self.bnName, self.activationName)
-            self.in_channels = self.outChannelList[-1]
+            self.in_channels = self.block_out_channels[-1]
             if index != len(self.num_blocks) - 1:
                 trans = TransitionBlock(in_channel=self.in_channels,
                                         output_channel=self.in_channels // 2,
@@ -76,8 +75,8 @@ class DenseNet(BaseBackbone):
                                         activationName=self.activationName)
                 self.add_block_list(trans.get_name(), trans, self.in_channels // 2)
                 avg_pool = nn.AvgPool2d(kernel_size=2, stride=2)
-                self.add_block_list(LayerType.GlobalAvgPool, avg_pool, self.outChannelList[-1])
-                self.in_channels = self.outChannelList[-1]
+                self.add_block_list(LayerType.GlobalAvgPool, avg_pool, self.block_out_channels[-1])
+                self.in_channels = self.block_out_channels[-1]
         layer3 = NormalizeLayer(bn_name=self.bnName,
                                 out_channel=self.in_channels)
         self.add_block_list(layer3.get_name(), layer3, self.in_channels)
