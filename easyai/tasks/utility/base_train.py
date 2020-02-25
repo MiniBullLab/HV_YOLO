@@ -12,7 +12,11 @@ class BaseTrain():
         self.timer = TimerProcess()
 
     @abc.abstractmethod
-    def load_param(self, latest_weights_path):
+    def load_pretrain_model(self, weights_path):
+        pass
+
+    @abc.abstractmethod
+    def load_latest_param(self, latest_weights_path):
         pass
 
     @abc.abstractmethod

@@ -35,7 +35,7 @@ class VggNetCls(BaseModel):
         layer1 = FcLayer(base_out_channels[-1], 4096)
         self.add_block_list(layer1.get_name(), layer1, 4096)
 
-        layer2 = ActivationLayer(self.activation_name)
+        layer2 = ActivationLayer(self.activation_name, inplace=False)
         self.add_block_list(layer2.get_name(), layer2, 4096)
 
         layer3 = nn.Dropout()
@@ -44,7 +44,7 @@ class VggNetCls(BaseModel):
         layer4 = nn.Linear(4096, 4096)
         self.add_block_list(LayerType.FcLinear, layer4, 4096)
 
-        layer5 = ActivationLayer(self.activation_name)
+        layer5 = ActivationLayer(self.activation_name, inplace=False)
         self.add_block_list(layer5.get_name(), layer5, 4096)
 
         layer6 = nn.Dropout()

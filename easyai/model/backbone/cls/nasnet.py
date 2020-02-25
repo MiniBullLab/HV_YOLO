@@ -59,7 +59,7 @@ class NasNet(BaseBackbone):
 
         self.make_normal(NormalCell, self.repeat_cell_num, self.filters)
 
-        relu = ActivationLayer(activation_name=self.activation_name)
+        relu = ActivationLayer(activation_name=self.activation_name, inplace=False)
         self.add_block_list(relu.get_name(), relu, self.filters * 6)
 
     def make_normal(self, block, repeat, output):

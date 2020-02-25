@@ -8,17 +8,18 @@ sys.path.insert(0, os.getcwd() + "/..")
 import numpy as np
 from easyai.helper.imageProcess import ImageProcess
 from easyai.data_loader.cls.classify_sample import ClassifySample
-from easyai.data_loader.cls.classify_dataset_process import ClassifyDatasetProcess
+from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
+from easyai.config import classify_config
 
 
 class ComputeClassifyMean():
 
-    def __init__(self, train_path, image_size=(416, 416)):
+    def __init__(self, train_path, image_size=classify_config.imgSize):
         self.image_size = image_size
         self.classify_sample = ClassifySample(train_path)
-        self.classify_sample.read_sample()
+        self.classify_sample.read_sample(flag=0)
         self.image_process = ImageProcess()
-        self.dataset_process = ClassifyDatasetProcess()
+        self.dataset_process = ImageDataSetProcess()
 
     def compute(self):
         numpy_images = []
@@ -26,8 +27,7 @@ class ComputeClassifyMean():
         for index in range(count):
             img_path, label = self.classify_sample.get_sample_path(index)
             src_image, rgb_image = self.image_process.readRgbImage(img_path)
-            rgb_image = self.dataset_process.resize_image(rgb_image, self.image_size)
-            rgb_image = self.dataset_process.normaliza_dataset(rgb_image)
+            rgb_image = self.dataset_process.image_resize(rgb_image, self.image_size)
             numpy_images.append(rgb_image)
         numpy_images = np.stack(numpy_images)
         mean = np.mean(numpy_images, axis=(0, 2, 3))

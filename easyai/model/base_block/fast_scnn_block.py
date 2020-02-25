@@ -79,7 +79,7 @@ class FeatureFusionBlock(BaseBlock):
                                                      kernel_size=1,
                                                      bnName=bn_name,
                                                      activationName=ActivationType.Linear)
-        self.relu = ActivationLayer(activation_name)
+        self.relu = ActivationLayer(activation_name, inplace=False)
 
     def forward(self, higher_res_feature, lower_res_feature):
         lower_res_feature = F.interpolate(lower_res_feature, scale_factor=self.scale_factor,

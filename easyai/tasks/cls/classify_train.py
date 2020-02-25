@@ -36,7 +36,10 @@ class ClassifyTrain(BaseTrain):
         self.best_precision = 0
         self.optimizer = None
 
-    def load_param(self, latest_weights_path):
+    def load_pretrain_model(self, weights_path):
+        pass
+
+    def load_latest_param(self, latest_weights_path):
         checkpoint = None
         if latest_weights_path and os.path.exists(latest_weights_path):
             checkpoint = self.torchModelProcess.loadLatestModelWeight(latest_weights_path, self.model)
@@ -60,7 +63,7 @@ class ClassifyTrain(BaseTrain):
 
         self.total_images = len(dataloader)
 
-        self.load_param(classify_config.latest_weights_file)
+        self.load_latest_param(classify_config.latest_weights_file)
         self.timer.tic()
         for epoch in range(self.start_epoch, classify_config.maxEpochs):
             # self.optimizer = torchOptimizer.adjust_optimizer(epoch, lr)

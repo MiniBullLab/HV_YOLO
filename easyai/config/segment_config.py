@@ -3,7 +3,7 @@ from easyai.config.base_config import *
 # data
 imgSize = (440, 512)
 # class_path = "./data/berkeley.names"
-train_batch_size = 2
+train_batch_size = 1
 test_batch_size = 1
 className = ['background', 'lane']
 
@@ -16,13 +16,17 @@ latest_weights_file = os.path.join(snapshotPath, 'latest.pt')
 best_weights_file = os.path.join(snapshotPath, 'best.pt')
 maxEpochs = 300
 
-base_lr = 1e-3
+base_lr = 1e-2
 lr_power = 0.9
-optimizerConfig = {0: {'optimizer': 'SGD',
-                       'momentum': 0.9,
-                       'weight_decay': 5e-4}
+optimizerConfig = {0: {'optimizer': 'RMSprop',
+                       'alpha': 0.9,
+                       'eps': 1e-08,
+                       'weight_decay': 0.}
                    }
 accumulated_batches = 1
+
+enable_freeze_layer = False
+freeze_layer_name = "route_0"
 
 enable_mixed_precision = False
 

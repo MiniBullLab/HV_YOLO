@@ -39,7 +39,7 @@ class RefineNetBlock(BaseBlock):
     def __init__(self, in_planes, out_planes, stages,
                  activation_name=ActivationType.ReLU):
         super().__init__(RefineNetBlockName.RefineNetBlock)
-        self.activate = ActivationLayer(activation_name)
+        self.activate = ActivationLayer(activation_name, inplace=False)
 
         self.mflow = CRPBlock(in_planes, out_planes, stages)
         self.conv1 = nn.Conv2d(out_planes, 256, 1, bias=False)

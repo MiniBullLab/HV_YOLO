@@ -116,7 +116,7 @@ class CreateModuleList():
             self.input_channels = self.filters
         elif module_def['type'] == LayerType.ActivationLayer:
             activation_name = module_def['activation'].strip()
-            layer = ActivationLayer(activation_name)
+            layer = ActivationLayer(activation_name, inplace=False)
             self.addBlockList(LayerType.ActivationLayer, layer, self.filters)
             self.input_channels = self.filters
 

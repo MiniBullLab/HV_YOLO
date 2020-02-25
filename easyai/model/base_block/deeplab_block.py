@@ -4,7 +4,6 @@
 
 from easyai.base_name.block_name import BatchNormType, ActivationType
 from easyai.model.base_block.base_block import *
-from easyai.model.base_block.utility_layer import ActivationLayer, NormalizeLayer
 from easyai.model.base_block.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.utility_block import SeparableConv2dBNActivation
 from easyai.model.base_block.bisenet_block import GlobalAvgPooling

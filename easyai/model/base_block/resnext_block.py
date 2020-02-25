@@ -71,7 +71,7 @@ class ResNextBottleNeck(BaseBlock):
                                                   bnName=bn_name,
                                                   activationName=ActivationType.Linear)
 
-        self.relu = ActivationLayer(activation_name=activation_name)
+        self.relu = ActivationLayer(activation_name=activation_name, inplace=False)
 
     def forward(self, x):
         x1 = self.split_transforms(x)

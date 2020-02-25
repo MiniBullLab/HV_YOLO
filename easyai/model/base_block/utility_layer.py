@@ -66,9 +66,9 @@ class NormalizeLayer(BaseBlock):
 
 class ActivationLayer(BaseBlock):
 
-    def __init__(self, activation_name):
+    def __init__(self, activation_name, inplace=True):
         super().__init__(LayerType.ActivationLayer)
-        self.activation = ActivationFunction.get_function(activation_name)
+        self.activation = ActivationFunction.get_function(activation_name, inplace)
 
     def forward(self, x):
         x = self.activation(x)

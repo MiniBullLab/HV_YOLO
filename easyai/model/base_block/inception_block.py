@@ -363,7 +363,7 @@ class InceptionResNetA(BaseBlock):
         self.reduction1x1 = nn.Conv2d(128, 384, kernel_size=1)
         self.shortcut = nn.Conv2d(input_channel, 384, kernel_size=1)
         self.bn = NormalizeLayer(bn_name=bn_name, out_channel=384)
-        self.relu = ActivationLayer(activation_name=activation_name)
+        self.relu = ActivationLayer(activation_name=activation_name, inplace=False)
 
     def forward(self, x):
         residual = [
@@ -409,7 +409,7 @@ class InceptionResNetB(BaseBlock):
         self.shortcut = nn.Conv2d(input_channel, 1154, kernel_size=1)
 
         self.bn = NormalizeLayer(bn_name=bn_name, out_channel=1154)
-        self.relu = ActivationLayer(activation_name=activation_name)
+        self.relu = ActivationLayer(activation_name=activation_name, inplace=False)
 
     def forward(self, x):
         residual = [
@@ -454,7 +454,7 @@ class InceptionResNetC(BaseBlock):
         self.shorcut = nn.Conv2d(input_channel, 2048, kernel_size=1)
 
         self.bn = NormalizeLayer(bn_name=bn_name, out_channel=2048)
-        self.relu = ActivationLayer(activation_name=activation_name)
+        self.relu = ActivationLayer(activation_name=activation_name, inplace=False)
 
     def forward(self, x):
         residual = [

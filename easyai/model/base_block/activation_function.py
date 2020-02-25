@@ -31,16 +31,16 @@ class ActivationFunction():
         pass
 
     @classmethod
-    def get_function(cls, name):
+    def get_function(cls, name, inplace=True):
         if name == ActivationType.Linear:
             return LinearActivation()
         elif name == ActivationType.ReLU:
-            return nn.ReLU(inplace=True)
+            return nn.ReLU(inplace=inplace)
         elif name == ActivationType.PReLU:
             return nn.PReLU()
         elif name == ActivationType.ReLU6:
-            return nn.ReLU6(inplace=True)
+            return nn.ReLU6(inplace=inplace)
         elif name == ActivationType.LeakyReLU:
-            return nn.LeakyReLU(0.1, inplace=True)
+            return nn.LeakyReLU(0.1, inplace=inplace)
         elif name == ActivationType.Sigmoid:
             return nn.Sigmoid()

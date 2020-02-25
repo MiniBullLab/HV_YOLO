@@ -82,7 +82,7 @@ class DenseNet(BaseBackbone):
                                 out_channel=self.in_channels)
         self.add_block_list(layer3.get_name(), layer3, self.in_channels)
 
-        layer4 = ActivationLayer(self.activationName)
+        layer4 = ActivationLayer(self.activationName, False)
         self.add_block_list(layer4.get_name(), layer4, self.in_channels)
 
     def make_densenet_layer(self, num_block, dilation,

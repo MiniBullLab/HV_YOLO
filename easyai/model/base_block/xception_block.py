@@ -352,7 +352,7 @@ class BlockA(BaseBlock):
         else:
             self.skip = None
 
-        self.relu = ActivationLayer(activation_name)
+        self.relu = ActivationLayer(activation_name, inplace=False)
         rep = list()
         inter_channels = out_channels // 4
 

@@ -47,7 +47,7 @@ class CellA(BaseBlock):
                                                bias=False,
                                                bnName=bn_name,
                                                activationName=ActivationType.Linear)
-        self.activate = ActivationLayer(activation_name)
+        self.activate = ActivationLayer(activation_name, inplace=False)
 
     def forward(self, x):
         y1 = self.sep_conv1(x)
@@ -81,8 +81,8 @@ class CellB(BaseBlock):
                                                bnName=bn_name,
                                                activationName=ActivationType.Linear)
 
-        self.activate1 = ActivationLayer(activation_name)
-        self.activate2 = ActivationLayer(activation_name)
+        self.activate1 = ActivationLayer(activation_name, inplace=False)
+        self.activate2 = ActivationLayer(activation_name, inplace=False)
 
         # Reduce channels
         self.conv2 = ConvBNActivationBlock(in_channels=2 * out_planes,

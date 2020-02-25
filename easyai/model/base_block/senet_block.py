@@ -48,7 +48,7 @@ class BasicResidualSEBlock(BaseBlock):
                                                   activationName=ActivationType.Linear)
         self.se_block = SEBlock(out_channels * self.expansion, reduction)
 
-        self.relu = ActivationLayer(activation_name=activation_name)
+        self.relu = ActivationLayer(activation_name=activation_name, inplace=False)
 
     def forward(self, x):
         shortcut = self.shortcut(x)
@@ -97,7 +97,7 @@ class BottleneckResidualSEBlock(BaseBlock):
                                                   stride=stride,
                                                   bnName=bn_name,
                                                   activationName=ActivationType.Linear)
-        self.relu = ActivationLayer(activation_name=activation_name)
+        self.relu = ActivationLayer(activation_name=activation_name, inplace=False)
 
     def forward(self, x):
         shortcut = self.shortcut(x)

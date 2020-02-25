@@ -37,7 +37,10 @@ class Detection2dTrain(BaseTrain):
         self.start_epoch = 0
         self.best_mAP = 0
 
-    def load_param(self, latest_weights_path):
+    def load_pretrain_model(self, weights_path):
+        pass
+
+    def load_latest_param(self, latest_weights_path):
         checkpoint = None
         if latest_weights_path and os.path.exists(latest_weights_path):
             checkpoint = self.torchModelProcess.loadLatestModelWeight(latest_weights_path, self.model)

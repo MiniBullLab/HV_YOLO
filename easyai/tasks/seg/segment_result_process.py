@@ -15,6 +15,7 @@ class SegmentResultProcess():
         result = None
         if prediction.ndim == 2:
             result = (prediction >= threshold).astype(int)
+            # print(set(list(result.flatten())))
         elif prediction.ndim == 3:
             result = np.argmax(prediction, axis=0)
         elif prediction.ndim == 4:

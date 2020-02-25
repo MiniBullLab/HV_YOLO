@@ -32,12 +32,12 @@ class ShuffleNetV2(BaseBackbone):
         self.activationName = activationName
         self.bnName = bnName
         self.first_output = 24
+        self.in_channels = self.first_output
 
         self.create_block_list()
 
     def create_block_list(self):
-        self.block_out_channels = []
-        self.index = 0
+        self.clear_list()
 
         layer1 = ConvBNActivationBlock(in_channels=self.data_channel,
                                        out_channels=self.first_output,
@@ -51,12 +51,11 @@ class ShuffleNetV2(BaseBackbone):
         layer2 = MyMaxPool2d(kernel_size=3, stride=2)
         self.add_block_list(LayerType.MyMaxPool2d, layer2, self.first_output)
 
-        self.in_channels = self.first_output
         for index, num_block in enumerate(self.num_blocks):
             self.make_suffle_block(self.out_channels[index], self.num_blocks[index],
                                  self.strides[index], self.dilations[index],
                                  self.bnName, self.activationName)
-            self.in_channels = self.outChannelList[-1]
+            self.in_channels = self.block_out_channels[-1]
 
     def make_suffle_block(self, out_channels, num_blocks, stride, dilation,
                           bnName, activationName):

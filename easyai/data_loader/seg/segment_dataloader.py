@@ -47,7 +47,7 @@ class SegmentDataLoader(data.Dataset):
 
 
 def get_segment_train_dataloader(train_path, image_size, batch_size, num_workers=8):
-    dataloader = SegmentDataLoader(train_path, image_size, True)
+    dataloader = SegmentDataLoader(train_path, image_size, False)
     result = data.DataLoader(dataset=dataloader, num_workers=num_workers,
                              batch_size=batch_size, shuffle=True)
     return result
