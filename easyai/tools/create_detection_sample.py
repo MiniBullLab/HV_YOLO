@@ -8,7 +8,7 @@ from easyai.helper import DirProcess, XMLProcess
 from easyai.config import detect_config
 
 
-class DetectionCreateSample():
+class CreateDetectionSample():
 
     def __init__(self):
         self.dirProcess = DirProcess()
@@ -71,7 +71,7 @@ class DetectionCreateSample():
 
 def test():
     print("start...")
-    test = DetectionCreateSample()
+    test = CreateDetectionSample()
     test.createBalanceSample("/home/lpj/github/data/Berkeley/ImageSets/train.txt",
                 "/home/lpj/github/data/Berkeley/ImageSets")
     print("End of game, have a nice day!")

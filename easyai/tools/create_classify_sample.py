@@ -10,7 +10,7 @@ from easyai.helper.dirProcess import DirProcess
 import cv2
 
 
-class ClassifyCreateSample():
+class CreateClassifySample():
 
     def __init__(self):
         self.dir_process = DirProcess()
@@ -99,7 +99,7 @@ class ClassifyCreateSample():
 
 def main():
     print("start...")
-    test = ClassifyCreateSample()
+    test = CreateClassifySample()
     test.process_sample("/home/lpj/github/data/cifar100/JPEGImages",
                         "/home/lpj/github/data/cifar100/ImageSets",
                         "train_val",

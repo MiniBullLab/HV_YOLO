@@ -36,7 +36,7 @@ class SegmentionTrain(BaseTrain):
         self.bestmIoU = 0
 
     def load_pretrain_model(self, weights_path):
-        pass
+        self.torchModelProcess.loadPretainModel(weights_path, self.model)
 
     def load_latest_param(self, latest_weights_path):
         checkpoint = None

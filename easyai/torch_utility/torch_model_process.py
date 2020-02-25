@@ -29,7 +29,7 @@ class TorchModelProcess():
             print("Loading pretainModel from {}".format(weightPath))
             model.load_state_dict(torch.load(weightPath), strict=True)
         else:
-            print("Loading %s fail" % weightPath)
+            print("pretain model %s not exist" % weightPath)
 
     def loadLatestModelWeight(self, weightPath, model):
         count = self.torchDeviceProcess.getCUDACount()

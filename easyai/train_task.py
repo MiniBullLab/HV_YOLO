@@ -11,16 +11,19 @@ from easyai.base_name.task_name import TaskName
 
 def classify_task(options):
     classify_train = ClassifyTrain(options.cfg, 0)
+    classify_train.load_pretrain_model(options.pretrainModel)
     classify_train.train(options.trainPath, options.valPath)
 
 
 def detect_task(options):
     detect_train = Detection2dTrain(options.cfg, 0)
+    detect_train.load_pretrain_model(options.pretrainModel)
     detect_train.train(options.trainPath, options.valPath)
 
 
 def segment_task(options):
     segment_train = SegmentionTrain(options.cfg, 0)
+    segment_train.load_pretrain_model(options.pretrainModel)
     segment_train.train(options.trainPath, options.valPath)
 
 

@@ -1,6 +1,5 @@
 import os
-from os import listdir
-from os.path import join
+import numpy as np
 from PIL import Image
 import cv2
 
@@ -29,6 +28,7 @@ class ImageProcess():
 
     def read_gray_image(self, image_path):
         gray_image = cv2.imread(image_path, cv2.COLOR_BGR2GRAY)
+        # cv2.imdecode(np.fromfile(image_path, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
         return gray_image
 
     def opencvImageRead(self, imagePath):

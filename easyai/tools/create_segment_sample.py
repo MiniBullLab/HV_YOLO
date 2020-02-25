@@ -8,7 +8,7 @@ from easyai.helper import DirProcess
 from easyai.helper import ImageProcess
 
 
-class SegmentionCreateSample():
+class CreateSegmentionSample():
 
     def __init__(self):
         self.dirProcess = DirProcess()
@@ -57,7 +57,7 @@ class SegmentionCreateSample():
 
 def test():
     print("start...")
-    test = SegmentionCreateSample()
+    test = CreateSegmentionSample()
     test.create_train_label_from_gray("/home/lpj/github/data/LED_detect/SegmentLabel1",
                                       {255: 0, 0: 1})
     print("End of game, have a nice day!")

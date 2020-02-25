@@ -14,7 +14,7 @@ from easyai.helper import ImageProcess
 from easyai.config import detect_config
 
 
-class CreateAnchors():
+class CreateDetectionAnchors():
 
     def __init__(self, train_path):
         self.xmlProcess = XMLProcess()
@@ -39,7 +39,6 @@ class CreateAnchors():
               (number, detect_config.imgSize, biou.min(), iou.mean(), biou.mean()), end='')
         for i, x in enumerate(k):
             print('%i,%i' % (round(x[0]), round(x[1])), end=',  ' if i < len(k) - 1 else '\n')
-
 
     def get_width_height(self):
         count = self.detection_sample.get_sample_count()
@@ -70,7 +69,7 @@ class CreateAnchors():
 
 def test():
     print("start...")
-    test = CreateAnchors("/home/lpj/github/data/Berkeley/ImageSets/train.txt")
+    test = CreateDetectionAnchors("/home/lpj/github/data/Berkeley/ImageSets/train.txt")
     test.get_anchors(9)
     print("End of game, have a nice day!")
 

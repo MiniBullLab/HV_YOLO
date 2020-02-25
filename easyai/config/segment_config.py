@@ -2,9 +2,10 @@ from easyai.config.base_config import *
 
 # data
 imgSize = (440, 512)
-# class_path = "./data/berkeley.names"
 train_batch_size = 1
 test_batch_size = 1
+
+label_is_gray = True
 className = ['background', 'lane']
 
 # segment
