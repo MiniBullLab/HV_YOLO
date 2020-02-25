@@ -43,8 +43,6 @@ class CreateSegmentionSample():
 def test():
     print("start...")
     test = CreateSegmentionSample()
-    test.create_train_label_from_gray("/home/lpj/github/data/LED_detect/SegmentLabel1",
-                                      {255: 0, 0: 1})
     print("End of game, have a nice day!")
 
 

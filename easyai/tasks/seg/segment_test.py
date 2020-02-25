@@ -41,7 +41,7 @@ class SegmentionTest(BaseTest):
             # file.write('%11.3g' * 2 % (mAP, aps[0]) + '\n')
             file.write("Epoch: {} | mIoU: {:.3f} | ".format(epoch, score['Mean IoU : \t']))
             for i, iou in enumerate(class_iou):
-                file.write(segment_config.className[i] + ": {:.3f} ".format(iou))
+                file.write(segment_config.className[i][0] + ": {:.3f} ".format(iou))
             file.write("\n")
 
     def print_evaluation(self, score):

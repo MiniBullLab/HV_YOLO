@@ -6,7 +6,8 @@ train_batch_size = 1
 test_batch_size = 1
 
 label_is_gray = True
-className = ['background', 'lane']
+className = [('background', 255),
+             ('lane', 0)]
 
 # segment
 log_name = "segment"

@@ -30,8 +30,8 @@ class ComputeClassifyMean():
             rgb_image = self.dataset_process.image_resize(rgb_image, self.image_size)
             numpy_images.append(rgb_image)
         numpy_images = np.stack(numpy_images)
-        mean = np.mean(numpy_images, axis=(0, 2, 3))
-        std = np.std(numpy_images, axis=(0, 2, 3))
+        mean = np.mean(numpy_images, axis=(0, 1, 2))
+        std = np.std(numpy_images, axis=(0, 1, 2))
         return mean, std
 
 

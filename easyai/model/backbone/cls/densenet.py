@@ -104,9 +104,7 @@ class DenseNet(BaseBackbone):
     def forward(self, x):
         output_list = []
         for key, block in self._modules.items():
-            print(x.shape)
             x = block(x)
-            print(key, x.shape)
             output_list.append(x)
         return output_list
 
