@@ -57,7 +57,7 @@ class Detection2dTrain(BaseTrain):
                                               detect_config.train_batch_size, detect_config.imgSize,
                                               multi_scale=False, augment=True, balanced_sample=True)
         self.total_images = len(dataloader)
-        self.load_param(detect_config.latest_weights_file)
+        self.load_latest_param(detect_config.latest_weights_file)
 
         self.timer.tic()
         for epoch in range(self.start_epoch, detect_config.maxEpochs):
