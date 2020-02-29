@@ -17,6 +17,8 @@ np.random.seed(42)
 rn.seed(12345)
 session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1,
                               gpu_options=tf.GPUOptions(allow_growth=True))
+# session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1,
+#                               gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.2))
 
 from keras import backend as K
 tf.set_random_seed(1234)
@@ -48,7 +50,7 @@ class FgSegV2Train():
         save_model_dir = fgseg_config.snapshotPath
         if not os.path.exists(save_model_dir):
             os.makedirs(save_model_dir)
-        self.mdl_path = os.path.join(save_model_dir, 'seg_best_weights.h5')
+        self.mdl_path = os.path.join(save_model_dir, 'seg_weights.h5')
 
     def train(self, train_val_path, vgg_weights_path):
 
@@ -58,8 +60,8 @@ class FgSegV2Train():
         model = MyFgSegNetV2(self.lr, img_shape, vgg_weights_path)
         model = model.init_model()
 
-        if os.path.exists(self.mdl_path):
-            model.load_weights(self.mdl_path)
+        if os.path.exists(fgseg_config.best_weights_file):
+            model.load_weights(fgseg_config.best_weights_file)
             print("checkpoint_loaded")
 
         # make sure that training input shape equals to model output
@@ -73,8 +75,8 @@ class FgSegV2Train():
                                                     write_graph=False,
                                                     write_images=False)
 
-        checkpoints = keras.callbacks.ModelCheckpoint(self.mdl_path,
-                                                      monitor='val_loss', verbose=0, save_best_only=True,
+        checkpoints = keras.callbacks.ModelCheckpoint(fgseg_config.best_weights_file,
+                                                      monitor='val_loss', verbose=0, save_best_only=False,
                                                       save_weights_only=False, mode='auto', period=1)
         early = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=1e-4, patience=10, verbose=0, mode='auto')
         redu = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, verbose=0, mode='auto')
@@ -84,7 +86,7 @@ class FgSegV2Train():
                   callbacks=[redu, early, checkpoints, show_callback],
                   verbose=1, class_weight=data[2],
                   shuffle=True)
-        model.save(fgseg_config.best_weights_file)
+        # model.save(fgseg_config.best_weights_file)
         del model, data, early, redu
 
     def get_train_data(self, train_path, image_size):

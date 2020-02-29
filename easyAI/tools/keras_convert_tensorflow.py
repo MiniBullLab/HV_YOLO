@@ -14,6 +14,7 @@ from keras.models import model_from_json, model_from_yaml
 from easyAI.converter.keras_models.model_factory import KerasModelFactory
 
 K.set_learning_phase(0)
+
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('input_model', None, 'Path to the input model.')

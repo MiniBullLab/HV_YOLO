@@ -122,7 +122,7 @@ class MyFgSegNetV2(BaseModel):
         x = self.M_FPM(x)
         x = self.decoder(x, a, b)
 
-        vision_model = Model(inputs=net_input, outputs=x, name=KerasModelName.FgSegNetV2)
+        vision_model = Model(inputs=net_input, outputs=x, name=KerasModelName.MyFgSegNetV2)
         opt = keras.optimizers.RMSprop(lr=self.lr, rho=0.9, epsilon=1e-08, decay=0.)
 
         vision_model.compile(loss=loss, optimizer=opt, metrics=[acc])
