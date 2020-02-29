@@ -27,7 +27,8 @@ class TorchModelProcess():
     def loadPretainModel(self, weightPath, model):
         if os.path.exists(weightPath):
             print("Loading pretainModel from {}".format(weightPath))
-            model.load_state_dict(torch.load(weightPath), strict=True)
+            checkpoint = torch.load(weightPath)
+            model.load_state_dict(checkpoint['model'])
         else:
             print("pretain model %s not exist" % weightPath)
 

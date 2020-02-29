@@ -1,4 +1,6 @@
+import re
 import torch
+
 
 class TorchOptimizer():
     def __init__(self, config):
@@ -32,6 +34,15 @@ class TorchOptimizer():
     def freeze_layer(self, model, layer_name):
         for key, block in model._modules.items():
             if layer_name in key:
+                for param in block.parameters():
+                    param.requires_grad = False
+
+    def freeze_layer_from_name(self, model, layer_name):
+        layer_name_re = None
+        if layer_name is not None:
+            layer_name_re = re.compile(layer_name)
+        for key, block in model._modules.items():
+            if layer_name_re.match(key) is not None:
                 for param in block.parameters():
                     param.requires_grad = False
 

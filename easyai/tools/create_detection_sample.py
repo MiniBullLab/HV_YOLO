@@ -31,7 +31,7 @@ class CreateDetectionSample():
             if os.path.exists(annotationPath) and \
                os.path.exists(imagePath):
                 _, _, boxes = self.xmlProcess.parseRectData(annotationPath)
-                allNames = [box.name for box in boxes if box.name in detectConfig.className]
+                allNames = [box.name for box in boxes if box.name in detect_config.className]
                 names = set(allNames)
                 print(names)
                 for className in names:

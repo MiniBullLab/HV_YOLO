@@ -37,7 +37,7 @@ class ModelConverter():
         self.converter = TorchConvertOnnx()
 
     def model_convert(self, model_path, weight_path, save_dir):
-        input_x = torch.randn(1, 3, 640, 352)
+        input_x = torch.randn(1, 3, 512, 440)
         self.converter.set_input(input_x)
         self.converter.set_save_dir(save_dir)
         model = self.model_factory.get_model(model_path)

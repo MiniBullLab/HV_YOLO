@@ -59,11 +59,12 @@ class TensorflowInference():
 
         sess.run(tf.global_variables_initializer())
         self.print_op(sess)
-        input_data = sess.graph.get_tensor_by_name("net_input:0")
-        oput_data = sess.graph.get_tensor_by_name("conv2d_10/Sigmoid:0")
+        input_data = sess.graph.get_tensor_by_name("0:0")
+        oput_data = sess.graph.get_tensor_by_name("Sigmoid:0")
 
         img = cv2.imread(input_path)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = img.transpose(2, 0, 1)
         img = np.ascontiguousarray(img, dtype=np.float32)
         img /= 255.0
         img = np.expand_dims(img, axis=0)

@@ -50,7 +50,7 @@ class CreateDetectionAnchors():
             rgb_image, labels = self.dataset_process.resize_dataset(rgb_image,
                                                                     detect_config.imgSize,
                                                                     boxes,
-                                                                    self.className)
+                                                                    detect_config.className)
             temp = np.zeros((len(labels), 2), dtype=np.float32)
             for index, object in enumerate(labels):
                 temp[index, :] = np.array([object.width(), object.height()])

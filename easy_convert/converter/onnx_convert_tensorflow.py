@@ -29,7 +29,7 @@ def parse_arguments():
 class OnnxConvertTensorflow():
 
     def __init__(self, onnx_path):
-        self.target_opset = 10
+        self.target_opset = 9
         self.onnx_path = pathlib.Path(onnx_path)
         self.tensorflow_model_save_path = self.onnx_path.with_suffix(".pb")
 

@@ -48,8 +48,9 @@ class SegmentionTrain(BaseTrain):
         self.start_epoch, self.bestmIoU = self.torchModelProcess.getLatestModelValue(checkpoint)
 
         if segment_config.enable_freeze_layer:
-            self.torchOptimizer.freeze_optimizer_layer(self.start_epoch, self.model,
+            self.torchOptimizer.freeze_optimizer_layer(self.start_epoch,
                                                        segment_config.base_lr,
+                                                       self.model,
                                                        segment_config.freeze_layer_name)
         else:
             self.torchOptimizer.createOptimizer(self.start_epoch, self.model, segment_config.base_lr)
@@ -59,7 +60,7 @@ class SegmentionTrain(BaseTrain):
         dataloader = get_segment_train_dataloader(train_path, segment_config.imgSize,
                                                   segment_config.train_batch_size)
         self.total_images = len(dataloader)
-        self.load_param(segment_config.latest_weights_file)
+        self.load_latest_param(segment_config.latest_weights_file)
 
         # set learning policy
         total_iteration = segment_config.maxEpochs * len(dataloader)

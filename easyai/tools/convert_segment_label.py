@@ -41,8 +41,11 @@ class ConvertSegmentionLable():
                 cv2.imwrite(save_path, mask)
 
     def convert_gray_label(self, mask, class_list):
+        unkonwn = False
         for index, class_name, value in enumerate(class_list):
                 mask[mask == value] = index
+                unkonwn = unkonwn | (mask == value)
+        mask[unkonwn] = 250
         return mask
 
     def convert_color_label(self, mask, class_list):
