@@ -40,7 +40,7 @@ class FgSegV2Train():
     def __init__(self):
         self.dirProcess = DirProcess()
         self.annotation_post = ".png"
-        self.lr = 0.01
+        self.lr = 1e-4
         self.val_split = 0.2
         self.max_epoch = fgseg_config.maxEpochs
         self.batch_size = fgseg_config.train_batch_size
