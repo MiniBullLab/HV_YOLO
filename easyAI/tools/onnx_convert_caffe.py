@@ -36,6 +36,7 @@ def parse_arguments():
 
     return options
 
+
 class OnnxConvertCaffe():
 
     transformers = [
@@ -59,6 +60,11 @@ class OnnxConvertCaffe():
     def convert_proto(self, proto_save_path):
         net = caffe_pb2.NetParameter()
         for index, layer in enumerate(self.layers):
+            if index == 0:
+                layer.layer_name = "data"
+                layer.outputs = ["data"]
+            elif index == 1:
+                layer.inputs = ["data"]
             self.layers[index] = layer._to_proto()
         net.layer.extend(self.layers)
         with open(proto_save_path, 'w') as f:

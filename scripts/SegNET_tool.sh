@@ -46,7 +46,7 @@ outputShape=1,3,512,440
 inputLayerName="i:net_input|is:1,512,440,3"
 compare_inputLayerName="i:net_input=${imageDir}/img_list.txt|iq|idf:0,0,0,0|is:1,512,440,3"
 temp_outputLayerName="conv2d_10/Sigmoid"
-outputLayerName="o:conv2d_10/Sigmoid|ot:0,3,1,2|odf:fp32"
+outputLayerName="o:conv2d_10/Sigmoid|ot:0,1,2,3|odf:fp32"
 inputDataFormat=0,0,0,0
 
 mean=0.0
