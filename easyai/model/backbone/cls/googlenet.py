@@ -2,12 +2,12 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.googlenet_block import InceptionBlock
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.cls.googlenet_block import InceptionBlock
 
 
 __all__ = ['GoogleNet']
@@ -15,7 +15,7 @@ __all__ = ['GoogleNet']
 
 class GoogleNet(BaseBackbone):
 
-    def __init__(self, data_channel=3, bnName=BatchNormType.BatchNormalize2d,
+    def __init__(self, data_channel=3, bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
         self.set_name(BackboneName.GoogleNet)

@@ -5,11 +5,11 @@
 Paper: "EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks".
 '''
 
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.efficientnet_block import EfficientNetBlock
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.cls.efficientnet_block import EfficientNetBlock
 
 __all__ = ['EfficientNet']
 
@@ -18,7 +18,7 @@ class EfficientNet(BaseBackbone):
     def __init__(self, data_channel=3, num_blocks=(1, 2, 2, 3, 3, 4, 1),
                  out_channels=(16, 24, 40, 80, 112, 192, 320),
                  strides=(2, 1, 2, 2, 1, 2, 2), expansions=(1, 6, 6, 6, 6, 6, 6),
-                 bnName=BatchNormType.BatchNormalize2d,
+                 bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
         self.set_name(BackboneName.EfficientNet)

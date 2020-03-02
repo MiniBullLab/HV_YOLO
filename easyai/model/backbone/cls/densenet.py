@@ -3,12 +3,12 @@
 # Author:
 
 from easyai.base_name.backbone_name import BackboneName
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_layer import NormalizeLayer, ActivationLayer
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.densenet_block import DenseBlock, TransitionBlock
+from easyai.model.base_block.utility.utility_layer import NormalizeLayer, ActivationLayer
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.cls.densenet_block import DenseBlock, TransitionBlock
 
 
 __all__ = ['densenet121', 'densenet169', 'densenet201', 'densenet161',
@@ -30,7 +30,7 @@ class DenseNet(BaseBackbone):
 
     def __init__(self, data_channel=3, growth_rate=32, num_init_features=64,
                  num_blocks=(6, 12, 24, 16), dilations=(1, 1, 1, 1), bn_size=4, drop_rate=0,
-                 bnName=BatchNormType.BatchNormalize2d, activationName=ActivationType.ReLU):
+                 bnName=NormalizationType.BatchNormalize2d, activationName=ActivationType.ReLU):
 
         super().__init__()
         self.set_name(BackboneName.Densenet121)

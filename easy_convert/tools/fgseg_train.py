@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-# Author:
+# Author:lipeijie
 
 import os
 import sys
@@ -32,6 +32,7 @@ import matplotlib.pyplot as plt
 from easy_convert.helper.dirProcess import DirProcess
 from easy_convert.keras_models.seg.fgsegnetv2 import FgSegNetV2
 from easy_convert.keras_models.seg.my_fgsegnetv2 import MyFgSegNetV2
+from easy_convert.config import fgseg_config
 
 
 class FgSegV2Train():
@@ -39,22 +40,29 @@ class FgSegV2Train():
     def __init__(self):
         self.dirProcess = DirProcess()
         self.annotation_post = ".png"
-        self.lr = 0.01
         self.val_split = 0.2
-        self.max_epoch = 100
-        self.batch_size = 1
+        self.lr = fgseg_config.lr
+        self.max_epoch = fgseg_config.maxEpochs
+        self.batch_size = fgseg_config.train_batch_size
 
-        if not os.path.exists("tests"):
-            os.makedirs("tests")
-        self.mdl_path = os.path.join("tests", 'mdl')
+        self.log_path = os.path.join(fgseg_config.root_save_dir, "seg_logs")
+
+        save_model_dir = fgseg_config.snapshotPath
+        if not os.path.exists(save_model_dir):
+            os.makedirs(save_model_dir)
+        self.mdl_path = os.path.join(save_model_dir, 'seg_weights.h5')
 
     def train(self, train_val_path, vgg_weights_path):
 
-        data = self.get_train_data(train_val_path)
+        data = self.get_train_data(train_val_path, fgseg_config.image_size)
         img_shape = data[0][0].shape  # (height, width, channel)
         # model = FgSegNetV2(self.lr, img_shape, vgg_weights_path)
         model = MyFgSegNetV2(self.lr, img_shape, vgg_weights_path)
         model = model.init_model()
+
+        if os.path.exists(fgseg_config.best_weights_file):
+            model.load_weights(fgseg_config.best_weights_file)
+            print("checkpoint_loaded")
 
         # make sure that training input shape equals to model output
         input_shape = (img_shape[0], img_shape[1])
@@ -62,7 +70,12 @@ class FgSegV2Train():
         assert input_shape == output_shape, 'Given input shape:' + str(
             input_shape) + ', but your model outputs shape:' + str(output_shape)
 
-        checkpoints = keras.callbacks.ModelCheckpoint(self.mdl_path + '-weights-{epoch:02d}-{val_acc:.5f}-{val_loss:.5f}.h5',
+        show_callback = keras.callbacks.TensorBoard(log_dir=self.log_path,
+                                                    histogram_freq=0,
+                                                    write_graph=False,
+                                                    write_images=False)
+
+        checkpoints = keras.callbacks.ModelCheckpoint(fgseg_config.best_weights_file,
                                                       monitor='val_loss', verbose=0, save_best_only=False,
                                                       save_weights_only=False, mode='auto', period=1)
         early = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=1e-4, patience=10, verbose=0, mode='auto')
@@ -70,21 +83,26 @@ class FgSegV2Train():
         model.fit(data[0], data[1],
                   validation_split=self.val_split,
                   epochs=self.max_epoch, batch_size=self.batch_size,
-                  callbacks=[redu, early, checkpoints], verbose=1, class_weight=data[2],
+                  callbacks=[redu, early, checkpoints, show_callback],
+                  verbose=1, class_weight=data[2],
                   shuffle=True)
+        # model.save(fgseg_config.best_weights_file)
         del model, data, early, redu
 
-    def get_train_data(self, train_path):
+    def get_train_data(self, train_path, image_size):
         train_datas = self.get_image_and_label_list(train_path)
         images = []
         labels = []
         for image_path, label_path in train_datas:
-            x = image.load_img(image_path)
+            x = image.load_img(image_path, target_size=image_size,
+                               interpolation='bilinear')
             x = image.img_to_array(x)
             x /= 255.0
             images.append(x)
 
-            y = image.load_img(label_path, grayscale=True)
+            y = image.load_img(label_path, grayscale=True,
+                               target_size=image_size,
+                               interpolation='bilinear')
             y = 255 - image.img_to_array(y)
             y /= 255.0
             y = np.floor(y)

@@ -14,10 +14,13 @@ class ActivationType():
     Sigmoid = "sigmoid"
 
 
-class BatchNormType():
+class NormalizationType():
 
     BatchNormalize2d = "bn2d"
     BatchNormalize1d = "bn1d"
+
+    InstanceNorm2d = "in2d"
+    InstanceNorm2d = "in1d"
 
 
 class LayerType():

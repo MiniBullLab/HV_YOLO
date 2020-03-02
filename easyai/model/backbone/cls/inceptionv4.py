@@ -11,14 +11,14 @@
     https://arxiv.org/abs/1602.07261
 """
 
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.inception_block import InceptionStem
-from easyai.model.base_block.inception_block import InceptionA, InceptionB, InceptionC
-from easyai.model.base_block.inception_block import ReductionA, ReductionB
-from easyai.model.base_block.inception_block import InceptionResNetA, InceptionResNetB, InceptionResNetC
-from easyai.model.base_block.inception_block import InceptionResNetReductionA, InceptionResNetReductionB
+from easyai.model.base_block.cls.inception_block import InceptionStem
+from easyai.model.base_block.cls.inception_block import InceptionA, InceptionB, InceptionC
+from easyai.model.base_block.cls.inception_block import ReductionA, ReductionB
+from easyai.model.base_block.cls.inception_block import InceptionResNetA, InceptionResNetB, InceptionResNetC
+from easyai.model.base_block.cls.inception_block import InceptionResNetReductionA, InceptionResNetReductionB
 
 
 __all__ = ['inceptionv4', 'inception_resnetv2']
@@ -28,7 +28,7 @@ class InceptionV4(BaseBackbone):
 
     def __init__(self, data_channel=3, num_blocks=(4, 7, 3),
                  out_channels=(192, 224, 256, 384, 96),
-                 bnName=BatchNormType.BatchNormalize2d,
+                 bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
 
         super().__init__()
@@ -90,7 +90,7 @@ class InceptionResNetV2(BaseBackbone):
 
     def __init__(self, data_channel=3, num_blocks=(5, 10, 5),
                  out_channels=(256, 256, 384, 384),
-                 bnName=BatchNormType.BatchNormalize2d,
+                 bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
         self.set_name(BackboneName.InceptionResNetV2)

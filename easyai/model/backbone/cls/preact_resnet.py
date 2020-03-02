@@ -9,12 +9,12 @@
     https://arxiv.org/abs/1603.05027
 """
 
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.preact_resnet_block import PreActBasic
-from easyai.model.base_block.preact_resnet_block import PreActBottleNeck
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.cls.preact_resnet_block import PreActBasic
+from easyai.model.base_block.cls.preact_resnet_block import PreActBottleNeck
 
 __all__ = ['preactresnet18', 'preactresnet34', 'preactresnet50', 'preactresnet101', 'preactresnet152']
 
@@ -23,7 +23,7 @@ class PreActResNet(BaseBackbone):
 
     def __init__(self, data_channel=3,
                  block=PreActBasic, num_blocks=(2, 2, 2, 2),
-                 bnName=BatchNormType.BatchNormalize2d,
+                 bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
         self.set_name(BackboneName.PreActResNet18)

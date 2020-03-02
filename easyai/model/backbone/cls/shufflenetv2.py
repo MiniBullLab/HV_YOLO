@@ -5,12 +5,12 @@
 # See the paper "ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design" for more details.
 
 from easyai.base_name.backbone_name import BackboneName
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_layer import MyMaxPool2d
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.shufflenet_block import DownBlock, BasicBlock
+from easyai.model.base_block.utility.utility_layer import MyMaxPool2d
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.cls.shufflenet_block import DownBlock, BasicBlock
 
 
 __all__ = ['shufflenetv2_1_0']
@@ -19,7 +19,7 @@ __all__ = ['shufflenetv2_1_0']
 class ShuffleNetV2(BaseBackbone):
 
     def __init__(self, data_channel=3, num_blocks=[3, 7, 3], out_channels=(116, 232, 464),
-                 strides=[2, 2, 2], dilations=[1, 1, 1], bnName=BatchNormType.BatchNormalize2d,
+                 strides=[2, 2, 2], dilations=[1, 1, 1], bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.LeakyReLU):
         super().__init__()
         # init param

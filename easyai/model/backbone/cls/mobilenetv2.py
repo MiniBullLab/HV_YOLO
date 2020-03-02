@@ -2,10 +2,10 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_block import ConvBNActivationBlock, InvertedResidual
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock, InvertedResidual
 
 
 __all__ = ['mobilenetv2_1_0', 'MobileNetV2']
@@ -15,7 +15,7 @@ class MobileNetV2(BaseBackbone):
 
     def __init__(self, data_channel=3, num_blocks=[1, 2, 3, 4, 3, 3, 1],
                  out_channels=[16, 24, 32, 64, 96, 160, 320], strides=[1, 2, 2, 2, 1, 2, 1],
-                 dilations=[1, 1, 1, 1, 1, 1, 1], bnName=BatchNormType.BatchNormalize2d,
+                 dilations=[1, 1, 1, 1, 1, 1, 1], bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU, expand_ratios=[1, 6, 6, 6, 6, 6, 6]):
         super().__init__()
         self.set_name(BackboneName.MobileNetV2_1_0)

@@ -5,11 +5,11 @@
 Paper: Progressive Neural Architecture Search
 '''
 
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.pnasnet_block import CellA, CellB
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.cls.pnasnet_block import CellA, CellB
 
 __all__ = ['pnasnet_A', 'pnasnet_B']
 
@@ -18,7 +18,7 @@ class PNASNet(BaseBackbone):
 
     def __init__(self, data_channel=3, num_cells=6,
                  num_planes=44, block=CellA,
-                 bnName=BatchNormType.BatchNormalize2d,
+                 bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
         self.set_name(BackboneName.PNASNetA)

@@ -3,11 +3,11 @@
 # Author:
 
 from easyai.base_name.backbone_name import BackboneName
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_block import ConvActivationBlock
-from easyai.model.base_block.squeezenet_block import FireBlock
+from easyai.model.base_block.utility.utility_block import ConvActivationBlock
+from easyai.model.base_block.cls.squeezenet_block import FireBlock
 
 
 __all__ = ['SqueezeNet', 'DilatedSqueezeNet']
@@ -15,7 +15,7 @@ __all__ = ['SqueezeNet', 'DilatedSqueezeNet']
 
 class SqueezeNet(BaseBackbone):
 
-    def __init__(self, data_channel=3, bnName=BatchNormType.BatchNormalize2d,
+    def __init__(self, data_channel=3, bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super(SqueezeNet, self).__init__()
         self.set_name(BackboneName.SqueezeNet)
@@ -96,7 +96,7 @@ class SqueezeNet(BaseBackbone):
 
 
 class DilatedSqueezeNet(BaseBackbone):
-    def __init__(self, data_channel=3, bnName=BatchNormType.BatchNormalize2d,
+    def __init__(self, data_channel=3, bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
         self.set_name(BackboneName.DilatedSqueezeNet)

@@ -8,11 +8,11 @@
     https://arxiv.org/abs/1610.02357
 """
 
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.xception_block import EntryFlow, ExitFLow
-from easyai.model.base_block.xception_block import MiddleFLowBlock
+from easyai.model.base_block.cls.xception_block import EntryFlow, ExitFLow
+from easyai.model.base_block.cls.xception_block import MiddleFLowBlock
 
 __all__ = ['xception']
 
@@ -21,7 +21,7 @@ class Xception(BaseBackbone):
 
     def __init__(self, data_channel=3,
                  block=MiddleFLowBlock,
-                 bnName=BatchNormType.BatchNormalize2d,
+                 bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
         self.set_name(BackboneName.Xception)

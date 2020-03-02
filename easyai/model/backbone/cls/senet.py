@@ -8,12 +8,12 @@
     https://arxiv.org/abs/1709.01507
 """
 
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.senet_block import BasicResidualSEBlock
-from easyai.model.base_block.senet_block import BottleneckResidualSEBlock
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.cls.senet_block import BasicResidualSEBlock
+from easyai.model.base_block.cls.senet_block import BottleneckResidualSEBlock
 
 __all__ = ['se_resnet18', 'se_resnet34', 'se_resnet50', 'se_resnet101', 'se_resnet152']
 
@@ -22,7 +22,7 @@ class SEResNet(BaseBackbone):
 
     def __init__(self, data_channel=3,
                  block=BasicResidualSEBlock, num_blocks=(2, 2, 2, 2),
-                 bnName=BatchNormType.BatchNormalize2d,
+                 bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
         self.set_name(BackboneName.SEResNet18)

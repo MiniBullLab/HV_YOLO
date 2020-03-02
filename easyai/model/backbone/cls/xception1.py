@@ -2,16 +2,16 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_layer import RouteLayer, AddLayer
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.utility_block import SeparableConv2dBNActivation
-from easyai.model.base_block.xception_block import DoubleSeparableConv2dBlock
-from easyai.model.base_block.xception_block import XceptionSumBlock, XceptionConvBlock
-from easyai.model.base_block.xception_block import BlockA, FCAttention
+from easyai.model.base_block.utility.utility_layer import RouteLayer, AddLayer
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.utility.utility_block import SeparableConv2dBNActivation
+from easyai.model.base_block.cls.xception_block import DoubleSeparableConv2dBlock
+from easyai.model.base_block.cls.xception_block import XceptionSumBlock, XceptionConvBlock
+from easyai.model.base_block.cls.xception_block import BlockA, FCAttention
 
 __all__ = ['Xception65', 'XceptionA']
 
@@ -19,7 +19,7 @@ __all__ = ['Xception65', 'XceptionA']
 class Xception65(BaseBackbone):
 
     def __init__(self, data_channel=3, output_stride=16,
-                 bnName=BatchNormType.BatchNormalize2d,
+                 bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
         self.set_name(BackboneName.Xception65)
@@ -192,7 +192,7 @@ class Xception65(BaseBackbone):
 
 class XceptionA(BaseBackbone):
     def __init__(self, data_channel=3,
-                 bnName=BatchNormType.BatchNormalize2d,
+                 bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
         self.set_name(BackboneName.XceptionA)

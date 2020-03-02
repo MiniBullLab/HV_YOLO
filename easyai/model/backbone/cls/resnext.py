@@ -8,11 +8,11 @@
     https://arxiv.org/abs/1611.05431
 """
 
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.resnext_block import ResNextBottleNeck
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.cls.resnext_block import ResNextBottleNeck
 
 __all__ = ['resnext50', 'resnext101', 'resnext152']
 
@@ -21,7 +21,7 @@ class ResNext(BaseBackbone):
 
     def __init__(self, data_channel=3,
                  block=ResNextBottleNeck, num_blocks=(3, 4, 6, 3),
-                 bnName=BatchNormType.BatchNormalize2d,
+                 bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
         self.set_name(BackboneName.ResNext50)

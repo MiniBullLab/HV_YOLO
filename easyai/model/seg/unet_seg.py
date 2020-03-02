@@ -3,13 +3,12 @@
 # Author:
 
 from easyai.base_name.model_name import ModelName
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType
 from easyai.base_name.loss_name import LossType
 from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
-from easyai.model.base_block.utility_layer import Upsample
-from easyai.model.base_block.unet_blcok import UNetBlockName
-from easyai.model.base_block.unet_blcok import DoubleConv2d, DownBlock, UpBlock
+from easyai.model.base_block.seg.unet_blcok import UNetBlockName
+from easyai.model.base_block.seg.unet_blcok import DoubleConv2d, DownBlock, UpBlock
 from easyai.model.utility.base_model import *
 
 
@@ -20,7 +19,7 @@ class UNetSeg(BaseModel):
         self.set_name(ModelName.UNetSeg)
         self.data_channel = data_channel
         self.class_number = class_num
-        self.bn_name = BatchNormType.BatchNormalize2d
+        self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
 
         self.create_block_list()

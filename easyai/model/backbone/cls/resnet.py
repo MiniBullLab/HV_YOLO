@@ -3,11 +3,11 @@
 # Author:
 
 from easyai.base_name.backbone_name import BackboneName
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.resnet_block import BasicBlock, Bottleneck
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.cls.resnet_block import BasicBlock, Bottleneck
 
 
 __all__ = ['resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152']
@@ -15,7 +15,7 @@ __all__ = ['resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152']
 
 class ResNet(BaseBackbone):
     def __init__(self, data_channel=3, num_blocks=[2, 2, 2, 2], out_channels=[64, 128, 256, 512],
-                 strides=[1, 2, 2, 2], dilations=[1, 1, 1, 1], bnName=BatchNormType.BatchNormalize2d,
+                 strides=[1, 2, 2, 2], dilations=[1, 1, 1, 1], bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU, block=BasicBlock):
         super().__init__()
         self.set_name(BackboneName.ResNet18)

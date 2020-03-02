@@ -6,14 +6,14 @@ import torch.nn as nn
 from collections import OrderedDict
 from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
-from easyai.model.base_block.utility_block import ConvBNActivationBlock, ConvActivationBlock
-from easyai.model.base_block.utility_layer import NormalizeLayer, ActivationLayer
-from easyai.model.base_block.utility_layer import MultiplyLayer, AddLayer
-from easyai.model.base_block.utility_layer import RouteLayer, ShortRouteLayer
-from easyai.model.base_block.utility_layer import ShortcutLayer
-from easyai.model.base_block.utility_layer import MyMaxPool2d, Upsample
-from easyai.model.base_block.utility_layer import GlobalAvgPool2d, FcLayer
-from easyai.model.base_block.darknet_block import ReorgBlock, DarknetBlockName
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock, ConvActivationBlock
+from easyai.model.base_block.utility.utility_layer import NormalizeLayer, ActivationLayer
+from easyai.model.base_block.utility.utility_layer import MultiplyLayer, AddLayer
+from easyai.model.base_block.utility.utility_layer import RouteLayer, ShortRouteLayer
+from easyai.model.base_block.utility.utility_layer import ShortcutLayer
+from easyai.model.base_block.utility.utility_layer import MyMaxPool2d, Upsample
+from easyai.model.base_block.utility.utility_layer import GlobalAvgPool2d, FcLayer
+from easyai.model.base_block.cls.darknet_block import ReorgBlock, DarknetBlockName
 from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
 from easyai.loss.utility.bce_loss import BinaryCrossEntropy2d
 from easyai.loss.seg.ohem_cross_entropy2d import OhemCrossEntropy2d

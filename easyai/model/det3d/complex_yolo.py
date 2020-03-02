@@ -3,11 +3,11 @@
 # Author:
 
 from easyai.base_name.model_name import ModelName
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType, BlockType
-from easyai.model.base_block.utility_layer import RouteLayer
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.darknet_block import ReorgBlock
+from easyai.model.base_block.utility.utility_layer import RouteLayer
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.cls.darknet_block import ReorgBlock
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 from easyai.model.utility.base_model import *
 
@@ -17,7 +17,7 @@ class ComplexYOLO(BaseModel):
     def __init__(self):
         super().__init__()
         self.set_name(ModelName.ComplexYOLO)
-        self.bn_name = BatchNormType.BatchNormalize2d
+        self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
 
         self.factory = BackboneFactory()

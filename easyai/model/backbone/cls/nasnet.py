@@ -8,13 +8,13 @@
     https://arxiv.org/abs/1707.07012
 """
 
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_layer import ActivationLayer
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.nasnet_block import NasNetBlockName
-from easyai.model.base_block.nasnet_block import NormalCell, ReductionCell
+from easyai.model.base_block.utility.utility_layer import ActivationLayer
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.cls.nasnet_block import NasNetBlockName
+from easyai.model.base_block.cls.nasnet_block import NormalCell, ReductionCell
 
 __all__ = ['nasnet']
 
@@ -32,7 +32,7 @@ class NasNet(BaseBackbone):
         self.reduction_num = reduction_num
 
         self.activation_name = ActivationType.ReLU
-        self.bn_name = BatchNormType.BatchNormalize2d
+        self.bn_name = NormalizationType.BatchNormalize2d
         self.first_output = 44
         self.prev_filters = self.first_output
         self.x_filters = self.first_output

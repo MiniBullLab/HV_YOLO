@@ -3,10 +3,10 @@
 # Author:
 
 from easyai.base_name.backbone_name import BackboneName
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 
 
 __all__ = ['vgg13', 'vgg16', 'vgg19']
@@ -31,7 +31,7 @@ class VGG(BaseBackbone):
     }
 
     def __init__(self, vgg_name=BackboneName.Vgg19, data_channel=3,
-                 bnName=BatchNormType.BatchNormalize2d, activationName=ActivationType.ReLU):
+                 bnName=NormalizationType.BatchNormalize2d, activationName=ActivationType.ReLU):
         super().__init__()
         self.set_name(BackboneName.Vgg19)
         self.data_channel = data_channel

@@ -4,15 +4,15 @@
 """Fast Segmentation Convolutional Neural Network"""
 
 from easyai.base_name.model_name import ModelName
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
 from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
-from easyai.model.base_block.utility_layer import Upsample
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.utility_block import SeparableConv2dBNActivation
-from easyai.model.base_block.fast_scnn_block import FastSCNNBlockName
-from easyai.model.base_block.fast_scnn_block import GlobalFeatureExtractor, FeatureFusionBlock
+from easyai.model.base_block.utility.utility_layer import Upsample
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.utility.utility_block import SeparableConv2dBNActivation
+from easyai.model.base_block.seg.fast_scnn_block import FastSCNNBlockName
+from easyai.model.base_block.seg.fast_scnn_block import GlobalFeatureExtractor, FeatureFusionBlock
 from easyai.model.utility.base_model import *
 
 
@@ -23,7 +23,7 @@ class FastSCNN(BaseModel):
         self.set_name(ModelName.FastSCNN)
         self.data_channel = data_channel
         self.class_number = class_num
-        self.bn_name = BatchNormType.BatchNormalize2d
+        self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
         self.first_output = 64
         self.create_block_list()

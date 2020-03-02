@@ -2,11 +2,11 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.darknet_block import BasicBlock
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.cls.darknet_block import BasicBlock
 
 
 __all__ = ['darknet21', 'darknet53',
@@ -17,7 +17,7 @@ __all__ = ['darknet21', 'darknet53',
 class DarkNet(BaseBackbone):
     def __init__(self, data_channel=3, num_blocks=[1, 2, 8, 8, 4],
                  out_channels=[64, 128, 256, 512, 1024], strides=[2, 2, 2, 2, 2],
-                 dilations=[1, 1, 1, 1, 1], bnName=BatchNormType.BatchNormalize2d,
+                 dilations=[1, 1, 1, 1, 1], bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.LeakyReLU):
         super().__init__()
         self.set_name(BackboneName.Darknet53)

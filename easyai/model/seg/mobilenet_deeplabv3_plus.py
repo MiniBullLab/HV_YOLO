@@ -9,14 +9,14 @@
 
 from easyai.base_name.model_name import ModelName
 from easyai.base_name.backbone_name import BackboneName
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
 from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
-from easyai.model.base_block.utility_layer import Upsample, RouteLayer
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.utility_block import SeparableConv2dBNActivation
-from easyai.model.base_block.deeplab_block import ASPP
+from easyai.model.base_block.utility.utility_layer import Upsample, RouteLayer
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.utility.utility_block import SeparableConv2dBNActivation
+from easyai.model.base_block.cls.deeplab_block import ASPP
 from easyai.model.utility.base_model import *
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 
@@ -28,7 +28,7 @@ class MobilenetDeepLabV3Plus(BaseModel):
         self.set_name(ModelName.MobilenetDeepLabV3Plus)
         self.data_channel = data_channel
         self.class_number = class_num
-        self.bn_name = BatchNormType.BatchNormalize2d
+        self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
         self.factory = BackboneFactory()
         self.create_block_list()

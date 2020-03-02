@@ -8,14 +8,14 @@
     https://arxiv.org/abs/1704.06904
 """
 
-from easyai.base_name.block_name import BatchNormType, ActivationType
+from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.preact_resnet_block import PreActBottleNeck
-from easyai.model.base_block.attention_block import AttentionModule1
-from easyai.model.base_block.attention_block import AttentionModule2
-from easyai.model.base_block.attention_block import AttentionModule3
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.cls.preact_resnet_block import PreActBottleNeck
+from easyai.model.base_block.cls.attention_block import AttentionModule1
+from easyai.model.base_block.cls.attention_block import AttentionModule2
+from easyai.model.base_block.cls.attention_block import AttentionModule3
 
 __all__ = ['attention56', 'attention92']
 
@@ -23,7 +23,7 @@ __all__ = ['attention56', 'attention92']
 class Attention(BaseBackbone):
 
     def __init__(self, data_channel=3, num_blocks=(1, 1, 1),
-                 bnName=BatchNormType.BatchNormalize2d,
+                 bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
         self.set_name(BackboneName.Attention56)
