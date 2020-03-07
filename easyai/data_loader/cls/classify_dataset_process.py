@@ -14,7 +14,8 @@ class ClassifyDatasetProcess():
         self.std = np.array(std)
 
     def normaliza_dataset(self, src_image):
-        image = self.dataset_process.numpy_normaliza(src_image,
+        normaliza_image = self.dataset_process.image_normaliza(src_image)
+        image = self.dataset_process.numpy_normaliza(normaliza_image,
                                                      self.mean,
                                                      self.std)
         image = self.dataset_process.image_transpose(image)

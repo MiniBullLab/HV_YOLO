@@ -45,6 +45,9 @@ class ResNet(BaseBackbone):
                                        activationName=self.activationName)
         self.add_block_list(layer1.get_name(), layer1, self.first_output)
 
+        layer2 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.add_block_list(LayerType.MyMaxPool2d, layer2, self.first_output)
+
         # layer1 = ConvBNActivationBlock(in_channels=self.data_channel,
         #                                out_channels=self.first_output,
         #                                kernel_size=3,
@@ -73,9 +76,6 @@ class ResNet(BaseBackbone):
         #                                bnName=self.bnName,
         #                                activationName=self.activationName)
         # self.add_block_list(layer12.get_name(), layer12, self.first_output)
-
-        layer2 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.add_block_list(LayerType.MyMaxPool2d, layer2, self.first_output)
 
         self.in_channels = self.first_output
         for index, num_block in enumerate(self.num_blocks):
