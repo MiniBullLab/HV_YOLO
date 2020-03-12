@@ -1,6 +1,6 @@
 from easyAI.config.base_config import *
 
-image_size = (512, 440)
+image_size = (400, 500)
 
 train_batch_size = 1
 snapshotPath = os.path.join(root_save_dir, model_save_dir)

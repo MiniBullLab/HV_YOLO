@@ -4,7 +4,7 @@ from easyAI.config.base_config import *
 imgSize = (640, 352)
 train_batch_size = 1
 test_batch_size = 1
-className = ['bike', 'bus', 'car', 'motor', 'person', 'rider', 'truck']
+className = ['object']
 
 # detect
 snapshotPath = os.path.join(root_save_dir, model_save_dir)
@@ -12,7 +12,7 @@ latest_weights_file = os.path.join(snapshotPath, "det_latest.pt")
 best_weights_file = os.path.join(snapshotPath, "det_best.pt")
 save_onnx_path = os.path.join(snapshotPath, "detection.onnx")
 save_image_dir = os.path.join(root_save_dir, "det_img")
-maxEpochs = 5
+maxEpochs = 100
 
 base_lr = 2e-4
 lr_power = 0.9
@@ -24,7 +24,7 @@ accumulated_batches = 1
 
 display = 20
 
-## speed
+# speed
 runType = "video"
 testImageFolder = "/home/wfw/HASCO/data/image/"
 testVideoFile = "/home/wfw/HASCO/data/video/VIDEO-5.MPG"
