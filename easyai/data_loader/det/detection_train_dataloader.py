@@ -7,7 +7,7 @@ import math
 import random
 from easyai.helper import XMLProcess
 from easyai.helper import ImageProcess
-from easyai.data_loader.utility.data_loader import *
+from easyai.data_loader.utility.data_loader import DataLoader
 from easyai.data_loader.det.detection_sample import DetectionSample
 from easyai.data_loader.det.detection_dataset_process import DetectionDataSetProcess
 from easyai.data_loader.det.detection_data_augment import DetectionDataAugment
@@ -73,10 +73,12 @@ class DetectionTrainDataloader(DataLoader):
             labels = self.dataset_process.change_outside_labels(labels)
 
             numpy_images.append(rgb_image)
-            numpy_labels.append(torch.from_numpy(labels))
+
+            torch_labels = self.dataset_process.numpy_to_torch(labels, flag=0)
+            numpy_labels.append(torch_labels)
 
         numpy_images = np.stack(numpy_images)
-        torch_images = self.numpy_to_tensor(numpy_images)
+        torch_images = self.all_numpy_to_tensor(numpy_images)
 
         return torch_images, numpy_labels
 

@@ -150,6 +150,7 @@ class MyMaxPool2d(BaseBlock):
 class GlobalAvgPool2d(BaseBlock):
     def __init__(self):
         super().__init__(LayerType.GlobalAvgPool)
+        self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
 
     def forward(self, x):
         h, w = x.shape[2:]

@@ -75,31 +75,31 @@ class ShuffleNetV2(BaseBackbone):
         return output_list
 
 
-def shufflenetv2_1_0():
-    model = ShuffleNetV2(num_blocks=[3, 7, 3])
+def shufflenetv2_1_0(data_channel):
+    model = ShuffleNetV2(data_channel=data_channel, num_blocks=[3, 7, 3])
     model.set_name(BackboneName.ShuffleNetV2_1_0)
     return model
 
 
-def shufflenet_v2_x0_5():
-    model = ShuffleNetV2(num_blocks=[3, 7, 3], out_channels=(48, 96, 192))
+def shufflenet_v2_x0_5(data_channel):
+    model = ShuffleNetV2(data_channel=data_channel, num_blocks=[3, 7, 3], out_channels=(48, 96, 192))
     model.set_name(BackboneName.ShuffleNetV2_1_0)
     return model
 
 
-def shufflenet_v2_x1_0():
-    model = ShuffleNetV2(num_blocks=[3, 7, 3], out_channels=(116, 232, 464))
+def shufflenet_v2_x1_0(data_channel):
+    model = ShuffleNetV2(data_channel=data_channel, num_blocks=[3, 7, 3], out_channels=(116, 232, 464))
     model.set_name(BackboneName.ShuffleNetV2_1_0)
     return model
 
 
-def shufflenet_v2_x1_5():
-    model = ShuffleNetV2(num_blocks=[3, 7, 3], out_channels=(176, 352, 704))
+def shufflenet_v2_x1_5(data_channel):
+    model = ShuffleNetV2(data_channel=data_channel, num_blocks=[3, 7, 3], out_channels=(176, 352, 704))
     model.set_name(BackboneName.ShuffleNetV2_1_0)
     return model
 
 
-def shufflenet_v2_x2_0():
-    model = ShuffleNetV2(num_blocks=[3, 7, 3], out_channels=(244, 488, 976))
+def shufflenet_v2_x2_0(data_channel):
+    model = ShuffleNetV2(data_channel=data_channel, num_blocks=[3, 7, 3], out_channels=(244, 488, 976))
     model.set_name(BackboneName.ShuffleNetV2_1_0)
     return model

@@ -7,6 +7,10 @@ class ModelName():
 
     FCNSeg = "FCNSeg"
     UNetSeg = "UNetSeg"
+    UNet11 = "UNet11"
+    UNet16 = "UNet16"
+    AlbuNet = "AlbuNet"
+    LinkNet34 = "LinkNet34"
     RefineNetSeg = "RefineNetSeg"
     PSPNetSeg = "PSPNetSeg"
     BiSeNet = "BiSeNet"

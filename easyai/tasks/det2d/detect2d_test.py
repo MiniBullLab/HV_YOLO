@@ -7,7 +7,7 @@ from easyai.tasks.utility.base_test import BaseTest
 from easyai.evaluation.calculate_mAp import CalculateMeanAp
 from easyai.data_loader.det.detection_val_dataloader import get_detection_val_dataloader
 from easyai.tasks.det2d.detect2d import Detection2d
-from easyai.config import detect_config
+from easyai.config import detect2d_config
 
 
 class Detection2dTest(BaseTest):
@@ -20,12 +20,12 @@ class Detection2dTest(BaseTest):
         self.detect_inference.load_weights(weights_path)
 
     def test(self, val_path):
-        os.system('rm -rf ' + detect_config.save_result_dir)
-        os.makedirs(detect_config.save_result_dir, exist_ok=True)
+        os.system('rm -rf ' + detect2d_config.save_result_dir)
+        os.makedirs(detect2d_config.save_result_dir, exist_ok=True)
 
-        dataloader = get_detection_val_dataloader(val_path, detect_config.className, batch_size=1,
-                                                  image_size=detect_config.imgSize)
-        evaluator = CalculateMeanAp(val_path, detect_config.className)
+        dataloader = get_detection_val_dataloader(val_path, detect2d_config.className, batch_size=1,
+                                                  image_size=detect2d_config.imgSize)
+        evaluator = CalculateMeanAp(val_path, detect2d_config.className)
 
         self.timer.tic()
         for i, (image_path, src_image, input_image) in enumerate(dataloader):
@@ -41,14 +41,14 @@ class Detection2dTest(BaseTest):
             path, filename_post = os.path.split(image_path[0])
             self.detect_inference.save_result(filename_post, detection_objects)
 
-        mAP, aps = evaluator.eval(detect_config.save_result_dir)
+        mAP, aps = evaluator.eval(detect2d_config.save_result_dir)
         return mAP, aps
 
     def save_test_value(self, epoch, mAP, aps):
         # Write epoch results
-        with open(detect_config.save_evaluation_path, 'a') as file:
+        with open(detect2d_config.save_evaluation_path, 'a') as file:
             # file.write('%11.3g' * 2 % (mAP, aps[0]) + '\n')
             file.write("Epoch: {} | mAP: {:.3f} | ".format(epoch, mAP))
             for i, ap in enumerate(aps):
-                file.write(detect_config.className[i] + ": {:.3f} ".format(ap))
+                file.write(detect2d_config.className[i] + ": {:.3f} ".format(ap))
             file.write("\n")

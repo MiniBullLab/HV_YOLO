@@ -73,26 +73,29 @@ class ResNext(BaseBackbone):
         return output_list
 
 
-def resnext50():
+def resnext50(data_channel):
     """ return a resnext50(c32x4d) network
     """
-    model = ResNext(num_blocks=(3, 4, 6, 3))
+    model = ResNext(data_channel=data_channel,
+                    num_blocks=(3, 4, 6, 3))
     model.set_name(BackboneName.ResNext50)
     return model
 
 
-def resnext101():
+def resnext101(data_channel):
     """ return a resnext101(c32x4d) network
     """
-    model = ResNext(num_blocks=(3, 4, 23, 3))
+    model = ResNext(data_channel=data_channel,
+                    num_blocks=(3, 4, 23, 3))
     model.set_name(BackboneName.ResNext101)
     return model
 
 
-def resnext152():
+def resnext152(data_channel):
     """ return a resnext152(c32x4d) network
     """
-    model = ResNext(num_blocks=(3, 4, 36, 3))
+    model = ResNext(data_channel=data_channel,
+                    num_blocks=(3, 4, 36, 3))
     model.set_name(BackboneName.ResNext152)
     return model
 

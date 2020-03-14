@@ -27,7 +27,8 @@ class Segmentation(BaseInference):
 
     def load_weights(self, weights_path):
         self.torchModelProcess.loadLatestModelWeight(weights_path, self.model)
-        self.torchModelProcess.modelTestInit(self.model)
+        self.model = self.torchModelProcess.modelTestInit(self.model)
+        self.model.eval()
 
     def process(self, input_path):
         dataloader = self.get_image_data_lodaer(input_path,
@@ -39,6 +40,7 @@ class Segmentation(BaseInference):
             result = self.postprocess(prediction)
             print('Batch %d... Done. (%.3fs)' % (index, self.timer.toc()))
             if not self.result_show.show(src_image, result,
+                                         segment_config.label_is_gray,
                                          segment_config.className):
                 break
 

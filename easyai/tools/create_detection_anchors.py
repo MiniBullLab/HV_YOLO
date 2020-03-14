@@ -11,7 +11,7 @@ from easyai.data_loader.det.detection_dataset_process import DetectionDataSetPro
 from easyai.data_loader.det.detection_sample import DetectionSample
 from easyai.helper import XMLProcess
 from easyai.helper import ImageProcess
-from easyai.config import detect_config
+from easyai.config import detect2d_config
 
 
 class CreateDetectionAnchors():
@@ -20,7 +20,7 @@ class CreateDetectionAnchors():
         self.xmlProcess = XMLProcess()
         self.image_process = ImageProcess()
         self.detection_sample = DetectionSample(train_path,
-                                                detect_config.className)
+                                                detect2d_config.className)
         self.detection_sample.read_sample()
         self.dataset_process = DetectionDataSetProcess()
 
@@ -36,7 +36,7 @@ class CreateDetectionAnchors():
 
         # Print
         print('kmeans anchors (n=%g, img_size=%g, IoU=%.2f/%.2f/%.2f-min/mean/best): ' %
-              (number, detect_config.imgSize, biou.min(), iou.mean(), biou.mean()), end='')
+              (number, detect2d_config.imgSize, biou.min(), iou.mean(), biou.mean()), end='')
         for i, x in enumerate(k):
             print('%i,%i' % (round(x[0]), round(x[1])), end=',  ' if i < len(k) - 1 else '\n')
 
@@ -48,9 +48,9 @@ class CreateDetectionAnchors():
             src_image, rgb_image = self.image_process.readRgbImage(img_path)
             _, _, boxes = self.xmlProcess.parseRectData(label_path)
             rgb_image, labels = self.dataset_process.resize_dataset(rgb_image,
-                                                                    detect_config.imgSize,
+                                                                    detect2d_config.imgSize,
                                                                     boxes,
-                                                                    detect_config.className)
+                                                                    detect2d_config.className)
             temp = np.zeros((len(labels), 2), dtype=np.float32)
             for index, object in enumerate(labels):
                 temp[index, :] = np.array([object.width(), object.height()])

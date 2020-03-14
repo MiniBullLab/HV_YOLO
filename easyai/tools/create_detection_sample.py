@@ -5,7 +5,7 @@ import random
 import cv2
 import numpy as np
 from easyai.helper import DirProcess, XMLProcess
-from easyai.config import detect_config
+from easyai.config import detect2d_config
 
 
 class CreateDetectionSample():
@@ -31,7 +31,7 @@ class CreateDetectionSample():
             if os.path.exists(annotationPath) and \
                os.path.exists(imagePath):
                 _, _, boxes = self.xmlProcess.parseRectData(annotationPath)
-                allNames = [box.name for box in boxes if box.name in detect_config.className]
+                allNames = [box.name for box in boxes if box.name in detect2d_config.className]
                 names = set(allNames)
                 print(names)
                 for className in names:
@@ -63,7 +63,7 @@ class CreateDetectionSample():
 
     def createWriteFile(self, outputPath):
         result = {}
-        for className in detect_config.className:
+        for className in detect2d_config.className:
             classImagePath = os.path.join(outputPath, className + ".txt")
             result[className] = open(classImagePath, "w")
         return result

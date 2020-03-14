@@ -67,6 +67,7 @@ class SegmentionTrain(BaseTrain):
         polyLR = PolyLR(segment_config.base_lr, total_iteration, segment_config.lr_power)
 
         self.timer.tic()
+        self.model.train()
         for epoch in range(self.start_epoch, segment_config.maxEpochs):
             # self.optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
             self.optimizer.zero_grad()
@@ -136,7 +137,10 @@ class SegmentionTrain(BaseTrain):
 
     def save_train_model(self, epoch):
         self.train_logger.epoch_train_log(epoch)
-        save_model_path = os.path.join(segment_config.snapshotPath, "model_epoch_%d.pt" % epoch)
+        if segment_config.is_save_epoch_model:
+            save_model_path = os.path.join(segment_config.snapshotPath, "model_epoch_%d.pt" % epoch)
+        else:
+            save_model_path = segment_config.latest_weights_file
         self.torchModelProcess.saveLatestModel(save_model_path, self.model,
                                                self.optimizer, epoch, self.bestmIoU)
         return save_model_path

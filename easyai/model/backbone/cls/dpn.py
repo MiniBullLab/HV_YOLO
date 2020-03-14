@@ -69,8 +69,9 @@ class DPN(BaseBackbone):
         return output_list
 
 
-def dpn26():
-    model = DPN(in_planes=(96, 192, 384, 768),
+def dpn26(data_channel):
+    model = DPN(data_channel=data_channel,
+                in_planes=(96, 192, 384, 768),
                 out_channels=(256, 512, 1024, 2048),
                 num_blocks=(2, 2, 2, 2),
                 dense_depths=(16, 32, 24, 128))
@@ -78,8 +79,9 @@ def dpn26():
     return model
 
 
-def dpn92():
-    model = DPN(in_planes=(96, 192, 384, 768),
+def dpn92(data_channel):
+    model = DPN(data_channel=data_channel,
+                in_planes=(96, 192, 384, 768),
                 out_channels=(256, 512, 1024, 2048),
                 num_blocks=(3, 4, 20, 3),
                 dense_depths=(16, 32, 24, 128))

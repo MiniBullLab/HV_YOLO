@@ -76,32 +76,42 @@ class PreActResNet(BaseBackbone):
         return output_list
 
 
-def preactresnet18():
-    model = PreActResNet(block=PreActBasic, num_blocks=(2, 2, 2, 2))
+def preactresnet18(data_channel):
+    model = PreActResNet(data_channel=data_channel,
+                         block=PreActBasic,
+                         num_blocks=(2, 2, 2, 2))
     model.set_name(BackboneName.PreActResNet18)
     return model
 
 
-def preactresnet34():
-    model = PreActResNet(block=PreActBasic, num_blocks=(3, 4, 6, 3))
+def preactresnet34(data_channel):
+    model = PreActResNet(data_channel=data_channel,
+                         block=PreActBasic,
+                         num_blocks=(3, 4, 6, 3))
     model.set_name(BackboneName.PreActResNet34)
     return model
 
 
-def preactresnet50():
-    model = PreActResNet(block=PreActBottleNeck, num_blocks=(3, 4, 6, 3))
+def preactresnet50(data_channel):
+    model = PreActResNet(data_channel=data_channel,
+                         block=PreActBottleNeck,
+                         num_blocks=(3, 4, 6, 3))
     model.set_name(BackboneName.PreActResNet50)
     return model
 
 
-def preactresnet101():
-    model = PreActResNet(block=PreActBottleNeck, num_blocks=(3, 4, 23, 3))
+def preactresnet101(data_channel):
+    model = PreActResNet(data_channel=data_channel,
+                         block=PreActBottleNeck,
+                         num_blocks=(3, 4, 23, 3))
     model.set_name(BackboneName.PreActResNet101)
     return model
 
 
-def preactresnet152():
-    model = PreActResNet(block=PreActBottleNeck, num_blocks=(3, 8, 36, 3))
+def preactresnet152(data_channel):
+    model = PreActResNet(data_channel=data_channel,
+                         block=PreActBottleNeck,
+                         num_blocks=(3, 8, 36, 3))
     model.set_name(BackboneName.PreActResNet152)
     return model
 

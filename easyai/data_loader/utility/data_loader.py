@@ -11,7 +11,7 @@ class DataLoader():
     def __init__(self):
         pass
 
-    def numpy_to_tensor(self, input_data):
+    def all_numpy_to_tensor(self, input_data):
         result = None
         if input_data is None:
             result = None

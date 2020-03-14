@@ -84,37 +84,47 @@ class DarkNet(BaseBackbone):
         return output_list
 
 
-def darknet21():
-    model = DarkNet(num_blocks=[1, 1, 2, 2, 1])
+def darknet21(data_channel):
+    model = DarkNet(data_channel=data_channel,
+                    num_blocks=[1, 1, 2, 2, 1])
     model.set_name(BackboneName.Darknet21)
     return model
 
 
-def darknet21_dilated8():
-    model = DarkNet(num_blocks=[1, 1, 2, 2, 1], dilations=[1, 1, 1, 2, 4])
+def darknet21_dilated8(data_channel):
+    model = DarkNet(data_channel=data_channel,
+                    num_blocks=[1, 1, 2, 2, 1],
+                    dilations=[1, 1, 1, 2, 4])
     model.set_name(BackboneName.Darknet21_Dilated8)
     return model
 
 
-def darknet21_dilated16():
-    model = DarkNet(num_blocks=[1, 1, 2, 2, 1], dilations=[1, 1, 1, 1, 2])
+def darknet21_dilated16(data_channel):
+    model = DarkNet(data_channel=data_channel,
+                    num_blocks=[1, 1, 2, 2, 1],
+                    dilations=[1, 1, 1, 1, 2])
     model.set_name(BackboneName.Darknet21_Dilated16)
     return model
 
 
-def darknet53():
-    model = DarkNet(num_blocks=[1, 2, 8, 8, 4])
+def darknet53(data_channel):
+    model = DarkNet(data_channel=data_channel,
+                    num_blocks=[1, 2, 8, 8, 4])
     model.set_name(BackboneName.Darknet53)
     return model
 
 
-def darknet53_dilated8():
-    model = DarkNet(num_blocks=[1, 2, 8, 8, 4], dilations=[1, 1, 1, 2, 4])
+def darknet53_dilated8(data_channel):
+    model = DarkNet(data_channel=data_channel,
+                    num_blocks=[1, 2, 8, 8, 4],
+                    dilations=[1, 1, 1, 2, 4])
     model.set_name(BackboneName.Darknet53_Dilated8)
     return model
 
 
-def darknet53_dilated16():
-    model = DarkNet(num_blocks=[1, 2, 8, 8, 4], dilations=[1, 1, 1, 1, 2])
+def darknet53_dilated16(data_channel):
+    model = DarkNet(data_channel=data_channel,
+                    num_blocks=[1, 2, 8, 8, 4],
+                    dilations=[1, 1, 1, 1, 2])
     model.set_name(BackboneName.Darknet53_Dilated16)
     return model

@@ -31,9 +31,9 @@ class TorchOptimizer():
         self.freeze_front_layer(model, layer_name)
         self.createOptimizer(epoch, model, base_lr)
 
-    def freeze_layer(self, model, layer_name):
+    def freeze_layers(self, model, layer_names):
         for key, block in model._modules.items():
-            if layer_name in key:
+            if key in layer_names:
                 for param in block.parameters():
                     param.requires_grad = False
 

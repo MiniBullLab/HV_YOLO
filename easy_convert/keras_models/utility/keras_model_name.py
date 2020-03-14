@@ -7,6 +7,9 @@ class KerasModelName():
 
     FgSegNetV2 = "FgSegNetV2"
     MyFgSegNetV2 = "MyFgSegNetV2"
+    UNet = "UNet"
+    MultiResUnet = "MultiResUnet"
+    MultiResUnet3D = "MultiResUnet3D"
 
 
 

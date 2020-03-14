@@ -2,7 +2,6 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-import torch
 import torch.utils.data as data
 from easyai.helper.imageProcess import ImageProcess
 from easyai.data_loader.seg.segment_sample import SegmentSample
@@ -38,8 +37,8 @@ class SegmentDataLoader(data.Dataset):
             rgb_image, target = self.data_augment.augment(rgb_image, target)
         target = self.dataset_process.change_label(target, self.valid_label_seg)
         rgb_image = self.dataset_process.normaliza_dataset(rgb_image)
-        torch_image = torch.from_numpy(rgb_image)
-        torch_target = torch.from_numpy(target).long()
+        torch_image = self.dataset_process.numpy_to_torch(rgb_image, flag=0)
+        torch_target = self.dataset_process.numpy_to_torch(target).long()
         return torch_image, torch_target
 
     def __len__(self):

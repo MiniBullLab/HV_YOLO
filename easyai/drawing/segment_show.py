@@ -11,13 +11,14 @@ class SegmentionShow():
     def __init__(self):
         self.drawing = ImageDrawing()
 
-    def show(self, src_image, result, class_name):
-        decoded = self.drawing.drawSegmentResult(src_image, result,
-                                                 class_name)
+    def show(self, src_image, result,
+             is_gray, class_name, scale=0.5):
+        segment_image = self.drawing.draw_segment_result(src_image, result,
+                                                         is_gray, class_name)
 
         cv2.namedWindow("image", 0)
-        cv2.resizeWindow("image", int(decoded.shape[1] * 0.5), int(decoded.shape[0] * 0.5))
-        cv2.imshow('image', decoded)
+        cv2.resizeWindow("image", int(segment_image.shape[1] * scale), int(segment_image.shape[0] * scale))
+        cv2.imshow('image', segment_image)
 
         if cv2.waitKey() & 0xFF == 27:
             return False

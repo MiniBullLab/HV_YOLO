@@ -84,11 +84,14 @@ class TorchModelProcess():
             print('Using ', count, ' GPUs')
             model = nn.DataParallel(model)
         model = model.to(self.torchDeviceProcess.device)
-        model.train()
+        return model
 
     def modelTestInit(self, model):
         model = model.to(self.torchDeviceProcess.device)
-        model.eval()
+        return model
+
+    def model_clip_grad(self, model):
+        nn.utils.clip_grad_norm_(model.parameters(), max_norm=20, norm_type=2)
 
     def convert_state_dict(self, state_dict):
         """Converts a state dict saved from a dataParallel module to normal

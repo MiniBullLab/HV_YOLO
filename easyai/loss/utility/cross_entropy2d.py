@@ -34,6 +34,6 @@ class CrossEntropy2d(BaseLoss):
             if self.weight_type != 0 and self.weight is not None:
                 loss = self.compute_loss_from_weight(loss, target)
         else:
-            loss = F.softmax(input, dim=1)
+            loss = F.softmax(input_data, dim=1)
         return loss
 

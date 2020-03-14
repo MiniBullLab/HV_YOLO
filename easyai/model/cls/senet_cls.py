@@ -15,9 +15,10 @@ from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 
 class SENetCls(BaseModel):
 
-    def __init__(self, class_num=100):
+    def __init__(self, data_channel=3, class_num=100):
         super().__init__()
         self.set_name(ModelName.SENetCls)
+        self.data_channel = data_channel
         self.class_number = class_num
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
@@ -28,7 +29,7 @@ class SENetCls(BaseModel):
     def create_block_list(self):
         self.clear_list()
 
-        backbone = self.factory.get_base_model(BackboneName.SEResNet50)
+        backbone = self.factory.get_base_model(BackboneName.SEResNet50, self.data_channel)
         base_out_channels = backbone.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])
 

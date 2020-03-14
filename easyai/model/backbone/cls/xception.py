@@ -58,7 +58,8 @@ class Xception(BaseBackbone):
         return output_list
 
 
-def xception():
-    return Xception(block=MiddleFLowBlock)
+def xception(data_channel):
+    return Xception(data_channel=data_channel,
+                    block=MiddleFLowBlock)
 
 

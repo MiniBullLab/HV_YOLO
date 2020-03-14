@@ -74,14 +74,16 @@ class MobileNetV2(BaseBackbone):
         return output_list
 
 
-def mobilenetv2_1_0():
-    model = MobileNetV2(num_blocks=[1, 2, 3, 4, 3, 3, 1])
+def mobilenetv2_1_0(data_channel):
+    model = MobileNetV2(data_channel=data_channel,
+                        num_blocks=[1, 2, 3, 4, 3, 3, 1])
     model.set_name(BackboneName.MobileNetV2_1_0)
     return model
 
 
-def mobilenetv2_1_0_dilated8():
-    model = MobileNetV2(num_blocks=[1, 2, 3, 4, 3, 3, 1],
+def mobilenetv2_1_0_dilated8(data_channel):
+    model = MobileNetV2(data_channel=data_channel,
+                        num_blocks=[1, 2, 3, 4, 3, 3, 1],
                         dilations=[1, 1, 1, 2, 2, 4, 4])
     model.set_name(BackboneName.MobileNetV2_1_0)
     return model

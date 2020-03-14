@@ -75,31 +75,41 @@ class SEResNet(BaseBackbone):
         return output_list
 
 
-def se_resnet18():
-    model = SEResNet(block=BasicResidualSEBlock, num_blocks=(2, 2, 2, 2))
+def se_resnet18(data_channel):
+    model = SEResNet(data_channel=data_channel,
+                     block=BasicResidualSEBlock,
+                     num_blocks=(2, 2, 2, 2))
     model.set_name(BackboneName.SEResNet18)
     return model
 
 
-def se_resnet34():
-    model = SEResNet(block=BasicResidualSEBlock, num_blocks=(3, 4, 6, 3))
+def se_resnet34(data_channel):
+    model = SEResNet(data_channel=data_channel,
+                     block=BasicResidualSEBlock,
+                     num_blocks=(3, 4, 6, 3))
     model.set_name(BackboneName.SEResNet34)
     return model
 
 
-def se_resnet50():
-    model = SEResNet(block=BottleneckResidualSEBlock, num_blocks=(3, 4, 6, 3))
+def se_resnet50(data_channel):
+    model = SEResNet(data_channel=data_channel,
+                     block=BottleneckResidualSEBlock,
+                     num_blocks=(3, 4, 6, 3))
     model.set_name(BackboneName.SEResNet50)
     return model
 
 
-def se_resnet101():
-    model = SEResNet(block=BottleneckResidualSEBlock, num_blocks=(3, 4, 23, 3))
+def se_resnet101(data_channel):
+    model = SEResNet(data_channel=data_channel,
+                     block=BottleneckResidualSEBlock,
+                     num_blocks=(3, 4, 23, 3))
     model.set_name(BackboneName.SEResNet101)
     return model
 
 
-def se_resnet152():
-    model = SEResNet(block=BottleneckResidualSEBlock, num_blocks=(3, 8, 36, 3))
+def se_resnet152(data_channel):
+    model = SEResNet(data_channel=data_channel,
+                     block=BottleneckResidualSEBlock,
+                     num_blocks=(3, 8, 36, 3))
     model.set_name(BackboneName.SEResNet152)
     return model

@@ -7,13 +7,15 @@ from easyai.tasks.utility.base_test import BaseTest
 from easyai.data_loader.cls.classify_dataloader import get_classify_val_dataloader
 from easyai.tasks.cls.classify import Classify
 from easyai.evaluation.classify_accuracy import ClassifyAccuracy
-from easyai.config import classify_config
+from easyai.config.classify_config import ClassifyConfig
 
 
 class ClassifyTest(BaseTest):
 
-    def __init__(self, cfg_path, gpu_id):
+    def __init__(self, cfg_path, gpu_id, config_path=None):
         super().__init__()
+        self.classify_config = ClassifyConfig()
+        self.classify_config.load_config(config_path)
         self.classify_inference = Classify(cfg_path, gpu_id)
         self.topK = (1,)
         self.evaluation = ClassifyAccuracy(top_k=self.topK)
@@ -23,9 +25,10 @@ class ClassifyTest(BaseTest):
 
     def test(self, val_path):
         dataloader = get_classify_val_dataloader(val_path,
-                                                 classify_config.TRAIN_MEAN,
-                                                 classify_config.TRAIN_STD,
-                                                 classify_config.imgSize, 1)
+                                                 self.classify_config.data_mean,
+                                                 self.classify_config.data_std,
+                                                 self.classify_config.image_size,
+                                                 self.classify_config.test_batch_size)
         for index, (images, labels) in enumerate(dataloader):
             output = self.classify_inference.infer(images)
             self.evaluation.torch_eval(output.data, labels.to(output.device))
@@ -34,7 +37,7 @@ class ClassifyTest(BaseTest):
 
     def save_test_value(self, epoch):
         # Write epoch results
-        save_result_path = os.path.join(classify_config.root_save_dir, 'result.txt')
+        save_result_path = self.classify_config.test_result_path
         if max(self.topK) > 1:
             with open(save_result_path, 'a') as file:
                 file.write("Epoch: {} | prec{}: {:.3f} | prec{}: {:.3f}\n".format(epoch,

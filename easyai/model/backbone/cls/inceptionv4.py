@@ -150,13 +150,15 @@ class InceptionResNetV2(BaseBackbone):
         return output_list
 
 
-def inceptionv4():
-    model = InceptionV4(num_blocks=(4, 7, 3))
+def inceptionv4(data_channel):
+    model = InceptionV4(data_channel=data_channel,
+                        num_blocks=(4, 7, 3))
     model.set_name(BackboneName.InceptionV4)
     return model
 
 
-def inception_resnetv2():
-    model = InceptionResNetV2(num_blocks=(5, 10, 5))
+def inception_resnetv2(data_channel):
+    model = InceptionResNetV2(data_channel=data_channel,
+                              num_blocks=(5, 10, 5))
     model.set_name(BackboneName.InceptionResNetV2)
     return model

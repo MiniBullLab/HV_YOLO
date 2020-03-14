@@ -2,7 +2,6 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-import torch
 import torch.utils.data as data
 from easyai.helper.imageProcess import ImageProcess
 from easyai.data_loader.det.detection_sample import DetectionSample
@@ -27,7 +26,7 @@ class DetectionValDataLoader(data.Dataset):
         rgb_image, _ = self.dataset_process.resize_dataset(rgb_image,
                                                            self.image_size)
         rgb_image, _ = self.dataset_process.normaliza_dataset(rgb_image)
-        rgb_image = torch.from_numpy(rgb_image)
+        rgb_image = self.dataset_process.numpy_to_torch(rgb_image, flag=0)
         return img_path, src_image, rgb_image
 
     def __len__(self):

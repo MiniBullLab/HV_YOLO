@@ -1,16 +1,16 @@
 import numpy as np
 from easyai.helper.dataType import Rect2D
-from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
+from easyai.data_loader.utility.base_dataset_process import BaseDataSetProcess
 
 
-class DetectionDataSetProcess():
+class DetectionDataSetProcess(BaseDataSetProcess):
 
     def __init__(self):
-        self.dataset_process = ImageDataSetProcess()
+        super().__init__()
 
     def normaliza_dataset(self, src_image, labels=None, image_size=None):
         image = self.dataset_process.image_normaliza(src_image)
-        image = self.dataset_process.image_transpose(image)
+        image = self.dataset_process.numpy_transpose(image)
         result = np.zeros((len(labels), 5), dtype=np.float32)
         for index, rect in enumerate(labels):
             class_id = rect.class_id

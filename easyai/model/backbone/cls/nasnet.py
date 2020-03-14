@@ -89,9 +89,10 @@ class NasNet(BaseBackbone):
         return output_list
         
         
-def nasnet():
-    #stem filters must be 44, it's a pytorch workaround, cant change to other number
-    return NasNet(repeat_cell_num=4,
+def nasnet(data_channel):
+    # stem filters must be 44, it's a pytorch workaround, cant change to other number
+    return NasNet(data_channel=data_channel,
+                  repeat_cell_num=4,
                   reduction_num=2,
                   filters=44)
 

@@ -20,16 +20,16 @@ class ImageDataSetProcess():
         result = (input_data - mean) / std
         return result
 
-    def image_transpose(self, images):
+    def numpy_transpose(self, images, dtype=np.float32):
         result = None
         if images is None:
             result = None
         elif images.ndim == 3:
             image = images.transpose(2, 0, 1)
-            result = np.ascontiguousarray(image, dtype=np.float32)
+            result = np.ascontiguousarray(image, dtype=dtype)
         elif images.ndim == 4:
             img_all = images.transpose(0, 3, 1, 2)
-            result = np.ascontiguousarray(img_all, dtype=np.float32)
+            result = np.ascontiguousarray(img_all, dtype=dtype)
         return result
 
     def image_resize(self, src_image, image_size):

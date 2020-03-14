@@ -43,8 +43,9 @@ class ConvertSegmentionLable():
     def convert_gray_label(self, mask, class_list):
         unkonwn = False
         for index, class_name, value in enumerate(class_list):
-                mask[mask == value] = index
-                unkonwn = unkonwn | (mask == value)
+            gray_value = int(value.strip())
+            mask[mask == gray_value] = index
+            unkonwn = unkonwn | (mask == gray_value)
         mask[unkonwn] = 250
         return mask
 
@@ -52,8 +53,9 @@ class ConvertSegmentionLable():
         shape = mask.shape[:2]  # shape = [height, width]
         result = np.full(shape, 250, dtype=np.uint8)
         for index, class_name, value in enumerate(class_list):
-            temp_value = np.array(value, dtype=np.uint8)
-            temp1 = mask[:, :] == temp_value
+            value_list = [int(x) for x in value.spilt(',') if x.strip()]
+            color_value = np.array(value_list, dtype=np.uint8)
+            temp1 = mask[:, :] == color_value
             temp2 = np.sum(temp1, axis=2)
             result[temp2 == 3] = index
         return result

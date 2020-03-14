@@ -4,16 +4,16 @@
 
 
 import numpy as np
-from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
+from easyai.data_loader.utility.base_dataset_process import BaseDataSetProcess
 
 
-class SegmentDatasetProcess():
+class SegmentDatasetProcess(BaseDataSetProcess):
     def __init__(self):
-        self.dataset_process = ImageDataSetProcess()
+        super().__init__()
 
     def normaliza_dataset(self, src_image):
         image = self.dataset_process.image_normaliza(src_image)
-        image = self.dataset_process.image_transpose(image)
+        image = self.dataset_process.numpy_transpose(image)
         return image
 
     def resize_dataset(self, src_image, image_size, label,

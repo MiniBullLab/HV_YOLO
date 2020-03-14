@@ -19,23 +19,27 @@ class ImageDrawing():
             index = object.classIndex
             cv2.rectangle(srcImage, point1, point2, ColorDefine.colors[index], 2)
 
-    def drawSegmentResult(self, srcImage, segmentResult, className):
-        count = len(className)
-        label_colours = dict(zip(range(19), ColorDefine.colors))
-        img = cv2.cvtColor(np.asarray(srcImage), cv2.COLOR_RGB2BGR)  # convert PIL.image to cv2.mat
+    def draw_segment_result(self, src_image, result,
+                            is_gray, class_list):
+        r = result.copy()
+        g = result.copy()
+        b = result.copy()
+        for index, class_name, value in enumerate(class_list):
+            if is_gray:
+                gray_value = int(value.strip())
+                r[result == index] = gray_value
+                g[result == index] = gray_value
+                b[result == index] = gray_value
+            else:
+                color_list = [int(x) for x in value.spilt(',') if x.strip()]
+                r[result == index] = color_list[0]
+                g[result == index] = color_list[1]
+                b[result == index] = color_list[2]
 
-        r = segmentResult.copy()
-        g = segmentResult.copy()
-        b = segmentResult.copy()
-        for l in range(0, count):
-            r[segmentResult == l] = label_colours[l][0]
-            g[segmentResult == l] = label_colours[l][1]
-            b[segmentResult == l] = label_colours[l][2]
+        rgb = np.zeros((result.shape[0], result.shape[1], 3))
 
-        rgb = np.zeros((segmentResult.shape[0], segmentResult.shape[1], 3))
-
-        rgb[:, :, 0] = (r * 0.4 + img[:, :, 2] * 0.6) / 255.0
-        rgb[:, :, 1] = (g * 0.4 + img[:, :, 1] * 0.6) / 255.0
-        rgb[:, :, 2] = (b * 0.4 + img[:, :, 0] * 0.6) / 255.0
+        rgb[:, :, 0] = (r * 0.4 + src_image[:, :, 2] * 0.6) / 255.0
+        rgb[:, :, 1] = (g * 0.4 + src_image[:, :, 1] * 0.6) / 255.0
+        rgb[:, :, 2] = (b * 0.4 + src_image[:, :, 0] * 0.6) / 255.0
 
         return rgb

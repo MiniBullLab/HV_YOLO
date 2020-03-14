@@ -82,14 +82,16 @@ class Attention(BaseBackbone):
         return output_list
 
 
-def attention56():
-    model = Attention(num_blocks=(1, 1, 1))
+def attention56(data_channel):
+    model = Attention(data_channel=data_channel,
+                      num_blocks=(1, 1, 1))
     model.set_name(BackboneName.Attention56)
     return model
 
 
-def attention92():
-    model = Attention(num_blocks=(1, 2, 3))
+def attention92(data_channel):
+    model = Attention(data_channel=data_channel,
+                      num_blocks=(1, 2, 3))
     model.set_name(BackboneName.Attention92)
     return model
 

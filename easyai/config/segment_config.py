@@ -6,13 +6,14 @@ train_batch_size = 1
 test_batch_size = 1
 
 label_is_gray = True
-className = [('background', 255),
-             ('lane', 0)]
+className = [('background', '255'),
+             ('lane', '0')]
 
 # segment
 log_name = "segment"
 save_evaluation_path = os.path.join(root_save_dir, 'seg_evaluation.txt')
 
+is_save_epoch_model = True
 snapshotPath = os.path.join(root_save_dir, model_save_dir)
 latest_weights_file = os.path.join(snapshotPath, 'latest.pt')
 best_weights_file = os.path.join(snapshotPath, 'best.pt')
@@ -35,9 +36,5 @@ enable_mixed_precision = False
 display = 20
 
 # speed
-runType = "video"
-testImageFolder = "/home/wfw/HASCO/data/image/"
-testVideoFile = "/home/wfw/HASCO/data/video/VIDEO-5.MPG"
-weightPath = "./weights/backup74.pt"
 confThresh = 0.5
 nmsThresh = 0.45

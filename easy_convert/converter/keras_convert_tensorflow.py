@@ -17,7 +17,7 @@ K.set_learning_phase(0)
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('input_model', None, 'Path to the input model.')
-flags.DEFINE_string('input_model_name', "FgSegNetV2", 'the input model name.')
+flags.DEFINE_string('input_model_name', None, 'the input model name.')
 flags.DEFINE_string('input_model_json', None, 'Path to the input model '
                                               'architecture in json format.')
 flags.DEFINE_string('input_model_yaml', None, 'Path to the input model '

@@ -21,6 +21,7 @@ class BackboneName():
     GoogleNet = "googlenet"
     InceptionV4 = "inceptionv4"
     InceptionResNetV2 = "inception_resnetv2"
+    Vgg11 = "vgg11"
     Vgg13 = "vgg13"
     Vgg16 = "vgg16"
     Vgg19 = "vgg19"

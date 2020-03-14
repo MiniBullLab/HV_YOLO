@@ -75,13 +75,18 @@ class PNASNet(BaseBackbone):
         return output_list
 
 
-def pnasnet_A():
-    model = PNASNet(num_cells=6, num_planes=44, block=CellA)
+def pnasnet_A(data_channel):
+    model = PNASNet(data_channel=data_channel,
+                    num_cells=6,
+                    num_planes=44,
+                    block=CellA)
     model.set_name(BackboneName.PNASNetA)
     return model
 
 
-def pnasnet_B():
-    model = PNASNet(num_cells=6, num_planes=32, block=CellB)
+def pnasnet_B(data_channel):
+    model = PNASNet(data_channel=data_channel,
+                    num_cells=6, num_planes=32,
+                    block=CellB)
     model.set_name(BackboneName.PNASNetB)
     return model

@@ -13,7 +13,7 @@ from easyai.model.backbone.cls.darknet import darknet21_dilated8, darknet21_dila
 from easyai.model.backbone.cls.darknet import darknet53_dilated8, darknet53_dilated16
 from easyai.model.backbone.cls.googlenet import GoogleNet
 from easyai.model.backbone.cls.inceptionv4 import inceptionv4, inception_resnetv2
-from easyai.model.backbone.cls.vgg import vgg13, vgg16, vgg19
+from easyai.model.backbone.cls.vgg import vgg11, vgg13, vgg16, vgg19
 from easyai.model.backbone.cls.squeezenet import SqueezeNet, DilatedSqueezeNet
 from easyai.model.backbone.cls.densenet import densenet121, densenet201, densenet169, densenet161
 from easyai.model.backbone.cls.densenet import densenet121_dilated8, densenet121_dilated16
@@ -37,12 +37,12 @@ class BackboneFactory():
     def __init__(self):
         self.cfgReader = ModelParse()
 
-    def get_base_model(self, baseNetName):
+    def get_base_model(self, baseNetName, data_channel=3):
         input_name = baseNetName.strip()
         if input_name.endswith("cfg"):
             result = self.get_base_model_from_cfg(input_name)
         else:
-            result = self.get_base_model_from_name(input_name)
+            result = self.get_base_model_from_name(input_name, data_channel)
         return result
 
     def get_base_model_from_cfg(self, cfg_path):
@@ -53,110 +53,112 @@ class BackboneFactory():
         model.set_name(file_name)
         return model
 
-    def get_base_model_from_name(self, net_name):
+    def get_base_model_from_name(self, net_name, data_channel=3):
         result = None
         if net_name == BackboneName.ShuffleNetV2_1_0:
-            result = shufflenetv2_1_0()
+            result = shufflenetv2_1_0(data_channel)
         elif net_name == BackboneName.MobileNetV2_1_0:
-            result = mobilenetv2_1_0()
+            result = mobilenetv2_1_0(data_channel)
         elif net_name == BackboneName.ResNet18:
-            result = resnet18()
+            result = resnet18(data_channel)
         elif net_name == BackboneName.ResNet34:
-            result = resnet34()
+            result = resnet34(data_channel)
         elif net_name == BackboneName.ResNet50:
-            result = resnet50()
+            result = resnet50(data_channel)
         elif net_name == BackboneName.ResNet101:
-            result = resnet101()
+            result = resnet101(data_channel)
         elif net_name == BackboneName.ResNet152:
-            result = resnet152()
+            result = resnet152(data_channel)
         elif net_name == BackboneName.Darknet53:
-            result = darknet53()
+            result = darknet53(data_channel)
         elif net_name == BackboneName.Darknet21:
-            result = darknet21()
+            result = darknet21(data_channel)
         elif net_name == BackboneName.Darknet21_Dilated8:
-            result = darknet21_dilated8()
+            result = darknet21_dilated8(data_channel)
         elif net_name == BackboneName.Darknet21_Dilated16:
-            result = darknet21_dilated16()
+            result = darknet21_dilated16(data_channel)
         elif net_name == BackboneName.Darknet53_Dilated8:
-            result = darknet53_dilated8()
+            result = darknet53_dilated8(data_channel)
         elif net_name == BackboneName.Darknet53_Dilated16:
-            result = darknet53_dilated16()
+            result = darknet53_dilated16(data_channel)
         elif net_name == BackboneName.GoogleNet:
-            result = GoogleNet()
+            result = GoogleNet(data_channel)
         elif net_name == BackboneName.InceptionV4:
-            result = inceptionv4()
+            result = inceptionv4(data_channel)
         elif net_name == BackboneName.InceptionResNetV2:
-            result = inception_resnetv2()
+            result = inception_resnetv2(data_channel)
+        elif net_name == BackboneName.Vgg11:
+            result = vgg11(data_channel)
         elif net_name == BackboneName.Vgg13:
-            result = vgg13()
+            result = vgg13(data_channel)
         elif net_name == BackboneName.Vgg16:
-            result = vgg16()
+            result = vgg16(data_channel)
         elif net_name == BackboneName.Vgg19:
-            result = vgg19()
+            result = vgg19(data_channel)
         elif net_name == BackboneName.SqueezeNet:
-            result = SqueezeNet()
+            result = SqueezeNet(data_channel)
         elif net_name == BackboneName.DilatedSqueezeNet:
-            result = DilatedSqueezeNet()
+            result = DilatedSqueezeNet(data_channel)
         elif net_name == BackboneName.Densenet121:
-            result = densenet121()
+            result = densenet121(data_channel)
         elif net_name == BackboneName.Densenet121_Dilated8:
-            result = densenet121_dilated8()
+            result = densenet121_dilated8(data_channel)
         elif net_name == BackboneName.Densenet121_Dilated16:
-            result = densenet121_dilated16()
+            result = densenet121_dilated16(data_channel)
         elif net_name == BackboneName.Densenet169:
-            result = densenet169()
+            result = densenet169(data_channel)
         elif net_name == BackboneName.Densenet201:
-            result = densenet201()
+            result = densenet201(data_channel)
         elif net_name == BackboneName.Densenet161:
-            result = densenet161()
+            result = densenet161(data_channel)
         elif net_name == BackboneName.SEResNet18:
-            result = se_resnet18()
+            result = se_resnet18(data_channel)
         elif net_name == BackboneName.SEResNet34:
-            result = se_resnet34()
+            result = se_resnet34(data_channel)
         elif net_name == BackboneName.SEResNet50:
-            result = se_resnet50()
+            result = se_resnet50(data_channel)
         elif net_name == BackboneName.SEResNet101:
-            result = se_resnet101()
+            result = se_resnet101(data_channel)
         elif net_name == BackboneName.SEResNet152:
-            result = se_resnet152()
+            result = se_resnet152(data_channel)
         elif net_name == BackboneName.ResNext50:
-            result = resnext50()
+            result = resnext50(data_channel)
         elif net_name == BackboneName.ResNext101:
-            result = resnext101()
+            result = resnext101(data_channel)
         elif net_name == BackboneName.ResNext152:
-            result = resnext152()
+            result = resnext152(data_channel)
         elif net_name == BackboneName.NasNet:
-            result = nasnet()
+            result = nasnet(data_channel)
         elif net_name == BackboneName.PreActResNet18:
-            result = preactresnet18()
+            result = preactresnet18(data_channel)
         elif net_name == BackboneName.PreActResNet34:
-            result = preactresnet34()
+            result = preactresnet34(data_channel)
         elif net_name == BackboneName.PreActResNet50:
-            result = preactresnet50()
+            result = preactresnet50(data_channel)
         elif net_name == BackboneName.PreActResNet101:
-            result = preactresnet101()
+            result = preactresnet101(data_channel)
         elif net_name == BackboneName.PreActResNet152:
-            result = preactresnet152()
+            result = preactresnet152(data_channel)
         elif net_name == BackboneName.Xception:
-            result = xception()
+            result = xception(data_channel)
         elif net_name == BackboneName.Xception65:
-            result = Xception65()
+            result = Xception65(data_channel)
         elif net_name == BackboneName.XceptionA:
-            result = XceptionA()
+            result = XceptionA(data_channel)
         elif net_name == BackboneName.Attention56:
-            result = attention56()
+            result = attention56(data_channel)
         elif net_name == BackboneName.Attention92:
-            result = attention92()
+            result = attention92(data_channel)
         elif net_name == BackboneName.EfficientNet:
-            result = EfficientNet()
+            result = EfficientNet(data_channel)
         elif net_name == BackboneName.DPN26:
-            result = dpn26()
+            result = dpn26(data_channel)
         elif net_name == BackboneName.DPN92:
-            result = dpn92()
+            result = dpn92(data_channel)
         elif net_name == BackboneName.PNASNetA:
-            result = pnasnet_A()
+            result = pnasnet_A(data_channel)
         elif net_name == BackboneName.PNASNetB:
-            result = pnasnet_B()
+            result = pnasnet_B(data_channel)
         else:
             print("base model:%s error" % net_name)
         return result
