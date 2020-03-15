@@ -23,11 +23,11 @@ class ClassifyTrain(BaseTrain):
 
         self.torchModelProcess = TorchModelProcess()
         self.torchOptimizer = TorchOptimizer(self.classify_config.optimizer_config)
-        # self.multiLR = WarmupMultiStepLR(self.classify_config.base_lr,
-        #                                  [[60, 1], [120, 0.2], [160, 0.04], [200, 0.0008]],
-        #                                  0, 390)
-        self.multiLR = MultiStageLR(self.classify_config.base_lr, [[60, 0.1], [120, 0.02],
-                                                                   [160, 0.004], [200, 0.0008]])
+        self.multiLR = WarmupMultiStepLR(self.classify_config.base_lr,
+                                         [[60, 1], [120, 0.2], [160, 0.04], [200, 0.008]],
+                                         0, 390)
+        # self.multiLR = MultiStageLR(self.classify_config.base_lr, [[60, 0.1], [120, 0.02],
+        #                                                            [160, 0.004], [200, 0.0008]])
 
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
         self.device = self.torchModelProcess.getDevice()
@@ -126,7 +126,7 @@ class ClassifyTrain(BaseTrain):
         self.train_logger.epoch_train_log(epoch)
         if self.classify_config.is_save_epoch_model:
             save_model_path = os.path.join(self.classify_config.snapshot_path,
-                                           "model_epoch_%d.pt" % epoch)
+                                           "cls_model_epoch_%d.pt" % epoch)
         else:
             save_model_path = self.classify_config.latest_weights_file
         self.torchModelProcess.saveLatestModel(save_model_path, self.model,

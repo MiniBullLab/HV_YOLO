@@ -8,13 +8,16 @@ from easyai.tasks.utility.base_inference import BaseInference
 from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.tasks.seg.segment_result_process import SegmentResultProcess
 from easyai.drawing.segment_show import SegmentionShow
-from easyai.config import segment_config
+from easyai.config.segment_config import SegmentionConfig
 
 
 class Segmentation(BaseInference):
 
-    def __init__(self, cfg_path, gpu_id):
+    def __init__(self, cfg_path, gpu_id, config_path=None):
         super().__init__()
+        self.segmention_config = SegmentionConfig()
+        self.segmention_config.load_config(config_path)
+
         self.torchModelProcess = TorchModelProcess()
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
         self.device = self.torchModelProcess.getDevice()
@@ -32,7 +35,7 @@ class Segmentation(BaseInference):
 
     def process(self, input_path):
         dataloader = self.get_image_data_lodaer(input_path,
-                                                segment_config.imgSize)
+                                                self.segmention_config.image_size)
         for index, (src_image, image) in enumerate(dataloader):
             self.timer.tic()
             self.set_src_size(src_image)
@@ -40,8 +43,8 @@ class Segmentation(BaseInference):
             result = self.postprocess(prediction)
             print('Batch %d... Done. (%.3fs)' % (index, self.timer.toc()))
             if not self.result_show.show(src_image, result,
-                                         segment_config.label_is_gray,
-                                         segment_config.className):
+                                         self.segmention_config.label_is_gray,
+                                         self.segmention_config.class_name):
                 break
 
     def infer(self, input_data, threshold=0.0):
@@ -53,7 +56,7 @@ class Segmentation(BaseInference):
 
     def postprocess(self, result):
         result = self.result_process.resize_segmention_result(self.src_size,
-                                                              segment_config.imgSize,
+                                                              self.segmention_config.image_size,
                                                               result)
         return result
 

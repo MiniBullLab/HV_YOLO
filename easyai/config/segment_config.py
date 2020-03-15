@@ -1,40 +1,164 @@
-from easyai.config.base_config import *
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
 
-# data
-imgSize = (440, 512)
-train_batch_size = 1
-test_batch_size = 1
+import os
+import codecs
+import json
+from easyai.config.base_config import BaseConfig
 
-label_is_gray = True
-className = [('background', '255'),
-             ('lane', '0')]
 
-# segment
-log_name = "segment"
-save_evaluation_path = os.path.join(root_save_dir, 'seg_evaluation.txt')
+class SegmentionConfig(BaseConfig):
 
-is_save_epoch_model = True
-snapshotPath = os.path.join(root_save_dir, model_save_dir)
-latest_weights_file = os.path.join(snapshotPath, 'latest.pt')
-best_weights_file = os.path.join(snapshotPath, 'best.pt')
-maxEpochs = 300
+    def __init__(self):
+        super().__init__()
+        # data
+        self.image_size = None  # w * h
+        self.label_is_gray = None
+        self.class_name = None
+        # test
+        self.test_batch_size = 1
+        self.save_evaluation_path = os.path.join(self.root_save_dir, 'seg_evaluation.txt')
+        # train
+        self.log_name = "segment"
+        self.train_batch_size = 1
+        self.enable_mixed_precision = False
+        self.is_save_epoch_model = False
+        self.latest_weights_name = 'seg_latest.pt'
+        self.best_weights_name = 'seg_best.pt'
+        self.latest_weights_file = None
+        self.best_weights_file = None
+        self.max_epochs = 1
 
-base_lr = 1e-2
-lr_power = 0.9
-optimizerConfig = {0: {'optimizer': 'RMSprop',
-                       'alpha': 0.9,
-                       'eps': 1e-08,
-                       'weight_decay': 0.}
-                   }
-accumulated_batches = 1
+        self.base_lr = 0.0
+        self.lr_power = 0.0
+        self.optimizer_config = None
+        self.accumulated_batches = 1
+        self.display = 1
 
-enable_freeze_layer = False
-freeze_layer_name = "route_0"
+        self.enable_freeze_layer = False
+        self.freeze_layer_name = None
 
-enable_mixed_precision = False
+        self.det2d_config_dir = os.path.join(self.root_save_dir, self.config_save_dir)
+        self.config_path = os.path.join(self.det2d_config_dir, "segmention.json")
 
-display = 20
+        self.get_data_default_value()
+        self.get_test_default_value()
+        self.get_train_default_value()
+        if self.snapshot_path is not None and not os.path.exists(self.snapshot_path):
+            os.makedirs(self.snapshot_path, exist_ok=True)
 
-# speed
-confThresh = 0.5
-nmsThresh = 0.45
+    def load_config(self, config_path):
+        if config_path is not None and os.path.exists(config_path):
+            self.config_path = config_path
+        if os.path.exists(self.config_path):
+            with codecs.open(self.config_path, 'r', encoding='utf-8') as f:
+                config_dict = json.load(f)
+            self.load_data_value(config_dict)
+            self.load_test_value(config_dict)
+            self.load_train_value(config_dict)
+        else:
+            print("{} not exits".format(self.config_path))
+
+    def save_config(self):
+        if not os.path.exists(self.config_path):
+            if not os.path.exists(self.det2d_config_dir):
+                os.makedirs(self.det2d_config_dir, exist_ok=True)
+        config_dict = {}
+        self.save_data_value(config_dict)
+        self.save_test_value(config_dict)
+        self.save_train_value(config_dict)
+        with codecs.open(self.config_path, 'w', encoding='utf-8') as f:
+            json.dump(config_dict, f, sort_keys=True, indent=4, ensure_ascii=False)
+
+    def load_data_value(self, config_dict):
+        if config_dict.get('image_size', None) is not None:
+            self.image_size = tuple(config_dict['image_size'])
+        if config_dict.get('label_is_gray', None) is not None:
+            self.label_is_gray = bool(config_dict['label_is_gray'])
+        if config_dict.get('class_name', None) is not None:
+            self.class_name = list(config_dict['class_name'])
+
+    def save_data_value(self, config_dict):
+        config_dict['image_size'] = self.image_size
+        config_dict['label_is_gray'] = self.label_is_gray
+        config_dict['class_name'] = self.class_name
+
+    def load_test_value(self, config_dict):
+        if config_dict.get('test_batch_size', None) is not None:
+            self.test_batch_size = int(config_dict['test_batch_size'])
+
+    def save_test_value(self, config_dict):
+        config_dict['test_batch_size'] = self.test_batch_size
+
+    def load_train_value(self, config_dict):
+        if config_dict.get('train_batch_size', None) is not None:
+            self.train_batch_size = int(config_dict['train_batch_size'])
+        if config_dict.get('is_save_epoch_model', None) is not None:
+            self.is_save_epoch_model = bool(config_dict['is_save_epoch_model'])
+        if config_dict.get('latest_weights_name', None) is not None:
+            self.latest_weights_name = str(config_dict['latest_weights_name'])
+        if config_dict.get('best_weights_name', None) is not None:
+            self.best_weights_name = str(config_dict['best_weights_name'])
+        if config_dict.get('max_epochs', None) is not None:
+            self.max_epochs = int(config_dict['max_epochs'])
+        if config_dict.get('base_lr', None) is not None:
+            self.base_lr = float(config_dict['base_lr'])
+        if config_dict.get('optimizer_config', None) is not None:
+            self.optimizer_config = config_dict['optimizer_config']
+        if config_dict.get('accumulated_batches', None) is not None:
+            self.accumulated_batches = int(config_dict['accumulated_batches'])
+        if config_dict.get('display', None) is not None:
+            self.display = int(config_dict['display'])
+        if config_dict.get('enable_freeze_layer', None) is not None:
+            self.enable_freeze_layer = bool(config_dict['enable_freeze_layer'])
+        if config_dict.get('freeze_layer_name', None) is not None:
+            self.freeze_layer_name = config_dict['freeze_layer_name']
+
+    def save_train_value(self, config_dict):
+        config_dict['train_batch_size'] = self.train_batch_size
+        config_dict['is_save_epoch_model'] = self.is_save_epoch_model
+        config_dict['latest_weights_name'] = self.latest_weights_name
+        config_dict['best_weights_name'] = self.best_weights_name
+        config_dict['max_epochs'] = self.max_epochs
+        config_dict['base_lr'] = self.base_lr
+        config_dict['optimizer_config'] = self.optimizer_config
+        config_dict['accumulated_batches'] = self.accumulated_batches
+        config_dict['display'] = self.display
+        config_dict['enable_freeze_layer'] = self.enable_freeze_layer
+        config_dict['freeze_layer_name'] = self.freeze_layer_name
+
+    def get_data_default_value(self):
+        self.image_size = (440, 512)  # w * H
+        self.label_is_gray = True
+        self.class_name = [('background', '255'),
+                           ('lane', '0')]
+
+    def get_test_default_value(self):
+        self.test_batch_size = 1
+
+    def get_train_default_value(self):
+        self.log_name = "segment"
+        self.train_batch_size = 1
+        self.enable_mixed_precision = False
+        self.is_save_epoch_model = False
+        self.latest_weights_name = 'seg_latest.pt'
+        self.best_weights_name = 'seg_best.pt'
+        self.latest_weights_file = os.path.join(self.snapshot_path, self.latest_weights_name)
+        self.best_weights_file = os.path.join(self.snapshot_path, self.latest_weights_name)
+        self.max_epochs = 300
+
+        self.base_lr = 1e-2
+        self.lr_power = 0.9
+        self.optimizer_config = {0: {'optimizer': 'RMSprop',
+                                     'alpha': 0.9,
+                                     'eps': 1e-08,
+                                     'weight_decay': 0.}
+                                 }
+        self.accumulated_batches = 1
+        self.display = 20
+
+        self.enable_freeze_layer = True
+        self.freeze_layer_name = "route_0"
+
+

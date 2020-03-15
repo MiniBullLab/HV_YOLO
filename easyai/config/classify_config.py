@@ -12,17 +12,16 @@ class ClassifyConfig(BaseConfig):
 
     def __init__(self):
         super().__init__()
-        self.log_name = "classify"
         # data
         self.image_size = None  # W * H
         self.data_mean = None
         self.data_std = None
         # test
         self.test_batch_size = 1
-        self.test_resul_name = 'cls_result.txt'
+        self.test_resul_name = 'cls_evaluation.txt'
         self.test_result_path = os.path.join(self.root_save_dir, self.test_resul_name)
-
         # train
+        self.log_name = "classify"
         self.train_batch_size = 1
         self.enable_mixed_precision = False
         self.is_save_epoch_model = False
@@ -31,7 +30,7 @@ class ClassifyConfig(BaseConfig):
         self.latest_weights_file = None
         self.best_weights_file = None
         self.max_epochs = 1
-        self.base_lr = 0.1
+        self.base_lr = 0.0
         self.optimizer_config = None
         self.accumulated_batches = 1
         self.display = 1
@@ -49,13 +48,13 @@ class ClassifyConfig(BaseConfig):
         if config_path is not None and os.path.exists(config_path):
             self.config_path = config_path
         if os.path.exists(self.config_path):
-            with codecs.open(config_path, 'r', encoding='utf-8') as f:
+            with codecs.open(self.config_path, 'r', encoding='utf-8') as f:
                 config_dict = json.load(f)
             self.load_data_value(config_dict)
             self.load_test_value(config_dict)
             self.load_train_value(config_dict)
         else:
-            print("{} not exits".format(config_path))
+            print("{} not exits".format(self.config_path))
 
     def save_config(self):
         if not os.path.exists(self.config_path):
@@ -69,11 +68,11 @@ class ClassifyConfig(BaseConfig):
             json.dump(config_dict, f, sort_keys=True, indent=4, ensure_ascii=False)
 
     def load_data_value(self, config_dict):
-        if config_dict.get('image_size', None):
+        if config_dict.get('image_size', None) is not None:
             self.image_size = tuple(config_dict['image_size'])
-        if config_dict.get('data_mean', None):
+        if config_dict.get('data_mean', None) is not None:
             self.data_mean = tuple(config_dict['data_mean'])
-        if config_dict.get('data_std', None):
+        if config_dict.get('data_std', None) is not None:
             self.data_std = tuple(config_dict['data_std'])
 
     def save_data_value(self, config_dict):
@@ -82,30 +81,30 @@ class ClassifyConfig(BaseConfig):
         config_dict['data_std'] = self.data_std
 
     def load_test_value(self, config_dict):
-        if config_dict.get('test_batch_size', None):
+        if config_dict.get('test_batch_size', None) is not None:
             self.test_batch_size = int(config_dict['test_batch_size'])
 
     def save_test_value(self, config_dict):
         config_dict['test_batch_size'] = self.test_batch_size
 
     def load_train_value(self, config_dict):
-        if config_dict.get('train_batch_size', None):
+        if config_dict.get('train_batch_size', None) is not None:
             self.train_batch_size = int(config_dict['train_batch_size'])
-        if config_dict.get('is_save_epoch_model', None):
+        if config_dict.get('is_save_epoch_model', None) is not None:
             self.is_save_epoch_model = bool(config_dict['is_save_epoch_model'])
-        if config_dict.get('latest_weights_name', None):
+        if config_dict.get('latest_weights_name', None) is not None:
             self.latest_weights_name = str(config_dict['latest_weights_name'])
-        if config_dict.get('best_weights_name', None):
+        if config_dict.get('best_weights_name', None) is not None:
             self.best_weights_name = str(config_dict['best_weights_name'])
-        if config_dict.get('max_epochs', None):
+        if config_dict.get('max_epochs', None) is not None:
             self.max_epochs = int(config_dict['max_epochs'])
-        if config_dict.get('base_lr', None):
+        if config_dict.get('base_lr', None) is not None:
             self.base_lr = float(config_dict['base_lr'])
-        if config_dict.get('optimizer_config', None):
+        if config_dict.get('optimizer_config', None) is not None:
             self.optimizer_config = config_dict['optimizer_config']
-        if config_dict.get('accumulated_batches', None):
+        if config_dict.get('accumulated_batches', None) is not None:
             self.accumulated_batches = int(config_dict['accumulated_batches'])
-        if config_dict.get('display', None):
+        if config_dict.get('display', None) is not None:
             self.display = int(config_dict['display'])
 
     def save_train_value(self, config_dict):

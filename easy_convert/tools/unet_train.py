@@ -41,9 +41,9 @@ myGene = trainGenerator(2, 'data/membrane/train', 'image','label',data_gen_args,
 unet = UNet()
 model = unet.init_unet()
 model_checkpoint = ModelCheckpoint('unet_membrane.hdf5', monitor='loss', verbose=1, save_best_only=True)
-model.fit_generator(myGene, steps_per_epoch=300, epochs=1, callbacks=[model_checkpoint])
+model.fit_generator(myGene, steps_per_epoch=2000, epochs=5, callbacks=[model_checkpoint])
 
 testGene = testGenerator("data/membrane/test")
 results = model.predict_generator(testGene, 30, verbose=1)
-saveResult("data/membrane/test", results)
+saveResult("log", results)
 

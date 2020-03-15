@@ -10,13 +10,16 @@ from easyai.tasks.det2d.detect2d_result_process import Detect2dResultProcess
 from easyai.base_algorithm.non_max_suppression import NonMaxSuppression
 from easyai.base_algorithm.fast_non_max_suppression import FastNonMaxSuppression
 from easyai.drawing.detect_show import DetectionShow
-from easyai.config import detect2d_config
+from easyai.config.detect2d_config import Detect2dConfig
 
 
 class Detection2d(BaseInference):
 
-    def __init__(self, cfg_path, gpu_id):
+    def __init__(self, cfg_path, gpu_id, config_path=None):
         super().__init__()
+        self.detection2d_config = Detect2dConfig()
+        self.detection2d_config.load_config(config_path)
+
         self.torchModelProcess = TorchModelProcess()
         self.result_process = Detect2dResultProcess()
         self.nms_process = FastNonMaxSuppression()
@@ -34,13 +37,13 @@ class Detection2d(BaseInference):
 
     def process(self, input_path):
         dataloader = self.get_image_data_lodaer(input_path,
-                                                detect2d_config.imgSize)
+                                                self.detection2d_config.image_size)
         for i, (src_image, img) in enumerate(dataloader):
             print('%g/%g' % (i + 1, len(dataloader)), end=' ')
             self.set_src_size(src_image)
 
             self.timer.tic()
-            result = self.infer(img, detect2d_config.confThresh)
+            result = self.infer(img, self.detection2d_config.confidence_th)
             detection_objects = self.postprocess(result)
             print('Batch %d... Done. (%.3fs)' % (i, self.timer.toc()))
 
@@ -54,7 +57,7 @@ class Detection2d(BaseInference):
             y1 = object.min_corner.y
             x2 = object.max_corner.x
             y2 = object.max_corner.y
-            temp_save_path = os.path.join(detect2d_config.save_result_dir, "%s.txt" % object.name)
+            temp_save_path = os.path.join(self.detection2d_config.save_result_dir, "%s.txt" % object.name)
             with open(temp_save_path, 'a') as file:
                 file.write("{} {} {} {} {} {}\n".format(filename, confidence, x1, y1, x2, y2))
 
@@ -66,11 +69,11 @@ class Detection2d(BaseInference):
         return result
 
     def postprocess(self, result):
-        detection_objects = self.nms_process.multi_class_nms(result, detect2d_config.nmsThresh)
+        detection_objects = self.nms_process.multi_class_nms(result, self.detection2d_config.nms_th)
         detection_objects = self.result_process.resize_detection_objects(self.src_size,
-                                                                         detect2d_config.imgSize,
+                                                                         self.detection2d_config.image_size,
                                                                          detection_objects,
-                                                                         detect2d_config.className)
+                                                                         self.detection2d_config.class_name)
         return detection_objects
 
     def compute_output(self, output_list):

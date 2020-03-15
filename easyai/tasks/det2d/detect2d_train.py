@@ -10,21 +10,23 @@ from easyai.solver.lr_scheduler import WarmupMultiStepLR
 from easyai.utility.train_log import TrainLogger
 from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.det2d.detect2d_test import Detection2dTest
-from easyai.config import detect2d_config
+from easyai.config.detect2d_config import Detect2dConfig
 
 
 class Detection2dTrain(BaseTrain):
 
-    def __init__(self, cfg_path, gpu_id):
+    def __init__(self, cfg_path, gpu_id, config_path=None):
         super().__init__()
-        if not os.path.exists(detect2d_config.snapshotPath):
-            os.makedirs(detect2d_config.snapshotPath, exist_ok=True)
 
-        self.train_logger = TrainLogger(detect2d_config.log_name)
+        self.detection2d_config = Detect2dConfig()
+        self.detection2d_config.load_config(config_path)
+
+        self.train_logger = TrainLogger(self.detection2d_config.log_name)
 
         self.torchModelProcess = TorchModelProcess()
-        self.torchOptimizer = TorchOptimizer(detect2d_config.optimizerConfig)
-        self.multi_lr = WarmupMultiStepLR(detect2d_config.base_lr, [[50, 1], [70, 0.1], [100, 0.01]],
+        self.torchOptimizer = TorchOptimizer(self.detection2d_config.optimizer_config)
+        self.multi_lr = WarmupMultiStepLR(self.detection2d_config.base_lr,
+                                          [[50, 1], [70, 0.1], [100, 0.01]],
                                           warm_epoch=0, warmup_iters=1000)
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
         self.device = self.torchModelProcess.getDevice()
@@ -49,19 +51,20 @@ class Detection2dTrain(BaseTrain):
             self.model = self.torchModelProcess.modelTrainInit(self.model)
         self.start_epoch, self.best_mAP = self.torchModelProcess.getLatestModelValue(checkpoint)
 
-        self.torchOptimizer.createOptimizer(self.start_epoch, self.model, detect2d_config.base_lr)
+        self.torchOptimizer.createOptimizer(self.start_epoch, self.model, self.detection2d_config.base_lr)
         self.optimizer = self.torchOptimizer.getLatestModelOptimizer(checkpoint)
 
     def train(self, train_path, val_path):
-        dataloader = DetectionTrainDataloader(train_path, detect2d_config.className,
-                                              detect2d_config.train_batch_size, detect2d_config.imgSize,
+        dataloader = DetectionTrainDataloader(train_path, self.detection2d_config.class_name,
+                                              self.detection2d_config.train_batch_size,
+                                              self.detection2d_config.image_size,
                                               multi_scale=False, augment=True, balanced_sample=True)
         self.total_images = len(dataloader)
-        self.load_latest_param(detect2d_config.latest_weights_file)
+        self.load_latest_param(self.detection2d_config.latest_weights_file)
 
         self.timer.tic()
         self.model.train()
-        for epoch in range(self.start_epoch, detect2d_config.maxEpochs):
+        for epoch in range(self.start_epoch, self.detection2d_config.max_epochs):
             # self.optimizer = self.torchOptimizer.adjust_optimizer(epoch, lr)
             self.optimizer.zero_grad()
             for i, (images, targets) in enumerate(dataloader):
@@ -83,7 +86,7 @@ class Detection2dTrain(BaseTrain):
         loss.backward()
 
         # accumulate gradient for x batches before optimizing
-        if ((setp_index + 1) % detect2d_config.accumulated_batches == 0) \
+        if ((setp_index + 1) % self.detection2d_config.accumulated_batches == 0) \
                 or (setp_index == self.total_images - 1):
             self.optimizer.step()
             self.optimizer.zero_grad()
@@ -102,11 +105,12 @@ class Detection2dTrain(BaseTrain):
         loss_value = loss.data
 
         if self.avg_loss < 0:
-            self.avg_loss = (loss.cpu().detach().numpy() / detect2d_config.train_batch_size)
-        self.avg_loss = 0.9 * (loss.cpu().detach().numpy() / detect2d_config.train_batch_size) + 0.1 * self.avg_loss
+            self.avg_loss = (loss.cpu().detach().numpy() / self.detection2d_config.train_batch_size)
+        self.avg_loss = 0.9 * (loss.cpu().detach().numpy() / self.detection2d_config.train_batch_size) \
+                        + 0.1 * self.avg_loss
 
-        self.train_logger.train_log(step, loss_value, detect2d_config.display)
-        self.train_logger.lr_log(step, lr, detect2d_config.display)
+        self.train_logger.train_log(step, loss_value, self.detection2d_config.display)
+        self.train_logger.lr_log(step, lr, self.detection2d_config.display)
         print('Epoch: {}[{}/{}]\t Loss: {}\t Rate: {} \t Time: {}\t'.format(epoch,
                                                                             index,
                                                                             total,
@@ -116,10 +120,11 @@ class Detection2dTrain(BaseTrain):
 
     def save_train_model(self, epoch):
         self.train_logger.epoch_train_log(epoch)
-        if detect2d_config.is_save_epoch_model:
-            save_model_path = os.path.join(detect2d_config.snapshotPath, "model_epoch_%d.pt" % epoch)
+        if self.detection2d_config.is_save_epoch_model:
+            save_model_path = os.path.join(self.detection2d_config.snapshot_path,
+                                           "det2d_model_epoch_%d.pt" % epoch)
         else:
-            save_model_path = detect2d_config.latest_weights_file
+            save_model_path = self.detection2d_config.latest_weights_file
         self.torchModelProcess.saveLatestModel(save_model_path, self.model,
                                                self.optimizer, epoch, self.best_mAP)
         return save_model_path
@@ -130,4 +135,4 @@ class Detection2dTrain(BaseTrain):
         self.detect_test.save_test_value(epoch, mAP, aps)
 
         self.best_mAP = self.torchModelProcess.saveBestModel(mAP, save_model_path,
-                                                             detect2d_config.best_weights_file)
+                                                             self.detection2d_config.best_weights_file)

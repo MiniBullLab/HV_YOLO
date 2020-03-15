@@ -39,6 +39,10 @@ class ClassifyAccuracy():
         # else:
         #     self.top1.update(res[0], 1)
 
+    def clean_data(self):
+        self.top1.reset()
+        self.topK.reset()
+
     def get_top1(self):
         return self.top1.avg
 

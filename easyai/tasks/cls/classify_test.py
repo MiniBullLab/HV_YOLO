@@ -2,7 +2,6 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-import os
 from easyai.tasks.utility.base_test import BaseTest
 from easyai.data_loader.cls.classify_dataloader import get_classify_val_dataloader
 from easyai.tasks.cls.classify import Classify
@@ -29,6 +28,7 @@ class ClassifyTest(BaseTest):
                                                  self.classify_config.data_std,
                                                  self.classify_config.image_size,
                                                  self.classify_config.test_batch_size)
+        self.evaluation.clean_data()
         for index, (images, labels) in enumerate(dataloader):
             output = self.classify_inference.infer(images)
             self.evaluation.torch_eval(output.data, labels.to(output.device))
