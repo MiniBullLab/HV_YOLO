@@ -27,15 +27,16 @@ class DetectionDataSetProcess(BaseDataSetProcess):
         image, ratio, pad = self.dataset_process.image_resize_square(src_image,
                                                                      image_size,
                                                                      color=(127.5, 127.5, 127.5))
-        for box in boxes:
-            if box.name in class_name:
-                rect = Rect2D()
-                rect.class_id = class_name.index(box.name)
-                rect.min_corner.x = ratio * box.min_corner.x + pad[0] // 2
-                rect.min_corner.y = ratio * box.min_corner.y + pad[1] // 2
-                rect.max_corner.x = ratio * box.max_corner.x + pad[0] // 2
-                rect.max_corner.y = ratio * box.max_corner.y + pad[1] // 2
-                labels.append(rect)
+        if boxes is not None:
+            for box in boxes:
+                if box.name in class_name:
+                    rect = Rect2D()
+                    rect.class_id = class_name.index(box.name)
+                    rect.min_corner.x = ratio * box.min_corner.x + pad[0] // 2
+                    rect.min_corner.y = ratio * box.min_corner.y + pad[1] // 2
+                    rect.max_corner.x = ratio * box.max_corner.x + pad[0] // 2
+                    rect.max_corner.y = ratio * box.max_corner.y + pad[1] // 2
+                    labels.append(rect)
         return image, labels
 
     def change_outside_labels(self, labels):

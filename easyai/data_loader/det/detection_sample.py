@@ -64,12 +64,12 @@ class DetectionSample():
                                                     self.balance_file_count[name]
         else:
             start_index = index * batch_size
-        return start_index
+        return int(start_index)
 
     def get_sample_count(self):
         result = 0
         if self.is_blance:
-            for key, value in self.balance_file_count:
+            for key, value in self.balance_file_count.items():
                 result += value
         else:
             result = len(self.image_and_label_list)
