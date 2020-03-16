@@ -18,7 +18,7 @@ class FastNonMaxSuppression(BaseNonMaxSuppression):
             return result
 
         inputs = self.sort_detect_objects(input_objects, 1)
-        class_index_list = inputs[:, -1].unique()
+        class_index_list = np.unique(inputs[:, -1])
 
         temp_result = []
         for class_index in class_index_list:

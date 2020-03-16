@@ -11,15 +11,17 @@ class DetectionDataSetProcess(BaseDataSetProcess):
     def normaliza_dataset(self, src_image, labels=None, image_size=None):
         image = self.dataset_process.image_normaliza(src_image)
         image = self.dataset_process.numpy_transpose(image)
-        result = np.zeros((len(labels), 5), dtype=np.float32)
-        for index, rect in enumerate(labels):
-            class_id = rect.class_id
-            x, y = rect.center()
-            x /= image_size[0]
-            y /= image_size[1]
-            width = rect.width() / image_size[0]
-            height = rect.height() / image_size[1]
-            result[index, :] = np.array([class_id, x, y, width, height])
+        result = None
+        if labels is not None:
+            result = np.zeros((len(labels), 5), dtype=np.float32)
+            for index, rect in enumerate(labels):
+                class_id = rect.class_id
+                x, y = rect.center()
+                x /= image_size[0]
+                y /= image_size[1]
+                width = rect.width() / image_size[0]
+                height = rect.height() / image_size[1]
+                result[index, :] = np.array([class_id, x, y, width, height])
         return image, result
 
     def resize_dataset(self, src_image, image_size, boxes=None, class_name=None):
