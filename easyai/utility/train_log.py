@@ -7,7 +7,7 @@ import time
 import torchvision.utils as vutils
 from tensorboardX import SummaryWriter
 from easyai.helper.average_meter import AverageMeter
-from easyai.config import base_config
+from easyai.config.utility import base_config
 
 
 class TrainLogger():

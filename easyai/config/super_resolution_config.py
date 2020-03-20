@@ -1,4 +1,4 @@
-from easyai.config.base_config import *
+from easyai.config.utility.base_config import *
 
 # data
 train_set = "/home/lpj/github/data/super/train"

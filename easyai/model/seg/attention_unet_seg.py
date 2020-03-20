@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 # Author:
 """
-U-Net: Convolutional Networks for Biomedical Image Segmentation
+Attention U-Net: Learning Where to Look for the Pancreas
 """
 
 from easyai.base_name.model_name import ModelName
@@ -11,11 +11,12 @@ from easyai.base_name.block_name import LayerType
 from easyai.base_name.loss_name import LossType
 from easyai.loss.utility.bce_loss import BinaryCrossEntropy2d
 from easyai.model.base_block.seg.unet_blcok import UNetBlockName
-from easyai.model.base_block.seg.unet_blcok import DoubleConv2d, DownBlock, UpBlock
+from easyai.model.base_block.seg.unet_blcok import DoubleConv2d, DownBlock
+from easyai.model.base_block.seg.unet_blcok import AttentionUpBlock
 from easyai.model.utility.base_model import *
 
 
-class UNetSeg(BaseModel):
+class AttentionUnetSeg(BaseModel):
 
     def __init__(self, data_channel=3, class_num=1):
         super().__init__()
@@ -72,9 +73,9 @@ class UNetSeg(BaseModel):
         self.add_block_list(down4.get_name(), down4, 1024)
 
     def up_layers(self):
-        up1 = UpBlock(in_channels=1024, out_channels=512,
-                      bn_name=self.bn_name,
-                      activation_name=self.activation_name)
+        up1 = AttentionUpBlock(in_channels=1024, out_channels=512,
+                               bn_name=self.bn_name,
+                               activation_name=self.activation_name)
         self.add_block_list(up1.get_name(), up1, 1024)
 
         conv1 = DoubleConv2d(in_channels=1024, out_channels=512,
@@ -82,9 +83,9 @@ class UNetSeg(BaseModel):
                              activation_name=self.activation_name)
         self.add_block_list(conv1.get_name(), conv1, 512)
 
-        up2 = UpBlock(in_channels=512, out_channels=256,
-                      bn_name=self.bn_name,
-                      activation_name=self.activation_name)
+        up2 = AttentionUpBlock(in_channels=512, out_channels=256,
+                               bn_name=self.bn_name,
+                               activation_name=self.activation_name)
         self.add_block_list(up2.get_name(), up2, 512)
 
         conv2 = DoubleConv2d(in_channels=512, out_channels=256,
@@ -92,9 +93,9 @@ class UNetSeg(BaseModel):
                              activation_name=self.activation_name)
         self.add_block_list(conv2.get_name(), conv2, 256)
 
-        up3 = UpBlock(in_channels=256, out_channels=128,
-                      bn_name=self.bn_name,
-                      activation_name=self.activation_name)
+        up3 = AttentionUpBlock(in_channels=256, out_channels=128,
+                               bn_name=self.bn_name,
+                               activation_name=self.activation_name)
         self.add_block_list(up3.get_name(), up3, 256)
 
         conv3 = DoubleConv2d(in_channels=256, out_channels=128,
@@ -102,9 +103,9 @@ class UNetSeg(BaseModel):
                              activation_name=self.activation_name)
         self.add_block_list(conv3.get_name(), conv3, 128)
 
-        up4 = UpBlock(in_channels=128, out_channels=64,
-                      bn_name=self.bn_name,
-                      activation_name=self.activation_name)
+        up4 = AttentionUpBlock(in_channels=128, out_channels=64,
+                               bn_name=self.bn_name,
+                               activation_name=self.activation_name)
         self.add_block_list(up4.get_name(), up4, 128)
 
         conv4 = DoubleConv2d(in_channels=128, out_channels=64,
@@ -113,12 +114,11 @@ class UNetSeg(BaseModel):
         self.add_block_list(conv4.get_name(), conv4, 64)
 
     def forward(self, x):
-        base_outputs = []
         layer_outputs = []
         output = []
         index = 3
         for key, block in self._modules.items():
-            if UNetBlockName.UpBlock in key:
+            if UNetBlockName.AttentionUpBlock in key:
                 x = block(layer_outputs[-1], layer_outputs[index])
                 index -= 1
             elif LossType.CrossEntropy2d in key:

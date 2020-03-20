@@ -6,7 +6,7 @@ import os
 from easyai.data_loader.det.detection_train_dataloader import DetectionTrainDataloader
 from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.solver.torch_optimizer import TorchOptimizer
-from easyai.solver.lr_scheduler import WarmupMultiStepLR
+from easyai.solver.lr_factory import LrSchedulerFactory
 from easyai.utility.train_log import TrainLogger
 from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.det2d.detect2d_test import Detection2dTest
@@ -25,9 +25,7 @@ class Detection2dTrain(BaseTrain):
 
         self.torchModelProcess = TorchModelProcess()
         self.torchOptimizer = TorchOptimizer(self.detection2d_config.optimizer_config)
-        self.multi_lr = WarmupMultiStepLR(self.detection2d_config.base_lr,
-                                          [[50, 1], [70, 0.1], [100, 0.01]],
-                                          warm_epoch=0, warmup_iters=1000)
+
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
@@ -58,10 +56,17 @@ class Detection2dTrain(BaseTrain):
         dataloader = DetectionTrainDataloader(train_path, self.detection2d_config.class_name,
                                               self.detection2d_config.train_batch_size,
                                               self.detection2d_config.image_size,
-                                              multi_scale=False, augment=True, balanced_sample=True)
+                                              multi_scale=False, augment=True, balanced_sample=False)
         self.total_images = len(dataloader)
+
+        lr_factory = LrSchedulerFactory(self.detection2d_config.base_lr,
+                                        self.detection2d_config.max_epochs,
+                                        self.total_images)
+        lr_scheduler = lr_factory.get_lr_scheduler(self.detection2d_config.lr_scheduler_config)
+
         self.load_latest_param(self.detection2d_config.latest_weights_file)
 
+        self.detection2d_config.save_config()
         self.timer.tic()
         self.model.train()
         for epoch in range(self.start_epoch, self.detection2d_config.max_epochs):
@@ -69,8 +74,8 @@ class Detection2dTrain(BaseTrain):
             self.optimizer.zero_grad()
             for i, (images, targets) in enumerate(dataloader):
                 current_iter = epoch * self.total_images + i
-                lr = self.multi_lr.get_lr(epoch, current_iter)
-                self.multi_lr.adjust_learning_rate(self.optimizer, lr)
+                lr = lr_scheduler.get_lr(epoch, current_iter)
+                lr_scheduler.adjust_learning_rate(self.optimizer, lr)
                 if sum([len(x) for x in targets]) < 1:  # if no targets continue
                     continue
                 loss = self.compute_backward(images, targets, i)

@@ -20,7 +20,7 @@ class NormalizationType():
     BatchNormalize1d = "bn1d"
 
     InstanceNorm2d = "in2d"
-    InstanceNorm2d = "in1d"
+    InstanceNorm1d = "in1d"
 
 
 class LayerType():

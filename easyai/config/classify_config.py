@@ -5,33 +5,26 @@
 import os
 import codecs
 import json
-from easyai.config.base_config import BaseConfig
+from easyai.config.utility.image_task_config import ImageTaskConfig
 
 
-class ClassifyConfig(BaseConfig):
+class ClassifyConfig(ImageTaskConfig):
 
     def __init__(self):
         super().__init__()
         # data
-        self.image_size = None  # W * H
         self.data_mean = None
         self.data_std = None
         # test
-        self.test_batch_size = 1
         self.test_resul_name = 'cls_evaluation.txt'
         self.test_result_path = os.path.join(self.root_save_dir, self.test_resul_name)
         # train
         self.log_name = "classify"
-        self.train_batch_size = 1
-        self.enable_mixed_precision = False
         self.is_save_epoch_model = False
         self.latest_weights_name = None
         self.best_weights_name = None
         self.latest_weights_file = None
         self.best_weights_file = None
-        self.max_epochs = 1
-        self.base_lr = 0.0
-        self.optimizer_config = None
         self.accumulated_batches = 1
         self.display = 1
 
@@ -102,6 +95,8 @@ class ClassifyConfig(BaseConfig):
             self.base_lr = float(config_dict['base_lr'])
         if config_dict.get('optimizer_config', None) is not None:
             self.optimizer_config = config_dict['optimizer_config']
+        if config_dict.get('lr_scheduler_config', None) is not None:
+            self.optimizer_config = config_dict['lr_scheduler_config']
         if config_dict.get('accumulated_batches', None) is not None:
             self.accumulated_batches = int(config_dict['accumulated_batches'])
         if config_dict.get('display', None) is not None:
@@ -115,6 +110,7 @@ class ClassifyConfig(BaseConfig):
         config_dict['max_epochs'] = self.max_epochs
         config_dict['base_lr'] = self.base_lr
         config_dict['optimizer_config'] = self.optimizer_config
+        config_dict['lr_scheduler_config'] = self.lr_scheduler_config
         config_dict['accumulated_batches'] = self.accumulated_batches
         config_dict['display'] = self.display
 
@@ -143,5 +139,9 @@ class ClassifyConfig(BaseConfig):
                                      'momentum': 0.9,
                                      'weight_decay': 5e-4}
                                  }
+        self.lr_scheduler_config = {'lr_type': 'MultiStageLR',
+                                    'lr_stages': [[60, 1], [120, 0.2], [160, 0.04], [200, 0.008]],
+                                    'warm_epoch': 0,
+                                    'warmup_iters': 390}
         self.accumulated_batches = 1
         self.display = 20

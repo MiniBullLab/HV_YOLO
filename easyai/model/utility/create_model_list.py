@@ -11,8 +11,9 @@ from easyai.model.base_block.utility.utility_layer import NormalizeLayer, Activa
 from easyai.model.base_block.utility.utility_layer import MultiplyLayer, AddLayer
 from easyai.model.base_block.utility.utility_layer import RouteLayer, ShortRouteLayer
 from easyai.model.base_block.utility.utility_layer import ShortcutLayer
-from easyai.model.base_block.utility.utility_layer import MyMaxPool2d, Upsample
-from easyai.model.base_block.utility.utility_layer import GlobalAvgPool2d, FcLayer
+from easyai.model.base_block.utility.utility_layer import FcLayer
+from easyai.model.base_block.utility.pooling_layer import MyMaxPool2d, GlobalAvgPool2d
+from easyai.model.base_block.utility.upsample_layer import Upsample
 from easyai.model.base_block.cls.darknet_block import ReorgBlock, DarknetBlockName
 from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
 from easyai.loss.utility.bce_loss import BinaryCrossEntropy2d
@@ -93,7 +94,9 @@ class CreateModuleList():
             self.addBlockList(LayerType.FcLayer, layer, num_output)
             self.input_channels = num_output
         elif module_def['type'] == LayerType.Upsample:
-            upsample = Upsample(scale_factor=int(module_def['stride']))
+            scale = int(module_def['stride'])
+            mode = module_def.get('model', 'bilinear')
+            upsample = Upsample(scale_factor=scale, mode=mode)
             self.addBlockList(LayerType.Upsample, upsample, self.filters)
             self.input_channels = self.filters
         elif module_def['type'] == LayerType.MultiplyLayer:

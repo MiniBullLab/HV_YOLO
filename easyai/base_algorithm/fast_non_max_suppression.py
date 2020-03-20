@@ -40,6 +40,6 @@ class FastNonMaxSuppression(BaseNonMaxSuppression):
                 result.append(numpy_objects[:1])  # save highest conf detection
                 if len(numpy_objects) == 1:  # Stop if we're at the last detection
                     break
-                iou = self.bbox_iou(numpy_objects[0], numpy_objects[1:])  # iou with other boxes
+                iou = self.numpy_box_iou(numpy_objects[0], numpy_objects[1:])  # iou with other boxes
                 numpy_objects = numpy_objects[1:][iou < threshold]  # remove ious > threshold
         return result

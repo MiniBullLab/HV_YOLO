@@ -13,7 +13,8 @@ from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
 from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
-from easyai.model.base_block.utility.utility_layer import Upsample, RouteLayer
+from easyai.model.base_block.utility.upsample_layer import Upsample
+from easyai.model.base_block.utility.utility_layer import RouteLayer
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.utility.utility_block import SeparableConv2dBNActivation
 from easyai.model.base_block.cls.deeplab_block import ASPP

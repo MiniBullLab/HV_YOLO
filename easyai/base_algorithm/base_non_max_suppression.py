@@ -2,7 +2,6 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-import torch
 import numpy as np
 from easyai.helper.dataType import DetectionObject
 
@@ -53,51 +52,32 @@ class BaseNonMaxSuppression():
                             reverse=True)
         return result
 
-    def bbox_iou(self, box1, box2):
-        # # Returns the IoU of box1 to box2. box1 is 4, box2 is nx4
-        # box2 = box2.t()
-        #
-        # # Get the coordinates of bounding boxes
-        # # x1, y1, x2, y2 = box1
-        # b1_x1, b1_y1, b1_x2, b1_y2 = box1[0], box1[1], box1[2], box1[3]
-        # b2_x1, b2_y1, b2_x2, b2_y2 = box2[0], box2[1], box2[2], box2[3]
-        #
-        # # Intersection area
-        # inter_area = (np.min(b1_x2, b2_x2) - np.max(b1_x1, b2_x1)).clamp(0) * \
-        #              (np.min(b1_y2, b2_y2) - np.max(b1_y1, b2_y1)).clamp(0)
-        #
-        # # Union Area
-        # union_area = ((b1_x2 - b1_x1) * (b1_y2 - b1_y1) + 1e-16) + \
-        #              (b2_x2 - b2_x1) * (b2_y2 - b2_y1) - inter_area
-        #
-        # iou = inter_area / union_area  # iou
-        # if self.is_GIoU:  # Generalized IoU https://arxiv.org/pdf/1902.09630.pdf
-        #     c_x1, c_x2 = np.min(b1_x1, b2_x1), np.max(b1_x2, b2_x2)
-        #     c_y1, c_y2 = np.min(b1_y1, b2_y1), np.max(b1_y2, b2_y2)
-        #     c_area = (c_x2 - c_x1) * (c_y2 - c_y1)  # convex area
-        #     return iou - (c_area - union_area) / c_area  # GIoU
-        # return iou
-
+    def numpy_box_iou(self, box1, box2):
         # Returns the IoU of box1 to box2. box1 is 4, box2 is nx4
-        box2 = box2.t()
+        box2 = box2.T
 
-        # Get the coordinates of bounding boxes
         # x1, y1, x2, y2 = box1
         b1_x1, b1_y1, b1_x2, b1_y2 = box1[0], box1[1], box1[2], box1[3]
-        b2_x1, b2_y1, b2_x2, b2_y2 = box2[0], box2[1], box2[2], box2[3]
+        b2_x1, b2_y1, b2_x2, b2_y2 = box2[0, :], box2[1, :], box2[2, :], box2[3, :]
+
+        min_x = (b2_x1 < b1_x1) * b1_x1 + (b2_x1 > b1_x1) * b2_x1
+        min_y = (b2_y1 < b1_y1) * b1_y1 + (b2_y1 > b1_y1) * b2_y1
+        max_x = (b2_x2 < b1_x2) * b2_x2 + (b2_x2 > b1_x2) * b1_x2
+        max_y = (b2_y2 < b1_y2) * b2_y2 + (b2_y2 > b1_y2) * b1_y2
 
         # Intersection area
-        inter_area = (torch.min(b1_x2, b2_x2) - torch.max(b1_x1, b2_x1)).clamp(0) * \
-                     (torch.min(b1_y2, b2_y2) - torch.max(b1_y1, b2_y1)).clamp(0)
+        inter_area = np.maximum(0, max_x - min_x) * np.maximum(0, max_y - min_y)
 
         # Union Area
-        union_area = ((b1_x2 - b1_x1) * (b1_y2 - b1_y1) + 1e-16) + \
+        union_area = (b1_x2 - b1_x1) * (b1_y2 - b1_y1) + \
                      (b2_x2 - b2_x1) * (b2_y2 - b2_y1) - inter_area
 
-        iou = inter_area / union_area  # iou
+        iou = inter_area / (union_area + + 1e-16)  # iou
         if self.is_GIoU:  # Generalized IoU https://arxiv.org/pdf/1902.09630.pdf
-            c_x1, c_x2 = torch.min(b1_x1, b2_x1), torch.max(b1_x2, b2_x2)
-            c_y1, c_y2 = torch.min(b1_y1, b2_y1), torch.max(b1_y2, b2_y2)
+            c_x1 = (b2_x1 < b1_x1) * b2_x1 + (b2_x1 > b1_x1) * b1_x1
+            c_y1 = (b2_y1 < b1_y1) * b2_y1 + (b2_y1 > b1_y1) * b1_y1
+            c_x2 = (b2_x2 < b1_x2) * b1_x2 + (b2_x2 > b1_x2) * b2_x2
+            c_y2 = (b2_y2 < b1_y2) * b1_y2 + (b2_y2 > b1_y2) * b2_y2
             c_area = (c_x2 - c_x1) * (c_y2 - c_y1)  # convex area
             return iou - (c_area - union_area) / c_area  # GIoU
         return iou

@@ -4,7 +4,8 @@
 
 from easyai.base_name.block_name import ActivationType
 from easyai.model.base_block.utility.base_block import *
-from easyai.model.base_block.utility.utility_layer import ActivationLayer, Upsample
+from easyai.model.base_block.utility.upsample_layer import Upsample
+from easyai.model.base_block.utility.utility_layer import ActivationLayer
 
 
 class RefineNetBlockName():

@@ -2,11 +2,14 @@
 # -*- coding:utf-8 -*-
 # Author:
 
+import abc
+
 
 class BaseLrSecheduler():
     def __init__(self):
-        super().__init__()
+        pass
 
+    @abc.abstractmethod
     def get_lr(self, cur_epoch, cur_iter):
         pass
 

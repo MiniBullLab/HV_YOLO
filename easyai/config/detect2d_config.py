@@ -5,34 +5,27 @@
 import os
 import codecs
 import json
-from easyai.config.base_config import BaseConfig
+from easyai.config.utility.image_task_config import ImageTaskConfig
 
 
-class Detect2dConfig(BaseConfig):
+class Detect2dConfig(ImageTaskConfig):
 
     def __init__(self):
         super().__init__()
         # data
-        self.image_size = None  # W * H
         self.class_name = None
         self.confidence_th = 1.0
         self.nms_th = 1.0
         # test
-        self.test_batch_size = 1
         self.save_result_dir = os.path.join(self.root_save_dir, 'det2d_results')
         self.save_evaluation_path = os.path.join(self.root_save_dir, 'det2d_evaluation.txt')
         # train
         self.log_name = "detect2d"
-        self.train_batch_size = 1
-        self.enable_mixed_precision = False
         self.is_save_epoch_model = False
         self.latest_weights_name = 'det2d_latest.pt'
         self.best_weights_name = 'det2d_best.pt'
         self.latest_weights_file = None
         self.best_weights_file = None
-        self.max_epochs = 1
-        self.base_lr = 0.0
-        self.optimizer_config = None
         self.accumulated_batches = 1
         self.display = 1
 
@@ -106,6 +99,8 @@ class Detect2dConfig(BaseConfig):
             self.base_lr = float(config_dict['base_lr'])
         if config_dict.get('optimizer_config', None) is not None:
             self.optimizer_config = config_dict['optimizer_config']
+        if config_dict.get('lr_scheduler_config', None) is not None:
+            self.optimizer_config = config_dict['lr_scheduler_config']
         if config_dict.get('accumulated_batches', None) is not None:
             self.accumulated_batches = int(config_dict['accumulated_batches'])
         if config_dict.get('display', None) is not None:
@@ -119,6 +114,7 @@ class Detect2dConfig(BaseConfig):
         config_dict['max_epochs'] = self.max_epochs
         config_dict['base_lr'] = self.base_lr
         config_dict['optimizer_config'] = self.optimizer_config
+        config_dict['lr_scheduler_config'] = self.lr_scheduler_config
         config_dict['accumulated_batches'] = self.accumulated_batches
         config_dict['display'] = self.display
 
@@ -140,13 +136,17 @@ class Detect2dConfig(BaseConfig):
         self.latest_weights_file = os.path.join(self.snapshot_path, self.latest_weights_name)
         self.best_weights_file = os.path.join(self.snapshot_path, self.best_weights_name)
 
-        self.max_epochs = 300
+        self.max_epochs = 100
 
         self.base_lr = 2e-4
         self.optimizer_config = {0: {'optimizer': 'SGD',
                                      'momentum': 0.9,
                                      'weight_decay': 5e-4}
                                  }
+        self.lr_scheduler_config = {'lr_type': 'MultiStageLR',
+                                    'lr_stages': [[50, 1], [70, 0.1], [100, 0.01]],
+                                    'warm_epoch': 0,
+                                    'warmup_iters': 1000}
         self.accumulated_batches = 1
         self.display = 20
 

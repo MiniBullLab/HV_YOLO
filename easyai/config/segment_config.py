@@ -5,15 +5,14 @@
 import os
 import codecs
 import json
-from easyai.config.base_config import BaseConfig
+from easyai.config.utility.image_task_config import ImageTaskConfig
 
 
-class SegmentionConfig(BaseConfig):
+class SegmentionConfig(ImageTaskConfig):
 
     def __init__(self):
         super().__init__()
         # data
-        self.image_size = None  # w * h
         self.label_is_gray = None
         self.class_name = None
         # test
@@ -21,18 +20,11 @@ class SegmentionConfig(BaseConfig):
         self.save_evaluation_path = os.path.join(self.root_save_dir, 'seg_evaluation.txt')
         # train
         self.log_name = "segment"
-        self.train_batch_size = 1
-        self.enable_mixed_precision = False
         self.is_save_epoch_model = False
         self.latest_weights_name = 'seg_latest.pt'
         self.best_weights_name = 'seg_best.pt'
         self.latest_weights_file = None
         self.best_weights_file = None
-        self.max_epochs = 1
-
-        self.base_lr = 0.0
-        self.lr_power = 0.0
-        self.optimizer_config = None
         self.accumulated_batches = 1
         self.display = 1
 
@@ -106,6 +98,8 @@ class SegmentionConfig(BaseConfig):
             self.base_lr = float(config_dict['base_lr'])
         if config_dict.get('optimizer_config', None) is not None:
             self.optimizer_config = config_dict['optimizer_config']
+        if config_dict.get('lr_scheduler_config', None) is not None:
+            self.optimizer_config = config_dict['lr_scheduler_config']
         if config_dict.get('accumulated_batches', None) is not None:
             self.accumulated_batches = int(config_dict['accumulated_batches'])
         if config_dict.get('display', None) is not None:
@@ -123,6 +117,7 @@ class SegmentionConfig(BaseConfig):
         config_dict['max_epochs'] = self.max_epochs
         config_dict['base_lr'] = self.base_lr
         config_dict['optimizer_config'] = self.optimizer_config
+        config_dict['lr_scheduler_config'] = self.lr_scheduler_config
         config_dict['accumulated_batches'] = self.accumulated_batches
         config_dict['display'] = self.display
         config_dict['enable_freeze_layer'] = self.enable_freeze_layer
@@ -149,12 +144,16 @@ class SegmentionConfig(BaseConfig):
         self.max_epochs = 300
 
         self.base_lr = 1e-2
-        self.lr_power = 0.9
         self.optimizer_config = {0: {'optimizer': 'RMSprop',
                                      'alpha': 0.9,
                                      'eps': 1e-08,
                                      'weight_decay': 0.}
                                  }
+
+        self.lr_scheduler_config = {'lr_type': 'PolyLR',
+                                    'lr_power': 0.9,
+                                    'warm_epoch': -1,
+                                    'warmup_iters': 2000}
         self.accumulated_batches = 1
         self.display = 20
 

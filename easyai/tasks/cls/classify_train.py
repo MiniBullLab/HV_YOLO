@@ -6,11 +6,12 @@ import os
 from easyai.data_loader.cls.classify_dataloader import get_classify_train_dataloader
 from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.solver.torch_optimizer import TorchOptimizer
-from easyai.solver.lr_scheduler import MultiStageLR, WarmupMultiStepLR
+from easyai.solver.lr_factory import LrSchedulerFactory
 from easyai.utility.train_log import TrainLogger
-from easyai.config.classify_config import ClassifyConfig
+from easyai.tasks.utility.base_task import DelayedKeyboardInterrupt
 from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.cls.classify_test import ClassifyTest
+from easyai.config.classify_config import ClassifyConfig
 
 
 class ClassifyTrain(BaseTrain):
@@ -23,11 +24,6 @@ class ClassifyTrain(BaseTrain):
 
         self.torchModelProcess = TorchModelProcess()
         self.torchOptimizer = TorchOptimizer(self.classify_config.optimizer_config)
-        self.multiLR = WarmupMultiStepLR(self.classify_config.base_lr,
-                                         [[60, 1], [120, 0.2], [160, 0.04], [200, 0.008]],
-                                         0, 390)
-        # self.multiLR = MultiStageLR(self.classify_config.base_lr, [[60, 0.1], [120, 0.02],
-        #                                                            [160, 0.004], [200, 0.0008]])
 
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
         self.device = self.torchModelProcess.getDevice()
@@ -68,24 +64,33 @@ class ClassifyTrain(BaseTrain):
 
         self.total_images = len(dataloader)
 
+        lr_factory = LrSchedulerFactory(self.classify_config.base_lr,
+                                        self.classify_config.max_epochs,
+                                        self.total_images)
+        lr_scheduler = lr_factory.get_lr_scheduler(self.classify_config.lr_scheduler_config)
+
         self.load_latest_param(self.classify_config.latest_weights_file)
+
         self.classify_config.save_config()
         self.timer.tic()
         self.model.train()
-        for epoch in range(self.start_epoch, self.classify_config.max_epochs):
-            # self.optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
-            self.optimizer.zero_grad()
-            for idx, (imgs, targets) in enumerate(dataloader):
-                current_iter = epoch * self.total_images + idx
-                lr = self.multiLR.get_lr(epoch, current_iter)
-                self.multiLR.adjust_learning_rate(self.optimizer, lr)
-                loss = self.compute_backward(imgs, targets, idx)
-                self.update_logger(idx, self.total_images, epoch, loss)
+        try:
+            for epoch in range(self.start_epoch, self.classify_config.max_epochs):
+                # self.optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
+                self.optimizer.zero_grad()
+                for idx, (imgs, targets) in enumerate(dataloader):
+                    current_iter = epoch * self.total_images + idx
+                    lr = lr_scheduler.get_lr(epoch, current_iter)
+                    lr_scheduler.adjust_learning_rate(self.optimizer, lr)
+                    loss = self.compute_backward(imgs, targets, idx)
+                    self.update_logger(idx, self.total_images, epoch, loss)
 
-            save_model_path = self.save_train_model(epoch)
-            self.test(val_path, epoch, save_model_path)
-
-        self.train_logger.close()
+                save_model_path = self.save_train_model(epoch)
+                self.test(val_path, epoch, save_model_path)
+        except Exception as e:
+            raise e
+        finally:
+            self.train_logger.close()
 
     def compute_backward(self, input_datas, targets, setp_index):
         # Compute loss, compute gradient, update parameters
@@ -123,15 +128,16 @@ class ClassifyTrain(BaseTrain):
                                                                             self.timer.toc(True)))
 
     def save_train_model(self, epoch):
-        self.train_logger.epoch_train_log(epoch)
-        if self.classify_config.is_save_epoch_model:
-            save_model_path = os.path.join(self.classify_config.snapshot_path,
-                                           "cls_model_epoch_%d.pt" % epoch)
-        else:
-            save_model_path = self.classify_config.latest_weights_file
-        self.torchModelProcess.saveLatestModel(save_model_path, self.model,
-                                               self.optimizer, epoch,
-                                               self.best_precision)
+        with DelayedKeyboardInterrupt():
+            self.train_logger.epoch_train_log(epoch)
+            if self.classify_config.is_save_epoch_model:
+                save_model_path = os.path.join(self.classify_config.snapshot_path,
+                                               "cls_model_epoch_%d.pt" % epoch)
+            else:
+                save_model_path = self.classify_config.latest_weights_file
+            self.torchModelProcess.saveLatestModel(save_model_path, self.model,
+                                                   self.optimizer, epoch,
+                                                   self.best_precision)
         return save_model_path
 
     def test(self, val_path, epoch, save_model_path):

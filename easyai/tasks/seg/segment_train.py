@@ -5,7 +5,7 @@
 import os
 import torch
 from easyai.data_loader.seg.segment_dataloader import get_segment_train_dataloader
-from easyai.solver.lr_scheduler import PolyLR
+from easyai.solver.lr_factory import LrSchedulerFactory
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.utility.train_log import TrainLogger
@@ -63,10 +63,12 @@ class SegmentionTrain(BaseTrain):
         self.total_images = len(dataloader)
         self.load_latest_param(self.segmention_config.latest_weights_file)
 
-        # set learning policy
-        total_iteration = self.segmention_config.max_epochs * len(dataloader)
-        polyLR = PolyLR(self.segmention_config.base_lr, total_iteration, self.segmention_config.lr_power)
+        lr_factory = LrSchedulerFactory(self.segmention_config.base_lr,
+                                        self.segmention_config.max_epochs,
+                                        self.total_images)
+        lr_scheduler = lr_factory.get_lr_scheduler(self.segmention_config.lr_scheduler_config)
 
+        self.segmention_config.save_config()
         self.timer.tic()
         self.model.train()
         for epoch in range(self.start_epoch, self.segmention_config.max_epochs):
@@ -74,8 +76,8 @@ class SegmentionTrain(BaseTrain):
             self.optimizer.zero_grad()
             for idx, (images, segments) in enumerate(dataloader):
                 current_idx = epoch * self.total_images + idx
-                lr = polyLR.get_lr(epoch, current_idx)
-                polyLR.adjust_learning_rate(self.optimizer, lr)
+                lr = lr_scheduler.get_lr(epoch, current_idx)
+                lr_scheduler.adjust_learning_rate(self.optimizer, lr)
                 loss = self.compute_backward(images, segments, idx)
                 self.update_logger(idx, self.total_images, epoch, loss.data)
 

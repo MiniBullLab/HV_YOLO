@@ -5,7 +5,7 @@
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.model.base_block.utility.base_block import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.utility.utility_layer import Upsample
+from easyai.model.base_block.utility.upsample_layer import Upsample
 
 
 class BiSeNetBlockName():
