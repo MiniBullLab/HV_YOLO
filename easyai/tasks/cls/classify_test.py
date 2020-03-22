@@ -6,15 +6,16 @@ from easyai.tasks.utility.base_test import BaseTest
 from easyai.data_loader.cls.classify_dataloader import get_classify_val_dataloader
 from easyai.tasks.cls.classify import Classify
 from easyai.evaluation.classify_accuracy import ClassifyAccuracy
-from easyai.config.classify_config import ClassifyConfig
+from easyai.base_name.task_name import TaskName
 
 
 class ClassifyTest(BaseTest):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__()
-        self.classify_config = ClassifyConfig()
-        self.classify_config.load_config(config_path)
+        super().__init__(config_path)
+        self.set_task_name(TaskName.Classify_Task)
+        self.test_task_config = self.config_factory.get_config(self.task_name, self.config_path)
+
         self.classify_inference = Classify(cfg_path, gpu_id)
         self.topK = (1,)
         self.evaluation = ClassifyAccuracy(top_k=self.topK)
@@ -24,10 +25,10 @@ class ClassifyTest(BaseTest):
 
     def test(self, val_path):
         dataloader = get_classify_val_dataloader(val_path,
-                                                 self.classify_config.data_mean,
-                                                 self.classify_config.data_std,
-                                                 self.classify_config.image_size,
-                                                 self.classify_config.test_batch_size)
+                                                 self.test_task_config.data_mean,
+                                                 self.test_task_config.data_std,
+                                                 self.test_task_config.image_size,
+                                                 self.test_task_config.test_batch_size)
         self.evaluation.clean_data()
         for index, (images, labels) in enumerate(dataloader):
             output = self.classify_inference.infer(images)
@@ -37,7 +38,7 @@ class ClassifyTest(BaseTest):
 
     def save_test_value(self, epoch):
         # Write epoch results
-        save_result_path = self.classify_config.test_result_path
+        save_result_path = self.test_task_config.test_result_path
         if max(self.topK) > 1:
             with open(save_result_path, 'a') as file:
                 file.write("Epoch: {} | prec{}: {:.3f} | prec{}: {:.3f}\n".format(epoch,

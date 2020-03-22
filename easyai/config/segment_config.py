@@ -5,6 +5,7 @@
 import os
 import codecs
 import json
+from easyai.base_name.task_name import TaskName
 from easyai.config.utility.image_task_config import ImageTaskConfig
 
 
@@ -12,11 +13,11 @@ class SegmentionConfig(ImageTaskConfig):
 
     def __init__(self):
         super().__init__()
+        self.set_task_name(TaskName.Segment_Task)
         # data
         self.label_is_gray = None
         self.class_name = None
         # test
-        self.test_batch_size = 1
         self.save_evaluation_path = os.path.join(self.root_save_dir, 'seg_evaluation.txt')
         # train
         self.log_name = "segment"
@@ -31,14 +32,11 @@ class SegmentionConfig(ImageTaskConfig):
         self.enable_freeze_layer = False
         self.freeze_layer_name = None
 
-        self.det2d_config_dir = os.path.join(self.root_save_dir, self.config_save_dir)
-        self.config_path = os.path.join(self.det2d_config_dir, "segmention.json")
+        self.config_path = os.path.join(self.config_save_dir, "segmention_config.json")
 
         self.get_data_default_value()
         self.get_test_default_value()
         self.get_train_default_value()
-        if self.snapshot_path is not None and not os.path.exists(self.snapshot_path):
-            os.makedirs(self.snapshot_path, exist_ok=True)
 
     def load_config(self, config_path):
         if config_path is not None and os.path.exists(config_path):
@@ -53,9 +51,7 @@ class SegmentionConfig(ImageTaskConfig):
             print("{} not exits".format(self.config_path))
 
     def save_config(self):
-        if not os.path.exists(self.config_path):
-            if not os.path.exists(self.det2d_config_dir):
-                os.makedirs(self.det2d_config_dir, exist_ok=True)
+        super().save_config()
         config_dict = {}
         self.save_data_value(config_dict)
         self.save_test_value(config_dict)

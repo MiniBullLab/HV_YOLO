@@ -7,12 +7,15 @@ import abc
 from easyai.helper.timer_process import TimerProcess
 from easyai.data_loader.utility.images_loader import ImagesLoader
 from easyai.data_loader.utility.video_loader import VideoLoader
+from easyai.tasks.utility.base_task import BaseTask
 
 
-class BaseInference():
+class BaseInference(BaseTask):
 
-    def __init__(self):
+    def __init__(self, config_path):
+        super().__init__()
         self.timer = TimerProcess()
+        self.config_path = config_path
 
     @abc.abstractmethod
     def load_weights(self, weights_path):

@@ -8,15 +8,15 @@ from easyai.tasks.utility.base_inference import BaseInference
 from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.tasks.seg.segment_result_process import SegmentResultProcess
 from easyai.drawing.segment_show import SegmentionShow
-from easyai.config.segment_config import SegmentionConfig
+from easyai.base_name.task_name import TaskName
 
 
 class Segmentation(BaseInference):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__()
-        self.segmention_config = SegmentionConfig()
-        self.segmention_config.load_config(config_path)
+        super().__init__(config_path)
+        self.set_task_name(TaskName.Segment_Task)
+        self.task_config = self.config_factory.get_config(self.task_name, self.config_path)
 
         self.torchModelProcess = TorchModelProcess()
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
@@ -35,7 +35,7 @@ class Segmentation(BaseInference):
 
     def process(self, input_path):
         dataloader = self.get_image_data_lodaer(input_path,
-                                                self.segmention_config.image_size)
+                                                self.task_config.image_size)
         for index, (src_image, image) in enumerate(dataloader):
             self.timer.tic()
             self.set_src_size(src_image)
@@ -43,8 +43,8 @@ class Segmentation(BaseInference):
             result = self.postprocess(prediction)
             print('Batch %d... Done. (%.3fs)' % (index, self.timer.toc()))
             if not self.result_show.show(src_image, result,
-                                         self.segmention_config.label_is_gray,
-                                         self.segmention_config.class_name):
+                                         self.task_config.label_is_gray,
+                                         self.task_config.class_name):
                 break
 
     def infer(self, input_data, threshold=0.0):
@@ -56,7 +56,7 @@ class Segmentation(BaseInference):
 
     def postprocess(self, result):
         result = self.result_process.resize_segmention_result(self.src_size,
-                                                              self.segmention_config.image_size,
+                                                              self.task_config.image_size,
                                                               result)
         return result
 

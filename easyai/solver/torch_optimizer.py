@@ -65,7 +65,7 @@ class TorchOptimizer():
         return self.optimizer
 
     def getLatestModelOptimizer(self, checkpoint):
-        if checkpoint:
+        if checkpoint is not None:
             if checkpoint.get('optimizer'):
                 self.optimizer.load_state_dict(checkpoint['optimizer'])
         return self.optimizer

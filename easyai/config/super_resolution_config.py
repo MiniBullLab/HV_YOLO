@@ -1,4 +1,7 @@
-from easyai.config.utility.base_config import *
+import os
+
+root_save_dir = "./log"
+model_save_dir_name = "snapshot"
 
 # data
 train_set = "/home/lpj/github/data/super/train"
@@ -11,7 +14,7 @@ crop_size = 72
 upscale_factor = 3
 
 # detect
-snapshotPath = os.path.join(root_save_dir, model_save_dir)
+snapshotPath = os.path.join(root_save_dir, model_save_dir_name)
 latest_weights_file = os.path.join(snapshotPath, 'latest.pt')
 best_weights_file = os.path.join(snapshotPath, 'best.pt')
 maxEpochs = 100

@@ -11,26 +11,25 @@ from easyai.utility.train_log import TrainLogger
 from easyai.tasks.utility.base_task import DelayedKeyboardInterrupt
 from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.cls.classify_test import ClassifyTest
-from easyai.config.classify_config import ClassifyConfig
+from easyai.base_name.task_name import TaskName
 
 
 class ClassifyTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__()
-
-        self.classify_config = ClassifyConfig()
-        self.classify_config.load_config(config_path)
+        super().__init__(config_path)
+        self.set_task_name(TaskName.Classify_Task)
+        self.train_task_config = self.config_factory.get_config(self.task_name, self.config_path)
 
         self.torchModelProcess = TorchModelProcess()
-        self.torchOptimizer = TorchOptimizer(self.classify_config.optimizer_config)
+        self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
 
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
         self.classify_test = ClassifyTest(cfg_path, gpu_id)
 
-        self.train_logger = TrainLogger(self.classify_config.log_name)
+        self.train_logger = TrainLogger(self.train_task_config.log_name)
 
         self.total_images = 0
         self.start_epoch = 0
@@ -51,31 +50,31 @@ class ClassifyTrain(BaseTrain):
         self.start_epoch, self.best_precision = self.torchModelProcess.getLatestModelValue(checkpoint)
 
         self.torchOptimizer.createOptimizer(self.start_epoch, self.model,
-                                            self.classify_config.base_lr)
+                                            self.train_task_config.base_lr)
         self.optimizer = self.torchOptimizer.getLatestModelOptimizer(checkpoint)
 
     def train(self, train_path, val_path):
 
         dataloader = get_classify_train_dataloader(train_path,
-                                                   self.classify_config.data_mean,
-                                                   self.classify_config.data_std,
-                                                   self.classify_config.image_size,
-                                                   self.classify_config.train_batch_size)
+                                                   self.train_task_config.data_mean,
+                                                   self.train_task_config.data_std,
+                                                   self.train_task_config.image_size,
+                                                   self.train_task_config.train_batch_size)
 
         self.total_images = len(dataloader)
 
-        lr_factory = LrSchedulerFactory(self.classify_config.base_lr,
-                                        self.classify_config.max_epochs,
+        lr_factory = LrSchedulerFactory(self.train_task_config.base_lr,
+                                        self.train_task_config.max_epochs,
                                         self.total_images)
-        lr_scheduler = lr_factory.get_lr_scheduler(self.classify_config.lr_scheduler_config)
+        lr_scheduler = lr_factory.get_lr_scheduler(self.train_task_config.lr_scheduler_config)
 
-        self.load_latest_param(self.classify_config.latest_weights_file)
+        self.load_latest_param(self.train_task_config.latest_weights_file)
 
-        self.classify_config.save_config()
+        self.train_task_config.save_config()
         self.timer.tic()
         self.model.train()
         try:
-            for epoch in range(self.start_epoch, self.classify_config.max_epochs):
+            for epoch in range(self.start_epoch, self.train_task_config.max_epochs):
                 # self.optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
                 self.optimizer.zero_grad()
                 for idx, (imgs, targets) in enumerate(dataloader):
@@ -98,7 +97,7 @@ class ClassifyTrain(BaseTrain):
         loss = self.compute_loss(output_list, targets)
         loss.backward()
         # accumulate gradient for x batches before optimizing
-        if ((setp_index + 1) % self.classify_config.accumulated_batches == 0) or \
+        if ((setp_index + 1) % self.train_task_config.accumulated_batches == 0) or \
                 (setp_index == self.total_images - 1):
             self.optimizer.step()
             self.optimizer.zero_grad()
@@ -116,8 +115,8 @@ class ClassifyTrain(BaseTrain):
         step = epoch * total + index
         lr = self.optimizer.param_groups[0]['lr']
         loss_value = loss.data.cpu().squeeze()
-        self.train_logger.train_log(step, loss_value, self.classify_config.display)
-        self.train_logger.lr_log(step, lr, self.classify_config.display)
+        self.train_logger.train_log(step, loss_value, self.train_task_config.display)
+        self.train_logger.lr_log(step, lr, self.train_task_config.display)
 
         print('Epoch: {}[{}/{}]\t Loss: {}\t Rate: {} \t Time: {}\t'.format(epoch,
                                                                             index,
@@ -130,11 +129,11 @@ class ClassifyTrain(BaseTrain):
     def save_train_model(self, epoch):
         with DelayedKeyboardInterrupt():
             self.train_logger.epoch_train_log(epoch)
-            if self.classify_config.is_save_epoch_model:
-                save_model_path = os.path.join(self.classify_config.snapshot_path,
+            if self.train_task_config.is_save_epoch_model:
+                save_model_path = os.path.join(self.train_task_config.snapshot_path,
                                                "cls_model_epoch_%d.pt" % epoch)
             else:
-                save_model_path = self.classify_config.latest_weights_file
+                save_model_path = self.train_task_config.latest_weights_file
             self.torchModelProcess.saveLatestModel(save_model_path, self.model,
                                                    self.optimizer, epoch,
                                                    self.best_precision)
@@ -145,6 +144,7 @@ class ClassifyTrain(BaseTrain):
         precision = self.classify_test.test(val_path)
         self.classify_test.save_test_value(epoch)
 
+        # save best model
         self.best_precision = self.torchModelProcess.saveBestModel(precision,
                                                                    save_model_path,
-                                                                   self.classify_config.best_weights_file)
+                                                                   self.train_task_config.best_weights_file)

@@ -26,6 +26,7 @@ class BaseNonMaxSuppression():
     def numpy_to_objects(self, input_numpy):
         result = []
         for value in input_numpy:
+            value = np.squeeze(value)
             temp_object = DetectionObject()
             temp_object.min_corner.x = value[0]
             temp_object.min_corner.y = value[1]

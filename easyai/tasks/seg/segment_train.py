@@ -11,21 +11,20 @@ from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.utility.train_log import TrainLogger
 from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.seg.segment_test import SegmentionTest
-from easyai.config.segment_config import SegmentionConfig
+from easyai.base_name.task_name import TaskName
 
 
 class SegmentionTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__()
+        super().__init__(config_path)
+        self.set_task_name(TaskName.Segment_Task)
+        self.train_task_config = self.config_factory.get_config(self.task_name, self.config_path)
 
-        self.segmention_config = SegmentionConfig()
-        self.segmention_config.load_config(config_path)
-
-        self.train_logger = TrainLogger(self.segmention_config.log_name)
+        self.train_logger = TrainLogger(self.train_task_config.log_name)
 
         self.torchModelProcess = TorchModelProcess()
-        self.torchOptimizer = TorchOptimizer(self.segmention_config.optimizer_config)
+        self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
@@ -48,30 +47,30 @@ class SegmentionTrain(BaseTrain):
             self.torchModelProcess.modelTrainInit(self.model)
         self.start_epoch, self.bestmIoU = self.torchModelProcess.getLatestModelValue(checkpoint)
 
-        if self.segmention_config.enable_freeze_layer:
+        if self.train_task_config.enable_freeze_layer:
             self.torchOptimizer.freeze_optimizer_layer(self.start_epoch,
-                                                       self.segmention_config.base_lr,
+                                                       self.train_task_config.base_lr,
                                                        self.model,
-                                                       self.segmention_config.freeze_layer_name)
+                                                       self.train_task_config.freeze_layer_name)
         else:
-            self.torchOptimizer.createOptimizer(self.start_epoch, self.model, self.segmention_config.base_lr)
+            self.torchOptimizer.createOptimizer(self.start_epoch, self.model, self.train_task_config.base_lr)
         self.optimizer = self.torchOptimizer.getLatestModelOptimizer(checkpoint)
 
     def train(self, train_path, val_path):
-        dataloader = get_segment_train_dataloader(train_path, self.segmention_config.image_size,
-                                                  self.segmention_config.train_batch_size)
+        dataloader = get_segment_train_dataloader(train_path, self.train_task_config.image_size,
+                                                  self.train_task_config.train_batch_size)
         self.total_images = len(dataloader)
-        self.load_latest_param(self.segmention_config.latest_weights_file)
+        self.load_latest_param(self.train_task_config.latest_weights_file)
 
-        lr_factory = LrSchedulerFactory(self.segmention_config.base_lr,
-                                        self.segmention_config.max_epochs,
+        lr_factory = LrSchedulerFactory(self.train_task_config.base_lr,
+                                        self.train_task_config.max_epochs,
                                         self.total_images)
-        lr_scheduler = lr_factory.get_lr_scheduler(self.segmention_config.lr_scheduler_config)
+        lr_scheduler = lr_factory.get_lr_scheduler(self.train_task_config.lr_scheduler_config)
 
-        self.segmention_config.save_config()
+        self.train_task_config.save_config()
         self.timer.tic()
         self.model.train()
-        for epoch in range(self.start_epoch, self.segmention_config.max_epochs):
+        for epoch in range(self.start_epoch, self.train_task_config.max_epochs):
             # self.optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
             self.optimizer.zero_grad()
             for idx, (images, segments) in enumerate(dataloader):
@@ -91,7 +90,7 @@ class SegmentionTrain(BaseTrain):
         loss.backward()
 
         # accumulate gradient for x batches before optimizing
-        if ((setp_index + 1) % self.segmention_config.accumulated_batches == 0) \
+        if ((setp_index + 1) % self.train_task_config.accumulated_batches == 0) \
                 or (setp_index == self.total_images - 1):
             self.optimizer.step()
             self.optimizer.zero_grad()
@@ -128,8 +127,8 @@ class SegmentionTrain(BaseTrain):
     def update_logger(self, index, total, epoch, loss_value):
         step = epoch * total + index
         lr = self.optimizer.param_groups[0]['lr']
-        self.train_logger.train_log(step, loss_value, self.segmention_config.display)
-        self.train_logger.lr_log(step, lr, self.segmention_config.display)
+        self.train_logger.train_log(step, loss_value, self.train_task_config.display)
+        self.train_logger.lr_log(step, lr, self.train_task_config.display)
 
         print('Epoch: {}[{}/{}]\t Loss: {}\t Rate: {} \t Time: {}\t'.format(epoch,
                                                                             index,
@@ -140,11 +139,11 @@ class SegmentionTrain(BaseTrain):
 
     def save_train_model(self, epoch):
         self.train_logger.epoch_train_log(epoch)
-        if self.segmention_config.is_save_epoch_model:
-            save_model_path = os.path.join(self.segmention_config.snapshot_path,
+        if self.train_task_config.is_save_epoch_model:
+            save_model_path = os.path.join(self.train_task_config.snapshot_path,
                                            "seg_model_epoch_%d.pt" % epoch)
         else:
-            save_model_path = self.segmention_config.latest_weights_file
+            save_model_path = self.train_task_config.latest_weights_file
         self.torchModelProcess.saveLatestModel(save_model_path, self.model,
                                                self.optimizer, epoch, self.bestmIoU)
         return save_model_path
@@ -153,8 +152,8 @@ class SegmentionTrain(BaseTrain):
         self.segment_test.load_weights(save_model_path)
         score, class_iou = self.segment_test.test(val_path)
         self.segment_test.save_test_value(epoch, score, class_iou)
-
+        # save best model
         self.bestmIoU = self.torchModelProcess.saveBestModel(score['Mean IoU : \t'],
                                                              save_model_path,
-                                                             self.segmention_config.best_weights_file)
+                                                             self.train_task_config.best_weights_file)
 

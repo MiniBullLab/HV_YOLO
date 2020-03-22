@@ -5,15 +5,16 @@
 import torch
 from easyai.tasks.utility.base_inference import BaseInference
 from easyai.torch_utility.torch_model_process import TorchModelProcess
-from easyai.config.classify_config import ClassifyConfig
+from easyai.base_name.task_name import TaskName
 
 
 class Classify(BaseInference):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__()
-        self.classify_config = ClassifyConfig()
-        self.classify_config.load_config(config_path)
+        super().__init__(config_path)
+        self.set_task_name(TaskName.Classify_Task)
+        self.task_config = self.config_factory.get_config(self.task_name, self.config_path)
+
         self.torchModelProcess = TorchModelProcess()
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
         self.device = self.torchModelProcess.getDevice()
@@ -25,7 +26,7 @@ class Classify(BaseInference):
 
     def process(self, input_path):
         dataloader = self.get_image_data_lodaer(input_path,
-                                                self.classify_config.image_size)
+                                                self.task_config.image_size)
 
     def infer(self, input_data, threshold=0.0):
         with torch.no_grad():
