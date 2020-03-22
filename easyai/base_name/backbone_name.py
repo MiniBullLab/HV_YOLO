@@ -18,6 +18,8 @@ class BackboneName():
     Darknet53_Dilated16 = "darknet53_dilated16"
     ShuffleNetV2_1_0 = "shufflenetv2_1_0"
     MobileNetV2_1_0 = "mobilenetv2_1_0"
+    MobileNetv3_large = "mobilenetv3_large"
+    MobileNetv3_small = "mobilenetv3_small"
     GoogleNet = "googlenet"
     InceptionV4 = "inceptionv4"
     InceptionResNetV2 = "inception_resnetv2"
@@ -57,4 +59,6 @@ class BackboneName():
     DPN92 = "dpn92"
     PNASNetA = "pnasnet_A"
     PNASNetB = "pnasnet_B"
+    GhostNet = "ghostnet"
+
 

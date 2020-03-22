@@ -32,8 +32,7 @@ class Xception65(BaseBackbone):
         self.create_block_list()
 
     def create_block_list(self):
-        self.block_out_channels = []
-        self.index = 0
+        self.clear_list()
 
         if self.output_stride == 32:
             entry_block3_stride = 2

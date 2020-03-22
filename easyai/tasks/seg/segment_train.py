@@ -151,8 +151,8 @@ class SegmentionTrain(BaseTrain):
 
     def test(self, val_path, epoch, save_model_path):
         self.segment_test.load_weights(save_model_path)
-        score, class_iou = self.segment_test.test(val_path)
-        self.segment_test.save_test_value(epoch, score, class_iou)
+        score, class_score = self.segment_test.test(val_path)
+        self.segment_test.save_test_value(epoch, score, class_score)
         # save best model
         self.bestmIoU = self.torchModelProcess.saveBestModel(score['Mean IoU : \t'],
                                                              save_model_path,

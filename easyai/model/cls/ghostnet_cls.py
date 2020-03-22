@@ -8,16 +8,17 @@ from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
 from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
-from easyai.model.base_block.utility.utility_layer import FcLayer, ActivationLayer
+from easyai.model.base_block.utility.utility_layer import FcLayer
+from easyai.model.base_block.utility.utility_layer import NormalizeLayer, ActivationLayer
 from easyai.model.utility.base_model import *
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 
 
-class VggNetCls(BaseModel):
+class GhostNetCls(BaseModel):
 
     def __init__(self, data_channel=3, class_num=100):
         super().__init__()
-        self.set_name(ModelName.VggNetCls)
+        self.set_name(ModelName.GhostNetCls)
         self.data_channel = data_channel
         self.class_number = class_num
         self.bn_name = NormalizationType.BatchNormalize2d
@@ -29,32 +30,29 @@ class VggNetCls(BaseModel):
     def create_block_list(self):
         self.clear_list()
 
-        backbone = self.factory.get_base_model(BackboneName.Vgg19, self.data_channel)
+        backbone = self.factory.get_base_model(BackboneName.GhostNet, self.data_channel)
         base_out_channels = backbone.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])
 
-        # avgpool = nn.AdaptiveAvgPool2d((7, 7))
+        avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.add_block_list(LayerType.GlobalAvgPool, avgpool, base_out_channels[-1])
 
-        layer1 = FcLayer(base_out_channels[-1], 4096)
-        self.add_block_list(layer1.get_name(), layer1, 4096)
+        output_channel = 1280
+        layer1 = FcLayer(base_out_channels[-1], output_channel)
+        self.add_block_list(layer1.get_name(), layer1, output_channel)
 
-        layer2 = ActivationLayer(self.activation_name, inplace=False)
-        self.add_block_list(layer2.get_name(), layer2, 4096)
+        layer2 = NormalizeLayer(bn_name=NormalizationType.BatchNormalize1d,
+                                out_channel=output_channel)
+        self.add_block_list(layer2.get_name(), layer2, output_channel)
 
-        layer3 = nn.Dropout()
-        self.add_block_list(LayerType.Dropout, layer3, 4096)
+        layer3 = ActivationLayer(self.activation_name, inplace=False)
+        self.add_block_list(layer3.get_name(), layer3, output_channel)
 
-        layer4 = nn.Linear(4096, 4096)
-        self.add_block_list(LayerType.FcLinear, layer4, 4096)
+        layer4 = nn.Dropout(0.2)
+        self.add_block_list(LayerType.Dropout, layer4, output_channel)
 
-        layer5 = ActivationLayer(self.activation_name, inplace=False)
-        self.add_block_list(layer5.get_name(), layer5, 4096)
-
-        layer6 = nn.Dropout()
-        self.add_block_list(LayerType.Dropout, layer6, 4096)
-
-        layer7 = nn.Linear(4096, self.class_number)
-        self.add_block_list(LayerType.FcLinear, layer7, self.class_number)
+        layer5 = nn.Linear(output_channel, self.class_number)
+        self.add_block_list(LayerType.FcLinear, layer5, self.class_number)
 
         self.create_loss()
 

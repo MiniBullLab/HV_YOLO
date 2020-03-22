@@ -9,6 +9,7 @@ from easyai.model.utility.my_model import MyModel
 from easyai.model.cls.vgg_cls import VggNetCls
 from easyai.model.cls.inceptionv4_cls import Inceptionv4Cls
 from easyai.model.cls.senet_cls import SENetCls
+from easyai.model.cls.ghostnet_cls import GhostNetCls
 from easyai.model.sr.MSRResNet import MSRResNet
 from easyai.model.sr.MySRModel import MySRModel
 from easyai.model.seg.fcn_seg import FCN8sSeg
@@ -52,6 +53,8 @@ class ModelFactory():
             model = Inceptionv4Cls()
         elif modelName == ModelName.SENetCls:
             model = SENetCls()
+        elif modelName == ModelName.GhostNetCls:
+            model = GhostNetCls()
         elif modelName == ModelName.MSRResNet:
             model = MSRResNet(in_nc=1, upscale_factor=3)
         elif modelName == ModelName.MySRModel:

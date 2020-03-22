@@ -136,7 +136,7 @@ class SegmentionConfig(ImageTaskConfig):
         self.latest_weights_name = 'seg_latest.pt'
         self.best_weights_name = 'seg_best.pt'
         self.latest_weights_file = os.path.join(self.snapshot_path, self.latest_weights_name)
-        self.best_weights_file = os.path.join(self.snapshot_path, self.latest_weights_name)
+        self.best_weights_file = os.path.join(self.snapshot_path, self.best_weights_name)
         self.max_epochs = 300
 
         self.base_lr = 1e-2

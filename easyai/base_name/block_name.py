@@ -5,13 +5,16 @@
 
 class ActivationType():
 
-    Mish = "mish"
     Linear = "linear"
     ReLU = "relu"
     PReLU = "prelu"
     ReLU6 = "relu6"
     LeakyReLU = "leaky"
     Sigmoid = "sigmoid"
+
+    Mish = "mish"
+    HSigmoid = "h_sigmoid"
+    HSwish = "h_swish"
 
 
 class NormalizationType():

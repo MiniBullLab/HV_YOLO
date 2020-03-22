@@ -280,9 +280,11 @@ class SEBlock(BaseBlock):
         y = y.view(b, c)
         y = self.fc(y)
         y = y.view(b, c, 1, 1)
+        # torch.clamp(y, 0, 1)
         return x * y
 
 
+# ???
 class SEConvBlock(BaseBlock):
 
     def __init__(self, in_channel, reduction=16):
@@ -294,6 +296,7 @@ class SEConvBlock(BaseBlock):
         w = F.adaptive_avg_pool2d(x, 1)
         w = F.relu(self.fc1(w))
         w = self.fc2(w).sigmoid()
+        # torch.clamp(y, 0, 1)
         return w
 
 

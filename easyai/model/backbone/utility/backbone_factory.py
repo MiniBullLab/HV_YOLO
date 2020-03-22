@@ -5,6 +5,7 @@
 import os.path
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.cls.mobilenetv2 import mobilenetv2_1_0
+from easyai.model.backbone.cls.mobilenetv3 import mobilenetv3_small, mobilenetv3_large
 from easyai.model.backbone.cls.shufflenetv2 import shufflenetv2_1_0
 from easyai.model.backbone.cls.resnet import resnet18, resnet34
 from easyai.model.backbone.cls.resnet import resnet50, resnet101, resnet152
@@ -28,6 +29,7 @@ from easyai.model.backbone.cls.attention import attention56, attention92
 from easyai.model.backbone.cls.efficientnet import EfficientNet
 from easyai.model.backbone.cls.dpn import dpn26, dpn92
 from easyai.model.backbone.cls.pnasnet import pnasnet_A, pnasnet_B
+from easyai.model.backbone.cls.ghostnet import ghost_net
 from easyai.model.backbone.utility.my_backbone import MyBackbone
 from easyai.model.utility.model_parse import ModelParse
 
@@ -55,8 +57,13 @@ class BackboneFactory():
 
     def get_base_model_from_name(self, net_name, data_channel=3):
         result = None
+        net_name = net_name.strip()
         if net_name == BackboneName.ShuffleNetV2_1_0:
             result = shufflenetv2_1_0(data_channel)
+        elif net_name == BackboneName.MobileNetv3_small:
+            result = mobilenetv3_small(data_channel)
+        elif net_name == BackboneName.MobileNetv3_large:
+            result = mobilenetv3_large(data_channel)
         elif net_name == BackboneName.MobileNetV2_1_0:
             result = mobilenetv2_1_0(data_channel)
         elif net_name == BackboneName.ResNet18:
@@ -159,6 +166,8 @@ class BackboneFactory():
             result = pnasnet_A(data_channel)
         elif net_name == BackboneName.PNASNetB:
             result = pnasnet_B(data_channel)
+        elif net_name == BackboneName.GhostNet:
+            result = ghost_net(data_channel)
         else:
             print("base model:%s error" % net_name)
         return result

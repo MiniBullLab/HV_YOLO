@@ -35,16 +35,15 @@ class SegmentionTest(BaseTest):
             self.metric.eval(prediction, gt)
             print('Batch %d... Done. (%.3fs)' % (i, self.timer.toc(True)))
 
-        score, class_iou = self.metric.get_score()
+        score, class_score = self.metric.get_score()
         self.print_evaluation(score)
-        return score, class_iou
+        return score, class_score
 
-    def save_test_value(self, epoch, score, class_iou):
+    def save_test_value(self, epoch, score, class_score):
         # write epoch results
         with open(self.test_task_config.save_evaluation_path, 'a') as file:
-            # file.write('%11.3g' * 2 % (mAP, aps[0]) + '\n')
             file.write("Epoch: {} | mIoU: {:.3f} | ".format(epoch, score['Mean IoU : \t']))
-            for i, iou in enumerate(class_iou):
+            for i, iou in class_score.items():
                 file.write(self.test_task_config.class_name[i][0] + ": {:.3f} ".format(iou))
             file.write("\n")
 
