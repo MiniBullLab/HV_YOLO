@@ -21,6 +21,9 @@ class ClassifyTrain(BaseTrain):
         self.set_task_name(TaskName.Classify_Task)
         self.train_task_config = self.config_factory.get_config(self.task_name, self.config_path)
 
+        self.train_logger = TrainLogger(self.train_task_config.log_name,
+                                        self.train_task_config.root_save_dir)
+
         self.torchModelProcess = TorchModelProcess()
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
 
@@ -28,8 +31,6 @@ class ClassifyTrain(BaseTrain):
         self.device = self.torchModelProcess.getDevice()
 
         self.classify_test = ClassifyTest(cfg_path, gpu_id)
-
-        self.train_logger = TrainLogger(self.train_task_config.log_name)
 
         self.total_images = 0
         self.start_epoch = 0

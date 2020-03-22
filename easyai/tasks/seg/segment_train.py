@@ -21,7 +21,8 @@ class SegmentionTrain(BaseTrain):
         self.set_task_name(TaskName.Segment_Task)
         self.train_task_config = self.config_factory.get_config(self.task_name, self.config_path)
 
-        self.train_logger = TrainLogger(self.train_task_config.log_name)
+        self.train_logger = TrainLogger(self.train_task_config.log_name,
+                                        self.train_task_config.root_save_dir)
 
         self.torchModelProcess = TorchModelProcess()
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)

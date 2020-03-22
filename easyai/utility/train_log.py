@@ -7,15 +7,14 @@ import time
 import torchvision.utils as vutils
 from tensorboardX import SummaryWriter
 from easyai.helper.average_meter import AverageMeter
-from easyai.config.utility import base_config
 
 
 class TrainLogger():
 
-    def __init__(self, log_name):
+    def __init__(self, log_name, log_save_dir):
         current_time = time.strftime("%Y-%m-%dT%H_%M", time.localtime())
         log_name = "%s_%s" % (log_name, current_time)
-        self.log_dir = os.path.join(base_config.root_save_dir, log_name)
+        self.log_dir = os.path.join(log_save_dir, log_name)
         if not os.path.exists(self.log_dir):
             os.makedirs(self.log_dir)
         self.writer = SummaryWriter(self.log_dir)

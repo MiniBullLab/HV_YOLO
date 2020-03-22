@@ -61,10 +61,10 @@ class Detect2dResultProcess():
             temp_object.min_corner.y = y1
             temp_object.max_corner.x = x2
             temp_object.max_corner.y = y2
-            temp_object.classIndex = obj.classIndex
+            temp_object.classIndex = int(obj.classIndex)
             temp_object.objectConfidence = obj.objectConfidence
             temp_object.classConfidence = obj.classConfidence
-            temp_object.name = class_name[obj.classIndex]
+            temp_object.name = class_name[temp_object.classIndex]
             result.append(temp_object)
         return result
 

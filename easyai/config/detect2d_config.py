@@ -125,7 +125,7 @@ class Detect2dConfig(ImageTaskConfig):
         self.test_batch_size = 1
 
     def get_train_default_value(self):
-        self.train_batch_size = 2
+        self.train_batch_size = 16
         self.enable_mixed_precision = False
         self.is_save_epoch_model = False
         self.latest_weights_name = 'det2d_latest.pt'
