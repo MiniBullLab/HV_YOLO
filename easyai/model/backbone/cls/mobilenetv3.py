@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 # Author:
+"""
+Creates a MobileNetV3 Model as defined in:
+Andrew Howard, Mark Sandler, Grace Chu, Liang-Chieh Chen, Bo Chen, Mingxing Tan, Weijun Wang, Yukun Zhu, Ruoming Pang, Vijay Vasudevan, Quoc V. Le, Hartwig Adam. (2019).
+Searching for MobileNetV3
+arXiv preprint arXiv:1905.02244.
+"""
 
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.backbone_name import BackboneName

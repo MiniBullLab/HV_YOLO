@@ -12,7 +12,3 @@ class BaseBackbone(AbstractModel):
 
     def get_outchannel_list(self):
         return self.block_out_channels
-
-    def print_block_name(self):
-        for key in self._modules.keys():
-            print(key)

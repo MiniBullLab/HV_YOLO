@@ -40,3 +40,7 @@ class AbstractModel(nn.Module):
         for m in self.modules():
             if is_freeze and isinstance(m, nn.BatchNorm2d):
                 m.eval()
+
+    def print_block_name(self):
+        for key in self._modules.keys():
+            print(key)

@@ -48,13 +48,11 @@ class SegmentionTrain(BaseTrain):
             self.torchModelProcess.modelTrainInit(self.model)
         self.start_epoch, self.bestmIoU = self.torchModelProcess.getLatestModelValue(checkpoint)
 
-        if self.train_task_config.enable_freeze_layer:
-            self.torchOptimizer.freeze_optimizer_layer(self.start_epoch,
-                                                       self.train_task_config.base_lr,
-                                                       self.model,
-                                                       self.train_task_config.freeze_layer_name)
-        else:
-            self.torchOptimizer.createOptimizer(self.start_epoch, self.model, self.train_task_config.base_lr)
+        self.torchOptimizer.freeze_optimizer_layer(self.start_epoch,
+                                                   self.train_task_config.base_lr,
+                                                   self.model,
+                                                   self.train_task_config.freeze_layer_name,
+                                                   self.train_task_config.freeze_layer_type)
         self.optimizer = self.torchOptimizer.getLatestModelOptimizer(checkpoint)
 
     def train(self, train_path, val_path):

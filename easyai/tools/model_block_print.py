@@ -16,6 +16,10 @@ def parse_arguments():
     parser = OptionParser()
     parser.description = "This program print model block name"
 
+    parser.add_option("-m", "--model", dest="model",
+                      action="store", type="string", default=None,
+                      help="model name or cfg file path")
+
     parser.add_option("-b", "--base_model", dest="base_model",
                       action="store", type="string", default=None,
                       help="base model name or cfg file path")
@@ -24,13 +28,25 @@ def parse_arguments():
     return options
 
 
-def main(base_model):
+def backbone_model_print(model_name):
     backbone_factory = BackboneFactory()
     input_x = torch.randn(1, 3, 32, 32)
-    model = backbone_factory.get_base_model(base_model)
+    backbone = backbone_factory.get_base_model(model_name)
+    backbone.print_block_name()
+
+
+def model_print(model_name):
+    model_factory = ModelFactory()
+    input_x = torch.randn(1, 3, 32, 32)
+    model = model_factory.get_model(model_name)
     model.print_block_name()
 
 
 if __name__ == '__main__':
     options = parse_arguments()
-    main(options.base_model)
+    if options.model is not None:
+        model_print(options.model)
+    elif options.base_model is not None:
+        backbone_model_print(options.base_model)
+    else:
+        print("input param error")

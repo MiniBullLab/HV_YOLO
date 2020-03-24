@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
 import math
 from easyai.solver.base_lr_secheduler import BaseLrSecheduler
 from easyai.solver.lr_factory import register_lr_scheduler

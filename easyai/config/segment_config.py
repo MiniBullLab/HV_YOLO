@@ -29,7 +29,7 @@ class SegmentionConfig(ImageTaskConfig):
         self.accumulated_batches = 1
         self.display = 1
 
-        self.enable_freeze_layer = False
+        self.freeze_layer_type = 0
         self.freeze_layer_name = None
 
         self.config_path = os.path.join(self.config_save_dir, "segmention_config.json")
@@ -100,8 +100,8 @@ class SegmentionConfig(ImageTaskConfig):
             self.accumulated_batches = int(config_dict['accumulated_batches'])
         if config_dict.get('display', None) is not None:
             self.display = int(config_dict['display'])
-        if config_dict.get('enable_freeze_layer', None) is not None:
-            self.enable_freeze_layer = bool(config_dict['enable_freeze_layer'])
+        if config_dict.get('freeze_layer_type', None) is not None:
+            self.freeze_layer_type = int(config_dict['freeze_layer_type'])
         if config_dict.get('freeze_layer_name', None) is not None:
             self.freeze_layer_name = config_dict['freeze_layer_name']
 
@@ -116,7 +116,7 @@ class SegmentionConfig(ImageTaskConfig):
         config_dict['lr_scheduler_config'] = self.lr_scheduler_config
         config_dict['accumulated_batches'] = self.accumulated_batches
         config_dict['display'] = self.display
-        config_dict['enable_freeze_layer'] = self.enable_freeze_layer
+        config_dict['freeze_layer_type'] = self.freeze_layer_type
         config_dict['freeze_layer_name'] = self.freeze_layer_name
 
     def get_data_default_value(self):
@@ -153,7 +153,7 @@ class SegmentionConfig(ImageTaskConfig):
         self.accumulated_batches = 1
         self.display = 20
 
-        self.enable_freeze_layer = True
+        self.freeze_layer_type = 1
         self.freeze_layer_name = "route_0"
 
 

@@ -1,5 +1,10 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
 import re
 import torch
+from easyai.base_name.block_name import BlockType
 
 
 class TorchOptimizer():
@@ -17,6 +22,41 @@ class TorchOptimizer():
         self.config = config
         self.optimizer = None
 
+    def freeze_optimizer_layer(self, epoch, base_lr, model,
+                               layer_name, flag=0):
+        if flag == 0:
+            pass
+        elif flag == 1:
+            layer_name = layer_name.strip()
+            self.freeze_front_layer(model, layer_name)
+        elif flag == 2:
+            layer_name = layer_name.strip()
+            for key, block in model._modules.items():
+                if key == BlockType.BaseNet:
+                    self.freeze_front_layer(block, layer_name)
+                    break
+        elif flag == 3:
+            layer_names = [x.strip() for x in layer_name.split(',') if x.strip()]
+            self.freeze_layers(model, layer_names)
+        elif flag == 4:
+            layer_names = [x.strip() for x in layer_name.split(',') if x.strip()]
+            for key, block in model._modules.items():
+                if key == BlockType.BaseNet:
+                    self.freeze_layers(block, layer_names)
+                    break
+        elif flag == 5:
+            layer_name = layer_name.strip()
+            self.freeze_layer_from_name(model, layer_name)
+        elif flag == 6:
+            layer_name = layer_name.strip()
+            for key, block in model._modules.items():
+                if key == BlockType.BaseNet:
+                    self.freeze_layer_from_name(block, layer_name)
+                    break
+        else:
+            print("freeze layer error")
+        self.createOptimizer(epoch, model, base_lr)
+
     def createOptimizer(self, epoch, model, base_lr):
         em = 0
         for e in self.config.keys():
@@ -26,10 +66,6 @@ class TorchOptimizer():
         self.optimizer = self.optimizers[setting['optimizer']](
             filter(lambda p: p.requires_grad, model.parameters()), lr=base_lr)
         self.adjust_param(self.optimizer, setting)
-
-    def freeze_optimizer_layer(self, epoch, base_lr, model, layer_name):
-        self.freeze_front_layer(model, layer_name)
-        self.createOptimizer(epoch, model, base_lr)
 
     def freeze_layers(self, model, layer_names):
         for key, block in model._modules.items():
@@ -50,7 +86,7 @@ class TorchOptimizer():
         for key, block in model._modules.items():
             for param in block.parameters():
                 param.requires_grad = False
-            if layer_name in key:
+            if layer_name == key:
                 break
 
     def adjust_optimizer(self, epoch, lr):
