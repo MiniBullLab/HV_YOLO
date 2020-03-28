@@ -8,7 +8,7 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_layer import RouteLayer, AddLayer
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.utility.utility_block import SeparableConv2dBNActivation
+from easyai.model.base_block.utility.separable_conv_block import SeparableConv2dBNActivation
 from easyai.model.base_block.cls.xception_block import DoubleSeparableConv2dBlock
 from easyai.model.base_block.cls.xception_block import XceptionSumBlock, XceptionConvBlock
 from easyai.model.base_block.cls.xception_block import BlockA, FCAttention

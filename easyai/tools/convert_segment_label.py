@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 from easyai.helper import DirProcess
 from easyai.helper import ImageProcess
-from easyai.config import segment_config
+from easyai.config.segment_config import SegmentionConfig
 
 
 class ConvertSegmentionLable():
@@ -42,8 +42,8 @@ class ConvertSegmentionLable():
 
     def convert_gray_label(self, mask, class_list):
         unkonwn = False
-        for index, class_name, value in enumerate(class_list):
-            gray_value = int(value.strip())
+        for index, value in enumerate(class_list):
+            gray_value = int(value[1].strip())
             mask[mask == gray_value] = index
             unkonwn = unkonwn | (mask == gray_value)
         mask[unkonwn] = 250
@@ -52,8 +52,8 @@ class ConvertSegmentionLable():
     def convert_color_label(self, mask, class_list):
         shape = mask.shape[:2]  # shape = [height, width]
         result = np.full(shape, 250, dtype=np.uint8)
-        for index, class_name, value in enumerate(class_list):
-            value_list = [int(x) for x in value.spilt(',') if x.strip()]
+        for index, value in enumerate(class_list):
+            value_list = [int(x) for x in value[1].spilt(',') if x.strip()]
             color_value = np.array(value_list, dtype=np.uint8)
             temp1 = mask[:, :] == color_value
             temp2 = np.sum(temp1, axis=2)
@@ -64,9 +64,11 @@ class ConvertSegmentionLable():
 def main():
     print("start...")
     test = ConvertSegmentionLable()
+    seg_config = SegmentionConfig()
+    seg_config.load_config(config_path=None)
     test.convert_segment_label("/home/lpj/github/data/LED_detect/SegmentLabel1",
-                               segment_config.label_is_gray,
-                               segment_config.className)
+                               seg_config.label_is_gray,
+                               seg_config.class_name)
     print("End of game, have a nice day!")
 
 

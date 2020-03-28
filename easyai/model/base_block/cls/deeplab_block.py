@@ -5,7 +5,7 @@
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.model.base_block.utility.base_block import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.utility.utility_block import SeparableConv2dBNActivation
+from easyai.model.base_block.utility.separable_conv_block import SeparableConv2dBNActivation
 from easyai.model.base_block.seg.bisenet_block import GlobalAvgPooling
 
 

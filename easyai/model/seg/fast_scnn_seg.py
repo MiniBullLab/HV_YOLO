@@ -10,7 +10,7 @@ from easyai.base_name.loss_name import LossType
 from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
 from easyai.model.base_block.utility.upsample_layer import Upsample
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.utility.utility_block import SeparableConv2dBNActivation
+from easyai.model.base_block.utility.separable_conv_block import SeparableConv2dBNActivation
 from easyai.model.base_block.seg.fast_scnn_block import FastSCNNBlockName
 from easyai.model.base_block.seg.fast_scnn_block import GlobalFeatureExtractor, FeatureFusionBlock
 from easyai.model.utility.base_model import *

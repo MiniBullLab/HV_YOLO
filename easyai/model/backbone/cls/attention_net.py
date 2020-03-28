@@ -13,20 +13,20 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.preact_resnet_block import PreActBottleNeck
-from easyai.model.base_block.cls.attention_block import AttentionModule1
-from easyai.model.base_block.cls.attention_block import AttentionModule2
-from easyai.model.base_block.cls.attention_block import AttentionModule3
+from easyai.model.base_block.cls.attention_net_block import AttentionModule1
+from easyai.model.base_block.cls.attention_net_block import AttentionModule2
+from easyai.model.base_block.cls.attention_net_block import AttentionModule3
 
-__all__ = ['attention56', 'attention92']
+__all__ = ['attention_net56', 'attention_net92']
 
 
-class Attention(BaseBackbone):
+class AttentionNet(BaseBackbone):
 
     def __init__(self, data_channel=3, num_blocks=(1, 1, 1),
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
-        self.set_name(BackboneName.Attention56)
+        self.set_name(BackboneName.AttentionNet56)
         self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.out_channels = (256, 512, 1024)
@@ -82,16 +82,16 @@ class Attention(BaseBackbone):
         return output_list
 
 
-def attention56(data_channel):
-    model = Attention(data_channel=data_channel,
+def attention_net56(data_channel):
+    model = AttentionNet(data_channel=data_channel,
                       num_blocks=(1, 1, 1))
-    model.set_name(BackboneName.Attention56)
+    model.set_name(BackboneName.AttentionNet56)
     return model
 
 
-def attention92(data_channel):
-    model = Attention(data_channel=data_channel,
+def attention_net92(data_channel):
+    model = AttentionNet(data_channel=data_channel,
                       num_blocks=(1, 2, 3))
-    model.set_name(BackboneName.Attention92)
+    model.set_name(BackboneName.AttentionNet92)
     return model
 

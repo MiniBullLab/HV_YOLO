@@ -5,7 +5,7 @@
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.model.base_block.utility.base_block import *
 from easyai.model.base_block.utility.utility_block import ActivationConvBNBlock
-from easyai.model.base_block.utility.utility_block import SeperableConv2dBlock
+from easyai.model.base_block.utility.separable_conv_block import SeperableConv2dBlock
 
 
 class NasNetBlockName():
@@ -14,28 +14,6 @@ class NasNetBlockName():
     Fit = "fit"
     NormalCell = "normalCell"
     ReductionCell = "reductionCell"
-
-
-class SeperableConv2d(BaseBlock):
-
-    def __init__(self, input_channel, output_channel, kernel_size, **kwargs):
-        super().__init__(NasNetBlockName.SeperableConv2d)
-        self.depthwise = nn.Conv2d(
-            input_channel,
-            input_channel,
-            kernel_size,
-            groups=input_channel,
-            **kwargs)
-
-        self.pointwise = nn.Conv2d(
-            input_channel,
-            output_channel,
-            1)
-
-    def forward(self, x):
-        x = self.depthwise(x)
-        x = self.pointwise(x)
-        return x
 
 
 class SeperableBranch(BaseBlock):

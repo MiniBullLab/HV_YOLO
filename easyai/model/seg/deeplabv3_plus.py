@@ -16,7 +16,7 @@ from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
 from easyai.model.base_block.utility.upsample_layer import Upsample
 from easyai.model.base_block.utility.utility_layer import RouteLayer
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.utility.utility_block import SeparableConv2dBNActivation
+from easyai.model.base_block.utility.separable_conv_block import SeparableConv2dBNActivation
 from easyai.model.base_block.cls.deeplab_block import ASPP
 from easyai.model.utility.base_model import *
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory

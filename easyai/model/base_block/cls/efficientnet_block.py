@@ -4,7 +4,8 @@
 
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.model.base_block.utility.base_block import *
-from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock, SEConvBlock
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.utility.attention_block import SEConvBlock
 
 
 class EfficientNetBlockName():

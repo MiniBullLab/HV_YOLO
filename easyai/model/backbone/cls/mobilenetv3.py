@@ -11,7 +11,8 @@ arXiv preprint arXiv:1905.02244.
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
-from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock, SEBlock
+from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.utility.attention_block import SEBlock
 from easyai.model.base_block.cls.mobilenet_block import InvertedResidual
 
 

@@ -19,13 +19,14 @@ from easyai.model.backbone.cls.squeezenet import SqueezeNet, DilatedSqueezeNet
 from easyai.model.backbone.cls.densenet import densenet121, densenet201, densenet169, densenet161
 from easyai.model.backbone.cls.densenet import densenet121_dilated8, densenet121_dilated16
 from easyai.model.backbone.cls.senet import se_resnet18, se_resnet34, se_resnet50, se_resnet101, se_resnet152
+from easyai.model.backbone.cls.sknet import sknet50, sknet101
 from easyai.model.backbone.cls.resnext import resnext50, resnext101, resnext152
 from easyai.model.backbone.cls.nasnet import nasnet
 from easyai.model.backbone.cls.preact_resnet import preactresnet18, preactresnet34, preactresnet50
 from easyai.model.backbone.cls.preact_resnet import preactresnet101, preactresnet152
 from easyai.model.backbone.cls.xception import xception
 from easyai.model.backbone.cls.xception1 import Xception65, XceptionA
-from easyai.model.backbone.cls.attention import attention56, attention92
+from easyai.model.backbone.cls.attention_net import attention_net56, attention_net92
 from easyai.model.backbone.cls.efficientnet import EfficientNet
 from easyai.model.backbone.cls.dpn import dpn26, dpn92
 from easyai.model.backbone.cls.pnasnet import pnasnet_A, pnasnet_B
@@ -128,6 +129,10 @@ class BackboneFactory():
             result = se_resnet101(data_channel)
         elif net_name == BackboneName.SEResNet152:
             result = se_resnet152(data_channel)
+        elif net_name == BackboneName.SKNet50:
+            result = sknet50(data_channel)
+        elif net_name == BackboneName.SKNet101:
+            result = sknet101(data_channel)
         elif net_name == BackboneName.ResNext50:
             result = resnext50(data_channel)
         elif net_name == BackboneName.ResNext101:
@@ -152,10 +157,10 @@ class BackboneFactory():
             result = Xception65(data_channel)
         elif net_name == BackboneName.XceptionA:
             result = XceptionA(data_channel)
-        elif net_name == BackboneName.Attention56:
-            result = attention56(data_channel)
-        elif net_name == BackboneName.Attention92:
-            result = attention92(data_channel)
+        elif net_name == BackboneName.AttentionNet56:
+            result = attention_net56(data_channel)
+        elif net_name == BackboneName.AttentionNet92:
+            result = attention_net92(data_channel)
         elif net_name == BackboneName.EfficientNet:
             result = EfficientNet(data_channel)
         elif net_name == BackboneName.DPN26:

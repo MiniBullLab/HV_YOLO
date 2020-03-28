@@ -7,7 +7,7 @@ from easyai.model.base_block.utility.base_block import *
 from easyai.model.base_block.cls.preact_resnet_block import PreActBottleNeck
 
 
-class AttentionBlockName():
+class AttentionNetBlockName():
 
     AttentionModule1 = "attentionModule1"
     AttentionModule2 = "attentionModule2"
@@ -19,7 +19,7 @@ class AttentionModule1(BaseBlock):
     def __init__(self, in_channels, out_channels, p=1, t=2, r=1,
                  bn_name=NormalizationType.BatchNormalize2d,
                  activation_name=ActivationType.ReLU):
-        super().__init__(AttentionBlockName.AttentionModule1)
+        super().__init__(AttentionNetBlockName.AttentionModule1)
         # """The hyperparameter p denotes the number of preprocessing Residual
         # Units before splitting into trunk branch and mask branch. t denotes
         # the number of Residual Units in trunk branch. r denotes the number of
@@ -121,7 +121,7 @@ class AttentionModule2(BaseBlock):
     def __init__(self, in_channels, out_channels, p=1, t=2, r=1,
                  bn_name=NormalizationType.BatchNormalize2d,
                  activation_name=ActivationType.ReLU):
-        super().__init__(AttentionBlockName.AttentionModule2)
+        super().__init__(AttentionNetBlockName.AttentionModule2)
         # """The hyperparameter p denotes the number of preprocessing Residual
         # Units before splitting into trunk branch and mask branch. t denotes
         # the number of Residual Units in trunk branch. r denotes the number of
@@ -204,7 +204,7 @@ class AttentionModule3(BaseBlock):
     def __init__(self, in_channels, out_channels, p=1, t=2, r=1,
                  bn_name=NormalizationType.BatchNormalize2d,
                  activation_name=ActivationType.ReLU):
-        super().__init__(AttentionBlockName.AttentionModule3)
+        super().__init__(AttentionNetBlockName.AttentionModule3)
 
         assert in_channels == out_channels
 
