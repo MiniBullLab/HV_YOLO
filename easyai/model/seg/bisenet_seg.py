@@ -36,8 +36,7 @@ class BiSeNet(BaseModel):
         self.create_block_list()
 
     def create_block_list(self):
-        self.block_out_channels = []
-        self.index = 0
+        self.clear_list()
 
         spatial_path = SpatialPath(self.data_channel, 128,
                                    bn_name=self.bn_name, activation_name=self.activation_name)

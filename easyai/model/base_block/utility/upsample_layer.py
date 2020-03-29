@@ -8,7 +8,7 @@ from easyai.model.base_block.utility.base_block import *
 
 class Upsample(BaseBlock):
 
-    def __init__(self, scale_factor=1, mode='bilinear'):
+    def __init__(self, scale_factor=1.0, mode='bilinear'):
         super().__init__(LayerType.Upsample)
         self.scale_factor = scale_factor
         self.mode = mode

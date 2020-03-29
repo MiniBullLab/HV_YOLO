@@ -3,13 +3,13 @@
 # Author:
 
 import os
-import torch
 from easyai.data_loader.seg.segment_dataloader import get_segment_train_dataloader
 from easyai.solver.lr_factory import LrSchedulerFactory
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.utility.train_log import TrainLogger
 from easyai.tasks.utility.base_train import BaseTrain
+from easyai.tasks.seg.segment_result_process import SegmentResultProcess
 from easyai.tasks.seg.segment_test import SegmentionTest
 from easyai.base_name.task_name import TaskName
 
@@ -28,6 +28,8 @@ class SegmentionTrain(BaseTrain):
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
         self.device = self.torchModelProcess.getDevice()
+
+        self.output_process = SegmentResultProcess()
 
         self.segment_test = SegmentionTest(cfg_path, gpu_id)
 
@@ -100,28 +102,9 @@ class SegmentionTrain(BaseTrain):
         loss_count = len(self.model.lossList)
         targets = targets.to(self.device)
         for k in range(0, loss_count):
-            output, target = self.segment_data_resize(output_list[k], targets)
+            output, target = self.output_process.output_feature_map_resize(output_list[k], targets)
             loss += self.model.lossList[k](output, target)
         return loss
-
-    def segment_data_resize(self, input_data, target):
-        target = target.type(input_data.dtype)
-        n, c, h, w = input_data.size()
-        nt, ht, wt = target.size()
-        # Handle inconsistent size between input and target
-        if h > ht and w > wt:  # upsample labels
-            target = target.unsequeeze(1)
-            target = torch.nn.functional.upsample(target, size=(h, w), mode='nearest')
-            target = target.sequeeze(1)
-        elif h < ht and w < wt:  # upsample images
-            input_data = torch.nn.functional.upsample(input_data, size=(ht, wt), mode='bilinear')
-        elif h == ht and w == wt:
-            pass
-        else:
-            print("input_data: (%d,%d) and target: (%d,%d) error "
-                  % (h, w, ht, wt))
-            raise Exception("segment_data_resize error")
-        return input_data, target
 
     def update_logger(self, index, total, epoch, loss_value):
         step = epoch * total + index

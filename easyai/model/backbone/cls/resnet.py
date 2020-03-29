@@ -29,13 +29,12 @@ class ResNet(BaseBackbone):
         self.block = block
         self.first_output = 64
         self.in_channels = self.first_output
-        self.head_type = 0
+        self.head_type = 1
 
         self.create_block_list()
 
     def create_block_list(self):
-        self.block_out_channels = []
-        self.index = 0
+        self.clear_list()
 
         if self.head_type == 0:
             layer1 = ConvBNActivationBlock(in_channels=self.data_channel,

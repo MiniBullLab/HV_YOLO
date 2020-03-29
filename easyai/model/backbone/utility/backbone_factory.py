@@ -29,6 +29,7 @@ from easyai.model.backbone.cls.xception1 import Xception65, XceptionA
 from easyai.model.backbone.cls.attention_net import attention_net56, attention_net92
 from easyai.model.backbone.cls.efficientnet import EfficientNet
 from easyai.model.backbone.cls.dpn import dpn26, dpn92
+from easyai.model.backbone.cls.dfnet import dfnetv1, dfnetv2
 from easyai.model.backbone.cls.pnasnet import pnasnet_A, pnasnet_B
 from easyai.model.backbone.cls.ghostnet import ghost_net
 from easyai.model.backbone.utility.my_backbone import MyBackbone
@@ -40,7 +41,7 @@ class BackboneFactory():
     def __init__(self):
         self.cfgReader = ModelParse()
 
-    def get_base_model(self, baseNetName, data_channel=3):
+    def get_base_model(self, baseNetName, data_channel=3, **kwargs):
         input_name = baseNetName.strip()
         if input_name.endswith("cfg"):
             result = self.get_base_model_from_cfg(input_name)
@@ -167,6 +168,10 @@ class BackboneFactory():
             result = dpn26(data_channel)
         elif net_name == BackboneName.DPN92:
             result = dpn92(data_channel)
+        elif net_name == BackboneName.DFNetV1:
+            result = dfnetv1(data_channel)
+        elif net_name == BackboneName.DFNetV2:
+            result = dfnetv2(data_channel)
         elif net_name == BackboneName.PNASNetA:
             result = pnasnet_A(data_channel)
         elif net_name == BackboneName.PNASNetB:

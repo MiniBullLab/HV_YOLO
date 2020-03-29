@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 # Author:
 
+import torch
 from easyai.tasks.utility.base_test import BaseTest
 from easyai.data_loader.seg.segment_dataloader import get_segment_val_dataloader
 from easyai.tasks.seg.segment import Segmentation
@@ -30,7 +31,7 @@ class SegmentionTest(BaseTest):
         self.timer.tic()
         self.metric.reset()
         for i, (images, segment_targets) in enumerate(dataloader):
-            prediction = self.segment_inference.infer(images, self.threshold)
+            prediction, output_list = self.segment_inference.infer(images, self.threshold)
             gt = segment_targets[0].data.cpu().numpy()
             self.metric.eval(prediction, gt)
             print('Batch %d... Done. (%.3fs)' % (i, self.timer.toc(True)))

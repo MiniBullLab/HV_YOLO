@@ -59,6 +59,8 @@ class BackboneName():
     EfficientNet = "efficientnet"
     DPN26 = "dpn26"
     DPN92 = "dpn92"
+    DFNetV1 = "dfnetv1"
+    DFNetV2 = "dfnetv2"
     PNASNetA = "pnasnet_A"
     PNASNetB = "pnasnet_B"
     GhostNet = "ghostnet"

@@ -39,7 +39,7 @@ class ModelNetShow():
         self.show_process.show_from_model(model)
 
     def base_model_show(self, base_model_path):
-        input_x = torch.randn(1, 3, 32, 32)
+        input_x = torch.randn(1, 3, 224, 224)
         self.show_process.set_input(input_x)
         model = self.backbone_factory.get_base_model(base_model_path)
         self.show_process.show_from_model(model)

@@ -18,6 +18,7 @@ from easyai.model.seg.refinenet_seg import RefineNetSeg
 from easyai.model.seg.pspnet_seg import PSPNetSeg
 from easyai.model.seg.bisenet_seg import BiSeNet
 from easyai.model.seg.fast_scnn_seg import FastSCNN
+from easyai.model.seg.icnet_seg import ICNet
 from easyai.model.seg.deeplabv3_plus import DeepLabV3Plus
 from easyai.model.seg.mobilenet_deeplabv3_plus import MobilenetDeepLabV3Plus
 from easyai.model.seg.mobilev2_fcn_seg import MobileV2FCN
@@ -29,7 +30,7 @@ class ModelFactory():
     def __init__(self):
         self.modelParse = ModelParse()
 
-    def get_model(self, input_name):
+    def get_model(self, input_name, **kwargs):
         input_name = input_name.strip()
         if input_name.endswith("cfg"):
             result = self.get_model_from_cfg(input_name)
@@ -37,7 +38,7 @@ class ModelFactory():
             result = self.get_model_from_name(input_name)
         return result
 
-    def get_model_from_cfg(self, cfg_path):
+    def get_model_from_cfg(self, cfg_path, **kwargs):
         path, file_name_and_post = os.path.split(cfg_path)
         file_name, post = os.path.splitext(file_name_and_post)
         model_define = self.modelParse.readCfgFile(cfg_path)
@@ -45,7 +46,7 @@ class ModelFactory():
         model.set_name(file_name)
         return model
 
-    def get_model_from_name(self, modelName):
+    def get_model_from_name(self, modelName, **kwargs):
         model = None
         if modelName == ModelName.VggNetCls:
             model = VggNetCls()
@@ -71,6 +72,8 @@ class ModelFactory():
             model = BiSeNet()
         elif modelName == ModelName.FastSCNN:
             model = FastSCNN()
+        elif modelName == ModelName.ICNet:
+            model = ICNet()
         elif modelName == ModelName.DeepLabV3Plus:
             model = DeepLabV3Plus()
         elif modelName == ModelName.MobilenetDeepLabV3Plus:

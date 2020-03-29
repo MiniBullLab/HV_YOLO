@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 # Author:
 
+import torch
 import numpy as np
 from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
 
@@ -34,3 +35,22 @@ class SegmentResultProcess():
         result = result.astype(np.float32)
         result = self.dataset_process.image_resize(result, src_size)
         return result
+
+    def output_feature_map_resize(self, input_data, target):
+        target = target.type(input_data.dtype)
+        n, c, h, w = input_data.size()
+        nt, ht, wt = target.size()
+        # Handle inconsistent size between input and target
+        if h > ht and w > wt:  # upsample labels
+            target = target.unsequeeze(1)
+            target = torch.nn.functional.upsample(target, size=(h, w), mode='nearest')
+            target = target.sequeeze(1)
+        elif h < ht and w < wt:  # upsample images
+            input_data = torch.nn.functional.upsample(input_data, size=(ht, wt), mode='bilinear')
+        elif h == ht and w == wt:
+            pass
+        else:
+            print("input_data: (%d,%d) and target: (%d,%d) error "
+                  % (h, w, ht, wt))
+            raise Exception("segment_data_resize error")
+        return input_data, target

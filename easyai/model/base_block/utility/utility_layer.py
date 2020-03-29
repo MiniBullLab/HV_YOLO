@@ -23,14 +23,13 @@ class MultiplyLayer(BaseBlock):
     def __init__(self, layers):
         super().__init__(LayerType.MultiplyLayer)
         self.layers = [int(x) for x in layers.split(',') if x]
-        if len(self.layers) <= 1:
-            print("% input error" % LayerType.MultiplyLayer)
+        assert len(self.layers) >= 2
 
     def forward(self, layer_outputs, base_outputs):
         temp_layer_outputs = [layer_outputs[i] if i < 0 else base_outputs[i]
                               for i in self.layers]
         x = temp_layer_outputs[0]
-        for layer in temp_layer_outputs:
+        for layer in temp_layer_outputs[1:]:
              x = x * layer
         return x
 
@@ -40,14 +39,13 @@ class AddLayer(BaseBlock):
     def __init__(self, layers):
         super().__init__(LayerType.AddLayer)
         self.layers = [int(x) for x in layers.split(',') if x]
-        if len(self.layers) <= 1:
-            print("% input error" % LayerType.AddLayer)
+        assert len(self.layers) >= 2
 
     def forward(self, layer_outputs, base_outputs):
         temp_layer_outputs = [layer_outputs[i] if i < 0 else base_outputs[i]
                               for i in self.layers]
         x = temp_layer_outputs[0]
-        for layer in temp_layer_outputs:
+        for layer in temp_layer_outputs[1:]:
              x = x + layer
         return x
 
@@ -81,7 +79,7 @@ class RouteLayer(BaseBlock):
         self.layers = [int(x) for x in layers.split(',') if x]
 
     def forward(self, layer_outputs, base_outputs):
-        #print(self.layers)
+        # print(self.layers)
         temp_layer_outputs = [layer_outputs[i] if i < 0 else base_outputs[i]
                               for i in self.layers]
         x = torch.cat(temp_layer_outputs, 1)

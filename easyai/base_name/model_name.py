@@ -16,6 +16,7 @@ class ModelName():
     PSPNetSeg = "PSPNetSeg"
     BiSeNet = "BiSeNet"
     FastSCNN = "FastSCNN"
+    ICNet = "ICNet"
     DeepLabV3Plus = "DeepLabV3Plus"
     MobilenetDeepLabV3Plus = "MobilenetDeepLabV3Plus"
     MobileV2FCN = "MobileV2FCN"

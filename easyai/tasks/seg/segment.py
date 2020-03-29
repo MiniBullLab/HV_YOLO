@@ -23,6 +23,7 @@ class Segmentation(BaseInference):
         self.device = self.torchModelProcess.getDevice()
 
         self.result_process = SegmentResultProcess()
+
         self.result_show = SegmentionShow()
 
         self.threshold = 0.5
@@ -39,7 +40,7 @@ class Segmentation(BaseInference):
         for index, (src_image, image) in enumerate(dataloader):
             self.timer.tic()
             self.set_src_size(src_image)
-            prediction = self.infer(image, self.threshold)
+            prediction, _ = self.infer(image, self.threshold)
             result = self.postprocess(prediction)
             print('Batch %d... Done. (%.3fs)' % (index, self.timer.toc()))
             if not self.result_show.show(src_image, result,
@@ -50,9 +51,9 @@ class Segmentation(BaseInference):
     def infer(self, input_data, threshold=0.0):
         with torch.no_grad():
             output_list = self.model(input_data.to(self.device))
-            output = self.compute_output(output_list)
+            output = self.compute_output(output_list[:])
             prediction = self.result_process.get_detection_result(output, threshold)
-        return prediction
+        return prediction, output_list
 
     def postprocess(self, result):
         result = self.result_process.resize_segmention_result(self.src_size,
