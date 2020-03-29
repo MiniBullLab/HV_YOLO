@@ -70,7 +70,7 @@ ls $imageDir/*.* > $imageDir/img_list.txt
 imgtobin.py -i $imageDir/img_list.txt \
             -o $outDir/dra_image_bin \
             -c $inputColorFormat \
-            -d 0,0,0,0 \
+            -d 0,0,8,0 \
             -s $outputShape
 
 ls $outDir/dra_image_bin/*.bin > $outDir/dra_image_bin/dra_bin_list.txt
@@ -80,7 +80,7 @@ caffeparser.py -p $modelDir/$caffeNetName.prototxt \
                -i $outDir/dra_image_bin/dra_bin_list.txt \
                -o $outNetName \
                -of $outDir/out_parser \
-               -im $mean -ic $scale  -it 0,1,2,3 \
+               -it 0,1,2,3 \
                -iq -idf $inputDataFormat -odst $outputLayerName -odst $outputLayerName1 -odst $outputLayerName2 # -c act-force-fx16,coeff-force-fx16 
 
 cd $outDir/out_parser;vas -auto -show-progress $outNetName.vas
