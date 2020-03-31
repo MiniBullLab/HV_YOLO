@@ -24,7 +24,8 @@ class ImageDrawing():
         r = result.copy()
         g = result.copy()
         b = result.copy()
-        for index, class_name, value in enumerate(class_list):
+        for index, value_data in enumerate(class_list):
+            value = value_data[1]
             if is_gray:
                 gray_value = int(value.strip())
                 r[result == index] = gray_value
@@ -38,8 +39,8 @@ class ImageDrawing():
 
         rgb = np.zeros((result.shape[0], result.shape[1], 3))
 
-        rgb[:, :, 0] = (r * 0.4 + src_image[:, :, 2] * 0.6) / 255.0
-        rgb[:, :, 1] = (g * 0.4 + src_image[:, :, 1] * 0.6) / 255.0
-        rgb[:, :, 2] = (b * 0.4 + src_image[:, :, 0] * 0.6) / 255.0
+        rgb[:, :, 0] = (r * 1.0 + src_image[:, :, 2] * 0) / 255.0
+        rgb[:, :, 1] = (g * 1.0 + src_image[:, :, 1] * 0) / 255.0
+        rgb[:, :, 2] = (b * 1.0 + src_image[:, :, 0] * 0) / 255.0
 
         return rgb
