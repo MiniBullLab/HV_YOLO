@@ -25,12 +25,13 @@ class TorchModelProcess():
         return model
 
     def loadPretainModel(self, weightPath, model):
-        if os.path.exists(weightPath):
-            print("Loading pretainModel from {}".format(weightPath))
-            checkpoint = torch.load(weightPath)
-            model.load_state_dict(checkpoint['model'])
-        else:
-            print("pretain model %s not exist" % weightPath)
+        if weightPath is not None:
+            if os.path.exists(weightPath):
+                print("Loading pretainModel from {}".format(weightPath))
+                checkpoint = torch.load(weightPath)
+                model.load_state_dict(checkpoint['model'])
+            else:
+                print("pretain model %s not exist" % weightPath)
 
     def loadLatestModelWeight(self, weightPath, model):
         count = self.torchDeviceProcess.getCUDACount()

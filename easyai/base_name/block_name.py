@@ -64,13 +64,18 @@ class BlockType():
     BNActivationConvBlock = "bnActivationConvBlock"
     ActivationConvBNBlock = "activationConvBNBlock"
 
-    SeparableConv2dBNActivation = "separableConv2dBNActivation"
-
-    SeperableConv2dBlock = "seperableConv2dBlock"
     ConvActivationBlock = "convActivationBlock"
 
     FcBNActivationBlock = "fcBNActivationBlock"
 
+    InceptionBlock = "inceptionBlock"
+
+    SeparableConv2dBNActivation = "separableConv2dBNActivation"
+    SeperableConv2dBlock = "seperableConv2dBlock"
+    ShuffleBlock = "shuffleBlock"
+
+    ResidualBlock = "residualBlock"
     InvertedResidual = "invertedResidual"
+
     SEBlock = "seBlock"
     SEConvBlock = "seConvBlock"

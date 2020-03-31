@@ -15,7 +15,7 @@ class BinaryCrossEntropy2d(BaseLoss):
         self.reduce = reduce
         self.reduction = reduction
         if weight_type == 0:
-            self.loss_function = torch.nn.BCELoss(weight=self.weight, reduce=False,
+            self.loss_function = torch.nn.BCELoss(weight=self.weight, reduce=self.reduce,
                                                   reduction=self.reduction)
         else:
             self.loss_function = torch.nn.BCELoss(reduce=self.reduce, reduction=self.reduction)
@@ -36,10 +36,9 @@ class BinaryCrossEntropy2d(BaseLoss):
 
     def forward(self, input_data, target=None):
         if target is not None:
-            input_data = F.sigmoid(input_data)
             loss = self.loss_function(input_data, target)
             if self.weight_type != 0 and self.weight is not None:
                 loss = self.compute_loss_from_weight(loss, target)
         else:
-            loss = F.sigmoid(input_data)
+            loss = input_data
         return loss

@@ -4,12 +4,14 @@
 
 import numpy as np
 from easyai.data_loader.utility.base_dataset_process import BaseDataSetProcess
+from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
 
 
 class ClassifyDatasetProcess(BaseDataSetProcess):
 
     def __init__(self, mean, std):
         super().__init__()
+        self.dataset_process = ImageDataSetProcess()
         self.mean = np.array(mean, dtype=np.float32)
         self.std = np.array(std, dtype=np.float32)
         self.normalize_transform = self.torchvision_process.torch_normalize(flag=0,

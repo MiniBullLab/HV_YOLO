@@ -5,11 +5,13 @@
 
 import numpy as np
 from easyai.data_loader.utility.base_dataset_process import BaseDataSetProcess
+from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
 
 
 class SegmentDatasetProcess(BaseDataSetProcess):
     def __init__(self):
         super().__init__()
+        self.dataset_process = ImageDataSetProcess()
 
     def normaliza_dataset(self, src_image):
         image = self.dataset_process.image_normaliza(src_image)

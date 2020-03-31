@@ -2,20 +2,17 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.base_name.block_name import NormalizationType, ActivationType
+from easyai.base_name.block_name import ActivationType, NormalizationType
+from easyai.base_name.block_name import BlockType
 from easyai.model.base_block.utility.base_block import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 
 
-class GoogelnetBlockName():
-
-    InceptionBlock = "inceptionBlock"
-
-
 class InceptionBlock(BaseBlock):
     def __init__(self, in_channels, planes, stride=1, dilation=1,
-                 bnName = NormalizationType.BatchNormalize2d, activationName = ActivationType.ReLU):
-        super().__init__(GoogelnetBlockName.InceptionBlock)
+                 bnName=NormalizationType.BatchNormalize2d,
+                 activationName=ActivationType.ReLU):
+        super().__init__(BlockType.InceptionBlock)
         # 1x1 conv branch
         self.conv1 = ConvBNActivationBlock(in_channels=in_channels,
                                            out_channels=planes[0],

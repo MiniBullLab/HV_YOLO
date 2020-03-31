@@ -4,8 +4,7 @@
 
 import os
 import torch
-import random
-import numpy as np
+from easyai.utility.env import set_random_seed
 
 
 class TorchDeviceProcess():
@@ -45,11 +44,5 @@ class TorchDeviceProcess():
     def initTorch(self):
         if TorchDeviceProcess.first_run:
             torch.cuda.empty_cache()
-            random.seed(0)
-            np.random.seed(0)
-            torch.manual_seed(0)
-            if TorchDeviceProcess.hasCUDA():
-                torch.cuda.manual_seed(0)
-                torch.cuda.manual_seed_all(0)
-                torch.backends.cudnn.benchmark = True
+            set_random_seed(0, TorchDeviceProcess.hasCUDA())
             TorchDeviceProcess.first_run = False

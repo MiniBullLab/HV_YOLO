@@ -36,8 +36,8 @@ class VideoLoader(DataLoader):
                                                                    self.image_size,
                                                                    self.color)
         rgb_image = self.dataset_process.image_normaliza(rgb_image)
-        numpy_image = self.dataset_process.image_transpose(rgb_image)
-        torch_image = self.numpy_to_tensor(numpy_image)
+        numpy_image = self.dataset_process.numpy_transpose(rgb_image)
+        torch_image = self.dataset_process.numpy_to_torch(numpy_image, 0)
         return src_image, torch_image
 
     def __len__(self):

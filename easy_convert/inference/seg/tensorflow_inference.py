@@ -63,6 +63,8 @@ class TensorflowInference():
         oput_data = sess.graph.get_tensor_by_name("Sigmoid:0")
 
         img = cv2.imread(input_path)
+        image_size = (500, 400)
+        img = cv2.resize(img, image_size, interpolation=cv2.INTER_NEAREST)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = img.transpose(2, 0, 1)
         img = np.ascontiguousarray(img, dtype=np.float32)

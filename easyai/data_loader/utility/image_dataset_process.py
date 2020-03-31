@@ -6,12 +6,13 @@ import cv2
 import numpy as np
 import random
 import math
+from easyai.data_loader.utility.base_dataset_process import BaseDataSetProcess
 
 
-class ImageDataSetProcess():
+class ImageDataSetProcess(BaseDataSetProcess):
 
     def __init__(self):
-        pass
+        super().__init__()
 
     def image_normaliza(self, image):
         return image / 255.0

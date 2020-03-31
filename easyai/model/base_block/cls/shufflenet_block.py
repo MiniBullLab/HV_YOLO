@@ -6,39 +6,16 @@ import numpy as np
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.model.base_block.utility.base_block import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
+from easyai.model.base_block.utility.separable_conv_block import ShuffleBlock
 from easyai.model.base_block.utility.attention_block import SEBlock
 
 
 class ShuffleNetBlockName():
 
-    ShuffleBlock = "shuffleBlock"
     SplitBlock = "splitBlock"
     BasicBlock = "basicBlock"
     SEBasicBlock = "seBasicBlock"
     DownBlock = "downBlock"
-
-
-class ShuffleBlock(BaseBlock):
-    def __init__(self, groups=2):
-        super().__init__(ShuffleNetBlockName.ShuffleBlock)
-        self.groups = groups
-
-    def forward(self, x):
-        '''Channel shuffle: [N,C,H,W] -> [N,g,C/g,H,W] -> [N,C/g,g,H,w] -> [N,C,H,W]'''
-        batchsize, num_channels, height, width = x.data.size()
-        assert (num_channels % self.groups == 0)
-        channels_per_group = num_channels // self.groups
-        # reshape
-        x = x.view(batchsize, self.groups, channels_per_group, height, width)
-
-        # transpose
-        # - contiguous() required if transpose() is used before view().
-        #   See https://github.com/pytorch/pytorch/issues/764
-        x = torch.transpose(x, 1, 2).contiguous()
-
-        # flatten
-        x = x.view(batchsize, -1, height, width)
-        return x
 
 
 class SplitBlock(BaseBlock):
@@ -84,7 +61,7 @@ class BasicBlock(BaseBlock):
                                           bnName=bnName,
                                           activationName=activationName)
 
-        self.shuffle = ShuffleBlock()
+        self.shuffle = ShuffleBlock(groups=2)
 
     def forward(self, x):
         x1, x2 = self.split(x)

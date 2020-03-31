@@ -95,9 +95,12 @@ class Detect2dConfig(ImageTaskConfig):
         if config_dict.get('base_lr', None) is not None:
             self.base_lr = float(config_dict['base_lr'])
         if config_dict.get('optimizer_config', None) is not None:
-            self.optimizer_config = config_dict['optimizer_config']
+            optimizer_dict = config_dict['optimizer_config']
+            self.optimizer_config = {}
+            for epoch, value in optimizer_dict.items():
+                self.optimizer_config[int(epoch)] = value
         if config_dict.get('lr_scheduler_config', None) is not None:
-            self.optimizer_config = config_dict['lr_scheduler_config']
+            self.lr_scheduler_config = config_dict['lr_scheduler_config']
         if config_dict.get('accumulated_batches', None) is not None:
             self.accumulated_batches = int(config_dict['accumulated_batches'])
         if config_dict.get('display', None) is not None:

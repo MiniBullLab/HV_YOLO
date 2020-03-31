@@ -4,7 +4,6 @@
 
 import abc
 import torch
-from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
 from easyai.torch_utility.torch_vision.torchvision_process import TorchVisionProcess
 
 
@@ -12,7 +11,6 @@ class BaseDataSetProcess():
 
     def __init__(self):
         self.torchvision_process = TorchVisionProcess()
-        self.dataset_process = ImageDataSetProcess()
 
     def numpy_to_torch(self, data, flag=0):
         result = None

@@ -41,13 +41,12 @@ class ConvertSegmentionLable():
                 cv2.imwrite(save_path, mask)
 
     def convert_gray_label(self, mask, class_list):
-        unkonwn = False
+        shape = mask.shape  # shape = [height, width]
+        result = np.full(shape, 250, dtype=np.uint8)
         for index, value in enumerate(class_list):
             gray_value = int(value[1].strip())
-            mask[mask == gray_value] = index
-            unkonwn = unkonwn | (mask == gray_value)
-        mask[unkonwn] = 250
-        return mask
+            result[mask == gray_value] = index
+        return result
 
     def convert_color_label(self, mask, class_list):
         shape = mask.shape[:2]  # shape = [height, width]
@@ -66,7 +65,7 @@ def main():
     test = ConvertSegmentionLable()
     seg_config = SegmentionConfig()
     seg_config.load_config(config_path=None)
-    test.convert_segment_label("/home/lpj/github/data/LED_detect/SegmentLabel1",
+    test.convert_segment_label("/home/lpj/github/data/LED_segment/SegmentLabel_raw",
                                seg_config.label_is_gray,
                                seg_config.class_name)
     print("End of game, have a nice day!")

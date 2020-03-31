@@ -2,10 +2,8 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.base_name.block_name import ActivationType, NormalizationType
 from easyai.base_name.block_name import BlockType
 from easyai.model.base_block.utility.base_block import *
-from easyai.model.base_block.utility.activation_function import ActivationFunction
 
 
 class SEBlock(BaseBlock):

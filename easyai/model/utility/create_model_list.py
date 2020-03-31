@@ -109,7 +109,7 @@ class CreateModuleList():
             self.input_channels = self.filters
         elif module_def['type'] == LayerType.Dropout:
             probability = float(module_def['probability'])
-            layer = nn.Dropout(p=probability, inplace=True)
+            layer = nn.Dropout(p=probability, inplace=False)
             self.addBlockList(LayerType.Dropout, layer, self.filters)
             self.input_channels = self.filters
         elif module_def['type'] == LayerType.NormalizeLayer:

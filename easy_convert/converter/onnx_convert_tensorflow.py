@@ -36,6 +36,7 @@ class OnnxConvertTensorflow():
     def convert_tensorflow(self):
         model = onnx.load(str(self.onnx_path))
         tf_rep = backend.prepare(model, optset_version=self.target_opset)
+        self.print_param(tf_rep)
         tf_rep.export_graph(str(self.tensorflow_model_save_path))
 
     def print_param(self, tf_rep):

@@ -9,6 +9,29 @@ from easyai.model.base_block.utility.utility_block import ActivationConvBNBlock
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 
 
+class ShuffleBlock(BaseBlock):
+    def __init__(self, groups=2):
+        super().__init__(BlockType.ShuffleBlock)
+        self.groups = groups
+
+    def forward(self, x):
+        '''Channel shuffle: [N,C,H,W] -> [N,g,C/g,H,W] -> [N,C/g,g,H,w] -> [N,C,H,W]'''
+        batchsize, num_channels, height, width = x.data.size()
+        assert (num_channels % self.groups == 0)
+        channels_per_group = num_channels // self.groups
+        # reshape
+        x = x.view(batchsize, self.groups, channels_per_group, height, width)
+
+        # transpose
+        # - contiguous() required if transpose() is used before view().
+        #   See https://github.com/pytorch/pytorch/issues/764
+        x = torch.transpose(x, 1, 2).contiguous()
+
+        # flatten
+        x = x.view(batchsize, -1, height, width)
+        return x
+
+
 class SeperableConv2dBlock(BaseBlock):
 
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0,
