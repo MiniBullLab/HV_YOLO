@@ -6,7 +6,9 @@ import torch
 from easyai.tasks.utility.base_test import BaseTest
 from easyai.data_loader.seg.segment_dataloader import get_segment_val_dataloader
 from easyai.tasks.seg.segment import Segmentation
+from easyai.tasks.seg.segment_result_process import SegmentResultProcess
 from easyai.evaluation.segmention_metric import SegmentionMetric
+from easyai.helper.average_meter import AverageMeter
 from easyai.base_name.task_name import TaskName
 
 
@@ -18,6 +20,13 @@ class SegmentionTest(BaseTest):
         self.test_task_config = self.config_factory.get_config(self.task_name, self.config_path)
 
         self.segment_inference = Segmentation(cfg_path, gpu_id)
+        self.model = self.segment_inference.model
+        self.device = self.segment_inference.device
+
+        self.output_process = SegmentResultProcess()
+
+        self.epoch_loss_average = AverageMeter()
+
         self.metric = SegmentionMetric(len(self.test_task_config.class_name))
         self.threshold = 0.5
 
@@ -32,13 +41,15 @@ class SegmentionTest(BaseTest):
         self.metric.reset()
         for i, (images, segment_targets) in enumerate(dataloader):
             prediction, output_list = self.segment_inference.infer(images, self.threshold)
+            loss = self.compute_loss(output_list, segment_targets)
             gt = segment_targets[0].data.cpu().numpy()
             self.metric.eval(prediction, gt)
-            print('Batch %d... Done. (%.3fs)' % (i, self.timer.toc(True)))
+            self.metirc_loss(i, loss.data)
 
         score, class_score = self.metric.get_score()
+        average_loss = self.epoch_loss_average.avg
         self.print_evaluation(score)
-        return score, class_score
+        return score, class_score, average_loss
 
     def save_test_value(self, epoch, score, class_score):
         # write epoch results
@@ -47,6 +58,22 @@ class SegmentionTest(BaseTest):
             for i, iou in class_score.items():
                 file.write(self.test_task_config.class_name[i][0] + ": {:.3f} ".format(iou))
             file.write("\n")
+
+    def compute_loss(self, output_list, targets):
+        loss = 0
+        loss_count = len(self.model.lossList)
+        targets = targets.to(self.device)
+        with torch.no_grad():
+            for k in range(0, loss_count):
+                output, target = self.output_process.output_feature_map_resize(output_list[k], targets)
+                loss += self.model.lossList[k](output, target)
+        return loss
+
+    def metirc_loss(self, step, loss_value):
+        self.epoch_loss_average.update(loss_value)
+        print("Val Batch {} loss: {} | Time: {}".format(step,
+                                                        loss_value,
+                                                        self.timer.toc(True)))
 
     def print_evaluation(self, score):
         for k, v in score.items():

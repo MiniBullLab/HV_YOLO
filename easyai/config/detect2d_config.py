@@ -31,6 +31,9 @@ class Detect2dConfig(ImageTaskConfig):
         self.accumulated_batches = 1
         self.display = 1
 
+        self.freeze_layer_type = 0
+        self.freeze_layer_name = None
+
         self.config_path = os.path.join(self.config_save_dir, "detection2d_config.json")
 
         self.get_data_default_value()
@@ -105,6 +108,10 @@ class Detect2dConfig(ImageTaskConfig):
             self.accumulated_batches = int(config_dict['accumulated_batches'])
         if config_dict.get('display', None) is not None:
             self.display = int(config_dict['display'])
+        if config_dict.get('freeze_layer_type', None) is not None:
+            self.freeze_layer_type = int(config_dict['freeze_layer_type'])
+        if config_dict.get('freeze_layer_name', None) is not None:
+            self.freeze_layer_name = config_dict['freeze_layer_name']
 
     def save_train_value(self, config_dict):
         config_dict['train_batch_size'] = self.train_batch_size
@@ -117,6 +124,8 @@ class Detect2dConfig(ImageTaskConfig):
         config_dict['lr_scheduler_config'] = self.lr_scheduler_config
         config_dict['accumulated_batches'] = self.accumulated_batches
         config_dict['display'] = self.display
+        config_dict['freeze_layer_type'] = self.freeze_layer_type
+        config_dict['freeze_layer_name'] = self.freeze_layer_name
 
     def get_data_default_value(self):
         self.image_size = (640, 352)  # W * H
@@ -149,4 +158,7 @@ class Detect2dConfig(ImageTaskConfig):
                                     'warmup_iters': 1000}
         self.accumulated_batches = 1
         self.display = 20
+
+        self.freeze_layer_type = 0
+        self.freeze_layer_name = "route_0"
 

@@ -50,8 +50,11 @@ class ClassifyTrain(BaseTrain):
 
         self.start_epoch, self.best_precision = self.torchModelProcess.getLatestModelValue(checkpoint)
 
-        self.torchOptimizer.createOptimizer(self.start_epoch, self.model,
-                                            self.train_task_config.base_lr)
+        self.torchOptimizer.freeze_optimizer_layer(self.start_epoch,
+                                                   self.train_task_config.base_lr,
+                                                   self.model,
+                                                   self.train_task_config.freeze_layer_name,
+                                                   self.train_task_config.freeze_layer_type)
         self.optimizer = self.torchOptimizer.getLatestModelOptimizer(checkpoint)
 
     def train(self, train_path, val_path):

@@ -38,7 +38,7 @@ class TrainLogger():
             self.lr_average.reset()
 
     def epoch_train_log(self, epoch):
-        self.add_scalar("epoch loss", self.epoch_loss_average.avg, epoch)
+        self.add_scalar("train epoch loss", self.epoch_loss_average.avg, epoch)
         self.epoch_loss_average.reset()
 
     def eval_log(self, tag, epoch, value):
