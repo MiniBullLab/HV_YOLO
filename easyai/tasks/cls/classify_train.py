@@ -5,6 +5,7 @@
 import os
 from easyai.data_loader.cls.classify_dataloader import get_classify_train_dataloader
 from easyai.torch_utility.torch_model_process import TorchModelProcess
+from easyai.torch_utility.torch_freeze_bn import TorchFreezeNormalization
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.solver.lr_factory import LrSchedulerFactory
 from easyai.utility.train_log import TrainLogger
@@ -25,12 +26,13 @@ class ClassifyTrain(BaseTrain):
                                         self.train_task_config.root_save_dir)
 
         self.torchModelProcess = TorchModelProcess()
+        self.freeze_normalization = TorchFreezeNormalization()
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
 
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
-        self.classify_test = ClassifyTest(cfg_path, gpu_id)
+        self.classify_test = ClassifyTest(cfg_path, gpu_id, config_path)
 
         self.total_images = 0
         self.start_epoch = 0
@@ -38,7 +40,7 @@ class ClassifyTrain(BaseTrain):
         self.optimizer = None
 
     def load_pretrain_model(self, weights_path):
-        pass
+        self.torchModelProcess.loadPretainModel(weights_path, self.model)
 
     def load_latest_param(self, latest_weights_path):
         checkpoint = None
@@ -63,7 +65,8 @@ class ClassifyTrain(BaseTrain):
                                                    self.train_task_config.data_mean,
                                                    self.train_task_config.data_std,
                                                    self.train_task_config.image_size,
-                                                   self.train_task_config.train_batch_size)
+                                                   self.train_task_config.train_batch_size,
+                                                   self.train_task_config.train_data_augment)
 
         self.total_images = len(dataloader)
 
@@ -77,6 +80,9 @@ class ClassifyTrain(BaseTrain):
         self.train_task_config.save_config()
         self.timer.tic()
         self.model.train()
+        self.freeze_normalization.freeze_normalization_layer(self.model,
+                                                             self.train_task_config.freeze_bn_layer_name,
+                                                             self.train_task_config.freeze_bn_type)
         try:
             for epoch in range(self.start_epoch, self.train_task_config.max_epochs):
                 # self.optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
@@ -125,10 +131,9 @@ class ClassifyTrain(BaseTrain):
         print('Epoch: {}[{}/{}]\t Loss: {}\t Rate: {} \t Time: {}\t'.format(epoch,
                                                                             index,
                                                                             total,
-                                                                            '%.3f' % loss_value,
-                                                                            '%.7f' %
-                                                                            lr,
-                                                                            self.timer.toc(True)))
+                                                                            '%.7f' % loss_value,
+                                                                            '%.7f' % lr,
+                                                                            '%.5f' % self.timer.toc(True)))
 
     def save_train_model(self, epoch):
         with DelayedKeyboardInterrupt():

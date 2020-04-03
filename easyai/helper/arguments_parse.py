@@ -62,7 +62,7 @@ class ArgumentsParse():
                           help="cfg file path")
 
         parser.add_option("-p", "--pretrainModel", dest="pretrainModel",
-                          metavar="PATH", type="string", default="weights/pretrain.pt",
+                          metavar="PATH", type="string", default=None,
                           help="path to store weights")
 
         (options, args) = parser.parse_args()
@@ -98,6 +98,27 @@ class ArgumentsParse():
         parser.add_option("-w", "--weights", dest="weights",
                           metavar="PATH", type="string", default="weights/latest.pt",
                           help="path to store weights")
+
+        (options, args) = parser.parse_args()
+
+        if options.inputPath:
+            if not os.path.exists(options.inputPath):
+                parser.error("Could not find the input file")
+            else:
+                options.input_path = os.path.normpath(options.inputPath)
+        else:
+            parser.error("'input' option is required to run this program")
+
+        return options
+
+    @classmethod
+    def dir_path_parse(cls):
+        parser = OptionParser()
+        parser.description = "This program"
+
+        parser.add_option("-i", "--input", dest="inputPath",
+                          metavar="PATH", type="string", default=None,
+                          help="images dir")
 
         (options, args) = parser.parse_args()
 

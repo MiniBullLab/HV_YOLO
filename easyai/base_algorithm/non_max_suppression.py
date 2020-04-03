@@ -2,7 +2,6 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-import numpy as np
 from easyai.base_algorithm.base_non_max_suppression import BaseNonMaxSuppression
 
 
@@ -37,6 +36,8 @@ class NonMaxSuppression(BaseNonMaxSuppression):
             pass
         elif self.nms_style == 'SOFT_Gaussian':
             pass
+        else:
+            print("nms function error!")
         return result
 
     def or_nms(self, input_objects, threshold):
@@ -110,10 +111,10 @@ class NonMaxSuppression(BaseNonMaxSuppression):
                 result.append(input_objects[loop1])
         return result
 
-    def soft_linear(self, input_objects, threshold):
+    def soft_linear_nms(self, input_objects, threshold):
         pass
 
-    def soft_gaussian(self, input_objects, threshold):
+    def soft_gaussian_nms(self, input_objects, threshold):
         pass
 
     def get_class_name(self, input_objects):

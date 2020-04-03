@@ -8,7 +8,7 @@ from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.helper.arguments_parse import ArgumentsParse
 
 from easyai.model.sr.MSRResNet import MSRResNet
-from easyai.config import super_resolution_config
+from easyai.config.task import super_resolution_config
 from PIL import Image
 from torchvision.transforms import ToTensor
 

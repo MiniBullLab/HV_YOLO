@@ -9,7 +9,7 @@ import numpy as np
 from easyai.helper.imageProcess import ImageProcess
 from easyai.data_loader.cls.classify_sample import ClassifySample
 from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
-from easyai.config import classify_config
+from easyai.config.task import classify_config
 
 
 class ComputeClassifyMean():

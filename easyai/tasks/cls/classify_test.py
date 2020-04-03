@@ -16,7 +16,7 @@ class ClassifyTest(BaseTest):
         self.set_task_name(TaskName.Classify_Task)
         self.test_task_config = self.config_factory.get_config(self.task_name, self.config_path)
 
-        self.classify_inference = Classify(cfg_path, gpu_id)
+        self.classify_inference = Classify(cfg_path, gpu_id, config_path)
         self.topK = (1,)
         self.evaluation = ClassifyAccuracy(top_k=self.topK)
 

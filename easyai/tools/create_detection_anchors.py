@@ -11,7 +11,7 @@ from easyai.data_loader.det.detection_dataset_process import DetectionDataSetPro
 from easyai.data_loader.det.detection_sample import DetectionSample
 from easyai.helper import XMLProcess
 from easyai.helper import ImageProcess
-from easyai.config import detect2d_config
+from easyai.config.task import detect2d_config
 
 
 class CreateDetectionAnchors():

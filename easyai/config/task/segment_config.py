@@ -21,6 +21,7 @@ class SegmentionConfig(ImageTaskConfig):
         self.save_evaluation_path = os.path.join(self.root_save_dir, 'seg_evaluation.txt')
         # train
         self.log_name = "segment"
+        self.train_data_augment = True
         self.is_save_epoch_model = False
         self.latest_weights_name = 'seg_latest.pt'
         self.best_weights_name = 'seg_best.pt'
@@ -31,6 +32,9 @@ class SegmentionConfig(ImageTaskConfig):
 
         self.freeze_layer_type = 0
         self.freeze_layer_name = None
+
+        self.freeze_bn_type = 0
+        self.freeze_bn_layer_name = None
 
         self.config_path = os.path.join(self.config_save_dir, "segmention_config.json")
 
@@ -80,6 +84,8 @@ class SegmentionConfig(ImageTaskConfig):
         config_dict['test_batch_size'] = self.test_batch_size
 
     def load_train_value(self, config_dict):
+        if config_dict.get('train_data_augment', None) is not None:
+            self.train_data_augment = bool(config_dict['train_data_augment'])
         if config_dict.get('train_batch_size', None) is not None:
             self.train_batch_size = int(config_dict['train_batch_size'])
         if config_dict.get('is_save_epoch_model', None) is not None:
@@ -107,8 +113,13 @@ class SegmentionConfig(ImageTaskConfig):
             self.freeze_layer_type = int(config_dict['freeze_layer_type'])
         if config_dict.get('freeze_layer_name', None) is not None:
             self.freeze_layer_name = config_dict['freeze_layer_name']
+        if config_dict.get('freeze_bn_type', None) is not None:
+            self.freeze_bn_type = int(config_dict['freeze_bn_type'])
+        if config_dict.get('freeze_bn_layer_name', None) is not None:
+            self.freeze_bn_layer_name = config_dict['freeze_bn_layer_name']
 
     def save_train_value(self, config_dict):
+        config_dict['train_data_augment'] = self.train_data_augment
         config_dict['train_batch_size'] = self.train_batch_size
         config_dict['is_save_epoch_model'] = self.is_save_epoch_model
         config_dict['latest_weights_name'] = self.latest_weights_name
@@ -121,6 +132,8 @@ class SegmentionConfig(ImageTaskConfig):
         config_dict['display'] = self.display
         config_dict['freeze_layer_type'] = self.freeze_layer_type
         config_dict['freeze_layer_name'] = self.freeze_layer_name
+        config_dict['freeze_bn_type'] = self.freeze_bn_type
+        config_dict['freeze_bn_layer_name'] = self.freeze_bn_layer_name
 
     def get_data_default_value(self):
         self.image_size = (440, 512)  # w * H
@@ -133,6 +146,7 @@ class SegmentionConfig(ImageTaskConfig):
 
     def get_train_default_value(self):
         self.log_name = "segment"
+        self.train_data_augment = False
         self.train_batch_size = 1
         self.enable_mixed_precision = False
         self.is_save_epoch_model = False
@@ -158,5 +172,8 @@ class SegmentionConfig(ImageTaskConfig):
 
         self.freeze_layer_type = 1
         self.freeze_layer_name = "route_0"
+
+        self.freeze_bn_type = 0
+        self.freeze_bn_layer_name = "route_0"
 
 

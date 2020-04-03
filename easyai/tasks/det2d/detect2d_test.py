@@ -17,7 +17,7 @@ class Detection2dTest(BaseTest):
         self.set_task_name(TaskName.Detect2d_Task)
         self.test_task_config = self.config_factory.get_config(self.task_name, self.config_path)
 
-        self.detect_inference = Detection2d(cfg_path, gpu_id)
+        self.detect_inference = Detection2d(cfg_path, gpu_id, config_path)
 
     def load_weights(self, weights_path):
         self.detect_inference.load_weights(weights_path)

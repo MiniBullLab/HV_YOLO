@@ -9,7 +9,8 @@ import cv2
 import numpy as np
 from easyai.helper import DirProcess
 from easyai.helper import ImageProcess
-from easyai.config.segment_config import SegmentionConfig
+from easyai.helper.arguments_parse import ArgumentsParse
+from easyai.config.task.segment_config import SegmentionConfig
 
 
 class ConvertSegmentionLable():
@@ -62,10 +63,11 @@ class ConvertSegmentionLable():
 
 def main():
     print("start...")
+    options = ArgumentsParse.dir_path_parse()
     test = ConvertSegmentionLable()
     seg_config = SegmentionConfig()
     seg_config.load_config(config_path=None)
-    test.convert_segment_label("/home/lpj/github/data/LED_segment/SegmentLabel_raw",
+    test.convert_segment_label(options.inputPath,
                                seg_config.label_is_gray,
                                seg_config.class_name)
     print("End of game, have a nice day!")

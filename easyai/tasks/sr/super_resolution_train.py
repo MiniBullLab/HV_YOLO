@@ -16,7 +16,7 @@ from easyai.solver.lr_scheduler import MultiStageLR
 from easyai.utility import AverageMeter, Logger
 
 from easyai.model.sr.MSRResNet import MSRResNet
-from easyai.config import super_resolution_config
+from easyai.config.task import super_resolution_config
 from math import log10
 
 class SuperResolutionTrain():

@@ -89,6 +89,12 @@ class TorchOptimizer():
             if layer_name == key:
                 break
 
+    def print_freeze_layer(self, model):
+        for key, block in model._modules.items():
+            print(key)
+            for param in block.named_parameters():
+                print(param[0], param[1].requires_grad)
+
     def adjust_optimizer(self, epoch, lr):
         # select the true epoch to adjust the optimizer
         em = 0

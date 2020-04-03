@@ -16,11 +16,11 @@ from easyai.data_loader.det.detection_data_augment import DetectionDataAugment
 class DetectionTrainDataloader(DataLoader):
 
     def __init__(self, train_path, class_name, batch_size=1, image_size=(768, 320),
-                 multi_scale=False, augment=False, balanced_sample=False):
+                 multi_scale=False, is_augment=False, balanced_sample=False):
         super().__init__()
         self.className = class_name
         self.multi_scale = multi_scale
-        self.augment = augment
+        self.is_augment = is_augment
         self.balanced_sample = balanced_sample
         self.batch_size = batch_size
         self.image_size = image_size

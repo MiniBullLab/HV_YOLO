@@ -19,7 +19,7 @@ class SegmentionTest(BaseTest):
         self.set_task_name(TaskName.Segment_Task)
         self.test_task_config = self.config_factory.get_config(self.task_name, self.config_path)
 
-        self.segment_inference = Segmentation(cfg_path, gpu_id)
+        self.segment_inference = Segmentation(cfg_path, gpu_id, config_path)
         self.model = self.segment_inference.model
         self.device = self.segment_inference.device
 
@@ -39,12 +39,13 @@ class SegmentionTest(BaseTest):
         print("Eval data num: {}".format(len(dataloader)))
         self.timer.tic()
         self.metric.reset()
+        self.epoch_loss_average.reset()
         for i, (images, segment_targets) in enumerate(dataloader):
             prediction, output_list = self.segment_inference.infer(images, self.threshold)
             loss = self.compute_loss(output_list, segment_targets)
             gt = segment_targets[0].data.cpu().numpy()
             self.metric.eval(prediction, gt)
-            self.metirc_loss(i, loss.data)
+            self.metirc_loss(i, loss)
 
         score, class_score = self.metric.get_score()
         average_loss = self.epoch_loss_average.avg
@@ -69,7 +70,8 @@ class SegmentionTest(BaseTest):
                 loss += self.model.lossList[k](output, target)
         return loss
 
-    def metirc_loss(self, step, loss_value):
+    def metirc_loss(self, step, loss):
+        loss_value = loss.data.cpu().squeeze()
         self.epoch_loss_average.update(loss_value)
         print("Val Batch {} loss: {} | Time: {}".format(step,
                                                         loss_value,

@@ -5,7 +5,7 @@ import random
 import cv2
 import numpy as np
 from easyai.helper import DirProcess, XMLProcess
-from easyai.config import detect2d_config
+from easyai.config.task import detect2d_config
 
 
 class CreateDetectionSample():

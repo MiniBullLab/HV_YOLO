@@ -36,11 +36,6 @@ class AbstractModel(nn.Module):
         self.index += 1
         self.block_out_channels.append(output_channel)
 
-    def freeze_bn(self, is_freeze):
-        for m in self.modules():
-            if is_freeze and isinstance(m, nn.BatchNorm2d):
-                m.eval()
-
     def print_block_name(self):
         for key in self._modules.keys():
             print(key)

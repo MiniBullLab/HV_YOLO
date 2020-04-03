@@ -6,6 +6,7 @@ import os
 from easyai.data_loader.seg.segment_dataloader import get_segment_train_dataloader
 from easyai.solver.lr_factory import LrSchedulerFactory
 from easyai.solver.torch_optimizer import TorchOptimizer
+from easyai.torch_utility.torch_freeze_bn import TorchFreezeNormalization
 from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.utility.train_log import TrainLogger
 from easyai.tasks.utility.base_train import BaseTrain
@@ -25,13 +26,14 @@ class SegmentionTrain(BaseTrain):
                                         self.train_task_config.root_save_dir)
 
         self.torchModelProcess = TorchModelProcess()
+        self.freeze_normalization = TorchFreezeNormalization()
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
         self.output_process = SegmentResultProcess()
 
-        self.segment_test = SegmentionTest(cfg_path, gpu_id)
+        self.segment_test = SegmentionTest(cfg_path, gpu_id, config_path)
 
         self.total_images = 0
         self.optimizer = None
@@ -55,11 +57,13 @@ class SegmentionTrain(BaseTrain):
                                                    self.model,
                                                    self.train_task_config.freeze_layer_name,
                                                    self.train_task_config.freeze_layer_type)
+        self.torchOptimizer.print_freeze_layer(self.model)
         self.optimizer = self.torchOptimizer.getLatestModelOptimizer(checkpoint)
 
     def train(self, train_path, val_path):
         dataloader = get_segment_train_dataloader(train_path, self.train_task_config.image_size,
-                                                  self.train_task_config.train_batch_size)
+                                                  self.train_task_config.train_batch_size,
+                                                  is_augment=self.train_task_config.train_data_augment)
         self.total_images = len(dataloader)
         self.load_latest_param(self.train_task_config.latest_weights_file)
 
@@ -70,7 +74,7 @@ class SegmentionTrain(BaseTrain):
 
         self.train_task_config.save_config()
         self.timer.tic()
-        self.model.train()
+        self.set_model_train()
         for epoch in range(self.start_epoch, self.train_task_config.max_epochs):
             # self.optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
             self.optimizer.zero_grad()
@@ -79,7 +83,7 @@ class SegmentionTrain(BaseTrain):
                 lr = lr_scheduler.get_lr(epoch, current_idx)
                 lr_scheduler.adjust_learning_rate(self.optimizer, lr)
                 loss = self.compute_backward(images, segments, idx)
-                self.update_logger(idx, self.total_images, epoch, loss.data)
+                self.update_logger(idx, self.total_images, epoch, loss)
 
             save_model_path = self.save_train_model(epoch)
             self.test(val_path, epoch, save_model_path)
@@ -106,7 +110,8 @@ class SegmentionTrain(BaseTrain):
             loss += self.model.lossList[k](output, target)
         return loss
 
-    def update_logger(self, index, total, epoch, loss_value):
+    def update_logger(self, index, total, epoch, loss):
+        loss_value = loss.data.cpu().squeeze()
         step = epoch * total + index
         lr = self.optimizer.param_groups[0]['lr']
         self.train_logger.train_log(step, loss_value, self.train_task_config.display)
@@ -115,9 +120,9 @@ class SegmentionTrain(BaseTrain):
         print('Epoch: {}[{}/{}]\t Loss: {}\t Rate: {} \t Time: {}\t'.format(epoch,
                                                                             index,
                                                                             total,
-                                                                            '%.3f' % loss_value,
+                                                                            '%.7f' % loss_value,
                                                                             '%.7f' % lr,
-                                                                            self.timer.toc(True)))
+                                                                            '%.5f' % self.timer.toc(True)))
 
     def save_train_model(self, epoch):
         self.train_logger.epoch_train_log(epoch)
@@ -129,6 +134,12 @@ class SegmentionTrain(BaseTrain):
         self.torchModelProcess.saveLatestModel(save_model_path, self.model,
                                                self.optimizer, epoch, self.bestmIoU)
         return save_model_path
+
+    def set_model_train(self):
+        self.model.train()
+        self.freeze_normalization.freeze_normalization_layer(self.model,
+                                                             self.train_task_config.freeze_bn_layer_name,
+                                                             self.train_task_config.freeze_bn_type)
 
     def test(self, val_path, epoch, save_model_path):
         self.segment_test.load_weights(save_model_path)

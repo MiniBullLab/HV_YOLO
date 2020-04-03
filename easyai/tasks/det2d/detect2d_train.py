@@ -5,6 +5,7 @@
 import os
 from easyai.data_loader.det.detection_train_dataloader import DetectionTrainDataloader
 from easyai.torch_utility.torch_model_process import TorchModelProcess
+from easyai.torch_utility.torch_freeze_bn import TorchFreezeNormalization
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.solver.lr_factory import LrSchedulerFactory
 from easyai.utility.train_log import TrainLogger
@@ -24,12 +25,13 @@ class Detection2dTrain(BaseTrain):
                                         self.train_task_config.root_save_dir)
 
         self.torchModelProcess = TorchModelProcess()
+        self.freeze_normalization = TorchFreezeNormalization()
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
 
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
-        self.detect_test = Detection2dTest(cfg_path, gpu_id)
+        self.detect_test = Detection2dTest(cfg_path, gpu_id, config_path)
 
         self.total_images = 0
         self.optimizer = None
@@ -38,7 +40,7 @@ class Detection2dTrain(BaseTrain):
         self.best_mAP = 0
 
     def load_pretrain_model(self, weights_path):
-        pass
+        self.torchModelProcess.loadPretainModel(weights_path, self.model)
 
     def load_latest_param(self, latest_weights_path):
         checkpoint = None
@@ -60,7 +62,9 @@ class Detection2dTrain(BaseTrain):
         dataloader = DetectionTrainDataloader(train_path, self.train_task_config.class_name,
                                               self.train_task_config.train_batch_size,
                                               self.train_task_config.image_size,
-                                              multi_scale=False, augment=True, balanced_sample=False)
+                                              multi_scale=self.train_task_config.train_multi_scale,
+                                              is_augment=self.train_task_config.train_data_augment,
+                                              balanced_sample=self.train_task_config.balanced_sample)
         self.total_images = len(dataloader)
 
         lr_factory = LrSchedulerFactory(self.train_task_config.base_lr,
@@ -73,6 +77,9 @@ class Detection2dTrain(BaseTrain):
         self.train_task_config.save_config()
         self.timer.tic()
         self.model.train()
+        self.freeze_normalization.freeze_normalization_layer(self.model,
+                                                             self.train_task_config.freeze_bn_layer_name,
+                                                             self.train_task_config.freeze_bn_type)
         for epoch in range(self.start_epoch, self.train_task_config.max_epochs):
             # self.optimizer = self.torchOptimizer.adjust_optimizer(epoch, lr)
             self.optimizer.zero_grad()
@@ -111,7 +118,7 @@ class Detection2dTrain(BaseTrain):
     def update_logger(self, index, total, epoch, loss):
         step = epoch * total + index
         lr = self.optimizer.param_groups[0]['lr']
-        loss_value = loss.data
+        loss_value = loss.data.cpu().squeeze()
 
         if self.avg_loss < 0:
             self.avg_loss = (loss.cpu().detach().numpy() / self.train_task_config.train_batch_size)
@@ -123,9 +130,9 @@ class Detection2dTrain(BaseTrain):
         print('Epoch: {}[{}/{}]\t Loss: {}\t Rate: {} \t Time: {}\t'.format(epoch,
                                                                             index,
                                                                             total,
-                                                                            '%.3f' % self.avg_loss,
+                                                                            '%.7f' % self.avg_loss,
                                                                             '%.7f' % lr,
-                                                                            self.timer.toc(True)))
+                                                                            '%.5f' % self.timer.toc(True)))
 
     def save_train_model(self, epoch):
         self.train_logger.epoch_train_log(epoch)

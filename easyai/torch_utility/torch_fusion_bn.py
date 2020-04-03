@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 
 
-class TorchBNfusion():
+class TorchFusionBN():
 
     def __init__(self):
         pass

@@ -38,8 +38,8 @@ class ClassifyDataloader(data.Dataset):
 
 
 def get_classify_train_dataloader(train_path, mean, std, image_size,
-                                  batch_size, num_workers=8):
-    dataloader = ClassifyDataloader(train_path, mean, std, image_size, is_augment=True)
+                                  batch_size, is_augment=True, num_workers=8):
+    dataloader = ClassifyDataloader(train_path, mean, std, image_size, is_augment=is_augment)
     result = data.DataLoader(dataset=dataloader, num_workers=num_workers,
                              batch_size=batch_size, shuffle=True)
     return result

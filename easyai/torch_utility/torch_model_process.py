@@ -1,4 +1,5 @@
 import os.path
+import re
 import torch
 from torch import nn
 from collections import OrderedDict
@@ -28,8 +29,19 @@ class TorchModelProcess():
         if weightPath is not None:
             if os.path.exists(weightPath):
                 print("Loading pretainModel from {}".format(weightPath))
+                model_dict = model.state_dict()
                 checkpoint = torch.load(weightPath)
-                model.load_state_dict(checkpoint['model'])
+                pretrained_dict = checkpoint['model']
+                # pretrained_dict = self.filter_param_dict(pretrained_dict)
+                new_pretrained_dict = {}
+                for k, v in pretrained_dict.items():
+                    if k in model_dict and v.shape == model_dict[k].shape:
+                        new_pretrained_dict[k] = v
+                print("Load pretrained parameters:")
+                for k, v in new_pretrained_dict.items():
+                    print(k, v.shape)
+                model_dict.update(new_pretrained_dict)
+                model.load_state_dict(model_dict)
             else:
                 print("pretain model %s not exist" % weightPath)
 
@@ -108,3 +120,22 @@ class TorchModelProcess():
 
     def getDevice(self):
         return self.torchDeviceProcess.device
+
+    def filter_param_dict(self, state_dict: dict, include: str = None, exclude: str = None):
+        assert isinstance(state_dict, dict)
+        include_re = None
+        if include is not None:
+            include_re = re.compile(include)
+        exclude_re = None
+        if exclude is not None:
+            exclude_re = re.compile(exclude)
+        res_dict = {}
+        for k, p in state_dict.items():
+            if include_re is not None:
+                if include_re.match(k) is None:
+                    continue
+            if exclude_re is not None:
+                if exclude_re.match(k) is not None:
+                    continue
+            res_dict[k] = p
+        return res_dict
