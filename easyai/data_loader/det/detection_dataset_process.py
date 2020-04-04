@@ -9,6 +9,7 @@ class DetectionDataSetProcess(BaseDataSetProcess):
     def __init__(self):
         super().__init__()
         self.dataset_process = ImageDataSetProcess()
+        self.image_pad_color = (127.5, 127.5, 127.5)
 
     def normaliza_dataset(self, src_image, labels=None, image_size=None):
         image = self.dataset_process.image_normaliza(src_image)
@@ -30,7 +31,7 @@ class DetectionDataSetProcess(BaseDataSetProcess):
         labels = []
         image, ratio, pad = self.dataset_process.image_resize_square(src_image,
                                                                      image_size,
-                                                                     color=(127.5, 127.5, 127.5))
+                                                                     color=self.image_pad_color)
         if boxes is not None:
             for box in boxes:
                 if box.name in class_name:

@@ -37,9 +37,9 @@ class TorchModelProcess():
                 for k, v in pretrained_dict.items():
                     if k in model_dict and v.shape == model_dict[k].shape:
                         new_pretrained_dict[k] = v
-                print("Load pretrained parameters:")
-                for k, v in new_pretrained_dict.items():
-                    print(k, v.shape)
+                # print("Load pretrained parameters:")
+                # for k, v in new_pretrained_dict.items():
+                #     print(k, v.shape)
                 model_dict.update(new_pretrained_dict)
                 model.load_state_dict(model_dict)
             else:

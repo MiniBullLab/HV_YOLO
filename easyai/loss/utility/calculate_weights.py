@@ -3,6 +3,23 @@
 # Author:
 
 import numpy as np
+from sklearn.utils import compute_class_weight
+
+
+def numpy_compute_weight(labels):
+    # compute class weights
+    cls_weight_list = []
+    batch_size = labels.shape[0]
+    for i in range(batch_size):
+        y = labels[i].reshape(-1)
+        lb = np.unique(y)  # 0., 1
+        cls_weight = compute_class_weight('balanced', lb, y)
+        cls_weight_list.append(cls_weight)
+    del y
+    cls_weight_list = np.asarray(cls_weight_list)
+    result = np.sum(cls_weight_list, axis=0) / batch_size
+    # print(result)
+    return result
 
 
 def enet_weighing(labels, num_classes, c=1.02):
