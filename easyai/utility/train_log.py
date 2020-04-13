@@ -14,7 +14,8 @@ class TrainLogger():
     def __init__(self, log_name, log_save_dir):
         current_time = time.strftime("%Y-%m-%dT%H_%M", time.localtime())
         log_name = "%s_%s" % (log_name, current_time)
-        self.log_dir = os.path.join(log_save_dir, log_name)
+        self.root_dir = log_save_dir
+        self.log_dir = os.path.join(self.root_dir, log_name)
         if not os.path.exists(self.log_dir):
             os.makedirs(self.log_dir)
         self.writer = SummaryWriter(self.log_dir)
@@ -55,5 +56,6 @@ class TrainLogger():
         self.writer.add_graph(model, (input_x,))
 
     def close(self):
-        self.writer.export_scalars_to_json("./all_scalars.json")
+        save_path = os.path.join(self.root_dir, "all_scalars.json")
+        self.writer.export_scalars_to_json(save_path)
         self.writer.close()

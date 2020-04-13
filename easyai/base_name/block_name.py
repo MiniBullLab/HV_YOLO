@@ -51,6 +51,8 @@ class LayerType():
 
     Convolutional = "convolutional"
 
+    MeanLayer = "mean"
+
 
 class BlockType():
 

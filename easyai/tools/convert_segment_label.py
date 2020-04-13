@@ -10,8 +10,8 @@ import numpy as np
 from easyai.helper import DirProcess
 from easyai.helper import ImageProcess
 from easyai.helper.arguments_parse import ArgumentsParse
-from easyai.config.task.segment_config import SegmentionConfig
-
+from easyai.config.utility.config_factory import ConfigFactory
+from easyai.base_name.task_name import TaskName
 
 class ConvertSegmentionLable():
 
@@ -65,11 +65,11 @@ def main():
     print("start...")
     options = ArgumentsParse.dir_path_parse()
     test = ConvertSegmentionLable()
-    seg_config = SegmentionConfig()
-    seg_config.load_config(config_path=None)
+    config_factory = ConfigFactory()
+    task_config = config_factory.get_config(TaskName.Segment_Task, config_path=None)
     test.convert_segment_label(options.inputPath,
-                               seg_config.label_is_gray,
-                               seg_config.class_name)
+                               task_config.label_is_gray,
+                               task_config.class_name)
     print("End of game, have a nice day!")
 
 

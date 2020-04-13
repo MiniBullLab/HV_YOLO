@@ -12,3 +12,8 @@ class LossType():
     FocalLoss = "focalLoss"
     FocalBinaryLoss = "focalBinaryLoss"
     YoloLoss = "yolo"
+
+    EncNetLoss = "encNetLoss"
+
+    # pc
+    PointNetLoss = "pointNetLoss"

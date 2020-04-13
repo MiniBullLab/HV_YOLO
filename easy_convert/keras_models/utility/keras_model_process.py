@@ -50,7 +50,7 @@ class KerasModelProcess():
             else:
                 x = layers[index](x)
 
-        change_model = Model(inputs=model.input, outputs=x, name=ModelName.FgSegNetV2)
+        change_model = Model(inputs=model.input, outputs=x, name=KerasModelName.FgSegNetV2)
         return change_model
 
     def change_my_fgsegnet_layer(self, model):

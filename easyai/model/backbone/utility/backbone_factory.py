@@ -31,9 +31,14 @@ from easyai.model.backbone.cls.efficientnet import EfficientNet
 from easyai.model.backbone.cls.dpn import dpn26, dpn92
 from easyai.model.backbone.cls.dfnet import dfnetv1, dfnetv2
 from easyai.model.backbone.cls.pnasnet import pnasnet_A, pnasnet_B
+from easyai.model.backbone.cls.wider_resnet import wider_resnet16, wider_resnet20, wider_resnet38
+from easyai.model.backbone.cls.wider_resnet import wider_resnet16_a2, wider_resnet20_a2, wider_resnet38_a2
 from easyai.model.backbone.cls.ghostnet import ghost_net
 from easyai.model.backbone.utility.my_backbone import MyBackbone
 from easyai.model.utility.model_parse import ModelParse
+# pc
+from easyai.model.backbone.pc_cls.pointnet import PointNet
+from easyai.model.backbone.pc_cls.pointnet2 import PointNet2
 
 
 class BackboneFactory():
@@ -44,12 +49,16 @@ class BackboneFactory():
     def get_base_model(self, baseNetName, data_channel=3, **kwargs):
         input_name = baseNetName.strip()
         if input_name.endswith("cfg"):
-            result = self.get_base_model_from_cfg(input_name)
+            result = self.get_backbone_from_cfg(input_name)
         else:
-            result = self.get_base_model_from_name(input_name, data_channel)
+            result = self.get_backbone_from_name(input_name, data_channel)
+            if result is None:
+                result = self.get_pc_backbone_from_name(input_name, data_channel)
+            if result is None:
+                print("backbone:%s error" % input_name)
         return result
 
-    def get_base_model_from_cfg(self, cfg_path):
+    def get_backbone_from_cfg(self, cfg_path):
         path, file_name_and_post = os.path.split(cfg_path)
         file_name, post = os.path.splitext(file_name_and_post)
         model_define = self.cfgReader.readCfgFile(cfg_path)
@@ -57,7 +66,7 @@ class BackboneFactory():
         model.set_name(file_name)
         return model
 
-    def get_base_model_from_name(self, net_name, data_channel=3):
+    def get_backbone_from_name(self, net_name, data_channel=3):
         result = None
         net_name = net_name.strip()
         if net_name == BackboneName.ShuffleNetV2_1_0:
@@ -176,8 +185,28 @@ class BackboneFactory():
             result = pnasnet_A(data_channel)
         elif net_name == BackboneName.PNASNetB:
             result = pnasnet_B(data_channel)
+        elif net_name == BackboneName.wider_resnet16:
+            result = wider_resnet16(data_channel)
+        elif net_name == BackboneName.wider_resnet20:
+            result = wider_resnet20(data_channel)
+        elif net_name == BackboneName.wider_resnet38:
+            result = wider_resnet38(data_channel)
+        elif net_name == BackboneName.wider_resnet16_a2:
+            result = wider_resnet16_a2(data_channel)
+        elif net_name == BackboneName.wider_resnet20_a2:
+            result = wider_resnet20_a2(data_channel)
+        elif net_name == BackboneName.wider_resnet38_a2:
+            result = wider_resnet38_a2(data_channel)
         elif net_name == BackboneName.GhostNet:
             result = ghost_net(data_channel)
-        else:
-            print("base model:%s error" % net_name)
         return result
+
+    def get_pc_backbone_from_name(self, net_name, data_channel=3):
+        result = None
+        net_name = net_name.strip()
+        if net_name == BackboneName.PointNet:
+            result = PointNet(data_channel)
+        elif net_name == BackboneName.PointNet2:
+            result = PointNet2(data_channel)
+        return result
+

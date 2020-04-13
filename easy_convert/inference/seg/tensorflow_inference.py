@@ -60,7 +60,7 @@ class TensorflowInference():
         sess.run(tf.global_variables_initializer())
         self.print_op(sess)
         input_data = sess.graph.get_tensor_by_name("0:0")
-        oput_data = sess.graph.get_tensor_by_name("Sigmoid:0")
+        oput_data = sess.graph.get_tensor_by_name("103:0")
 
         img = cv2.imread(input_path)
         image_size = (500, 400)

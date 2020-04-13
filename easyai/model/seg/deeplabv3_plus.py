@@ -35,8 +35,7 @@ class DeepLabV3Plus(BaseModel):
         self.create_block_list()
 
     def create_block_list(self):
-        self.block_out_channels = []
-        self.index = 0
+        self.clear_list()
 
         c1_channels = 256
         c4_channels = 2048

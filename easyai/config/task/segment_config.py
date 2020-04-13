@@ -136,7 +136,7 @@ class SegmentionConfig(ImageTaskConfig):
         config_dict['freeze_bn_layer_name'] = self.freeze_bn_layer_name
 
     def get_data_default_value(self):
-        self.image_size = (440, 512)  # w * H
+        self.image_size = (500, 400)  # w * H
         self.label_is_gray = True
         self.class_name = [('background', '255'),
                            ('lane', '0')]

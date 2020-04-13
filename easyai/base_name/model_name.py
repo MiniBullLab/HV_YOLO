@@ -14,9 +14,11 @@ class ModelName():
     LinkNet34 = "LinkNet34"
     RefineNetSeg = "RefineNetSeg"
     PSPNetSeg = "PSPNetSeg"
+    EncNetSeg = "EncNetSeg"
     BiSeNet = "BiSeNet"
     FastSCNN = "FastSCNN"
     ICNet = "ICNet"
+    DeepLabV3 = "DeepLabV3"
     DeepLabV3Plus = "DeepLabV3Plus"
     MobilenetDeepLabV3Plus = "MobilenetDeepLabV3Plus"
     MobileV2FCN = "MobileV2FCN"
@@ -30,6 +32,12 @@ class ModelName():
 
     MSRResNet = "MSRResNet"
     MySRModel = "MySRModel"
+
+    # pc
+    PointNetCls = "PointNetCls"
+    PointNet2Cls = "PointNet2Cls"
+    PointNetSeg = "PointNetSeg"
+    PointNet2Seg = "PointNet2Seg"
 
 
 

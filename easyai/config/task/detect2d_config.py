@@ -158,6 +158,7 @@ class Detect2dConfig(ImageTaskConfig):
         self.test_batch_size = 1
 
     def get_train_default_value(self):
+        self.log_name = "detect2d"
         self.train_data_augment = True
         self.train_multi_scale = False
         self.balanced_sample = False

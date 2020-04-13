@@ -9,7 +9,7 @@ class DetectionDataSetProcess(BaseDataSetProcess):
     def __init__(self):
         super().__init__()
         self.dataset_process = ImageDataSetProcess()
-        self.image_pad_color = (127.5, 127.5, 127.5)
+        self.image_pad_color = (0, 0, 0)
 
     def normaliza_dataset(self, src_image, labels=None, image_size=None):
         image = self.dataset_process.image_normaliza(src_image)

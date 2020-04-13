@@ -13,8 +13,6 @@ from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.torch_utility.torch_vision.torchvision_process import TorchVisionProcess
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.solver.lr_scheduler import MultiStageLR
-from easyai.utility import AverageMeter, Logger
-
 from easyai.model.sr.MSRResNet import MSRResNet
 from easyai.config.task import super_resolution_config
 from math import log10
@@ -24,9 +22,6 @@ class SuperResolutionTrain():
     def __init__(self):
         if not os.path.exists(super_resolution_config.snapshotPath):
             os.makedirs(super_resolution_config.snapshotPath, exist_ok=True)
-
-        self.logger = Logger(os.path.join("./log", "logs"))
-        self.lossTrain = AverageMeter()
 
         self.torchModelProcess = TorchModelProcess()
         self.torchOptimizer = TorchOptimizer(super_resolution_config.optimizerConfig)
@@ -55,11 +50,7 @@ class SuperResolutionTrain():
         self.optimizer = self.torchOptimizer.getLatestModelOptimizer(checkpoint)
 
     def update_logger(self, step, value):
-        self.lossTrain.update(value)
-        if (step % super_resolution_config.display) == 0:
-            # print(lossTrain.avg)
-            self.logger.scalar_summary("losstrain", self.lossTrain.avg, step)
-            self.lossTrain.reset()
+        pass
 
     def compute_loss(self, output, targets):
         loss = 0

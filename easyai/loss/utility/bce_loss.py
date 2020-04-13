@@ -34,7 +34,7 @@ class BinaryCrossEntropy2d(BaseLoss):
                      weights[1] * target.eq(1).type(loss.dtype) * loss
         else:
             result = loss
-        result = target.nq(self.ignore_index).type(loss.dtype) * result
+        result = target.ne(self.ignore_index).type(loss.dtype) * result
         if self.reduction == 'mean':
             return result.mean()
         elif self.reduction == 'sum':

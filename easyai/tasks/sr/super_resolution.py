@@ -1,12 +1,18 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/.")
 import time
+import torch
+import cv2
+import numpy as np
 from easyai.data_loader.utility.images_loader import ImagesLoader
 from easyai.data_loader.utility.video_loader import VideoLoader
 from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.helper.arguments_parse import ArgumentsParse
-
 from easyai.model.sr.MSRResNet import MSRResNet
 from easyai.config.task import super_resolution_config
 from PIL import Image
@@ -26,9 +32,9 @@ class SuperResolution():
 
     def super_resolution(self, input_path):
         if os.path.isdir(input_path):
-            dataloader = ImagesLoader(input_path, batch_size=1)
+            dataloader = ImagesLoader(input_path)
         else:
-            dataloader = VideoLoader(input_path, batch_size=1)
+            dataloader = VideoLoader(input_path)
 
         prev_time = time.time()
         for i, (oriImg, imgs) in enumerate(dataloader):

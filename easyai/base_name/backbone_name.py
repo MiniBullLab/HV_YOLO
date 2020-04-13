@@ -63,6 +63,16 @@ class BackboneName():
     DFNetV2 = "dfnetv2"
     PNASNetA = "pnasnet_A"
     PNASNetB = "pnasnet_B"
+    wider_resnet16 = "wider_resnet16"
+    wider_resnet20 = "wider_resnet20"
+    wider_resnet38 = "wider_resnet38"
+    wider_resnet16_a2 = "wider_resnet16_a2"
+    wider_resnet20_a2 = "wider_resnet20_a2"
+    wider_resnet38_a2 = "wider_resnet38_a2"
     GhostNet = "ghostnet"
+
+    # pc
+    PointNet = "pointnet"
+    PointNet2 = "pointnet2"
 
 

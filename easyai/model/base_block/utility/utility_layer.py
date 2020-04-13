@@ -124,5 +124,15 @@ class FcLayer(BaseBlock):
         return x
 
 
+class MeanLayer(BaseBlock):
+    def __init__(self, dim, keep_dim=False):
+        super().__init__(LayerType.MeanLayer)
+        self.dim = dim
+        self.keep_dim = keep_dim
+
+    def forward(self, x):
+        return x.mean(self.dim, self.keep_dim)
+
+
 if __name__ == "__main__":
     pass

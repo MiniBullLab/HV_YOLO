@@ -116,9 +116,17 @@ class ClassifyTrain(BaseTrain):
     def compute_loss(self, output_list, targets):
         loss = 0
         loss_count = len(self.model.lossList)
+        output_count = len(output_list)
         targets = targets.to(self.device)
-        for k in range(0, loss_count):
-            loss += self.model.lossList[k](output_list[k], targets)
+        if loss_count == 1 and output_count == 1:
+            loss = self.model.lossList[0](output_list[0], targets)
+        elif loss_count == 1 and output_count > 1:
+            loss = self.model.lossList[0](output_list, targets)
+        elif loss_count > 1 and loss_count == output_count:
+            for k in range(0, loss_count):
+                loss += self.model.lossList[k](output_list[k], targets)
+        else:
+            print("compute loss error")
         return loss
 
     def update_logger(self, index, total, epoch, loss):

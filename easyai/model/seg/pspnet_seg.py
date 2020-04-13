@@ -16,6 +16,8 @@ from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
 from easyai.model.base_block.utility.upsample_layer import Upsample
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.seg.pspnet_block import PyramidPooling
+from easyai.model.base_block.seg.encnet_block import EncNetBlockName
+from easyai.model.base_block.seg.encnet_block import JPUBlock
 from easyai.model.utility.base_model import *
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 
@@ -27,6 +29,7 @@ class PSPNetSeg(BaseModel):
         self.set_name(ModelName.PSPNetSeg)
         self.data_channel = data_channel
         self.class_number = class_num
+        self.is_jpu = True
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
 
@@ -34,12 +37,19 @@ class PSPNetSeg(BaseModel):
         self.create_block_list()
 
     def create_block_list(self):
-        self.block_out_channels = []
-        self.index = 0
+        self.clear_list()
 
         backbone = self.factory.get_base_model(BackboneName.ResNet101)
         base_out_channels = backbone.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])
+
+        if self.is_jpu:
+            jup = JPUBlock(layers='4,8,31,34', in_planes=(512, 1024, 2048), width=512,
+                           bn_name=self.bn_name, activation_name=self.activation_name)
+            self.add_block_list(jup.get_name(), jup, 512 + 512 + 512 + 512)
+            scale_factor = 8
+        else:
+            scale_factor = 32
 
         psp = PyramidPooling(2048, bn_name=self.bn_name,
                              activation_name=self.activation_name)
@@ -60,7 +70,7 @@ class PSPNetSeg(BaseModel):
         conv2 = nn.Conv2d(512, self.class_number, 1)
         self.add_block_list(LayerType.Convolutional, conv2, self.class_number)
 
-        layer = Upsample(scale_factor=32, mode='bilinear')
+        layer = Upsample(scale_factor=scale_factor, mode='bilinear')
         self.add_block_list(layer.get_name(), layer, self.block_out_channels[-1])
 
         self.create_loss()
@@ -79,14 +89,10 @@ class PSPNetSeg(BaseModel):
             if BlockType.BaseNet in key:
                 base_outputs = block(x)
                 x = base_outputs[-1]
-            elif LayerType.MultiplyLayer in key:
-                x = block(layer_outputs, base_outputs)
-            elif LayerType.AddLayer in key:
-                x = block(layer_outputs, base_outputs)
             elif LayerType.RouteLayer in key:
                 x = block(layer_outputs, base_outputs)
-            elif LayerType.ShortcutLayer in key:
-                x = block(layer_outputs)
+            elif EncNetBlockName.JPUBlock in key:
+                x = block(layer_outputs, base_outputs)
             elif LossType.CrossEntropy2d in key:
                 output.append(x)
             else:
