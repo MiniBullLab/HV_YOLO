@@ -46,7 +46,7 @@ outputShape=1,3,352,640
 outputLayerName="o:628|odf:fp32"
 outputLayerName1="o:654|odf:fp32"
 outputLayerName2="o:680|odf:fp32"
-inputDataFormat=0,0,0,0
+inputDataFormat=0,0,8,0
 
 mean=0.0
 scale=255.0
