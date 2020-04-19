@@ -1,45 +1,16 @@
 #!/bin/bash
-pid_file=.monitor.pid
-host=$(cat /etc/hostname)
-rm -rf ./.log/det_logs
-service1="tensorboard --logdir=./.log/det_logs --port=9998"
-service2="google-chrome http://${host}:9998"
 
-function start() {
-    ${service1} &
-    if [[ $? -eq 0 ]]; then
-        echo $! > ${pid_file}
-    else exit 1
-    fi
-    ${service2} &
-    if [[ $? -eq 0 ]]; then
-        echo $! >> ${pid_file}
-    else exit 1
-    fi
-}
-
-function stop() {
-    # shellcheck disable=SC2046
-    kill -9 $(cat ${pid_file})
-    # shellcheck disable=SC2181
-    if [[ $? -eq 0 ]]; then
-        rm -f ${pid_file}
-    else exit 1
-    fi
-}
-
-start
-python3 -m easyAI.easy_ai_det --gpu 0 --trainPath /home/minibull/lipeijie/dataset/Berkeley/ImageSets/train.txt --valPath /home/minibull/lipeijie/dataset/Berkeley/ImageSets/val.txt
-python3 -m easyAI.easy_convert --task DeNET
-stop
+rm -rf ./.log/detect2d*
+python3 -m easyai.easy_ai --task DeNET --gpu 0 --trainPath /home/minibull/lipeijie/dataset/Berkeley/ImageSets/train.txt --valPath /home/minibull/lipeijie/dataset/Berkeley/ImageSets/val.txt
+python3 -m easy_convert.easy_convert --task DeNET --input ./.log/snapshot/detnet.onnx
 
 set -v
 root_path=$(pwd)
-modelDir="./.log/model"
+modelDir="./.log/snapshot"
 imageDir="./.log/det_img"
 outDir="${root_path}/.log/out"
-caffeNetName=detection
-outNetName=detection
+caffeNetName=detnet
+outNetName=detnet
 
 inputColorFormat=0
 outputShape=1,3,352,640
@@ -95,4 +66,5 @@ cavalry_gen -d $outDir/out_parser/vas_output/ \
 
 rm -rf vas_output
 
-python3 -m easyAI.easy_encrypt -i $outDir/cavalry/$outNetName.bin -o ${root_path}/${outNetName}.bin
+cp $outDir/cavalry/$outNetName.bin  ${root_path}/${outNetName}.bin
+# python3 -m easyAI.easy_encrypt -i $outDir/cavalry/$outNetName.bin -o ${root_path}/${outNetName}.bin

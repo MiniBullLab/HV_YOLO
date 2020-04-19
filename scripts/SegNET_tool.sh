@@ -1,52 +1,20 @@
 #!/bin/bash
-pid_file=.monitor.pid
-host=$(cat /etc/hostname)
-rm -rf ./.log/seg_logs/
-service1="tensorboard --logdir=./.log/seg_logs/ --port=9999"
-service2="google-chrome http://${host}:9999"
 
-function start() {
-    ${service1} &
-    if [[ $? -eq 0 ]]; then
-        echo $! > ${pid_file}
-    else exit 1
-    fi
-    ${service2} &
-    if [[ $? -eq 0 ]]; then
-        echo $! >> ${pid_file}
-    else exit 1
-    fi
-}
-
-function stop() {
-    # shellcheck disable=SC2046
-    kill -9 $(cat ${pid_file})
-    # shellcheck disable=SC2181
-    if [[ $? -eq 0 ]]; then
-        rm -f ${pid_file}
-    else exit 1
-    fi
-}
-
-start
-python3 -m easyAI.easy_ai_seg --gpu 0 --trainPath /home/minibull/lipeijie/dataset/LED_segment/ImageSets/train_val.txt
-python3 -m easyAI.easy_convert --task SegNET
-stop
+rm -rf ./.log/segment*
+python3 -m easyai.easy_ai --task SegNET --gpu 0 -i /home/minibull/lipeijie/dataset/LED_segment/ImageSets/train.txt -v /home/minibull/lipeijie/dataset/LED_segment/ImageSets/val.txt
+# python3 -m easy_convert.easy_convert --task SegNET --input ./.log/snapshot/segnet.onnx
 
 set -v
 root_path=$(pwd)
-modelDir="./.log/model"
+modelDir="./.log/snapshot"
 imageDir="./.log/seg_img"
 outDir="${root_path}/.log/out"
-tensorflowName=seg_best
-outNetName=seg_best
+modelName=segnet
+outNetName=segnet
 
 inputColorFormat=1
 outputShape=1,3,400,500
-inputLayerName="i:net_input|is:1,400,500,3"
-compare_inputLayerName="i:net_input=${imageDir}/img_list.txt|iq|idf:0,0,0,0|is:1,400,500,3"
-temp_outputLayerName="conv2d_10/Sigmoid"
-outputLayerName="o:conv2d_10/Sigmoid|ot:0,1,2,3|odf:fp32"
+outputLayerName="o:102|ot:0,1,2,3|odf:fp32"
 inputDataFormat=0,0,0,0
 
 mean=0.0
@@ -74,22 +42,16 @@ imgtobin.py -i $imageDir/img_list.txt \
             -s $outputShape
 
 ls $outDir/dra_image_bin/*.bin > $outDir/dra_image_bin/dra_bin_list.txt
-graph_surgery.py tf -p $modelDir/$tensorflowName.pb \
-                    -o $modelDir/${tensorflowName}_temp.pb \
-                    -isrc $inputLayerName \
-                    -on $temp_outputLayerName \
-                    -t ConstantifyShapes
 
-CUDA_VISIBLE_DEVICES=-1
-tfparser.py -p $modelDir/${tensorflowName}_temp.pb \
-               -i $outDir/dra_image_bin/dra_bin_list.txt \
-               -o $outNetName \
-               -of $outDir/out_parser \
-               -is $outputShape \
-               -im $mean -ic $scale \
-               -iq -idf $inputDataFormat \
-               -odst $outputLayerName \
-               -c act-allow-fp16,coeff-force-fx16
+onnxparser.py -m $modelDir/${modelName}.onnx \
+                -i $outDir/dra_image_bin/dra_bin_list.txt \
+                -o $outNetName \
+                -of $outDir/out_parser \
+                -is $outputShape \
+                -im $mean -ic $scale \
+                -iq -idf $inputDataFormat \
+                -odst $outputLayerName \
+                -c act-allow-fp16,coeff-force-fx16
 
 cd $outDir/out_parser;vas -auto -show-progress $outNetName.vas
 
@@ -103,4 +65,5 @@ cavalry_gen -d $outDir/out_parser/vas_output/ \
 
 rm -rf vas_output
 
-python3 -m easyAI.easy_encrypt -i $outDir/cavalry/$outNetName.bin -o ${root_path}/${outNetName}.bin
+cp $outDir/cavalry/$outNetName.bin  ${root_path}/${outNetName}.bin
+# python3 -m easyAI.easy_encrypt -i $outDir/cavalry/$outNetName.bin -o ${root_path}/${outNetName}.bin
