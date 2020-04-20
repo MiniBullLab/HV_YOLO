@@ -12,6 +12,7 @@ class ActivationType():
     LeakyReLU = "leaky"
     Sigmoid = "sigmoid"
 
+    Swish = "swish"
     Mish = "mish"
     HSigmoid = "h_sigmoid"
     HSwish = "h_swish"
@@ -40,7 +41,10 @@ class LayerType():
     ShortRouteLayer = "shortRoute"
     ShortcutLayer = "shortcut"
     MyMaxPool2d = "maxpool"
+
     Upsample = "upsample"
+    PixelShuffle = "pixelShuffle"
+
     GlobalAvgPool = "globalavgpool"
     FcLayer = "fcLayer"
     Dropout = "dropout"
@@ -72,8 +76,9 @@ class BlockType():
 
     InceptionBlock = "inceptionBlock"
 
-    SeparableConv2dBNActivation = "separableConv2dBNActivation"
     SeperableConv2dBlock = "seperableConv2dBlock"
+    DepthwiseConv2dBlock = "depthwiseConv2dBlock"
+    SeparableConv2dBNActivation = "separableConv2dBNActivation"
     ShuffleBlock = "shuffleBlock"
 
     ResidualBlock = "residualBlock"

@@ -15,6 +15,16 @@ class LinearActivation(BaseBlock):
         return x
 
 
+class SwishActivation(BaseBlock):
+
+    def __init__(self):
+        super().__init__(ActivationType.Swish)
+
+    def forward(self, x):
+        x = x * torch.sigmoid(x)
+        return x
+
+
 class MishActivation(BaseBlock):
 
     def __init__(self):
@@ -63,6 +73,8 @@ class ActivationFunction():
             return nn.LeakyReLU(0.1, inplace=inplace)
         elif name == ActivationType.Sigmoid:
             return nn.Sigmoid()
+        elif name == ActivationType.Swish:
+            return SwishActivation()
         elif name == ActivationType.HSigmoid:
             return HSigmoid(inplace=inplace)
         elif name == ActivationType.HSwish:

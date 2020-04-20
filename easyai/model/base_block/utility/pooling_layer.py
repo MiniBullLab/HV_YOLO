@@ -34,10 +34,12 @@ class GlobalAvgPool2d(BaseBlock):
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
 
     def forward(self, x):
-        h, w = x.shape[2:]
-        if torch.is_tensor(h) or torch.is_tensor(w):
-            h = np.asarray(h)
-            w = np.asarray(w)
-            return F.avg_pool2d(x, kernel_size=(h, w), stride=(h, w))
-        else:
-            return F.avg_pool2d(x, kernel_size=(h, w), stride=(h, w))
+        x = self.avg_pool(x)
+        return x
+        # h, w = x.shape[2:]
+        # if torch.is_tensor(h) or torch.is_tensor(w):
+        #     h = np.asarray(h)
+        #     w = np.asarray(w)
+        #     return F.avg_pool2d(x, kernel_size=(h, w), stride=(h, w))
+        # else:
+        #     return F.avg_pool2d(x, kernel_size=(h, w), stride=(h, w))

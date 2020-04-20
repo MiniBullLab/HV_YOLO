@@ -14,3 +14,4 @@ pandas
 tabulate
 pydot
 netron
+graphviz

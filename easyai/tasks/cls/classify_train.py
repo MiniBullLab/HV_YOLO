@@ -157,11 +157,14 @@ class ClassifyTrain(BaseTrain):
         return save_model_path
 
     def test(self, val_path, epoch, save_model_path):
-        self.classify_test.load_weights(save_model_path)
-        precision = self.classify_test.test(val_path)
-        self.classify_test.save_test_value(epoch)
+        if val_path is not None and os.path.exists(val_path):
+            self.classify_test.load_weights(save_model_path)
+            precision = self.classify_test.test(val_path)
+            self.classify_test.save_test_value(epoch)
 
-        # save best model
-        self.best_precision = self.torchModelProcess.saveBestModel(precision,
-                                                                   save_model_path,
-                                                                   self.train_task_config.best_weights_file)
+            # save best model
+            self.best_precision = self.torchModelProcess.saveBestModel(precision,
+                                                                       save_model_path,
+                                                                       self.train_task_config.best_weights_file)
+        else:
+            print("no test!")

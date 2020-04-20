@@ -15,7 +15,7 @@ from easyai.model.base_block.utility.utility_layer import FcLayer
 from easyai.model.base_block.utility.pooling_layer import MyMaxPool2d, GlobalAvgPool2d
 from easyai.model.base_block.utility.upsample_layer import Upsample
 from easyai.model.base_block.cls.darknet_block import ReorgBlock, DarknetBlockName
-from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
+from easyai.loss.utility.ce2d_loss import CrossEntropy2d
 from easyai.loss.utility.bce_loss import BinaryCrossEntropy2d
 from easyai.loss.seg.ohem_cross_entropy2d import OhemCrossEntropy2d
 from easyai.loss.det2d.yolo_loss import YoloLoss

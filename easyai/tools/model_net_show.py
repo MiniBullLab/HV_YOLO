@@ -1,37 +1,11 @@
+import os
+import sys
+sys.path.insert(0, os.getcwd() + "/..")
 import torch
-from optparse import OptionParser
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 from easyai.model.utility.model_factory import ModelFactory
 from easyai.torch_utility.torch_onnx.model_show import ModelShow
-
-
-def parse_arguments():
-
-    parser = OptionParser()
-    parser.description = "This program show model net"
-
-    parser.add_option("-m", "--model", dest="model",
-                      action="store", type="string", default=None,
-                      help="model name or cfg file path")
-
-    parser.add_option("-b", "--backbone", dest="backbone",
-                      action="store", type="string", default=None,
-                      help="backbone name or cfg file path")
-
-    parser.add_option("-o", "--onnx_path", dest="onnx_path",
-                      action="store", type="string", default=None,
-                      help="onnx file path")
-
-    parser.add_option("-p", "--pc_model", dest="pc_model",
-                      action="store", type="string", default=None,
-                      help="model name or cfg file path")
-
-    parser.add_option("-c", "--pc_backbone", dest="pc_backbone",
-                      action="store", type="string", default=None,
-                      help="backbone name or cfg file path")
-
-    (options, args) = parser.parse_args()
-    return options
+from easyai.helper.arguments_parse import ToolArgumentsParse
 
 
 class ModelNetShow():
@@ -76,7 +50,7 @@ def main():
 
 
 if __name__ == '__main__':
-    options = parse_arguments()
+    options = ToolArgumentsParse.model_show_parse()
     show = ModelNetShow()
     if options.model is not None:
         show.model_show(options.model)

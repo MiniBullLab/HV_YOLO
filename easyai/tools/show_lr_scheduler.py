@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.solver.lr_factory import LrSchedulerFactory
 from easyai.config.utility.config_factory import ConfigFactory
+from easyai.helper.arguments_parse import ToolArgumentsParse
 
 
 class ShowLrScheduler():
@@ -59,10 +60,8 @@ class ShowLrScheduler():
 
 def main():
     print("process start...")
-    task_name = "classify"
-    config_path = None
-    epoch_iteration = 4000
-    show_lr = ShowLrScheduler(task_name, config_path, epoch_iteration)
+    options = ToolArgumentsParse.show_lr_parse()
+    show_lr = ShowLrScheduler(options.task_name, options.config_path, options.epoch_iteration)
     show_lr.show()
     print("process end!")
 

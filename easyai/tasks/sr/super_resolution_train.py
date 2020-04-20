@@ -13,7 +13,7 @@ from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.torch_utility.torch_vision.torchvision_process import TorchVisionProcess
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.solver.lr_scheduler import MultiStageLR
-from easyai.model.sr.MSRResNet import MSRResNet
+from easyai.model.sr.msr_resnet import MSRResNet
 from easyai.config.task import super_resolution_config
 from math import log10
 

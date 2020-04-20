@@ -56,7 +56,14 @@ class BackboneName():
     XceptionA = "xceptionA"
     AttentionNet56 = "attention_net56"
     AttentionNet92 = "attention_net92"
-    EfficientNet = "efficientnet"
+    Efficientnet_b0 = "efficientnet_b0"
+    Efficientnet_b1 = "efficientnet_b1"
+    Efficientnet_b2 = "efficientnet_b2"
+    Efficientnet_b3 = "efficientnet_b3"
+    Efficientnet_b4 = "efficientnet_b4"
+    Efficientnet_b5 = "efficientnet_b5"
+    Efficientnet_b6 = "efficientnet_b6"
+    Efficientnet_b7 = "efficientnet_b7"
     DPN26 = "dpn26"
     DPN92 = "dpn92"
     DFNetV1 = "dfnetv1"
@@ -70,9 +77,3 @@ class BackboneName():
     wider_resnet20_a2 = "wider_resnet20_a2"
     wider_resnet38_a2 = "wider_resnet38_a2"
     GhostNet = "ghostnet"
-
-    # pc
-    PointNet = "pointnet"
-    PointNet2 = "pointnet2"
-
-

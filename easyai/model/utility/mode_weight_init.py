@@ -11,8 +11,12 @@ class ModelWeightInit():
     def __init__(self):
         pass
 
-    def initWeight(self, model):
+    def init_weight(self, model):
         # weight initialization
+        if model is not None:
+            self.utility_init(model)
+
+    def utility_init(self, model):
         for m in model.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')

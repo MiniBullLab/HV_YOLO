@@ -3,7 +3,7 @@
 # Author:
 
 from easyai.loss.utility.base_loss import *
-from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
+from easyai.loss.utility.ce2d_loss import CrossEntropy2d
 from easyai.loss.utility.bce_loss import BinaryCrossEntropy2d
 
 

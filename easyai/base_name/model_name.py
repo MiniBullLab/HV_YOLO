@@ -31,13 +31,7 @@ class ModelName():
     GhostNetCls = "GhostNetCls"
 
     MSRResNet = "MSRResNet"
-    MySRModel = "MySRModel"
-
-    # pc
-    PointNetCls = "PointNetCls"
-    PointNet2Cls = "PointNet2Cls"
-    PointNetSeg = "PointNetSeg"
-    PointNet2Seg = "PointNet2Seg"
+    SmallSRNet = "SmallSRNet"
 
 
 

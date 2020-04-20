@@ -27,7 +27,9 @@ from easyai.model.backbone.cls.preact_resnet import preactresnet101, preactresne
 from easyai.model.backbone.cls.xception import xception
 from easyai.model.backbone.cls.xception1 import Xception65, XceptionA
 from easyai.model.backbone.cls.attention_net import attention_net56, attention_net92
-from easyai.model.backbone.cls.efficientnet import EfficientNet
+from easyai.model.backbone.cls.efficientnet import efficientnet_b0, efficientnet_b1, efficientnet_b2
+from easyai.model.backbone.cls.efficientnet import efficientnet_b3, efficientnet_b4, efficientnet_b5
+from easyai.model.backbone.cls.efficientnet import efficientnet_b6, efficientnet_b7
 from easyai.model.backbone.cls.dpn import dpn26, dpn92
 from easyai.model.backbone.cls.dfnet import dfnetv1, dfnetv2
 from easyai.model.backbone.cls.pnasnet import pnasnet_A, pnasnet_B
@@ -36,9 +38,6 @@ from easyai.model.backbone.cls.wider_resnet import wider_resnet16_a2, wider_resn
 from easyai.model.backbone.cls.ghostnet import ghost_net
 from easyai.model.backbone.utility.my_backbone import MyBackbone
 from easyai.model.utility.model_parse import ModelParse
-# pc
-from easyai.model.backbone.pc_cls.pointnet import PointNet
-from easyai.model.backbone.pc_cls.pointnet2 import PointNet2
 
 
 class BackboneFactory():
@@ -52,8 +51,6 @@ class BackboneFactory():
             result = self.get_backbone_from_cfg(input_name)
         else:
             result = self.get_backbone_from_name(input_name, data_channel)
-            if result is None:
-                result = self.get_pc_backbone_from_name(input_name, data_channel)
             if result is None:
                 print("backbone:%s error" % input_name)
         return result
@@ -171,8 +168,22 @@ class BackboneFactory():
             result = attention_net56(data_channel)
         elif net_name == BackboneName.AttentionNet92:
             result = attention_net92(data_channel)
-        elif net_name == BackboneName.EfficientNet:
-            result = EfficientNet(data_channel)
+        elif net_name == BackboneName.Efficientnet_b0:
+            result = efficientnet_b0(data_channel)
+        elif net_name == BackboneName.Efficientnet_b1:
+            result = efficientnet_b1(data_channel)
+        elif net_name == BackboneName.Efficientnet_b2:
+            result = efficientnet_b2(data_channel)
+        elif net_name == BackboneName.Efficientnet_b3:
+            result = efficientnet_b3(data_channel)
+        elif net_name == BackboneName.Efficientnet_b4:
+            result = efficientnet_b4(data_channel)
+        elif net_name == BackboneName.Efficientnet_b5:
+            result = efficientnet_b5(data_channel)
+        elif net_name == BackboneName.Efficientnet_b6:
+            result = efficientnet_b6(data_channel)
+        elif net_name == BackboneName.Efficientnet_b7:
+            result = efficientnet_b7(data_channel)
         elif net_name == BackboneName.DPN26:
             result = dpn26(data_channel)
         elif net_name == BackboneName.DPN92:
@@ -199,14 +210,5 @@ class BackboneFactory():
             result = wider_resnet38_a2(data_channel)
         elif net_name == BackboneName.GhostNet:
             result = ghost_net(data_channel)
-        return result
-
-    def get_pc_backbone_from_name(self, net_name, data_channel=3):
-        result = None
-        net_name = net_name.strip()
-        if net_name == BackboneName.PointNet:
-            result = PointNet(data_channel)
-        elif net_name == BackboneName.PointNet2:
-            result = PointNet2(data_channel)
         return result
 

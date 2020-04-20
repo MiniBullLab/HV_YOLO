@@ -2,10 +2,7 @@
 # -*- coding:utf-8 -*-
 # Author:
 """
-title={Gated-SCNN: Gated Shape CNNs for Semantic Segmentation},
-author={Takikawa, Towaki and Acuna, David and Jampani, Varun and Fidler, Sanja},
-journal={ICCV},
-year={2019}
+Focal Loss for Dense Object Detection
 """
 
 from easyai.base_name.model_name import ModelName
@@ -21,22 +18,14 @@ from easyai.model.utility.base_model import *
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 
 
-class GSCNNSeg(BaseModel):
+class RetinaNet(BaseModel):
 
-    def __init__(self, data_channel=3, class_num=19):
+    def __init__(self, data_channel=3, class_num=80):
         super().__init__()
-        self.set_name(ModelName.EncNetSeg)
+        self.set_name(ModelName.FastSCNN)
         self.data_channel = data_channel
         self.class_number = class_num
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
-
         self.factory = BackboneFactory()
         self.create_block_list()
-
-    def create_block_list(self):
-        self.clear_list()
-
-        backbone = self.factory.get_base_model(BackboneName.wider_resnet38_a2)
-        base_out_channels = backbone.get_outchannel_list()
-        self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])

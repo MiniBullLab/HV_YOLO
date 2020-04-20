@@ -13,7 +13,7 @@ from easyai.data_loader.utility.images_loader import ImagesLoader
 from easyai.data_loader.utility.video_loader import VideoLoader
 from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.helper.arguments_parse import ArgumentsParse
-from easyai.model.sr.MSRResNet import MSRResNet
+from easyai.model.sr.msr_resnet import MSRResNet
 from easyai.config.task import super_resolution_config
 from PIL import Image
 from torchvision.transforms import ToTensor

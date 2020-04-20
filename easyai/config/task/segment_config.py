@@ -154,24 +154,23 @@ class SegmentionConfig(ImageTaskConfig):
         self.best_weights_name = 'seg_best.pt'
         self.latest_weights_file = os.path.join(self.snapshot_path, self.latest_weights_name)
         self.best_weights_file = os.path.join(self.snapshot_path, self.best_weights_name)
-        self.max_epochs = 300
+        self.max_epochs = 100
 
-        self.base_lr = 1e-2
+        self.base_lr = 0.001
         self.optimizer_config = {0: {'optimizer': 'RMSprop',
                                      'alpha': 0.9,
                                      'eps': 1e-08,
-                                     'weight_decay': 5e-4}
+                                     'weight_decay': 0}
                                  }
 
-        self.lr_scheduler_config = {'lr_type': 'PolyLR',
-                                    'lr_power': 0.9,
+        self.lr_scheduler_config = {'lr_type': 'CosineLR',
                                     'warm_epoch': -1,
                                     'warmup_iters': 2000}
         self.accumulated_batches = 1
         self.display = 20
 
-        self.freeze_layer_type = 1
-        self.freeze_layer_name = "route_0"
+        self.freeze_layer_type = 2
+        self.freeze_layer_name = "base_convActivationBlock_8"
 
         self.freeze_bn_type = 0
         self.freeze_bn_layer_name = "route_0"

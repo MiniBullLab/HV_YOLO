@@ -50,5 +50,5 @@ class TorchConvertOnnx():
             self.model_process.loadLatestModelWeight(weight_path, model)
         save_onnx_path = os.path.join(self.save_dir, "%s.onnx" % model.get_name())
         onnx.export(model, self.input_x, save_onnx_path, export_params=True,
-                    opset_version=self.opset_version, verbose=False)
+                    verbose=False)
         return save_onnx_path

@@ -6,26 +6,9 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 import torch
-from optparse import OptionParser
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 from easyai.model.utility.model_factory import ModelFactory
-
-
-def parse_arguments():
-
-    parser = OptionParser()
-    parser.description = "This program print model block name"
-
-    parser.add_option("-m", "--model", dest="model",
-                      action="store", type="string", default=None,
-                      help="model name or cfg file path")
-
-    parser.add_option("-b", "--base_model", dest="base_model",
-                      action="store", type="string", default=None,
-                      help="base model name or cfg file path")
-
-    (options, args) = parser.parse_args()
-    return options
+from easyai.helper.arguments_parse import ToolArgumentsParse
 
 
 def backbone_model_print(model_name):
@@ -43,7 +26,7 @@ def model_print(model_name):
 
 
 if __name__ == '__main__':
-    options = parse_arguments()
+    options = ToolArgumentsParse.model_show_parse()
     if options.model is not None:
         model_print(options.model)
     elif options.base_model is not None:

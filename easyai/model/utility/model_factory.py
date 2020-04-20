@@ -10,8 +10,8 @@ from easyai.model.cls.vgg_cls import VggNetCls
 from easyai.model.cls.inceptionv4_cls import Inceptionv4Cls
 from easyai.model.cls.senet_cls import SENetCls
 from easyai.model.cls.ghostnet_cls import GhostNetCls
-from easyai.model.sr.MSRResNet import MSRResNet
-from easyai.model.sr.MySRModel import MySRModel
+from easyai.model.sr.msr_resnet import MSRResNet
+from easyai.model.sr.small_srnet import SmallSRNet
 from easyai.model.seg.fcn_seg import FCN8sSeg
 from easyai.model.seg.unet_seg import UNetSeg
 from easyai.model.seg.refinenet_seg import RefineNetSeg
@@ -25,17 +25,15 @@ from easyai.model.seg.deeplabv3_plus import DeepLabV3Plus
 from easyai.model.seg.mobilenet_deeplabv3_plus import MobilenetDeepLabV3Plus
 from easyai.model.seg.mobilev2_fcn_seg import MobileV2FCN
 from easyai.model.det3d.complex_yolo import ComplexYOLO
-# pc
-from easyai.model.pc_cls.pointnet_cls import PointNetCls
-from easyai.model.pc_cls.pointnet2_cls import PointNet2Cls
-from easyai.model.pc_seg.pointnet_seg import PointNetSeg
-from easyai.model.pc_seg.pointnet2_seg import PointNet2Seg
+
+from easyai.model.utility.mode_weight_init import ModelWeightInit
 
 
 class ModelFactory():
 
     def __init__(self):
         self.modelParse = ModelParse()
+        self.model_weight_init = ModelWeightInit()
 
     def get_model(self, input_name, **kwargs):
         input_name = input_name.strip()
@@ -44,9 +42,8 @@ class ModelFactory():
         else:
             result = self.get_model_from_name(input_name)
             if result is None:
-                result = self.get_pc_model_from_name(input_name)
-            if result is None:
                 print("%s model error!" % input_name)
+        self.model_weight_init.init_weight(result)
         return result
 
     def get_model_from_cfg(self, cfg_path, **kwargs):
@@ -68,9 +65,9 @@ class ModelFactory():
         elif modelName == ModelName.GhostNetCls:
             model = GhostNetCls()
         elif modelName == ModelName.MSRResNet:
-            model = MSRResNet(in_nc=1, upscale_factor=3)
-        elif modelName == ModelName.MySRModel:
-            model = MySRModel(upscale_factor=3)
+            model = MSRResNet(upscale_factor=3)
+        elif modelName == ModelName.MSRResNet:
+            model = SmallSRNet(upscale_factor=3)
         elif modelName == ModelName.FCNSeg:
             model = FCN8sSeg()
         elif modelName == ModelName.UNetSeg:
@@ -97,16 +94,4 @@ class ModelFactory():
             model = MobileV2FCN()
         elif modelName == ModelName.ComplexYOLO:
             model = ComplexYOLO()
-        return model
-
-    def get_pc_model_from_name(self, modelName, **kwargs):
-        model = None
-        if modelName == ModelName.PointNetCls:
-            model = PointNetCls()
-        elif modelName == ModelName.PointNet2Cls:
-            model = PointNet2Cls()
-        elif modelName == ModelName.PointNetSeg:
-            model = PointNetSeg()
-        elif modelName == ModelName.PointNet2Seg:
-            model = PointNet2Seg()
         return model

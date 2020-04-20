@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 import cv2
 
+
 class ImageProcess():
 
     def __init__(self):

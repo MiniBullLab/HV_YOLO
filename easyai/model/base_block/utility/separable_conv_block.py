@@ -2,9 +2,12 @@
 # -*- coding:utf-8 -*-
 # Author:
 
+from easyai.base_name.block_name import LayerType
 from easyai.base_name.block_name import ActivationType, NormalizationType
 from easyai.base_name.block_name import BlockType
 from easyai.model.base_block.utility.base_block import *
+from easyai.model.base_block.utility.utility_layer import ActivationLayer
+from easyai.model.base_block.utility.utility_layer import NormalizeLayer
 from easyai.model.base_block.utility.utility_block import ActivationConvBNBlock
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 
@@ -44,6 +47,30 @@ class SeperableConv2dBlock(BaseBlock):
     def forward(self, x):
         x = self.depthwise(x)
         x = self.pointwise(x)
+        return x
+
+
+class DepthwiseConv2dBlock(BaseBlock):
+    """ DepthwiseConv2D + Normalize2 + Activation """
+
+    def __init__(self, in_channel, kernel_size,
+                 padding=0, stride=1, dilation=1, bias=False,
+                 bn_name=NormalizationType.BatchNormalize2d,
+                 activation_name=ActivationType.ReLU):
+        super().__init__(BlockType.DepthwiseConv2dBlock)
+        conv = nn.Conv2d(in_channel, in_channel, kernel_size,
+                         padding=padding, stride=stride, dilation=dilation,
+                         groups=in_channel, bias=bias)
+        normal = NormalizeLayer(bn_name, in_channel)
+        activation = ActivationLayer(activation_name)
+        self.block = nn.Sequential(OrderedDict([
+            (LayerType.Convolutional, conv),
+            (bn_name, normal),
+            (activation_name, activation)
+        ]))
+
+    def forward(self, x):
+        x = self.block(x)
         return x
 
 

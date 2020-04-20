@@ -7,7 +7,7 @@ import numpy as np
 from easyai.helper import DirProcess
 
 
-class SegmentSample():
+class SuperResolutionSample():
 
     def __init__(self, train_path):
         self.train_path = train_path
@@ -43,7 +43,7 @@ class SegmentSample():
         result = []
         path, _ = os.path.split(train_path)
         images_dir = os.path.join(path, "../JPEGImages")
-        labels_dir = os.path.join(path, "../SegmentLabel")
+        labels_dir = os.path.join(path, "../SuperResolutionLabel")
         for filename_and_post in self.dirProcess.getFileData(train_path):
             filename, post = os.path.splitext(filename_and_post)
             label_filename = filename + self.annotation_post

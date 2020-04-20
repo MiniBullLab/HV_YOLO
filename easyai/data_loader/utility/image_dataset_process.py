@@ -25,6 +25,8 @@ class ImageDataSetProcess(BaseDataSetProcess):
         result = None
         if images is None:
             result = None
+        elif images.ndim == 2:
+            result = images[np.newaxis, :, :]
         elif images.ndim == 3:
             image = images.transpose(2, 0, 1)
             result = np.ascontiguousarray(image, dtype=dtype)

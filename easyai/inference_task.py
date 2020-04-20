@@ -2,31 +2,37 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.helper.arguments_parse import ArgumentsParse
+from easyai.helper.arguments_parse import TaskArgumentsParse
 from easyai.tasks.det2d.detect2d import Detection2d
 from easyai.tasks.seg.segment import Segmentation
 from easyai.base_name.task_name import TaskName
 
 
-def detect_task(options):
-    detect = Detection2d(options.cfg, 0)
-    detect.load_weights(options.weights)
-    detect.process(options.inputPath)
+class InferenceTask():
 
+    def __init__(self, input_path, weight_path):
+        self.input_path = input_path
+        self.weight_path = weight_path
 
-def segment_task(options):
-    segment = Segmentation(options.cfg, 0)
-    segment.load_weights(options.weights)
-    segment.process(options.inputPath)
+    def detect2d_task(self, cfg_path, gpu_id, config_path):
+        det2d = Detection2d(cfg_path, gpu_id, config_path)
+        det2d.load_weights(self.weight_path)
+        det2d.process(self.input_path)
+
+    def segment_task(self, cfg_path, gpu_id, config_path):
+        seg = Segmentation(cfg_path, gpu_id, config_path)
+        seg.load_weights(self.weight_path)
+        seg.process(self.input_path)
 
 
 def main():
     print("process start...")
-    options = ArgumentsParse.parse_arguments()
+    options = TaskArgumentsParse.inference_parse_arguments()
+    inference_task = InferenceTask(options.inputPath, options.model)
     if options.task_name == TaskName.Detect2d_Task:
-        detect_task(options)
+        inference_task.detect2d_task(options.model, 0, options.config_path)
     elif options.task_name == TaskName.Segment_Task:
-        segment_task(options)
+        inference_task.segment_task(options.model, 0, options.config_path)
     print("process end!")
 
 

@@ -5,7 +5,6 @@ from torch import nn
 from collections import OrderedDict
 from easyai.torch_utility.torch_device_process import TorchDeviceProcess
 from easyai.model.utility.model_factory import ModelFactory
-from easyai.model.utility.mode_weight_init import ModelWeightInit
 
 
 class TorchModelProcess():
@@ -13,7 +12,7 @@ class TorchModelProcess():
     def __init__(self):
         self.torchDeviceProcess = TorchDeviceProcess()
         self.modelFactory = ModelFactory()
-        self.modelWeightInit = ModelWeightInit()
+
         self.torchDeviceProcess.initTorch()
         self.best_value = 0
         self.is_multi_gpu = False
@@ -22,7 +21,6 @@ class TorchModelProcess():
         self.is_multi_gpu = is_multi_gpu
         self.torchDeviceProcess.setGpuId(gpuId)
         model = self.modelFactory.get_model(cfgPath)
-        self.modelWeightInit.initWeight(model)
         return model
 
     def loadPretainModel(self, weightPath, model):

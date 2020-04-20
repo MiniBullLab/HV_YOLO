@@ -12,7 +12,7 @@ def numpy_compute_weight(labels):
     batch_size = labels.shape[0]
     for i in range(batch_size):
         y = labels[i].reshape(-1)
-        lb = np.unique(y)  # 0., 1
+        lb = np.unique(y)
         cls_weight = compute_class_weight('balanced', lb, y)
         cls_weight_list.append(cls_weight)
     del y

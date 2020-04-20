@@ -17,4 +17,6 @@ pillow
 sklearn
 netron
 absl-py
+pathlib
+future
 cython

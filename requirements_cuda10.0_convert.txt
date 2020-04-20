@@ -16,4 +16,6 @@ scipy
 pillow
 sklearn
 absl-py
+pathlib
+future
 cython

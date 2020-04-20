@@ -63,11 +63,20 @@ class SegmentionTest(BaseTest):
     def compute_loss(self, output_list, targets):
         loss = 0
         loss_count = len(self.model.lossList)
+        output_count = len(output_list)
         targets = targets.to(self.device)
         with torch.no_grad():
-            for k in range(0, loss_count):
-                output, target = self.output_process.output_feature_map_resize(output_list[k], targets)
-                loss += self.model.lossList[k](output, target)
+            if loss_count == 1 and output_count == 1:
+                output, target = self.output_process.output_feature_map_resize(output_list[0], targets)
+                loss = self.model.lossList[0](output, target)
+            elif loss_count == 1 and output_count > 1:
+                loss = self.model.lossList[0](output_list, targets)
+            elif loss_count > 1 and loss_count == output_count:
+                for k in range(0, loss_count):
+                    output, target = self.output_process.output_feature_map_resize(output_list[k], targets)
+                    loss += self.model.lossList[k](output, target)
+            else:
+                print("compute loss error")
         return loss
 
     def metirc_loss(self, step, loss):

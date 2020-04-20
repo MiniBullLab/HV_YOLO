@@ -9,9 +9,10 @@ import cv2
 import numpy as np
 from easyai.helper import DirProcess
 from easyai.helper import ImageProcess
-from easyai.helper.arguments_parse import ArgumentsParse
+from easyai.helper.arguments_parse import ToolArgumentsParse
 from easyai.config.utility.config_factory import ConfigFactory
 from easyai.base_name.task_name import TaskName
+
 
 class ConvertSegmentionLable():
 
@@ -29,17 +30,22 @@ class ConvertSegmentionLable():
         for label_path in label_list:
             path, file_name_and_post = os.path.split(label_path)
             print(label_path)
-            if is_gray:
-                mask = self.image_process.read_gray_image(label_path)
-            else:
-                _, mask = self.image_process.readRgbImage(label_path)
+            mask = self.process_segment_label(label_path, is_gray, class_list)
             if mask is not None:
-                if is_gray:
-                    mask = self.convert_gray_label(mask, class_list)
-                else:
-                    mask = self.convert_color_label(mask, class_list)
                 save_path = os.path.join(output_dir, file_name_and_post)
                 cv2.imwrite(save_path, mask)
+
+    def process_segment_label(self, label_path, is_gray, class_list):
+        if is_gray:
+            mask = self.image_process.read_gray_image(label_path)
+        else:
+            _, mask = self.image_process.readRgbImage(label_path)
+        if mask is not None:
+            if is_gray:
+                mask = self.convert_gray_label(mask, class_list)
+            else:
+                mask = self.convert_color_label(mask, class_list)
+        return mask
 
     def convert_gray_label(self, mask, class_list):
         shape = mask.shape  # shape = [height, width]
@@ -63,10 +69,10 @@ class ConvertSegmentionLable():
 
 def main():
     print("start...")
-    options = ArgumentsParse.dir_path_parse()
+    options = ToolArgumentsParse.dir_path_parse()
     test = ConvertSegmentionLable()
     config_factory = ConfigFactory()
-    task_config = config_factory.get_config(TaskName.Segment_Task, config_path=None)
+    task_config = config_factory.get_config(TaskName.Segment_Task, config_path=options.config_path)
     test.convert_segment_label(options.inputPath,
                                task_config.label_is_gray,
                                task_config.class_name)
