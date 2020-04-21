@@ -1,0 +1,17 @@
+torch==1.0.1
+torchvision==0.2.2
+numpy==1.16.0
+scipy>=1.4.1
+tensorboard==1.14.0
+tensorflow==1.14.0
+tensorboardX==1.8
+pillow==6.2.0
+tqdm
+opencv-python 
+matplotlib
+protobuf
+pandas
+tabulate
+pydot
+netron
+graphviz

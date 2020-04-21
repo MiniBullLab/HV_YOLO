@@ -1,0 +1,1 @@
+python3 easyai/train_task.py -t detect2d -i /home/minibull/lipeijie/dataset/Berkeley/ImageSets/train.txt -v /home/minibull/lipeijie/dataset/Berkeley/ImageSets/val.txt -c ./cfg/det2d/shufflenetV2-0.5_spp_BerkeleyAll.cfg
