@@ -25,7 +25,7 @@ class MobileNetV3(BaseBackbone):
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
         super().__init__()
-        self.set_name(BackboneName.MobileNetV2_1_0)
+        self.set_name(BackboneName.MobileNetv3_small)
         assert mode in ['large', 'small']
         self.cfgs = cfgs
         self.mode = mode
@@ -47,7 +47,7 @@ class MobileNetV3(BaseBackbone):
                                        padding=1,
                                        bias=False,
                                        bnName=self.bn_name,
-                                       activationName=ActivationType.HSwish)
+                                       activationName=ActivationType.HardSwish)
         self.add_block_list(layer1.get_name(), layer1, output_channel)
 
         input_channel = output_channel
@@ -62,7 +62,7 @@ class MobileNetV3(BaseBackbone):
                                        padding=0,
                                        bias=False,
                                        bnName=self.bn_name,
-                                       activationName=ActivationType.HSwish)
+                                       activationName=ActivationType.HardSwish)
         self.add_block_list(layer2.get_name(), layer2, output_channel)
 
         if self.mode == 'small':
@@ -72,7 +72,7 @@ class MobileNetV3(BaseBackbone):
     def make_layer(self, input_channel, block, cfgs):
         # building inverted residual blocks
         hidden_channel = 0
-        for k, exp_size, c, use_se, use_hs, s in self.cfgs:
+        for k, exp_size, c, use_se, use_hs, s in cfgs:
             output_channel = self.make_divisible(c * self.width_mult, 8)
             hidden_channel = self.make_divisible(exp_size * self.width_mult, 8)
             if use_hs == 0:
@@ -80,7 +80,7 @@ class MobileNetV3(BaseBackbone):
                                    bn_name=self.bn_name, activation_name=ActivationType.ReLU)
             else:
                 temp_block = block(input_channel, exp_size, output_channel, k, s, use_se,
-                                   bn_name=self.bn_name, activation_name=ActivationType.HSwish)
+                                   bn_name=self.bn_name, activation_name=ActivationType.HardSwish)
             self.add_block_list(temp_block.get_name(), temp_block, output_channel)
             input_channel = output_channel
         return hidden_channel

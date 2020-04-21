@@ -14,8 +14,9 @@ class ActivationType():
 
     Swish = "swish"
     Mish = "mish"
-    HSigmoid = "h_sigmoid"
-    HSwish = "h_swish"
+
+    HardSigmoid = "hard_sigmoid"
+    HardSwish = "hard_swish"
 
 
 class NormalizationType():

@@ -6,6 +6,7 @@ import os.path
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.cls.mobilenetv2 import mobilenetv2_1_0
 from easyai.model.backbone.cls.mobilenetv3 import mobilenetv3_small, mobilenetv3_large
+from easyai.model.backbone.cls.mixnet import mixnet_s, mixnet_m, mixnet_l
 from easyai.model.backbone.cls.shufflenetv2 import shufflenetv2_1_0
 from easyai.model.backbone.cls.resnet import resnet18, resnet34
 from easyai.model.backbone.cls.resnet import resnet50, resnet101, resnet152
@@ -72,6 +73,12 @@ class BackboneFactory():
             result = mobilenetv3_small(data_channel)
         elif net_name == BackboneName.MobileNetv3_large:
             result = mobilenetv3_large(data_channel)
+        elif net_name == BackboneName.mixnet_s:
+            result = mixnet_s(data_channel)
+        elif net_name == BackboneName.mixnet_m:
+            result = mixnet_m(data_channel)
+        elif net_name == BackboneName.mixnet_l:
+            result = mixnet_l(data_channel)
         elif net_name == BackboneName.MobileNetV2_1_0:
             result = mobilenetv2_1_0(data_channel)
         elif net_name == BackboneName.ResNet18:
