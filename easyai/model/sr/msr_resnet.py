@@ -14,13 +14,13 @@ from easyai.model.base_block.sr.msr_resnet_block import ResidualBlockNoBN
 
 class MSRResNet(BaseModel):
 
-    def __init__(self, data_channel=3, out_channel=64, num_block=3, upscale_factor=3):
+    def __init__(self, data_channel=1, upscale_factor=3):
         super().__init__()
         self.set_name(ModelName.MSRResNet)
         self.data_channel = data_channel
-        self.out_channel = out_channel
-        self.num_block = num_block
         self.upscale_factor = upscale_factor
+        self.out_channel = 64
+        self.num_block = 3
         self.activation_name = ActivationType.LeakyReLU
         self.create_block_list()
 
@@ -48,8 +48,8 @@ class MSRResNet(BaseModel):
         self.out_channel = 32
         self.add_block_list(last_conv.get_name(), last_conv, self.out_channel)
 
-        upconv1 = nn.Conv2d(self.out_channel, self.upscale_factor ** 2, 3, 1, 1, bias=True)
-        self.out_channel = self.upscale_factor ** 2
+        self.out_channel = self.out_channel * self.upscale_factor ** 2
+        upconv1 = nn.Conv2d(self.out_channel, self.out_channel, 3, 1, 1, bias=True)
         self.add_block_list(LayerType.Convolutional, upconv1, self.out_channel)
 
         pixel_shuffle = nn.PixelShuffle(self.upscale_factor)

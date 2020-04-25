@@ -3,8 +3,6 @@
 # Author:
 
 import os
-import codecs
-import json
 from easyai.base_name.task_name import TaskName
 from easyai.config.utility.image_task_config import ImageTaskConfig
 
@@ -43,30 +41,11 @@ class ClassifyConfig(ImageTaskConfig):
         self.get_test_default_value()
         self.get_train_default_value()
 
-    def load_config(self, config_path):
-        if config_path is not None and os.path.exists(config_path):
-            self.config_path = config_path
-        if os.path.exists(self.config_path):
-            with codecs.open(self.config_path, 'r', encoding='utf-8') as f:
-                config_dict = json.load(f)
-            self.load_data_value(config_dict)
-            self.load_test_value(config_dict)
-            self.load_train_value(config_dict)
-        else:
-            print("{} not exits".format(self.config_path))
-
-    def save_config(self):
-        super().save_config()
-        config_dict = {}
-        self.save_data_value(config_dict)
-        self.save_test_value(config_dict)
-        self.save_train_value(config_dict)
-        with codecs.open(self.config_path, 'w', encoding='utf-8') as f:
-            json.dump(config_dict, f, sort_keys=True, indent=4, ensure_ascii=False)
-
     def load_data_value(self, config_dict):
         if config_dict.get('image_size', None) is not None:
             self.image_size = tuple(config_dict['image_size'])
+        if config_dict.get('image_channel', None) is not None:
+            self.image_channel = int(config_dict['image_channel'])
         if config_dict.get('data_mean', None) is not None:
             self.data_mean = tuple(config_dict['data_mean'])
         if config_dict.get('data_std', None) is not None:
@@ -74,6 +53,7 @@ class ClassifyConfig(ImageTaskConfig):
 
     def save_data_value(self, config_dict):
         config_dict['image_size'] = self.image_size
+        config_dict['image_channel'] = self.image_channel
         config_dict['data_mean'] = self.data_mean
         config_dict['data_std'] = self.data_std
 
@@ -138,6 +118,7 @@ class ClassifyConfig(ImageTaskConfig):
 
     def get_data_default_value(self):
         self.image_size = (32, 32)
+        self.image_channel = 3
         self.data_mean = (0.5070751592371323, 0.48654887331495095, 0.4409178433670343)
         self.data_std = (0.2673342858792401, 0.2564384629170883, 0.27615047132568404)
 
@@ -152,8 +133,8 @@ class ClassifyConfig(ImageTaskConfig):
         self.latest_weights_name = 'cls_latest.pt'
         self.best_weights_name = 'cls_best.pt'
 
-        self.latest_weights_file = os.path.join(self.snapshot_path, self.latest_weights_name)
-        self.best_weights_file = os.path.join(self.snapshot_path, self.best_weights_name)
+        self.latest_weights_file = os.path.join(self.snapshot_dir, self.latest_weights_name)
+        self.best_weights_file = os.path.join(self.snapshot_dir, self.best_weights_name)
 
         self.max_epochs = 200
 

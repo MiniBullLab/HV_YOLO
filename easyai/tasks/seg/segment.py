@@ -19,7 +19,10 @@ class Segmentation(BaseInference):
         self.task_config = self.config_factory.get_config(self.task_name, self.config_path)
 
         self.torchModelProcess = TorchModelProcess()
-        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
+        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
+                                                      default_args={
+                                                          "data_channel": self.task_config.image_channel
+                                                      })
         self.device = self.torchModelProcess.getDevice()
 
         self.result_process = SegmentResultProcess()
@@ -36,7 +39,8 @@ class Segmentation(BaseInference):
 
     def process(self, input_path):
         dataloader = self.get_image_data_lodaer(input_path,
-                                                self.task_config.image_size)
+                                                self.task_config.image_size,
+                                                self.task_config.image_channel)
         for index, (src_image, image) in enumerate(dataloader):
             self.timer.tic()
             self.set_src_size(src_image)

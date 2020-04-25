@@ -25,7 +25,10 @@ class Detection2d(BaseInference):
         self.nms_process = FastNonMaxSuppression()
         self.result_show = DetectionShow()
 
-        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
+        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
+                                                      default_args={
+                                                          "data_channel": self.task_config.image_channel
+                                                      })
         self.device = self.torchModelProcess.getDevice()
 
         self.src_size = (0, 0)
@@ -37,7 +40,8 @@ class Detection2d(BaseInference):
 
     def process(self, input_path):
         dataloader = self.get_image_data_lodaer(input_path,
-                                                self.task_config.image_size)
+                                                self.task_config.image_size,
+                                                self.task_config.image_channel)
         for i, (src_image, img) in enumerate(dataloader):
             print('%g/%g' % (i + 1, len(dataloader)), end=' ')
             self.set_src_size(src_image)

@@ -33,7 +33,7 @@ class SegmentResultProcess():
         stop_w = image_size[0] - (pad[0] - (pad[0] // 2))
         result = segmention_result[start_h:stop_h, start_w:stop_w]
         result = result.astype(np.float32)
-        result = self.dataset_process.image_resize(result, src_size)
+        result = self.dataset_process.cv_image_resize(result, src_size)
         return result
 
     def output_feature_map_resize(self, input_data, target):

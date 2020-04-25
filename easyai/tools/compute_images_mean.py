@@ -31,7 +31,7 @@ class ComputeImagesMean():
             if len(data_list) >= 1:
                 image_path = os.path.join(images_dir, data_list[0])
                 src_image, rgb_image = self.image_process.readRgbImage(image_path)
-                rgb_image = self.dataset_process.image_resize(rgb_image, self.image_size)
+                rgb_image = self.dataset_process.cv_image_resize(rgb_image, self.image_size)
                 normaliza_image = self.dataset_process.image_normaliza(rgb_image)
                 numpy_images.append(normaliza_image)
             else:

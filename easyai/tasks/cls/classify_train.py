@@ -29,7 +29,10 @@ class ClassifyTrain(BaseTrain):
         self.freeze_normalization = TorchFreezeNormalization()
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
 
-        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
+        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
+                                                      default_args={
+                                                          "data_channel": self.train_task_config.image_channel
+                                                      })
         self.device = self.torchModelProcess.getDevice()
 
         self.classify_test = ClassifyTest(cfg_path, gpu_id, config_path)
@@ -65,6 +68,7 @@ class ClassifyTrain(BaseTrain):
                                                    self.train_task_config.data_mean,
                                                    self.train_task_config.data_std,
                                                    self.train_task_config.image_size,
+                                                   self.train_task_config.image_channel,
                                                    self.train_task_config.train_batch_size,
                                                    self.train_task_config.train_data_augment)
 

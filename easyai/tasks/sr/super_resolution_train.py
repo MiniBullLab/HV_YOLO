@@ -3,138 +3,167 @@
 # Author:
 
 import os
-import sys
-sys.path.insert(0, os.getcwd() + "/.")
-import time
-import torch
-import torch.nn as nn
-from easyai.data_loader.sr.super_resolution_dataloader import get_sr_dataloader
-from easyai.torch_utility.torch_model_process import TorchModelProcess
-from easyai.torch_utility.torch_vision.torchvision_process import TorchVisionProcess
+from easyai.data_loader.sr.super_resolution_dataloader import get_sr_train_dataloader
+from easyai.solver.lr_factory import LrSchedulerFactory
 from easyai.solver.torch_optimizer import TorchOptimizer
-from easyai.solver.lr_scheduler import MultiStageLR
-from easyai.model.sr.msr_resnet import MSRResNet
-from easyai.config.task import super_resolution_config
-from math import log10
+from easyai.torch_utility.torch_freeze_bn import TorchFreezeNormalization
+from easyai.torch_utility.torch_model_process import TorchModelProcess
+from easyai.utility.train_log import TrainLogger
+from easyai.tasks.utility.base_train import BaseTrain
+from easyai.tasks.sr.super_resolution_test import SuperResolutionTest
+from easyai.base_name.task_name import TaskName
 
-class SuperResolutionTrain():
 
-    def __init__(self):
-        if not os.path.exists(super_resolution_config.snapshotPath):
-            os.makedirs(super_resolution_config.snapshotPath, exist_ok=True)
+class SuperResolutionTrain(BaseTrain):
+
+    def __init__(self, cfg_path, gpu_id, config_path=None):
+        super().__init__(config_path)
+        self.set_task_name(TaskName.SuperResolution_Task)
+        self.train_task_config = self.config_factory.get_config(self.task_name, self.config_path)
+
+        self.train_logger = TrainLogger(self.train_task_config.log_name,
+                                        self.train_task_config.root_save_dir)
 
         self.torchModelProcess = TorchModelProcess()
-        self.torchOptimizer = TorchOptimizer(super_resolution_config.optimizerConfig)
-        self.multiLR = MultiStageLR(super_resolution_config.base_lr, [[50, 1], [70, 0.1], [100, 0.01]])
+        self.freeze_normalization = TorchFreezeNormalization()
+
+        self.torch_optimizer = TorchOptimizer(self.train_task_config.optimizer_config)
+        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
+                                                      default_args={
+                                                          "data_channel": self.train_task_config.image_channel,
+                                                          "upscale_factor": self.train_task_config.upscale_factor
+                                                      })
         self.device = self.torchModelProcess.getDevice()
-        self.model = MSRResNet(super_resolution_config.in_nc, upscale_factor=super_resolution_config.upscale_factor).to(self.device)
 
-        vision_process = TorchVisionProcess()
-        self.input_transform = vision_process.input_transform(super_resolution_config.crop_size,
-                                                              super_resolution_config.upscale_factor)
-        self.target_transform = vision_process.target_transform(super_resolution_config.crop_size)
+        self.sr_test = SuperResolutionTest(cfg_path, gpu_id, config_path)
 
+        self.total_images = 0
+        self.optimizer = None
         self.start_epoch = 0
-        self.psnr = 0
+        self.best_score = 0
 
-    def load_param(self, latest_weights_path):
+    def load_pretrain_model(self, weights_path):
+        self.torchModelProcess.loadPretainModel(weights_path, self.model)
+
+    def load_latest_param(self, latest_weights_path):
         checkpoint = None
         if latest_weights_path and os.path.exists(latest_weights_path):
             checkpoint = self.torchModelProcess.loadLatestModelWeight(latest_weights_path, self.model)
             self.torchModelProcess.modelTrainInit(self.model)
         else:
             self.torchModelProcess.modelTrainInit(self.model)
-        self.start_epoch, self.best_mAP = self.torchModelProcess.getLatestModelValue(checkpoint)
+        self.start_epoch, self.best_score = self.torchModelProcess.getLatestModelValue(checkpoint)
 
-        self.torchOptimizer.createOptimizer(self.start_epoch, self.model, super_resolution_config.base_lr)
-        self.optimizer = self.torchOptimizer.getLatestModelOptimizer(checkpoint)
+        self.torch_optimizer.freeze_optimizer_layer(self.start_epoch,
+                                                    self.train_task_config.base_lr,
+                                                    self.model,
+                                                    self.train_task_config.freeze_layer_name,
+                                                    self.train_task_config.freeze_layer_type)
+        self.torch_optimizer.print_freeze_layer(self.model)
+        self.optimizer = self.torch_optimizer.getLatestModelOptimizer(checkpoint)
 
-    def update_logger(self, step, value):
-        pass
+    def train(self, train_path, val_path):
+        dataloader = get_sr_train_dataloader(train_path, self.train_task_config.image_size,
+                                             self.train_task_config.image_channel,
+                                             self.train_task_config.upscale_factor,
+                                             self.train_task_config.train_batch_size)
+        self.total_images = len(dataloader)
+        self.load_latest_param(self.train_task_config.latest_weights_file)
 
-    def compute_loss(self, output, targets):
-        loss = 0
-        criterion = nn.MSELoss()
-        loss += criterion(output, targets)
+        lr_factory = LrSchedulerFactory(self.train_task_config.base_lr,
+                                        self.train_task_config.max_epochs,
+                                        self.total_images)
+        lr_scheduler = lr_factory.get_lr_scheduler(self.train_task_config.lr_scheduler_config)
+
+        self.train_task_config.save_config()
+        self.timer.tic()
+        self.set_model_train()
+        for epoch in range(self.start_epoch, self.train_task_config.max_epochs):
+            # self.optimizer = torchOptimizer.adjust_optimizer(epoch, lr)
+            self.optimizer.zero_grad()
+            for idx, (images, labels) in enumerate(dataloader):
+                current_idx = epoch * self.total_images + idx
+                lr = lr_scheduler.get_lr(epoch, current_idx)
+                lr_scheduler.adjust_learning_rate(self.optimizer, lr)
+                loss = self.compute_backward(images, labels, idx)
+                self.update_logger(idx, self.total_images, epoch, loss)
+
+            save_model_path = self.save_train_model(epoch)
+            self.test(val_path, epoch, save_model_path)
+
+    def compute_backward(self, input_datas, targets, setp_index):
+        # Compute loss, compute gradient, update parameters
+        output_list = self.model(input_datas.to(self.device))
+        loss = self.compute_loss(output_list, targets)
+        loss.backward()
+
+        # accumulate gradient for x batches before optimizing
+        if ((setp_index + 1) % self.train_task_config.accumulated_batches == 0) \
+                or (setp_index == self.total_images - 1):
+            self.optimizer.step()
+            self.optimizer.zero_grad()
         return loss
 
-    def test(self, epoch):
-        save_model_path = os.path.join(super_resolution_config.snapshotPath, "model_epoch_%d.pt" % epoch)
+    def compute_loss(self, output_list, targets):
+        loss = 0
+        loss_count = len(self.model.lossList)
+        output_count = len(output_list)
+        targets = targets.to(self.device)
+        if loss_count == 1 and output_count == 1:
+            loss = self.model.lossList[0](output_list[0], targets)
+        elif loss_count > 1 and loss_count == output_count:
+            for k in range(0, loss_count):
+                loss += self.model.lossList[k](output_list[k], targets)
+        else:
+            print("compute loss error")
+        return loss
+
+    def update_logger(self, index, total, epoch, loss):
+        loss_value = loss.data.cpu().squeeze()
+        step = epoch * total + index
+        lr = self.optimizer.param_groups[0]['lr']
+        self.train_logger.train_log(step, loss_value, self.train_task_config.display)
+        self.train_logger.lr_log(step, lr, self.train_task_config.display)
+
+        print('Epoch: {}[{}/{}]\t Loss: {}\t Rate: {} \t Time: {}\t'.format(epoch,
+                                                                            index,
+                                                                            total,
+                                                                            '%.7f' % loss_value,
+                                                                            '%.7f' % lr,
+                                                                            '%.5f' % self.timer.toc(True)))
+
+    def save_train_model(self, epoch):
+        self.train_logger.epoch_train_log(epoch)
+        if self.train_task_config.is_save_epoch_model:
+            save_model_path = os.path.join(self.train_task_config.snapshot_path,
+                                           "seg_model_epoch_%d.pt" % epoch)
+        else:
+            save_model_path = self.train_task_config.latest_weights_file
         self.torchModelProcess.saveLatestModel(save_model_path, self.model,
-                                               self.optimizer, epoch, self.psnr)
-        testing_data_loader = get_sr_dataloader(super_resolution_config.val_set,
-                                                super_resolution_config.val_set,
-                                                super_resolution_config.test_batch_size,
-                                                num_workers=8,
-                                                input_transform=self.input_transform,
-                                                target_transform=self.target_transform)
-        avg_psnr = 0
-        with torch.no_grad():
-            for batch in testing_data_loader:
-                input, target = batch[0].to(self.device), batch[1].to(self.device)
+                                               self.optimizer, epoch, self.best_score)
+        return save_model_path
 
-                prediction = self.model(input)
-                mse = self.compute_loss(prediction, target)
-                psnr = 10 * log10(1 / mse.item())
-                avg_psnr += psnr
+    def set_model_train(self):
+        self.model.train()
+        self.freeze_normalization.freeze_normalization_layer(self.model,
+                                                             self.train_task_config.freeze_bn_layer_name,
+                                                             self.train_task_config.freeze_bn_type)
 
-        self.psnr = avg_psnr / len(testing_data_loader)
+    def test(self, val_path, epoch, save_model_path):
+        if val_path is not None and os.path.exists(val_path):
+            self.sr_test.load_weights(save_model_path)
+            score, average_loss = self.sr_test.test(val_path)
+            self.sr_test.save_test_value(epoch, score)
 
-        self.torchModelProcess.saveBestModel(self.psnr,
-                                             save_model_path,
-                                             super_resolution_config.best_weights_file)
-
-        print("===> Avg. PSNR: {:.4f} dB".format(self.psnr))
-
-    def train(self):
-        training_data_loader = get_sr_dataloader(super_resolution_config.train_set,
-                                                 super_resolution_config.train_set,
-                                                 super_resolution_config.train_batch_size,
-                                                 num_workers=8,
-                                                 shuffle=True,
-                                                 input_transform=self.input_transform,
-                                                 target_transform=self.target_transform)
-        total_images = len(training_data_loader)
-        self.load_param(super_resolution_config.latest_weights_file)
-
-        t0 = time.time()
-        for epoch in range(self.start_epoch, super_resolution_config.maxEpochs):
-            self.optimizer.zero_grad()
-            for i, batch in enumerate(training_data_loader, 1):
-                imgs, targets = batch[0].to(self.device), batch[1].to(self.device)
-
-                current_iter = epoch * total_images + i
-                lr = self.multiLR.get_lr(epoch, current_iter)
-                self.multiLR.adjust_learning_rate(self.optimizer, lr)
-
-                # Compute loss, compute gradient, update parameters
-                output = self.model(imgs.to(self.device))
-                loss = self.compute_loss(output, targets)
-                loss.backward()
-
-                # accumulate gradient for x batches before optimizing
-                if ((i + 1) % super_resolution_config.accumulated_batches == 0) or (i == len(training_data_loader) - 1):
-                    self.optimizer.step()
-                    self.optimizer.zero_grad()
-
-                print('Epoch: {}[{}/{}]\t Loss: {}\t Rate: {} \t Time: {}\t'.format(epoch, i, len(training_data_loader),
-                                                                                    '%.3f' % loss,
-                                                                                    '%.7f' %
-                                                                                    self.optimizer.param_groups[0][
-                                                                                        'lr'], time.time() - t0))
-                self.update_logger(current_iter, loss.data)
-
-                t0 = time.time()
-
-            self.test(epoch)
-
-
-def main():
-    print("process start...")
-    detect_train = SuperResolutionTrain()
-    detect_train.train()
-    print("process end!")
+            self.train_logger.eval_log("val epoch loss", epoch, average_loss)
+            print("Val epoch loss: {}".format(average_loss))
+            # save best model
+            self.best_score = self.torchModelProcess.saveBestModel(score,
+                                                                   save_model_path,
+                                                                   self.train_task_config.best_weights_file)
+        else:
+            print("no test!")
 
 
 if __name__ == '__main__':
-    main()
+    pass

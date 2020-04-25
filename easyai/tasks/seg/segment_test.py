@@ -35,6 +35,7 @@ class SegmentionTest(BaseTest):
 
     def test(self, val_path):
         dataloader = get_segment_val_dataloader(val_path, self.test_task_config.image_size,
+                                                self.test_task_config.image_channel,
                                                 self.test_task_config.test_batch_size)
         print("Eval data num: {}".format(len(dataloader)))
         self.timer.tic()

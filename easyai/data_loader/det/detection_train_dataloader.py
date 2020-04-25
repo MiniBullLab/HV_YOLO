@@ -16,7 +16,7 @@ from easyai.data_loader.det.detection_data_augment import DetectionDataAugment
 class DetectionTrainDataloader(DataLoader):
 
     def __init__(self, train_path, class_name, batch_size=1, image_size=(768, 320),
-                 multi_scale=False, is_augment=False, balanced_sample=False):
+                 data_channel=3, multi_scale=False, is_augment=False, balanced_sample=False):
         super().__init__()
         self.className = class_name
         self.multi_scale = multi_scale
@@ -24,6 +24,7 @@ class DetectionTrainDataloader(DataLoader):
         self.balanced_sample = balanced_sample
         self.batch_size = batch_size
         self.image_size = image_size
+        self.data_channel = data_channel
 
         self.detection_sample = DetectionSample(train_path,
                                                 class_name,
@@ -58,21 +59,21 @@ class DetectionTrainDataloader(DataLoader):
         stop_index = start_index + self.batch_size
         for temp_index in range(start_index, stop_index):
             img_path, label_path = self.detection_sample.get_sample_path(temp_index, class_index)
-            src_image, rgb_image = self.image_process.readRgbImage(img_path)
+            src_image = self.read_src_image(img_path)
             _, _, boxes = self.xmlProcess.parseRectData(label_path)
 
-            rgb_image, labels = self.dataset_process.resize_dataset(rgb_image,
-                                                                    (width, height),
-                                                                    boxes,
-                                                                    self.className)
-            rgb_image, labels = self.dataset_augment.augment(rgb_image, labels)
-            rgb_image, labels = self.dataset_process.normaliza_dataset(rgb_image,
-                                                                       labels,
-                                                                       (width, height))
+            image, labels = self.dataset_process.resize_dataset(src_image,
+                                                                (width, height),
+                                                                boxes,
+                                                                self.className)
+            image, labels = self.dataset_augment.augment(image, labels)
+            image, labels = self.dataset_process.normaliza_dataset(image,
+                                                                   labels,
+                                                                   (width, height))
 
             labels = self.dataset_process.change_outside_labels(labels)
 
-            numpy_images.append(rgb_image)
+            numpy_images.append(image)
 
             torch_labels = self.dataset_process.numpy_to_torch(labels, flag=0)
             numpy_labels.append(torch_labels)
@@ -104,5 +105,15 @@ class DetectionTrainDataloader(DataLoader):
             width = self.image_size[0]
             height = self.image_size[1]
         return width, height
+
+    def read_src_image(self, image_path):
+        src_image = None
+        if self.data_channel == 1:
+            src_image = self.image_process.read_gray_image(image_path)
+        elif self.data_channel == 3:
+            _, src_image = self.image_process.readRgbImage(image_path)
+        else:
+            print("det2d read src image error!")
+        return src_image
 
 

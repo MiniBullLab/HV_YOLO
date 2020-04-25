@@ -26,9 +26,11 @@ class Detection2dTest(BaseTest):
         os.system('rm -rf ' + self.test_task_config.save_result_dir)
         os.makedirs(self.test_task_config.save_result_dir, exist_ok=True)
 
-        dataloader = get_detection_val_dataloader(val_path, self.test_task_config.class_name,
-                                                  batch_size=1,
-                                                  image_size=self.test_task_config.image_size)
+        dataloader = get_detection_val_dataloader(val_path,
+                                                  self.test_task_config.class_name,
+                                                  image_size=self.test_task_config.image_size,
+                                                  data_channel=self.test_task_config.image_channel,
+                                                  batch_size=1)
         evaluator = CalculateMeanAp(val_path, self.test_task_config.class_name)
 
         self.timer.tic()

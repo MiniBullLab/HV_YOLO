@@ -14,9 +14,10 @@ from easyai.model.utility.base_model import *
 
 class ComplexYOLO(BaseModel):
 
-    def __init__(self):
+    def __init__(self, backbone_path="./cfg/det3d/complex-darknet19.cfg"):
         super().__init__()
         self.set_name(ModelName.ComplexYOLO)
+        self.backbone_path = backbone_path
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
 
@@ -27,7 +28,7 @@ class ComplexYOLO(BaseModel):
         self.block_out_channels = []
         self.index = 0
 
-        basic_model = self.factory.get_base_model("./cfg/det3d/complex-darknet19.cfg")
+        basic_model = self.factory.get_base_model(self.backbone_path)
         base_out_channels = basic_model.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, basic_model, base_out_channels[-1])
 

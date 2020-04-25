@@ -12,7 +12,7 @@ from easyai.model.base_block.utility.utility_block import ConvActivationBlock
 
 
 class SmallSRNet(BaseModel):
-    def __init__(self, data_channel=3, upscale_factor=3):
+    def __init__(self, data_channel=1, upscale_factor=3):
         super().__init__()
         self.set_name(ModelName.SmallSRNet)
         self.data_channel = data_channel
@@ -51,7 +51,8 @@ class SmallSRNet(BaseModel):
                                     activationName=self.activation_name)
         self.add_block_list(conv3.get_name(), conv3, 32)
 
-        conv4 = nn.Conv2d(32, self.upscale_factor ** 2, (3, 3), (1, 1), (1, 1))
+        out_channel = self.data_channel * self.upscale_factor ** 2
+        conv4 = nn.Conv2d(32, out_channel, (3, 3), (1, 1), (1, 1))
         self.add_block_list(LayerType.Convolutional, conv4, self.upscale_factor ** 2)
 
         pixel_shuffle = nn.PixelShuffle(self.upscale_factor)
@@ -62,12 +63,6 @@ class SmallSRNet(BaseModel):
         loss = MeanSquaredErrorLoss()
         self.add_block_list(LossType.MeanSquaredErrorLoss, loss, self.block_out_channels[-1])
         self.lossList.append(loss)
-
-    def sr_initialize_weights(self):
-        nn.init.orthogonal_(self.conv1.weight, nn.init.calculate_gain('relu'))
-        nn.init.orthogonal_(self.conv2.weight, nn.init.calculate_gain('relu'))
-        nn.init.orthogonal_(self.conv3.weight, nn.init.calculate_gain('relu'))
-        nn.init.orthogonal_(self.conv4.weight)
 
     def forward(self, x):
         base_outputs = []

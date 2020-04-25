@@ -26,8 +26,7 @@ class ConvertSegmentionLable():
         output_dir = os.path.join(label_dir, "../%s" % self.save_label_dir)
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
-        label_list = list(self.dirProcess.getDirFiles(label_dir, "*.*"))
-        for label_path in label_list:
+        for label_path in self.dirProcess.getDirFiles(label_dir, "*.*"):
             path, file_name_and_post = os.path.split(label_path)
             print(label_path)
             mask = self.process_segment_label(label_path, is_gray, class_list)
