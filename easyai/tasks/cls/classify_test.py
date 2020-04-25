@@ -28,6 +28,7 @@ class ClassifyTest(BaseTest):
                                                  self.test_task_config.data_mean,
                                                  self.test_task_config.data_std,
                                                  self.test_task_config.image_size,
+                                                 self.test_task_config.image_channel,
                                                  self.test_task_config.test_batch_size)
         self.evaluation.clean_data()
         for index, (images, labels) in enumerate(dataloader):

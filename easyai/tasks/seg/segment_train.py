@@ -27,8 +27,12 @@ class SegmentionTrain(BaseTrain):
 
         self.torchModelProcess = TorchModelProcess()
         self.freeze_normalization = TorchFreezeNormalization()
+
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
-        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
+        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
+                                                      default_args={
+                                                          "data_channel": self.train_task_config.image_channel
+                                                      })
         self.device = self.torchModelProcess.getDevice()
 
         self.output_process = SegmentResultProcess()
@@ -62,6 +66,7 @@ class SegmentionTrain(BaseTrain):
 
     def train(self, train_path, val_path):
         dataloader = get_segment_train_dataloader(train_path, self.train_task_config.image_size,
+                                                  self.train_task_config.image_channel,
                                                   self.train_task_config.train_batch_size,
                                                   is_augment=self.train_task_config.train_data_augment)
         self.total_images = len(dataloader)

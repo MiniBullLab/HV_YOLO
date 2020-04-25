@@ -26,9 +26,12 @@ class Detection2dTrain(BaseTrain):
 
         self.torchModelProcess = TorchModelProcess()
         self.freeze_normalization = TorchFreezeNormalization()
-        self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
 
-        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
+        self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
+        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
+                                                      default_args={
+                                                          "data_channel": self.train_task_config.image_channel
+                                                      })
         self.device = self.torchModelProcess.getDevice()
 
         self.detect_test = Detection2dTest(cfg_path, gpu_id, config_path)
@@ -62,6 +65,7 @@ class Detection2dTrain(BaseTrain):
         dataloader = DetectionTrainDataloader(train_path, self.train_task_config.class_name,
                                               self.train_task_config.train_batch_size,
                                               self.train_task_config.image_size,
+                                              self.train_task_config.image_channel,
                                               multi_scale=self.train_task_config.train_multi_scale,
                                               is_augment=self.train_task_config.train_data_augment,
                                               balanced_sample=self.train_task_config.balanced_sample)

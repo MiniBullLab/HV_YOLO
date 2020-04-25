@@ -35,63 +35,63 @@ class ModelFactory():
         self.modelParse = ModelParse()
         self.model_weight_init = ModelWeightInit()
 
-    def get_model(self, input_name, **kwargs):
+    def get_model(self, input_name, default_args=None):
         input_name = input_name.strip()
         if input_name.endswith("cfg"):
-            result = self.get_model_from_cfg(input_name)
+            result = self.get_model_from_cfg(input_name, default_args)
         else:
-            result = self.get_model_from_name(input_name)
+            result = self.get_model_from_name(input_name, default_args)
             if result is None:
                 print("%s model error!" % input_name)
         self.model_weight_init.init_weight(result)
         return result
 
-    def get_model_from_cfg(self, cfg_path, **kwargs):
+    def get_model_from_cfg(self, cfg_path, default_args=None):
         path, file_name_and_post = os.path.split(cfg_path)
         file_name, post = os.path.splitext(file_name_and_post)
         model_define = self.modelParse.readCfgFile(cfg_path)
-        model = MyModel(model_define, path)
+        model = MyModel(model_define, path, default_args)
         model.set_name(file_name)
         return model
 
-    def get_model_from_name(self, modelName, **kwargs):
+    def get_model_from_name(self, modelName, default_args=None):
         model = None
         if modelName == ModelName.VggNetCls:
-            model = VggNetCls()
+            model = VggNetCls(**default_args)
         elif modelName == ModelName.Inceptionv4Cls:
-            model = Inceptionv4Cls()
+            model = Inceptionv4Cls(**default_args)
         elif modelName == ModelName.SENetCls:
-            model = SENetCls()
+            model = SENetCls(**default_args)
         elif modelName == ModelName.GhostNetCls:
-            model = GhostNetCls()
+            model = GhostNetCls(**default_args)
         elif modelName == ModelName.MSRResNet:
-            model = MSRResNet(upscale_factor=3)
+            model = MSRResNet(**default_args)
         elif modelName == ModelName.MSRResNet:
-            model = SmallSRNet(upscale_factor=3)
+            model = SmallSRNet(**default_args)
         elif modelName == ModelName.FCNSeg:
-            model = FCN8sSeg()
+            model = FCN8sSeg(**default_args)
         elif modelName == ModelName.UNetSeg:
-            model = UNetSeg()
+            model = UNetSeg(**default_args)
         elif modelName == ModelName.RefineNetSeg:
-            model = RefineNetSeg()
+            model = RefineNetSeg(**default_args)
         elif modelName == ModelName.PSPNetSeg:
-            model = PSPNetSeg()
+            model = PSPNetSeg(**default_args)
         elif modelName == ModelName.EncNetSeg:
-            model = EncNetSeg()
+            model = EncNetSeg(**default_args)
         elif modelName == ModelName.BiSeNet:
-            model = BiSeNet()
+            model = BiSeNet(**default_args)
         elif modelName == ModelName.FastSCNN:
-            model = FastSCNN()
+            model = FastSCNN(**default_args)
         elif modelName == ModelName.ICNet:
-            model = ICNet()
+            model = ICNet(**default_args)
         elif modelName == ModelName.DeepLabV3:
-            model = DeepLabV3()
+            model = DeepLabV3(**default_args)
         elif modelName == ModelName.DeepLabV3Plus:
-            model = DeepLabV3Plus()
+            model = DeepLabV3Plus(**default_args)
         elif modelName == ModelName.MobilenetDeepLabV3Plus:
-            model = MobilenetDeepLabV3Plus()
+            model = MobilenetDeepLabV3Plus(**default_args)
         elif modelName == ModelName.MobileV2FCN:
-            model = MobileV2FCN()
+            model = MobileV2FCN(**default_args)
         elif modelName == ModelName.ComplexYOLO:
-            model = ComplexYOLO()
+            model = ComplexYOLO(**default_args)
         return model

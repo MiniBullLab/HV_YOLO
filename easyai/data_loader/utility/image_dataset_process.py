@@ -35,9 +35,17 @@ class ImageDataSetProcess(BaseDataSetProcess):
             result = np.ascontiguousarray(img_all, dtype=dtype)
         return result
 
-    def image_resize(self, src_image, image_size):
+    def cv_image_resize(self, src_image, image_size):
         image = cv2.resize(src_image, image_size, interpolation=cv2.INTER_NEAREST)
         return image
+
+    def cv_image_color_convert(self, src_image, flag):
+        result = None
+        if flag == 0:
+            result = cv2.cvtColor(src_image, cv2.COLOR_BGR2GRAY)
+        elif flag == 1:
+            result = cv2.cvtColor(src_image, cv2.COLOR_BGR2RGB)
+        return result
 
     def image_resize_square(self, src_image, image_size, color=(0, 0, 0)): # src_image h, w, c
         shape = src_image.shape[:2]  # shape = [height, width]

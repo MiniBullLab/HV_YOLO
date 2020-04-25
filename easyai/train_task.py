@@ -6,6 +6,7 @@ from easyai.helper.arguments_parse import TaskArgumentsParse
 from easyai.tasks.cls.classify_train import ClassifyTrain
 from easyai.tasks.det2d.detect2d_train import Detection2dTrain
 from easyai.tasks.seg.segment_train import SegmentionTrain
+from easyai.tasks.sr.super_resolution_train import SuperResolutionTrain
 from easyai.tools.model_to_onnx import ModelConverter
 from easyai.base_name.task_name import TaskName
 
@@ -35,6 +36,12 @@ class TrainTask():
         seg_train.load_pretrain_model(self.pretrain_model_path)
         seg_train.train(self.train_path, self.val_path)
         self.image_model_convert(seg_train, cfg_path)
+
+    def super_resolution_train(self, cfg_path, gpu_id, config_path):
+        sr_train = SuperResolutionTrain(cfg_path, gpu_id, config_path)
+        sr_train.load_pretrain_model(self.pretrain_model_path)
+        sr_train.train(self.train_path, self.val_path)
+        self.image_model_convert(sr_train, cfg_path)
 
     def image_model_convert(self, train_task, cfg_path):
         if self.is_convert:

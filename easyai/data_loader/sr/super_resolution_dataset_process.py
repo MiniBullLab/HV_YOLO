@@ -13,11 +13,14 @@ class SuperResolutionDatasetProcess(BaseDataSetProcess):
         super().__init__()
         self.dataset_process = ImageDataSetProcess()
 
-    def normaliza_dataset(self, src_image):
-        image = self.dataset_process.numpy_transpose(src_image)
-        return image
+    def normaliza_dataset(self, src_lr_image, src_hr_image):
+        lr_image = self.dataset_process.image_normaliza(src_lr_image)
+        lr_image = self.dataset_process.numpy_transpose(lr_image)
+        hr_image = self.dataset_process.image_normaliza(src_hr_image)
+        hr_image = self.dataset_process.numpy_transpose(hr_image)
+        return lr_image, hr_image
 
-    def resize_dataset(self, src_image, src_image_size, label, target_size):
-        image = self.dataset_process.image_resize(src_image, src_image_size)
-        target = self.dataset_process.image_resize(label, target_size)
+    def resize_dataset(self, lr_image, src_image_size, hr_image, target_size):
+        image = self.dataset_process.cv_image_resize(lr_image, src_image_size)
+        target = self.dataset_process.cv_image_resize(hr_image, target_size)
         return image, target

@@ -12,10 +12,9 @@ class BaseConfig():
         self.task_name = None
         self.root_save_dir = None
         self.model_save_dir_name = None
-        self.snapshot_path = None
+        self.snapshot_dir = None
         self.config_save_dir_name = None
         self.config_save_dir = None
-        self.config_path = None
         self.log_name = "easy"
         self.get_base_default_value()
 
@@ -37,9 +36,7 @@ class BaseConfig():
         self.root_save_dir = "./.log"
         self.model_save_dir_name = "snapshot"
         self.config_save_dir_name = "config"
-        self.log_name = "easy"
 
-        self.snapshot_path = os.path.join(self.root_save_dir, self.model_save_dir_name)
+        self.snapshot_dir = os.path.join(self.root_save_dir, self.model_save_dir_name)
 
         self.config_save_dir = os.path.join(self.root_save_dir, self.config_save_dir_name)
-        self.config_path = os.path.join(self.config_save_dir, "config.json")

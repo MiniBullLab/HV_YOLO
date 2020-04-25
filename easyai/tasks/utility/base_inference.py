@@ -33,9 +33,9 @@ class BaseInference(BaseTask):
     def postprocess(self, result):
         pass
 
-    def get_image_data_lodaer(self, input_path, image_size):
+    def get_image_data_lodaer(self, input_path, image_size, data_channel):
         if os.path.isdir(input_path):
-            dataloader = ImagesLoader(input_path, image_size)
+            dataloader = ImagesLoader(input_path, image_size, data_channel)
         else:
-            dataloader = VideoLoader(input_path, image_size)
+            dataloader = VideoLoader(input_path, image_size, data_channel)
         return dataloader

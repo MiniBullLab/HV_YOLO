@@ -16,7 +16,10 @@ class Classify(BaseInference):
         self.task_config = self.config_factory.get_config(self.task_name, self.config_path)
 
         self.torchModelProcess = TorchModelProcess()
-        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
+        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
+                                                      default_args={
+                                                          "data_channel": self.task_config.image_channel
+                                                      })
         self.device = self.torchModelProcess.getDevice()
 
     def load_weights(self, weights_path):
@@ -26,7 +29,8 @@ class Classify(BaseInference):
 
     def process(self, input_path):
         dataloader = self.get_image_data_lodaer(input_path,
-                                                self.task_config.image_size)
+                                                self.task_config.image_size,
+                                                self.task_config.image_channel)
 
     def infer(self, input_data, threshold=0.0):
         with torch.no_grad():

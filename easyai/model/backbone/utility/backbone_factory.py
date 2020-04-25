@@ -46,12 +46,12 @@ class BackboneFactory():
     def __init__(self):
         self.cfgReader = ModelParse()
 
-    def get_base_model(self, baseNetName, data_channel=3, **kwargs):
-        input_name = baseNetName.strip()
+    def get_base_model(self, backbone_name, default_args=None):
+        input_name = backbone_name.strip()
         if input_name.endswith("cfg"):
             result = self.get_backbone_from_cfg(input_name)
         else:
-            result = self.get_backbone_from_name(input_name, data_channel)
+            result = self.get_backbone_from_name(input_name, default_args)
             if result is None:
                 print("backbone:%s error" % input_name)
         return result
@@ -64,9 +64,10 @@ class BackboneFactory():
         model.set_name(file_name)
         return model
 
-    def get_backbone_from_name(self, net_name, data_channel=3):
+    def get_backbone_from_name(self, net_name, default_args=None):
         result = None
         net_name = net_name.strip()
+        data_channel = default_args['data_channel']
         if net_name == BackboneName.ShuffleNetV2_1_0:
             result = shufflenetv2_1_0(data_channel)
         elif net_name == BackboneName.MobileNetv3_small:

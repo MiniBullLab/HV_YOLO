@@ -13,17 +13,18 @@ from easyai.model.utility.base_model import *
 
 class MyModel(BaseModel):
 
-    def __init__(self, modelDefine, cfg_dir):
+    def __init__(self, modelDefine, cfg_dir, default_args=None):
         super().__init__()
         self.backbone_factory = BackboneFactory()
         self.createTaskList = CreateModuleList()
         self.modelDefine = modelDefine
         self.cfg_dir = cfg_dir
+        self.default_args = default_args
 
         self.create_block_list()
 
     def create_block_list(self):
-        basicModel = self.creatBaseModel()
+        basicModel = self.creat_backbone()
         self.add_module(BlockType.BaseNet, basicModel)
         taskBlockDict = self.createTask(basicModel)
         for key, block in taskBlockDict.items():
@@ -42,7 +43,7 @@ class MyModel(BaseModel):
             elif LossType.YoloLoss in key:
                 self.lossList.append(block)
 
-    def creatBaseModel(self):
+    def creat_backbone(self):
         result = None
         base_net = self.modelDefine[0]
         if base_net["type"] == BlockType.BaseNet:
@@ -51,7 +52,7 @@ class MyModel(BaseModel):
             input_name = base_net_name.strip()
             if input_name.endswith("cfg"):
                 input_name = os.path.join(self.cfg_dir, input_name)
-            result = self.backbone_factory.get_base_model(input_name)
+            result = self.backbone_factory.get_base_model(input_name, self.default_args)
         return result
 
     def createTask(self, basicModel):
