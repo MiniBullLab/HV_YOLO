@@ -18,31 +18,21 @@ class ModelNetShow():
     def model_show(self, model_path):
         input_x = torch.randn(1, 3, 224, 224)
         self.show_process.set_input(input_x)
-        model = self.model_factory.get_model(model_path)
+        model = self.model_factory.get_model(model_path,
+                                             default_args={"data_channel": 3})
         self.show_process.show_from_model(model)
 
     def backbone_show(self, backbone_path):
         input_x = torch.randn(1, 3, 224, 224)
         self.show_process.set_input(input_x)
-        model = self.backbone_factory.get_base_model(backbone_path)
+        model = self.backbone_factory.get_base_model(backbone_path,
+                                                     default_args={"data_channel": 3})
         self.show_process.show_from_model(model)
 
     def onnx_show(self, onnx_path):
         input_x = torch.randn(1, 3, 640, 352)
         self.show_process.set_input(input_x)
         self.show_process.show_from_onnx(onnx_path)
-
-    def pc_model_show(self, backbone_path):
-        input_x = torch.randn(1, 3, 1024)
-        self.show_process.set_input(input_x)
-        model = self.model_factory.get_model(backbone_path)
-        self.show_process.show_from_model(model)
-
-    def pc_backbone_show(self, backbone_path):
-        input_x = torch.randn(1, 3, 1024)
-        self.show_process.set_input(input_x)
-        model = self.backbone_factory.get_base_model(backbone_path)
-        self.show_process.show_from_model(model)
 
 
 def main():
@@ -58,7 +48,3 @@ if __name__ == '__main__':
         show.backbone_show(options.backbone)
     elif options.onnx_path is not None:
         show.onnx_show(options.onnx_path)
-    elif options.pc_model is not None:
-        show.pc_model_show(options.pc_model)
-    elif options.pc_backbone is not None:
-        show.pc_backbone_show(options.pc_backbone)

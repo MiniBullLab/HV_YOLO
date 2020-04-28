@@ -125,7 +125,7 @@ def _convert_BatchNorm(node,graph,err):
     input_name = str(node.inputs[0])
     output_name = str(node.outputs[0])
 
-    if input_name==output_name:
+    if input_name == output_name:
         inplace = True
     else:
         inplace = False
@@ -136,6 +136,7 @@ def _convert_BatchNorm(node,graph,err):
     graph.channel_dims[output_name] = graph.channel_dims[input_name]
 
     return bn_layer,scale_layer
+
 
 def _convert_Add(node,graph,err):
     input_name_list = [str(i) for i in node.inputs]
@@ -163,6 +164,7 @@ def _convert_Add(node,graph,err):
     graph.channel_dims[output_name] = graph.channel_dims[input_name_list[0]]
     return layer
 
+
 def _convert_Mul(node,graph,err):
     input_name_list = [str(i) for i in node.inputs]
     output_name = str(node.outputs[0])
@@ -188,18 +190,19 @@ def _convert_Mul(node,graph,err):
     graph.channel_dims[output_name] = graph.channel_dims[input_name_list[0]]
     return layer
 
+
 def _convert_Reshape(node,graph,err):
     node_name = node.name
     input_name = str(node.inputs[0])
     output_name = str(node.outputs[0])
-    if len(node.inputs)==1:
+    if len(node.inputs) == 1:
         shape = tuple(node.attrs.get('shape', ()))
     else:
         shape = tuple(node.input_tensors[node.inputs[1]])
     # if shape == ():
 
 
-    if input_name==output_name:
+    if input_name == output_name:
         inplace = True
     else:
         inplace = False
@@ -214,6 +217,7 @@ def _convert_Reshape(node,graph,err):
     else:
         return err.unsupported_op_configuration(node, "Reshape dimention number shall be 2 or 4")
 
+
 def _convert_Flatten(node, graph, err):
     node_name = node.name
     input_name = str(node.inputs[0])
@@ -226,6 +230,7 @@ def _convert_Flatten(node, graph, err):
     layer = myf("Flatten", node_name, [input_name], [output_name], in_place=inplace)
     # graph.channel_dims[output_name] = shape[1]
     return layer
+
 
 def _convert_pool(node,graph,err):
     node_name = node.name
@@ -252,6 +257,7 @@ def _convert_pool(node,graph,err):
     graph.channel_dims[output_name] = graph.channel_dims[input_name]
     return layer
 
+
 def _convert_dropout(node,graph,err):
     node_name = node.name
     input_name = str(node.inputs[0])
@@ -260,6 +266,7 @@ def _convert_dropout(node,graph,err):
     layer = myf("Dropout", node_name, [input_name], [output_name], dropout_ratio =ratio)
     graph.channel_dims[output_name] = graph.channel_dims[input_name]
     return layer
+
 
 def _convert_gemm(node,graph,err):
     node_name = node.name
@@ -293,6 +300,7 @@ def _convert_gemm(node,graph,err):
     graph.channel_dims[output_name] = W.shape[0]
 
     return layer
+
 
 def _convert_upsample(node,graph,err):
     factor = int(node.attrs["height_scale"])
@@ -333,6 +341,7 @@ def _convert_upsample(node,graph,err):
     graph.channel_dims[output_name] = graph.channel_dims[input_name]
     return layer
 
+
 def _convert_concat(node,graph,err):
     node_name = node.name
     input_name_list = [str(i) for i in node.inputs]
@@ -349,6 +358,7 @@ def _convert_concat(node,graph,err):
         graph.channel_dims[output_name] = graph.channel_dims[input_name_list[0]]
 
     return layer
+
 
 def _convert_conv_transpose(node,graph,err):
     input_name = str(node.inputs[0])

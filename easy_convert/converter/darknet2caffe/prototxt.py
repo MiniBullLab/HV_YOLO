@@ -1,5 +1,7 @@
+from functools import reduce
 from collections import OrderedDict
 from caffe.proto import caffe_pb2
+
 
 def parse_caffemodel(caffemodel):
     model = caffe_pb2.NetParameter()
@@ -82,12 +84,14 @@ def parse_prototxt(protofile):
     else:
         return props
 
+
 def is_number(s):
     try:
         float(s)
         return True
     except ValueError:
         return False
+
 
 def print_prototxt(net_info):
     # whether add double quote
@@ -126,6 +130,7 @@ def print_prototxt(net_info):
     for layer in layers:
         print_block(layer, 'layer', 0)
 
+
 def save_prototxt(net_info, protofile, region=True):
     fp = open(protofile, 'w')
     # whether add double quote
@@ -141,31 +146,85 @@ def save_prototxt(net_info, protofile, region=True):
 
     def print_block(block_info, prefix, indent):
         blanks = ''.join([' ']*indent)
-        print >>fp, '%s%s {' % (blanks, prefix)
-        for key,value in block_info.items():
+        print('%s%s {' % (blanks, prefix), file=fp)
+        for key, value in block_info.items():
             if type(value) == OrderedDict:
                 print_block(value, key, indent+4)
             elif type(value) == list:
                 for v in value:
-                    print >> fp, '%s    %s: %s' % (blanks, key, format_value(v))
+                    print('%s    %s: %s' % (blanks, key, format_value(v)), file=fp)
             else:
-                print >> fp, '%s    %s: %s' % (blanks, key, format_value(value))
-        print >> fp, '%s}' % blanks
-        
+                print('%s    %s: %s' % (blanks, key, format_value(value)), file=fp)
+        print('%s}' % blanks, file=fp)
+
     props = net_info['props']
     layers = net_info['layers']
-    print >> fp, 'name: \"%s\"' % props['name']
-    print >> fp, 'input: \"%s\"' % props['input']
-    print >> fp, 'input_dim: %s' % props['input_dim'][0]
-    print >> fp, 'input_dim: %s' % props['input_dim'][1]
-    print >> fp, 'input_dim: %s' % props['input_dim'][2]
-    print >> fp, 'input_dim: %s' % props['input_dim'][3]
-    print >> fp, ''
+
+    print('layer {', file=fp)
+    print('  name: \"%s\"' % props['name'], file=fp)
+    print('  type: \"Input\"', file=fp)
+    print('  top: \"data\"', file=fp)
+    print('  input_param {', file=fp)
+    print('    shape {', file=fp)
+    print('      dim: %s' % props['input_dim'][0], file=fp)
+    print('      dim: %s' % props['input_dim'][1], file=fp)
+    print('      dim: %s' % props['input_dim'][2], file=fp)
+    print('      dim: %s' % props['input_dim'][3], file=fp)
+    print('    }', file=fp)
+    print('  }', file=fp)
+    print('}', file=fp)
+
+    print('', file=fp)
     for layer in layers:
-        if layer['type'] != 'Region' or region == True:
+        if layer['type'] != 'Region' or region:
             print_block(layer, 'layer', 0)
     fp.close()
 
+
+def format_data_layer(protofile):
+    model_name_pattern = '(.*)\..*'
+    dim_pattern = 'input_dim: (.*)'
+    with open(protofile) as protofile_handle:
+        lines = protofile_handle.readlines()
+   
+    try:
+        import re
+        #model_name = re.findall(model_name_pattern, protofile)[0]
+        model_name = re.findall(model_name_pattern, protofile.replace("/", "-"))[0]
+        dim = [re.findall(dim_pattern, lines[1])[0],
+               re.findall(dim_pattern, lines[2])[0],
+               re.findall(dim_pattern, lines[3])[0],
+               re.findall(dim_pattern, lines[4])[0],
+              ]
+    except:
+        print("Don't need to format data layer")
+        return
+
+    dim = map(str, dim)
+    data_layer_str = '''name: "%(model_name)s"
+
+layer {
+  name: "data"
+  type: "Input"
+  top: "data"
+  input_param {
+    shape {
+      dim: %(dim0)s
+      dim: %(dim1)s
+      dim: %(dim2)s
+      dim: %(dim3)s
+    }    
+  }
+}\n''' % {'model_name': model_name, 'dim0': dim[0], 'dim1': dim[1], 'dim2': dim[2], 'dim3': dim[3]}
+
+    print(data_layer_str)
+
+    proto_lines_str = data_layer_str + reduce(lambda l1, l2: l1+l2, lines[5:])
+
+    savefile_handle = open(protofile, "w")
+    savefile_handle.write(proto_lines_str)    
+    savefile_handle.close()
+        
 
 if __name__ == '__main__':
     import sys

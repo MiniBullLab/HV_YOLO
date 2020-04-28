@@ -37,6 +37,9 @@ from easyai.model.backbone.cls.pnasnet import pnasnet_A, pnasnet_B
 from easyai.model.backbone.cls.wider_resnet import wider_resnet16, wider_resnet20, wider_resnet38
 from easyai.model.backbone.cls.wider_resnet import wider_resnet16_a2, wider_resnet20_a2, wider_resnet38_a2
 from easyai.model.backbone.cls.ghostnet import ghost_net
+from easyai.model.backbone.cls.hrnet import hrnet_w18_small, hrnet_w18_small_v2, hrnet_w18
+from easyai.model.backbone.cls.hrnet import hrnet_w30, hrnet_w32, hrnet_w40, hrnet_w44
+from easyai.model.backbone.cls.hrnet import hrnet_w48, hrnet_w64
 from easyai.model.backbone.utility.my_backbone import MyBackbone
 from easyai.model.utility.model_parse import ModelParse
 
@@ -218,5 +221,23 @@ class BackboneFactory():
             result = wider_resnet38_a2(data_channel)
         elif net_name == BackboneName.GhostNet:
             result = ghost_net(data_channel)
+        elif net_name == BackboneName.HRnet_w18_small:
+            result = hrnet_w18_small(data_channel)
+        elif net_name == BackboneName.HRnet_w18_small_v2:
+            result = hrnet_w18_small_v2(data_channel)
+        elif net_name == BackboneName.HRnet_w18:
+            result = hrnet_w18(data_channel)
+        elif net_name == BackboneName.HRnet_w30:
+            result = hrnet_w30(data_channel)
+        elif net_name == BackboneName.HRnet_w32:
+            result = hrnet_w32(data_channel)
+        elif net_name == BackboneName.HRnet_w40:
+            result = hrnet_w40(data_channel)
+        elif net_name == BackboneName.HRnet_w44:
+            result = hrnet_w44(data_channel)
+        elif net_name == BackboneName.HRnet_w48:
+            result = hrnet_w48(data_channel)
+        elif net_name == BackboneName.HRnet_w64:
+            result = hrnet_w64(data_channel)
         return result
 

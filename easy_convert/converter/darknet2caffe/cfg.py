@@ -1,5 +1,6 @@
-import torch
 from collections import OrderedDict
+import torch
+
 
 def parse_cfg(cfgfile):
     def erase_comment(line):
@@ -24,7 +25,7 @@ def parse_cfg(cfgfile):
                 block['batch_normalize'] = 0
         else:
             line = erase_comment(line)
-            key,value = line.split('=')
+            key, value = line.split('=')
             key = key.strip()
             if key == 'type':
                 key = '_type'
@@ -37,6 +38,7 @@ def parse_cfg(cfgfile):
     fp.close()
     return blocks
 
+
 def print_cfg(blocks):
     for block in blocks:
         print('[%s]' % (block['type']))
@@ -44,6 +46,8 @@ def print_cfg(blocks):
             if key != 'type':
                 print('%s=%s' % (key, value))
         print('')
+
+
 def save_cfg(blocks, cfgfile):
     with open(cfgfile, 'w') as fp:
         for block in blocks:
@@ -52,6 +56,7 @@ def save_cfg(blocks, cfgfile):
                 if key != 'type':
                     fp.write('%s=%s\n' % (key, value))
             fp.write('\n')
+
 
 def print_cfg_nicely(blocks):
     print('layer     filters    size              input                output');
@@ -174,6 +179,7 @@ def print_cfg_nicely(blocks):
         else:
             print('unknown type %s' % (block['type']))
 
+
 def load_conv(buf, start, conv_model):
     num_w = conv_model.weight.numel()
     num_b = conv_model.bias.numel()
@@ -181,13 +187,16 @@ def load_conv(buf, start, conv_model):
     conv_model.weight.data.copy_(torch.from_numpy(buf[start:start+num_w])); start = start + num_w
     return start
 
+
 def save_conv(fp, conv_model):
     if conv_model.bias.is_cuda:
-        convert2cpu(conv_model.bias.data).numpy().tofile(fp)
-        convert2cpu(conv_model.weight.data).numpy().tofile(fp)
+        pass
+        # convert2cpu(conv_model.bias.data).numpy().tofile(fp)
+        # convert2cpu(conv_model.weight.data).numpy().tofile(fp)
     else:
         conv_model.bias.data.numpy().tofile(fp)
         conv_model.weight.data.numpy().tofile(fp)
+
 
 def load_conv_bn(buf, start, conv_model, bn_model):
     num_w = conv_model.weight.numel()
@@ -199,13 +208,15 @@ def load_conv_bn(buf, start, conv_model, bn_model):
     conv_model.weight.data.copy_(torch.from_numpy(buf[start:start+num_w])); start = start + num_w 
     return start
 
+
 def save_conv_bn(fp, conv_model, bn_model):
     if bn_model.bias.is_cuda:
-        convert2cpu(bn_model.bias.data).numpy().tofile(fp)
-        convert2cpu(bn_model.weight.data).numpy().tofile(fp)
-        convert2cpu(bn_model.running_mean).numpy().tofile(fp)
-        convert2cpu(bn_model.running_var).numpy().tofile(fp)
-        convert2cpu(conv_model.weight.data).numpy().tofile(fp)
+        pass
+        # convert2cpu(bn_model.bias.data).numpy().tofile(fp)
+        # convert2cpu(bn_model.weight.data).numpy().tofile(fp)
+        # convert2cpu(bn_model.running_mean).numpy().tofile(fp)
+        # convert2cpu(bn_model.running_var).numpy().tofile(fp)
+        # convert2cpu(conv_model.weight.data).numpy().tofile(fp)
     else:
         bn_model.bias.data.numpy().tofile(fp)
         bn_model.weight.data.numpy().tofile(fp)
@@ -213,13 +224,15 @@ def save_conv_bn(fp, conv_model, bn_model):
         bn_model.running_var.numpy().tofile(fp)
         conv_model.weight.data.numpy().tofile(fp)
 
+
 def save_conv_shrink_bn(fp, conv_model, bn_model, eps=1e-5):
     if bn_model.bias.is_cuda:
-        bias = bn_model.bias.data - bn_model.running_mean * bn_model.weight.data / torch.sqrt(bn_model.running_var + eps)
-        convert2cpu(bias).numpy().tofile(fp)
-        s = conv_model.weight.data.size()
-        weight = conv_model.weight.data * (bn_model.weight.data / torch.sqrt(bn_model.running_var + eps)).view(-1,1,1,1).repeat(1, s[1], s[2], s[3])
-        convert2cpu(weight).numpy().tofile(fp)
+        pass
+        # bias = bn_model.bias.data - bn_model.running_mean * bn_model.weight.data / torch.sqrt(bn_model.running_var + eps)
+        # convert2cpu(bias).numpy().tofile(fp)
+        # s = conv_model.weight.data.size()
+        # weight = conv_model.weight.data * (bn_model.weight.data / torch.sqrt(bn_model.running_var + eps)).view(-1,1,1,1).repeat(1, s[1], s[2], s[3])
+        # convert2cpu(weight).numpy().tofile(fp)
     else:
         bias = bn_model.bias.data - bn_model.running_mean * bn_model.weight.data / torch.sqrt(bn_model.running_var + eps)
         bias.numpy().tofile(fp)
@@ -227,12 +240,14 @@ def save_conv_shrink_bn(fp, conv_model, bn_model, eps=1e-5):
         weight = conv_model.weight.data * (bn_model.weight.data / torch.sqrt(bn_model.running_var + eps)).view(-1,1,1,1).repeat(1, s[1], s[2], s[3])
         weight.numpy().tofile(fp)
 
+
 def load_fc(buf, start, fc_model):
     num_w = fc_model.weight.numel()
     num_b = fc_model.bias.numel()
     fc_model.bias.data.copy_(torch.from_numpy(buf[start:start+num_b]));     start = start + num_b
     fc_model.weight.data.copy_(torch.from_numpy(buf[start:start+num_w]));   start = start + num_w 
     return start
+
 
 def save_fc(fp, fc_model):
     fc_model.bias.data.numpy().tofile(fp)

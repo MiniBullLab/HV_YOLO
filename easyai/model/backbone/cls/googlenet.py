@@ -7,7 +7,7 @@ from easyai.base_name.block_name import LayerType
 from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
-from easyai.model.base_block.utility.multi_conv_block import InceptionBlock
+from easyai.model.base_block.utility.multi_path_conv_block import InceptionBlock
 
 
 __all__ = ['GoogleNet']
