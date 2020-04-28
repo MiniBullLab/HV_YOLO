@@ -34,7 +34,9 @@ class SegmentionTest(BaseTest):
         self.segment_inference.load_weights(weights_path)
 
     def test(self, val_path):
-        dataloader = get_segment_val_dataloader(val_path, self.test_task_config.image_size,
+        number_class = len(self.test_task_config.class_name)
+        dataloader = get_segment_val_dataloader(val_path, number_class,
+                                                self.test_task_config.image_size,
                                                 self.test_task_config.image_channel,
                                                 self.test_task_config.test_batch_size)
         print("Eval data num: {}".format(len(dataloader)))

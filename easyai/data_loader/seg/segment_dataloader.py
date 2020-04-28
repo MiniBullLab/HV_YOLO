@@ -11,9 +11,10 @@ from easyai.data_loader.seg.segment_data_augment import SegmentDataAugment
 
 class SegmentDataLoader(data.Dataset):
 
-    def __init__(self, train_path, image_size=(768, 320),
+    def __init__(self, train_path, number_class, image_size=(768, 320),
                  data_channel=3, is_augment=False):
         super().__init__()
+        self.number_class = number_class
         self.is_augment = is_augment
         self.image_size = image_size
         self.data_channel = data_channel
@@ -23,21 +24,16 @@ class SegmentDataLoader(data.Dataset):
         self.dataset_process = SegmentDatasetProcess()
         self.data_augment = SegmentDataAugment()
 
-        self.volid_label_seg = []
-        self.valid_label_seg = [[0], [1]]
-
     def __getitem__(self, index):
         img_path, label_path = self.segment_sample.get_sample_path(index)
         src_image = self.read_src_image(img_path)
         label = self.image_process.read_gray_image(label_path)
         image, target = self.dataset_process.resize_dataset(src_image,
                                                             self.image_size,
-                                                            label,
-                                                            self.volid_label_seg,
-                                                            self.valid_label_seg)
+                                                            label)
         if self.is_augment:
             image, target = self.data_augment.augment(image, target)
-        target = self.dataset_process.change_label(target, self.valid_label_seg)
+        target = self.dataset_process.change_label(target, self.number_class)
         rgb_image = self.dataset_process.normaliza_dataset(image)
         torch_image = self.dataset_process.numpy_to_torch(rgb_image, flag=0)
         torch_target = self.dataset_process.numpy_to_torch(target).long()
@@ -57,17 +53,17 @@ class SegmentDataLoader(data.Dataset):
         return src_image
 
 
-def get_segment_train_dataloader(train_path, image_size, data_channel, batch_size,
-                                 is_augment=False, num_workers=8):
-    dataloader = SegmentDataLoader(train_path, image_size, data_channel, is_augment)
+def get_segment_train_dataloader(train_path, number_class, image_size, data_channel,
+                                 batch_size, is_augment=False, num_workers=8):
+    dataloader = SegmentDataLoader(train_path, number_class, image_size, data_channel, is_augment)
     result = data.DataLoader(dataset=dataloader, num_workers=num_workers,
                              batch_size=batch_size, shuffle=True)
     return result
 
 
-def get_segment_val_dataloader(val_path, image_size, data_channel,
+def get_segment_val_dataloader(val_path, number_class, image_size, data_channel,
                                batch_size, num_workers=8):
-    dataloader = SegmentDataLoader(val_path, image_size, data_channel, False)
+    dataloader = SegmentDataLoader(val_path, number_class, image_size, data_channel, False)
     result = data.DataLoader(dataset=dataloader, num_workers=num_workers,
                              batch_size=batch_size, shuffle=False)
     return result
