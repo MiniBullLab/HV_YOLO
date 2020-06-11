@@ -5,7 +5,7 @@
 import os
 from easyai.tasks.utility.base_test import BaseTest
 from easyai.evaluation.calculate_mAp import CalculateMeanAp
-from easyai.data_loader.det.detection_val_dataloader import get_detection_val_dataloader
+from easyai.data_loader.det2d.det2d_val_dataloader import get_detection_val_dataloader
 from easyai.tasks.det2d.detect2d import Detection2d
 from easyai.base_name.task_name import TaskName
 

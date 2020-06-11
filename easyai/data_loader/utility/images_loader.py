@@ -20,7 +20,7 @@ class ImagesLoader(DataLoader):
         temp_files = self.dirProcess.getDirFiles(input_dir, "*.*")
         self.files = list(temp_files)
         self.count = len(self.files)
-        self.color = (0, 0, 0)
+        self.image_pad_color = (0, 0, 0)
 
     def __iter__(self):
         self.index = -1
@@ -32,10 +32,11 @@ class ImagesLoader(DataLoader):
             raise StopIteration
         image_path = self.files[self.index]
         cv_image, src_image = self.read_src_image(image_path)
-        # Padded resize
-        image, _, _ = self.dataset_process.image_resize_square(src_image,
-                                                               self.image_size,
-                                                               self.color)
+        shape = src_image.shape[:2]  # shape = [height, width]
+        src_size = (shape[0], shape[1])
+        ratio, pad_size = self.dataset_process.get_square_size(src_size, self.image_size)
+        image, = self.dataset_process.image_resize_square(src_image, ratio, pad_size,
+                                                          color=self.image_pad_color)
         image = self.dataset_process.image_normaliza(image)
         numpy_image = self.dataset_process.numpy_transpose(image)
         torch_image = self.all_numpy_to_tensor(numpy_image)

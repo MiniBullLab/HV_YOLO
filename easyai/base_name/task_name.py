@@ -9,3 +9,4 @@ class TaskName():
     Detect2d_Task = "detect2d"
     Segment_Task = "segment"
     SuperResolution_Task = "super_resolution"
+    Det2d_Seg_Task = "det2d_seg"

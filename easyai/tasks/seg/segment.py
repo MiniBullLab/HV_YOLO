@@ -7,7 +7,7 @@ import numpy as np
 from easyai.tasks.utility.base_inference import BaseInference
 from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.tasks.seg.segment_result_process import SegmentResultProcess
-from easyai.drawing.segment_show import SegmentionShow
+from easyai.visualization.segment_show import SegmentionShow
 from easyai.base_name.task_name import TaskName
 
 
@@ -56,7 +56,7 @@ class Segmentation(BaseInference):
         with torch.no_grad():
             output_list = self.model(input_data.to(self.device))
             output = self.compute_output(output_list[:])
-            prediction = self.result_process.get_detection_result(output, threshold)
+            prediction = self.result_process.get_segmentation_result(output, threshold)
         return prediction, output_list
 
     def postprocess(self, result):

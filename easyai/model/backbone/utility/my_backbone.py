@@ -9,23 +9,23 @@ from easyai.model.utility.create_model_list import CreateModuleList
 
 class MyBackbone(BaseBackbone):
 
-    def __init__(self, modelDefine):
+    def __init__(self, model_defines):
         super().__init__()
         self.createTaskList = CreateModuleList()
-        self.modelDefine = modelDefine
+        self.model_defines = model_defines
         self.create_block_list()
 
     def create_block_list(self):
         self.clear_list()
 
-        outChannels = []
-        self.createTaskList.createOrderedDict(self.modelDefine, outChannels)
-        blockDict = self.createTaskList.getBlockList()
+        base_out_channels = []
+        self.createTaskList.createOrderedDict(self.model_defines, base_out_channels)
+        block_dict = self.createTaskList.getBlockList()
 
-        self.block_out_channels = self.createTaskList.getOutChannelList()
-        for key, block in blockDict.items():
+        out_channel_list = self.createTaskList.getOutChannelList()
+        for index, (key, block) in enumerate(block_dict.items()):
             name = "base_%s" % key
-            self.add_module(name, block)
+            self.add_block_list(name, block, out_channel_list[index], flag=1)
 
     def forward(self, x):
         base_outputs = []

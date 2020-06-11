@@ -3,7 +3,7 @@
 # Author:
 
 import cv2
-from easyai.drawing.image_drawing import ImageDrawing
+from easyai.visualization.image_drawing import ImageDrawing
 
 
 class DetectionShow():

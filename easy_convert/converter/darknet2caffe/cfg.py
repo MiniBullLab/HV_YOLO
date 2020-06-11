@@ -8,7 +8,7 @@ def parse_cfg(cfgfile):
         return line
     blocks = []
     fp = open(cfgfile, 'r')
-    block =  None
+    block = None
     line = fp.readline()
     while line != '':
         line = line.rstrip()

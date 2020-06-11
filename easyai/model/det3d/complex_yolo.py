@@ -14,7 +14,7 @@ from easyai.model.utility.base_model import *
 
 class ComplexYOLO(BaseModel):
 
-    def __init__(self, backbone_path="./cfg/det3d/complex-darknet19.cfg"):
+    def __init__(self, backbone_path="./cfg/det3d/complex_darknet19.cfg"):
         super().__init__()
         self.set_name(ModelName.ComplexYOLO)
         self.backbone_path = backbone_path

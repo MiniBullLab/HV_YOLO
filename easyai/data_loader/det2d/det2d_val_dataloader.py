@@ -4,8 +4,8 @@
 
 import torch.utils.data as data
 from easyai.helper.imageProcess import ImageProcess
-from easyai.data_loader.det.detection_sample import DetectionSample
-from easyai.data_loader.det.detection_dataset_process import DetectionDataSetProcess
+from easyai.data_loader.det2d.det2d_sample import DetectionSample
+from easyai.data_loader.det2d.det2d_dataset_process import DetectionDataSetProcess
 
 
 class DetectionValDataLoader(data.Dataset):
@@ -24,9 +24,9 @@ class DetectionValDataLoader(data.Dataset):
     def __getitem__(self, index):
         img_path, label_path = self.detection_sample.get_sample_path(index)
         cv_image, src_image = self.read_src_image(img_path)
-        image, _ = self.dataset_process.resize_dataset(src_image,
-                                                       self.image_size)
-        image, _ = self.dataset_process.normaliza_dataset(image)
+        image, _ = self.dataset_process.resize_src_image(src_image,
+                                                         self.image_size)
+        image, _ = self.dataset_process.normaliza_image(image)
         image = self.dataset_process.numpy_to_torch(image, flag=0)
         return img_path, cv_image, image
 

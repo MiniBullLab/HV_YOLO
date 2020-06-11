@@ -3,7 +3,7 @@
 # Author:
 
 import os
-from easyai.data_loader.det.detection_train_dataloader import DetectionTrainDataloader
+from easyai.data_loader.det2d.det2d_train_dataloader import DetectionTrainDataloader
 from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.torch_utility.torch_freeze_bn import TorchFreezeNormalization
 from easyai.solver.torch_optimizer import TorchOptimizer

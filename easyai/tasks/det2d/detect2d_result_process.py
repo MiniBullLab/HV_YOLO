@@ -49,8 +49,8 @@ class Detect2dResultProcess():
     def resize_detection_objects(self, src_size, image_size,
                                  detection_objects, class_name):
         result = []
-        ratio, pad = self.dataset_process.resize_square_size(src_size,
-                                                             image_size)
+        ratio, pad = self.dataset_process.get_square_size(src_size,
+                                                          image_size)
         for obj in detection_objects:
             temp_object = DetectionObject()
             x1 = (obj.min_corner.x - pad[0] // 2) / ratio

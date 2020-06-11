@@ -3,14 +3,45 @@
 # Author:
 
 import cv2
-import numpy as np
 import random
+import numpy as np
+from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
 
 
 class ImageDataAugment():
 
     def __init__(self):
-        pass
+        self.dataset_process = ImageDataSetProcess()
+        self.border_value = (0.0, 0.0, 0.0)
+
+    def augment_affine(self, src_image, degrees=(-15, 15),
+                       translate=(0.0, 0.0), scale=(1.0, 1.0), shear=(-3, 3)):
+        image_size = (src_image.shape[1], src_image.shape[0])
+        matrix, degree = self.dataset_process.affine_matrix(image_size,
+                                                            degrees=degrees,
+                                                            translate=translate,
+                                                            scale=scale,
+                                                            shear=shear)
+        image = self.dataset_process.image_affine(src_image, matrix,
+                                                  border_value=self.border_value)
+        return image, matrix, degree
+
+    def augment_lr_flip(self, src_image):
+        image = src_image[:]
+        is_lr = False
+        if random.random() > 0.5:
+            image = np.fliplr(image)
+            is_lr = True
+        return image, is_lr
+
+    def augment_up_flip(self, src_image):
+        # random up-down flip
+        image = src_image[:]
+        is_up = False
+        if random.random() > 0.5:
+            image = np.flipud(image)
+            is_up = True
+        return image, is_up
 
     def augment_hsv(self, rgb_image):
         # SV augmentation by 50%

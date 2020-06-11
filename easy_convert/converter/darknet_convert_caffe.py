@@ -1,4 +1,7 @@
-import sys
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
 import pathlib
 import caffe
 import numpy as np
@@ -26,9 +29,10 @@ def parse_arguments():
 
 class DarknetConvertCaffe():
 
-    def __init__(self, cfg_path, weight_path):
+    def __init__(self, cfg_path, weight_path, header_count=4):
         self.cfg_path = pathlib.Path(cfg_path)
         self.weight_path = pathlib.Path(weight_path)
+        self.header_count = header_count  # yolov2 is 4 or yolov3 is 5
         self.proto_path = self.cfg_path.with_suffix(".prototxt")
         self.caffe_model_save_path = self.cfg_path.with_suffix(".caffemodel")
 
@@ -46,7 +50,7 @@ class DarknetConvertCaffe():
 
         blocks = parse_cfg(cfgfile)
         fp = open(weightfile, 'rb')
-        header = np.fromfile(fp, count=5, dtype=np.int32)
+        header = np.fromfile(fp, count=self.header_count, dtype=np.int32)
         buf = np.fromfile(fp, dtype=np.float32)
         fp.close()
 
@@ -105,6 +109,8 @@ class DarknetConvertCaffe():
             elif block['type'] == 'maxpool':
                 layer_id = layer_id + 1
             elif block['type'] == 'avgpool':
+                layer_id = layer_id + 1
+            elif block['type'] == 'reorg':
                 layer_id = layer_id + 1
             elif block['type'] == 'region':
                 layer_id = layer_id + 1
@@ -401,48 +407,37 @@ class DarknetConvertCaffe():
                 layer_id = layer_id + 1
 
             elif block['type'] == 'route':
-                route_layer = OrderedDict()
-                layer_name = str(block['layers']).split(',')
-                # print(layer_name[0])
-                bottom_layer_size = len(str(block['layers']).split(','))
-                # print(bottom_layer_size)
-                if 1 == bottom_layer_size:
-                    prev_layer_id = layer_id + int(block['layers'])
+                from_layers = block['layers'].split(',')
+                bottom_tmp = []
+                if len(from_layers) == 1:
+                    if int(from_layers[0]) < 0:
+                        prev_layer_id = layer_id + int(from_layers[0])
+                    else:
+                        prev_layer_id = int(from_layers[0])
                     bottom = topnames[prev_layer_id]
-                    # topnames[layer_id] = bottom
-                    route_layer['bottom'] = bottom
-                if 2 == bottom_layer_size:
-                    prev_layer_id1 = layer_id + int(layer_name[0])
-                    # print(prev_layer_id1)
-                    prev_layer_id2 = int(layer_name[1]) + 1
-                    print(topnames)
-                    bottom1 = topnames[prev_layer_id1]
-                    bottom2 = topnames[prev_layer_id2]
-                    route_layer['bottom'] = [bottom1, bottom2]
-                if 4 == bottom_layer_size:
-                    prev_layer_id1 = layer_id + int(layer_name[0])
-                    prev_layer_id2 = layer_id + int(layer_name[1])
-                    prev_layer_id3 = layer_id + int(layer_name[2])
-                    prev_layer_id4 = layer_id + int(layer_name[3])
-
-                    bottom1 = topnames[prev_layer_id1]
-                    bottom2 = topnames[prev_layer_id2]
-                    bottom3 = topnames[prev_layer_id3]
-                    bottom4 = topnames[prev_layer_id4]
-                    route_layer['bottom'] = [bottom1, bottom2, bottom3, bottom4]
-                if 'name' in block:
-                    route_layer['top'] = block['name']
-                    route_layer['name'] = block['name']
+                    topnames[layer_id] = bottom
+                    layer_id = layer_id + 1
                 else:
-                    route_layer['top'] = 'layer%d-route' % layer_id
-                    route_layer['name'] = 'layer%d-route' % layer_id
-                route_layer['type'] = 'Concat'
-                print(route_layer)
-                layers.append(route_layer)
-                bottom = route_layer['top']
-                print(layer_id)
-                topnames[layer_id] = bottom
-                layer_id = layer_id + 1
+                    for index in range(len(from_layers)):
+                        if int(from_layers[index]) < 0:
+                            prev_layer_id = layer_id + int(from_layers[index])
+                        else:
+                            prev_layer_id = int(from_layers[index])
+                        bottom = topnames[prev_layer_id]
+                        bottom_tmp.append(bottom)
+                    concat_layer = OrderedDict()
+                    concat_layer['bottom'] = bottom_tmp
+                    if 'name' in block:
+                        concat_layer['top'] = block['name']
+                        concat_layer['name'] = block['name']
+                    else:
+                        concat_layer['top'] = 'layer%d-concat' % layer_id
+                        concat_layer['name'] = 'layer%d-concat' % layer_id
+                    concat_layer['type'] = 'Concat'
+                    layers.append(concat_layer)
+                    bottom = concat_layer['top']
+                    topnames[layer_id] = bottom
+                    layer_id = layer_id + 1
 
             elif block['type'] == 'shortcut':
                 prev_layer_id1 = layer_id + int(block['from'])
@@ -541,6 +536,25 @@ class DarknetConvertCaffe():
                 convolution_param['weight_filler'] = weight_filler_param
                 layers.append(deconv_layer)
                 topnames[layer_id] = deconv_layer['top']
+                layer_id = layer_id + 1
+
+            # add reorg layer yolov2
+            elif block['type'] == 'reorg':
+                reorg_layer = OrderedDict()
+                reorg_layer['bottom'] = bottom
+                if 'name' in block:
+                    reorg_layer['top'] = block['name']
+                    reorg_layer['name'] = block['name']
+                else:
+                    reorg_layer['top'] = 'layer%d-reorg' % layer_id
+                    reorg_layer['name'] = 'layer%d-reorg' % layer_id
+                reorg_layer['type'] = 'Reorg'
+                reorg_param = OrderedDict()
+                reorg_param['stride'] = 2
+                reorg_layer['reorg_param'] = reorg_param
+                layers.append(reorg_layer)
+                bottom = reorg_layer['top']
+                topnames[layer_id] = bottom
                 layer_id = layer_id + 1
 
             elif block['type'] == 'yolo':

@@ -28,6 +28,25 @@ class FrozenBatchNorm2d(nn.Module):
         return x * scale + bias
 
 
+class L2Norm(nn.Module):
+    def __init__(self, input_channel, scale):
+        super().__init__()
+        self.input_channel = input_channel
+        self.gamma = scale or None
+        self.eps = 1e-10
+        self.weight = nn.Parameter(torch.Tensor(self.input_channel))
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        nn.init.constant_(self.weight, self.gamma)
+
+    def forward(self, x):
+        norm = x.pow(2).sum(dim=1, keepdim=True).sqrt()+self.eps
+        x = x / norm
+        out = self.weight.unsqueeze(0).unsqueeze(2).unsqueeze(3).expand_as(x) * x
+        return out
+
+
 class NormalizationFunction():
 
     def __init__(self):

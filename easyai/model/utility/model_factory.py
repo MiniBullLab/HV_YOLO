@@ -47,6 +47,9 @@ class ModelFactory():
         return result
 
     def get_model_from_cfg(self, cfg_path, default_args=None):
+        if not cfg_path.endswith("cfg"):
+            print("%s model error" % cfg_path)
+            return None
         path, file_name_and_post = os.path.split(cfg_path)
         file_name, post = os.path.splitext(file_name_and_post)
         model_define = self.modelParse.readCfgFile(cfg_path)
@@ -66,7 +69,7 @@ class ModelFactory():
             model = GhostNetCls(**default_args)
         elif modelName == ModelName.MSRResNet:
             model = MSRResNet(**default_args)
-        elif modelName == ModelName.MSRResNet:
+        elif modelName == ModelName.SmallSRNet:
             model = SmallSRNet(**default_args)
         elif modelName == ModelName.FCNSeg:
             model = FCN8sSeg(**default_args)

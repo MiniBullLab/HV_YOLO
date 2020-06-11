@@ -9,12 +9,12 @@ from easyai.model.base_block.utility.base_block import *
 
 class MyMaxPool2d(BaseBlock):
 
-    def __init__(self, kernel_size, stride):
+    def __init__(self, kernel_size, stride, ceil_mode=False):
         super().__init__(LayerType.MyMaxPool2d)
         layers = OrderedDict()
         maxpool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride,
                                padding=int((kernel_size - 1) // 2),
-                               ceil_mode=False)
+                               ceil_mode=ceil_mode)
         if kernel_size == 2 and stride == 1:
             layer1 = nn.ZeroPad2d((0, 1, 0, 1))
             layers["pad2d"] = layer1

@@ -3,6 +3,7 @@ import numpy as np
 from copy import deepcopy
 import torch.nn.functional as F
 
+
 class TorchModelPrune():
 
     def __init__(self, global_percent, layer_keep):

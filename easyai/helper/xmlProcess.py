@@ -3,6 +3,7 @@ import xml.dom
 import xml.dom.minidom
 import xml.etree.ElementTree as ElementTree
 
+
 class XMLProcess():
 
     MIN_WIDTH = 0
@@ -13,6 +14,41 @@ class XMLProcess():
 
     def parseRectData(self, xmlPath):
         xmlTree = ElementTree.parse(xmlPath)
+        root = xmlTree.getroot()
+        folder_node = root.find("folder")
+        folder = folder_node.text
+        image_node = root.find("filename")
+        image_name = image_node.text
+        # print(image_name)
+        imageSizeNode = root.find("size")
+        widthNode = imageSizeNode.find("width")
+        heightNode = imageSizeNode.find("height")
+        imageSize = Point2d(int(widthNode.text), int(heightNode.text))
+
+        boxes = []
+        for object_node in root.findall('rectObject'):
+            box_node = object_node.find("bndbox")
+            name_node = object_node.find("name")
+            xMinNode = box_node.find("xmin")
+            yMinNode = box_node.find("ymin")
+            xMaxNode = box_node.find("xmax")
+            yMaxNode = box_node.find("ymax")
+            xMin = int(xMinNode.text)
+            yMin = int(yMinNode.text)
+            xMax = int(xMaxNode.text)
+            yMax = int(yMaxNode.text)
+            box = Rect2D()
+            box.name = name_node.text
+            box.min_corner.x = xMin
+            box.min_corner.y = yMin
+            box.max_corner.x = xMax
+            box.max_corner.y = yMax
+            if box.width() >= self.MIN_WIDTH and box.height() >= self.MIN_HEIGHT:
+                boxes.append(box)
+        return image_name, imageSize, boxes
+
+    def parse_key_points_data(self, xml_path):
+        xmlTree = ElementTree.parse(xml_path)
         root = xmlTree.getroot()
         folder_node = root.find("folder")
         folder = folder_node.text
@@ -94,7 +130,7 @@ class XMLProcess():
         root.appendChild(nodeSegmented)
 
         for box in boxes:
-            nodeObject = doc.createElement("object")
+            nodeObject = doc.createElement("rectObject")
             nodeObjectName = doc.createElement("name")
             nodeObjectName.appendChild(doc.createTextNode(str(box.name)))
             nodeObjectPose = doc.createElement("pose")

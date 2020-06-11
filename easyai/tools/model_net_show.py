@@ -16,7 +16,7 @@ class ModelNetShow():
         self.show_process = ModelShow()
 
     def model_show(self, model_path):
-        input_x = torch.randn(1, 3, 224, 224)
+        input_x = torch.randn(1, 3, 512, 512)
         self.show_process.set_input(input_x)
         model = self.model_factory.get_model(model_path,
                                              default_args={"data_channel": 3})

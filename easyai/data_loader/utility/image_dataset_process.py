@@ -47,10 +47,8 @@ class ImageDataSetProcess(BaseDataSetProcess):
             result = cv2.cvtColor(src_image, cv2.COLOR_BGR2RGB)
         return result
 
-    def image_resize_square(self, src_image, image_size, color=(0, 0, 0)): # src_image h, w, c
+    def image_resize_square(self, src_image, ratio, pad_size, color=(0, 0, 0)):
         shape = src_image.shape[:2]  # shape = [height, width]
-        src_size = (shape[1], shape[0])
-        ratio, pad_size = self.resize_square_size(src_size, image_size)
         new_shape = (round(shape[0] * ratio), round(shape[1] * ratio))
         top = pad_size[1] // 2
         bottom = pad_size[1] - (pad_size[1] // 2)
@@ -60,9 +58,9 @@ class ImageDataSetProcess(BaseDataSetProcess):
                            interpolation=cv2.INTER_AREA)  # resized, no border
         image = cv2.copyMakeBorder(image, top, bottom, left, right,
                                    cv2.BORDER_CONSTANT, value=color)
-        return image, ratio, pad_size
+        return image
 
-    def resize_square_size(self, src_size, dst_size):
+    def get_square_size(self, src_size, dst_size):
         # ratio  = old / new
         ratio = min(float(dst_size[0]) / src_size[0], float(dst_size[1]) / src_size[1])
         new_shape = (round(src_size[0] * ratio), round(src_size[1] * ratio))

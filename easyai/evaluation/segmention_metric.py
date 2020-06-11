@@ -46,7 +46,7 @@ class SegmentionMetric():
                 'Mean IoU : \t': mean_iu,}, cls_iu
 
     def fast_hist(self, gt, pred, n_class):
-        mask = (pred >= 0) & (pred < n_class)
+        mask = (gt >= 0) & (gt < n_class)
         hist = np.bincount(n_class * gt[mask].astype(int) +
                            pred[mask], minlength=n_class**2).reshape(n_class, n_class)
         return hist

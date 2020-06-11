@@ -8,9 +8,9 @@ import random
 from easyai.helper import XMLProcess
 from easyai.helper import ImageProcess
 from easyai.data_loader.utility.data_loader import DataLoader
-from easyai.data_loader.det.detection_sample import DetectionSample
-from easyai.data_loader.det.detection_dataset_process import DetectionDataSetProcess
-from easyai.data_loader.det.detection_data_augment import DetectionDataAugment
+from easyai.data_loader.det2d.det2d_sample import DetectionSample
+from easyai.data_loader.det2d.det2d_dataset_process import DetectionDataSetProcess
+from easyai.data_loader.det2d.det2d_data_augment import DetectionDataAugment
 
 
 class DetectionTrainDataloader(DataLoader):
@@ -67,10 +67,8 @@ class DetectionTrainDataloader(DataLoader):
                                                                 boxes,
                                                                 self.className)
             image, labels = self.dataset_augment.augment(image, labels)
-            image, labels = self.dataset_process.normaliza_dataset(image,
-                                                                   labels,
-                                                                   (width, height))
-
+            image = self.dataset_process.normaliza_image(image)
+            labels = self.dataset_process.normaliza_labels(labels, (width, height))
             labels = self.dataset_process.change_outside_labels(labels)
 
             numpy_images.append(image)

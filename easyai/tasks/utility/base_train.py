@@ -13,6 +13,8 @@ class BaseTrain(BaseTask):
         super().__init__()
         self.timer = TimerProcess()
         self.config_path = config_path
+        self.is_sparse = False
+        self.sparse_ratio = 0.0
 
     @abc.abstractmethod
     def load_pretrain_model(self, weights_path):
@@ -33,4 +35,8 @@ class BaseTrain(BaseTask):
     @abc.abstractmethod
     def compute_loss(self, output_list, targets):
         pass
+
+    def set_is_sparse_train(self, is_sparse=False, sparse_ratio=0.0):
+        self.is_sparse = is_sparse
+        self.sparse_ratio = sparse_ratio
 

@@ -70,7 +70,10 @@ class BackboneFactory():
     def get_backbone_from_name(self, net_name, default_args=None):
         result = None
         net_name = net_name.strip()
-        data_channel = default_args['data_channel']
+        if default_args:
+            data_channel = default_args['data_channel']
+        else:
+            data_channel = 3
         if net_name == BackboneName.ShuffleNetV2_1_0:
             result = shufflenetv2_1_0(data_channel)
         elif net_name == BackboneName.MobileNetv3_small:

@@ -58,13 +58,20 @@ class TorchModelProcess():
             print("Loading %s fail" % weightPath)
         return checkpoint
 
-    def saveLatestModel(self, latestWeightsFile, model, optimizer, epoch=0, best_value=0):
+    def saveLatestModel(self, weights_path, model,
+                        optimizer=None, epoch=0, best_value=0):
         # Save latest checkpoint
-        checkpoint = {'epoch': epoch,
-                      'best_value': best_value,
-                      'model': model.state_dict(),
-                      'optimizer': optimizer.state_dict()}
-        torch.save(checkpoint, latestWeightsFile)
+        if optimizer is None:
+            checkpoint = {'epoch': epoch,
+                          'best_value': best_value,
+                          'model': model.state_dict()
+                          }
+        else:
+            checkpoint = {'epoch': epoch,
+                          'best_value': best_value,
+                          'model': model.state_dict(),
+                          'optimizer': optimizer.state_dict()}
+        torch.save(checkpoint, weights_path)
 
     def getLatestModelValue(self, checkpoint):
         start_epoch = 0

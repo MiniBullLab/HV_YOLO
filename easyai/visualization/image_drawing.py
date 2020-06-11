@@ -4,7 +4,7 @@
 
 import cv2
 import numpy as np
-from easyai.drawing.colorDefine import ColorDefine
+from easyai.visualization.colorDefine import ColorDefine
 
 
 class ImageDrawing():
@@ -32,7 +32,7 @@ class ImageDrawing():
                 g[result == index] = gray_value
                 b[result == index] = gray_value
             else:
-                color_list = [int(x) for x in value.spilt(',') if x.strip()]
+                color_list = [int(x) for x in value.split(',') if x.strip()]
                 r[result == index] = color_list[0]
                 g[result == index] = color_list[1]
                 b[result == index] = color_list[2]

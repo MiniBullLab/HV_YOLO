@@ -39,7 +39,7 @@ class CaffeYoloV3Inference():
 
 			totalBoxes = []
 			totalCount = 0
-			mask=[[6,7,8],[3,4,5],[0,1,2]]
+			mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
 			for k in range(self.box_of_each_grid):
 				feat = eval('feat'+str(k+1))
 

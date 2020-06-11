@@ -12,7 +12,7 @@ class SegmentResultProcess():
     def __init__(self):
         self.dataset_process = ImageDataSetProcess()
 
-    def get_detection_result(self, prediction, threshold=0):
+    def get_segmentation_result(self, prediction, threshold=0):
         result = None
         if prediction.ndim == 2:
             result = (prediction >= threshold).astype(int)
@@ -25,8 +25,8 @@ class SegmentResultProcess():
 
     def resize_segmention_result(self, src_size, image_size,
                                  segmention_result):
-        ratio, pad = self.dataset_process.resize_square_size(src_size,
-                                                             image_size)
+        ratio, pad = self.dataset_process.get_square_size(src_size,
+                                                          image_size)
         start_h = pad[1] // 2
         stop_h = image_size[1] - (pad[1] - (pad[1] // 2))
         start_w = pad[0] // 2
@@ -37,7 +37,6 @@ class SegmentResultProcess():
         return result
 
     def output_feature_map_resize(self, input_data, target):
-        target = target.type(input_data.dtype)
         n, c, h, w = input_data.size()
         nt, ht, wt = target.size()
         # Handle inconsistent size between input and target

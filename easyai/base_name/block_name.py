@@ -87,3 +87,5 @@ class BlockType():
 
     SEBlock = "seBlock"
     SEConvBlock = "seConvBlock"
+
+    Detection2dBlock = "detection2dBlock"

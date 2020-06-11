@@ -5,7 +5,7 @@
 import os.path
 import numpy as np
 from easyai.helper import XMLProcess
-from easyai.data_loader.det.detection_sample import DetectionSample
+from easyai.data_loader.det2d.det2d_sample import DetectionSample
 
 
 class CalculateMeanAp():

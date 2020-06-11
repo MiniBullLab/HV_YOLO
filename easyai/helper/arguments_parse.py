@@ -21,7 +21,7 @@ class TaskArgumentsParse():
                           help="path to data config file")
 
         parser.add_option("-m", "--model", dest="model",
-                          metavar="PATH", type="string", default="cfg/cifar100.cfg",
+                          metavar="PATH", type="string", default="cfg/conv_block.cfg",
                           help="cfg file path or model name")
 
         parser.add_option("-w", "--weights", dest="weights",
@@ -62,7 +62,7 @@ class TaskArgumentsParse():
                           help="path to data config file")
 
         parser.add_option("-m", "--model", dest="model",
-                          metavar="PATH", type="string", default="cfg/cifar100.cfg",
+                          metavar="PATH", type="string", default="cfg/conv_block.cfg",
                           help="cfg file path or model name")
 
         parser.add_option("-p", "--pretrainModel", dest="pretrainModel",
@@ -100,7 +100,7 @@ class TaskArgumentsParse():
                           help="images path or video path")
 
         parser.add_option("-m", "--model", dest="model",
-                          metavar="PATH", type="string", default="cfg/cifar100.cfg",
+                          metavar="PATH", type="string", default="cfg/conv_block.cfg",
                           help="cfg file path or model name")
 
         parser.add_option("-w", "--weights", dest="weights",

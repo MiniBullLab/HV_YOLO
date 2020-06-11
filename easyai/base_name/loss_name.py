@@ -9,10 +9,18 @@ class LossType():
     BinaryCrossEntropy2d = "bceLoss"
     MeanSquaredErrorLoss = "mseLoss"
 
-    OhemCrossEntropy2d = "ohemCrossEntropy2d"
     SmoothCrossEntropy = "smoothCrossEntropy"
     FocalLoss = "focalLoss"
     FocalBinaryLoss = "focalBinaryLoss"
-    YoloLoss = "yolo"
 
+    # det2d
+    Region2dLoss = "Region2dLoss"
+    YoloV3Loss = "YoloV3Loss"
+    MultiBoxLoss = "MultiBoxLoss"
+    KeyPoints2dRegionLoss = "KeyPoints2dRegionLoss"
+
+    # det3d
+
+    # seg
     EncNetLoss = "encNetLoss"
+    OhemCrossEntropy2d = "ohemCrossEntropy2d"

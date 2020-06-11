@@ -28,7 +28,7 @@ class InferenceTask():
 def main():
     print("process start...")
     options = TaskArgumentsParse.inference_parse_arguments()
-    inference_task = InferenceTask(options.inputPath, options.model)
+    inference_task = InferenceTask(options.inputPath, options.weights)
     if options.task_name == TaskName.Detect2d_Task:
         inference_task.detect2d_task(options.model, 0, options.config_path)
     elif options.task_name == TaskName.Segment_Task:

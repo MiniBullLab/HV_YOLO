@@ -9,7 +9,7 @@ from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.tasks.det2d.detect2d_result_process import Detect2dResultProcess
 from easyai.base_algorithm.non_max_suppression import NonMaxSuppression
 from easyai.base_algorithm.fast_non_max_suppression import FastNonMaxSuppression
-from easyai.drawing.detect_show import DetectionShow
+from easyai.visualization.detect_show import DetectionShow
 from easyai.base_name.task_name import TaskName
 
 

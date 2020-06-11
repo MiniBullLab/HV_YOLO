@@ -8,24 +8,27 @@ from easyai.helper.arguments_parse import ToolArgumentsParse
 
 class ModelConverter():
 
-    def __init__(self, input_size=(352, 640)):
+    def __init__(self, input_size=(352, 640), data_channel=3):
         self.backbone_factory = BackboneFactory()
         self.model_factory = ModelFactory()
         self.converter = TorchConvertOnnx()
         self.input_size = input_size  # w * h
+        self.data_channel = data_channel
 
     def model_convert(self, model_path, weight_path, save_dir):
-        input_x = torch.randn(1, 3, self.input_size[1], self.input_size[0])
+        input_x = torch.randn(1, self.data_channel, self.input_size[1], self.input_size[0])
         self.converter.set_input(input_x)
         self.converter.set_save_dir(save_dir)
-        model = self.model_factory.get_model(model_path)
+        model = self.model_factory.get_model(model_path,
+                                             default_args={"data_channel": self.data_channel})
         self.converter.torch2onnx(model, weight_path)
 
     def base_model_convert(self, base_model_path, weight_path, save_dir):
-        input_x = torch.randn(1, 3, self.input_size[1], self.input_size[0])
+        input_x = torch.randn(1, self.data_channel, self.input_size[1], self.input_size[0])
         self.converter.set_input(input_x)
         self.converter.set_save_dir(save_dir)
-        model = self.backbone_factory.get_base_model(base_model_path)
+        model = self.backbone_factory.get_base_model(base_model_path,
+                                                     default_args={"data_channel": self.data_channel})
         self.converter.torch2onnx(model, weight_path)
 
 

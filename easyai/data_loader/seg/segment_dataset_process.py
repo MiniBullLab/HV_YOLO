@@ -9,10 +9,10 @@ from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
 
 
 class SegmentDatasetProcess(BaseDataSetProcess):
-    def __init__(self):
+    def __init__(self, image_pad_color=(0, 0, 0)):
         super().__init__()
         self.dataset_process = ImageDataSetProcess()
-        self.image_pad_color = (0, 0, 0)
+        self.image_pad_color = image_pad_color
         self.label_pad_color = 250
 
     def normaliza_dataset(self, src_image):
@@ -21,14 +21,18 @@ class SegmentDatasetProcess(BaseDataSetProcess):
         return image
 
     def resize_dataset(self, src_image, image_size, label):
-        image, _, _ = self.dataset_process.image_resize_square(src_image,
-                                                               image_size,
-                                                               color=self.image_pad_color)
-        target, _, _ = self.dataset_process.image_resize_square(label,
-                                                                image_size,
-                                                                self.label_pad_color)
-        target = np.array(label, dtype=np.uint8)
+        src_size = (src_image.shape[1], src_image.shape[0])  # [width, height]
+        ratio, pad_size = self.dataset_process.get_square_size(src_size, image_size)
+        image = self.dataset_process.image_resize_square(src_image, ratio, pad_size,
+                                                         color=self.image_pad_color)
+        target = self.resize_lable(label, ratio, pad_size)
         return image, target
+
+    def resize_lable(self, label, ratio, pad_size):
+        target = self.dataset_process.image_resize_square(label, ratio, pad_size,
+                                                          self.label_pad_color)
+        target = np.array(target, dtype=np.uint8)
+        return target
 
     def change_label(self, label, number_class):
         valid_masks = np.zeros(label.shape)

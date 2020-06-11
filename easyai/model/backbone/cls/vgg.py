@@ -6,6 +6,7 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType
 from easyai.model.backbone.utility.base_backbone import *
+from easyai.model.base_block.utility.pooling_layer import MyMaxPool2d
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.utility.utility_block import ConvActivationBlock
 
@@ -18,12 +19,12 @@ class VGG(BaseBackbone):
     CONFIG_DICT = {
         BackboneName.Vgg11: [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
         BackboneName.Vgg13: [64, 64, 'M', 128, 128, 'M',
-                              256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
+                             256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
         BackboneName.Vgg16: [64, 64, 'M', 128, 128, 'M',
-                              256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
+                             256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
         BackboneName.Vgg19: [64, 64, 'M', 128, 128, 'M',
-                              256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M',
-                              512, 512, 512, 512, 'M'],
+                             256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M',
+                             512, 512, 512, 512, 'M'],
         'vgg13_dilated8': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512],
         'vgg16_dilated8': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512],
         'vgg19_dilated8': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512],
@@ -54,8 +55,8 @@ class VGG(BaseBackbone):
         in_channels = self.data_channel
         for v in cfg:
             if v == 'M':
-                temp_layer = nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=False)
-                self.add_block_list(LayerType.MyMaxPool2d, temp_layer, in_channels)
+                max_pooling = MyMaxPool2d(kernel_size=2, stride=2, ceil_mode=False)
+                self.add_block_list(LayerType.MyMaxPool2d, max_pooling, in_channels)
             else:
                 if self.is_norm:
                     conv2d = ConvBNActivationBlock(in_channels=in_channels,

@@ -2,6 +2,7 @@
 import os
 import random
 import subprocess
+import time
 
 import numpy as np
 import torch
@@ -57,4 +58,11 @@ def set_random_seed(seed, has_cuda=False):
     if has_cuda:
         torch.cuda.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.enabled = True
         torch.backends.cudnn.benchmark = True
+
+
+def worker_init_fn(worker_id):
+    time_seed = np.array(time.time(), dtype=np.int32)
+    np.random.seed(time_seed + worker_id)
+    print("WORKER {} seed:".format(worker_id), np.random.get_state()[1][0])
