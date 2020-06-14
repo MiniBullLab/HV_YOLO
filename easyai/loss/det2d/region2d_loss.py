@@ -126,7 +126,7 @@ class Region2dLoss(YoloLoss):
 
         # Get x,y,w,h,conf,cls
         coord = outputs[:, :, :, :4]
-        coord[:, :, :2, :] = torch.sigmoid(outputs[:, :, :, :2])
+        coord[:, :, :, :2] = torch.sigmoid(outputs[:, :, :, :2])
         coord = coord.view(batch_size, -1, 4)
         conf = torch.sigmoid(outputs[:, :, :, 4]).view(batch_size, -1, 1)
         cls = outputs[:, :, :, 5:].view(batch_size, -1, self.class_number)

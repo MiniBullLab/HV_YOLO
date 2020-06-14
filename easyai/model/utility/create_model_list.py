@@ -89,7 +89,7 @@ class CreateModuleList():
             self.input_channels = num_output
         elif module_def['type'] == LayerType.Upsample:
             scale = int(module_def['stride'])
-            mode = module_def.get('model', 'bilinear')
+            mode = module_def.get('mode', 'bilinear')
             upsample = Upsample(scale_factor=scale, mode=mode)
             self.add_block_list(LayerType.Upsample, upsample, self.filters)
             self.input_channels = self.filters
