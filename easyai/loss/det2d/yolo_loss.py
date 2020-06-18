@@ -22,11 +22,12 @@ class YoloLoss(BaseLoss):
         self.gt_process = Det2dGroundTruthProcess()
 
     def decode_predict_box(self, coord, N, H, W, device):
-        pred_boxes = torch.zeros(N * self.anchor_count * H * W, 4, dtype=torch.float, device=device)
-        lin_x = torch.range(0, W - 1).to(device).repeat(H, 1).view(H * W)
-        lin_y = torch.range(0, H - 1).to(device).repeat(W, 1).t().contiguous().view(H * W)
-        anchor_w = self.anchor_sizes[:, 0].contiguous().view(self.anchor_count, 1).to(device)
-        anchor_h = self.anchor_sizes[:, 1].contiguous().view(self.anchor_count, 1).to(device)
+        all_count = N * self.anchor_count * H * W
+        pred_boxes = torch.zeros(all_count, 4, dtype=torch.float, device=device)
+        lin_x = torch.linspace(0, W - 1, W).to(device).repeat(H, 1).view(H * W)
+        lin_y = torch.linspace(0, H - 1, H).to(device).repeat(W, 1).t().contiguous().view(H * W)
+        anchor_w = self.anchors[:, 0].view(self.anchor_count, 1).to(device)
+        anchor_h = self.anchors[:, 1].view(self.anchor_count, 1).to(device)
 
         pred_boxes[:, 0] = (coord[:, :, 0].detach() + lin_x).view(-1)
         pred_boxes[:, 1] = (coord[:, :, 1].detach() + lin_y).view(-1)
@@ -37,15 +38,17 @@ class YoloLoss(BaseLoss):
     def decode_predict_points(self, x_point, y_point, point_count,
                               N, H, W, device):
         # Create pred points
-        point_all_count = N * 1 * H * W
+        all_count = N * 1 * H * W
         temp_count = N * 1
-        pred_corners = torch.FloatTensor(point_count * 2, point_all_count)
-        grid_x = torch.linspace(0, W - 1, W).repeat(H, 1).repeat(temp_count, 1, 1).view(point_all_count).cuda()
-        grid_y = torch.linspace(0, H - 1, H).repeat(W, 1).t().repeat(temp_count, 1, 1).view(point_all_count).cuda()
+        pred_corners = torch.zeros(point_count * 2, all_count, dtype=torch.float, device=device)
+        grid_x = torch.linspace(0, W - 1, W).to(device).repeat(H, 1).\
+            repeat(temp_count, 1, 1).view(all_count)
+        grid_y = torch.linspace(0, H - 1, H).to(device).repeat(W, 1).t().\
+            repeat(temp_count, 1, 1).view(all_count)
         for i in range(0, self.keypoint_count, 2):
             pred_corners[i] = (x_point[i].data.contiguous().view_as(grid_x) + grid_x)
             pred_corners[i + 1] = (y_point[i].data.contiguous().view_as(grid_y) + grid_y)
-        return pred_corners.to(device)
+        return pred_corners
 
     def scale_anchor(self):
         if self.anchor_step == 4:

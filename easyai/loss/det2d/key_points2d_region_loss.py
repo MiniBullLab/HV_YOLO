@@ -69,9 +69,9 @@ class KeyPoints2dRegionLoss(YoloLoss):
 
     def compute_confidence(self, pred_corners, gt_targets,
                            batch_size, H, W, device):
-        conf_mask = torch.ones(batch_size, 1, H, W,
-                               requires_grad=False, device=device) * self.noobject_scale
-        num_anchors = 1 * H * W
+        num_anchors = H * W
+        conf_mask = torch.ones(batch_size, num_anchors, requires_grad=False,
+                               device=device) * self.noobject_scale
         for b in range(batch_size):
             pred_data = pred_corners[b]
             gt_data = gt_targets[b]
@@ -79,7 +79,8 @@ class KeyPoints2dRegionLoss(YoloLoss):
                 continue
             cur_confs = torch.zeros(num_anchors)
             for i, anno in enumerate(gt_data):
-                gt_corners, _, _ = self.get_gt_points(anno, W, H).repeat(num_anchors, 1).t().to(device)
+                gt_corners, _, _ = self.gt_process.scale_gt_points(anno, self.point_count, W, H).\
+                    repeat(num_anchors, 1).t().to(device)
                 mean_conf = self.corner2d_confidence(gt_corners, pred_data.t(), self.point_count, W, H)
                 # some irrelevant areas are filtered, in the same grid multiple anchor boxes might exceed the threshold
                 cur_confs = torch.max(cur_confs, mean_conf).view(1, H, W)
@@ -96,21 +97,21 @@ class KeyPoints2dRegionLoss(YoloLoss):
 
     def build_targets(self, pred_corners, gt_targets, H, W, device):
         batch_size = len(gt_targets)
-
-        coord_mask = torch.zeros(batch_size, 1, H, W, requires_grad=False, device=device)
-        cls_mask = torch.zeros(batch_size, 1, H, W, requires_grad=False, device=device)
+        coord_mask = torch.zeros(batch_size, H * W, requires_grad=False, device=device)
+        cls_mask = torch.zeros(batch_size, H * W, requires_grad=False, device=device)
 
         txs = []
         tys = []
         for i in range(self.point_count):
-            txs.append(torch.zeros(batch_size, 1, H, W, device=device))
-            tys.append(torch.zeros(batch_size, 1, H, W, device=device))
-        tconf = torch.zeros(batch_size, 1, H, W, device=device)
-        tcls = torch.zeros(batch_size, 1, H, W, device=device)
+            txs.append(torch.zeros(batch_size, H * W, device=device))
+            tys.append(torch.zeros(batch_size, H * W, device=device))
+        tconf = torch.zeros(batch_size, H * W, device=device)
+        tcls = torch.zeros(batch_size, H * W, device=device)
 
+        self.normaliza_points(pred_corners, batch_size, H, W)
         conf_mask = self.compute_confidence(pred_corners, gt_targets,
                                             batch_size, H, W, device)
-        self.seen_process(batch_size, txs, tys, coord_mask)
+        # self.seen_process(batch_size, txs, tys, coord_mask)
 
         num_ground_truth = 0
         num_det_correct = 0
@@ -121,21 +122,21 @@ class KeyPoints2dRegionLoss(YoloLoss):
                 continue
             num_ground_truth += len(gt_data)
             for i, anno in enumerate(gt_data):
-                gt_corners, gx, gy = self.get_gt_points(anno, W, H)
+                gt_corners, gx, gy = self.gt_process.scale_gt_points(anno, self.point_count, W, H)
                 gi0 = int(gx[0])
                 gj0 = int(gy[0])
                 gt_corners = gt_corners.to(device)
                 pred_corners = pred_data[gj0 * W + gi0]
                 conf = self.corner2d_confidence(gt_corners, pred_corners, self.point_count, W, H)
-                coord_mask[b][0][gj0][gi0] = 1
-                cls_mask[b][0][gj0][gi0] = 1
-                conf_mask[b][0][gj0][gi0] = self.object_scale
+                coord_mask[b][gj0 * W + gi0] = 1
+                cls_mask[b][gj0 * W + gi0] = 1
+                conf_mask[b][gj0 * W + gi0] = self.object_scale
                 # Update targets
                 for index in range(self.point_count):
-                    txs[i][b][0][gj0][gi0] = gx[index] - gi0
-                    tys[i][b][0][gj0][gi0] = gy[index] - gj0
-                tconf[b][0][gj0][gi0] = conf
-                tcls[b][0][gj0][gi0] = gt_data[i, 0]
+                    txs[index][b][gj0 * W + gi0] = gx[index] - gi0
+                    tys[index][b][gj0 * W + gi0] = gy[index] - gj0
+                tconf[b][gj0 * W + gi0] = conf
+                tcls[b][gj0 * W + gi0] = gt_data[i, 0]
                 # Update recall during training
                 if conf > 0.5:
                     num_det_correct = num_det_correct + 1
@@ -151,13 +152,13 @@ class KeyPoints2dRegionLoss(YoloLoss):
 
         x_point = []
         y_point = []
-        x_point.append(torch.sigmoid(output[:, :, :, 0]))
-        y_point.append(torch.sigmoid(output[:, :, :, 1]))
+        x_point.append(torch.sigmoid(output[:, :, 0]))
+        y_point.append(torch.sigmoid(output[:, :, 1]))
         for index in range(2, self.point_count, 2):
-            x_point.append(output[:, :, :, index])
-            y_point.append(output[:, :, :, index + 1])
-        conf = torch.sigmoid(output[:, :, :, self.loc_count]).view(N, -1, 1)
-        cls = output[:, :, :, self.loc_count + 1:self.loc_count + 1 + self.class_number].\
+            x_point.append(output[:, :, index])
+            y_point.append(output[:, :, index + 1])
+        conf = torch.sigmoid(output[:, :, self.loc_count]).view(N, -1, 1)
+        cls = output[:, :, self.loc_count + 1:self.loc_count + 1 + self.class_number].\
             view(N, -1, self.class_number)
 
         pred_corners = self.decode_predict_points(x_point, y_point, self.point_count,
@@ -169,17 +170,18 @@ class KeyPoints2dRegionLoss(YoloLoss):
             cls = F.softmax(cls, 2)
             return torch.cat([pred_corners, conf, cls], 2)
         else:
-            self.normaliza_points(pred_corners, N, H, W)
             num_ground_truth, num_det_correct, \
             coord_mask, conf_mask, cls_mask, \
             txs, tys, tconf, tcls = self.build_targets(pred_corners, targets, H, W, device)
 
-            cls_mask = (cls_mask == 1)
-            tcls = tcls[cls_mask].long()
+            # conf
+            conf = conf.view(N, H * W)
             conf_mask = conf_mask.sqrt()
+            # cls
+            cls = cls.view(-1, self.class_number)
+            tcls = tcls[cls_mask].view(-1).long()
             cls_mask = cls_mask.view(-1, 1).repeat(1, self.class_number)
             cls = cls[cls_mask].view(-1, self.class_number)
-
             # Create loss
             loss_x = 0
             loss_y = 0

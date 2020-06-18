@@ -4,11 +4,8 @@
 
 import os
 from easyai.data_loader.cls.classify_dataloader import get_classify_train_dataloader
-from easyai.torch_utility.torch_model_process import TorchModelProcess
-from easyai.torch_utility.torch_freeze_bn import TorchFreezeNormalization
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.solver.lr_factory import LrSchedulerFactory
-from easyai.utility.train_log import TrainLogger
 from easyai.tasks.utility.base_task import DelayedKeyboardInterrupt
 from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.cls.classify_test import ClassifyTest
@@ -18,15 +15,8 @@ from easyai.base_name.task_name import TaskName
 class ClassifyTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path)
-        self.set_task_name(TaskName.Classify_Task)
-        self.train_task_config = self.config_factory.get_config(self.task_name, self.config_path)
+        super().__init__(config_path, TaskName.Classify_Task)
 
-        self.train_logger = TrainLogger(self.train_task_config.log_name,
-                                        self.train_task_config.root_save_dir)
-
-        self.torchModelProcess = TorchModelProcess()
-        self.freeze_normalization = TorchFreezeNormalization()
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
 
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
@@ -40,10 +30,6 @@ class ClassifyTrain(BaseTrain):
         self.total_images = 0
         self.start_epoch = 0
         self.best_precision = 0
-        self.optimizer = None
-
-    def load_pretrain_model(self, weights_path):
-        self.torchModelProcess.loadPretainModel(weights_path, self.model)
 
     def load_latest_param(self, latest_weights_path):
         checkpoint = None

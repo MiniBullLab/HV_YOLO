@@ -19,7 +19,7 @@ class Region2dLoss(YoloLoss):
         self.reduction = reduction
         self.coord_weight = coord_weight
         self.noobject_weight = noobject_weight
-        self.object_scale = object_weight
+        self.object_weight = object_weight
         self.class_weight = class_weight
         self.iou_threshold = iou_threshold
 
@@ -29,8 +29,7 @@ class Region2dLoss(YoloLoss):
         self.ce = nn.CrossEntropyLoss()
 
         self.info = {'object_count': 0, 'average_iou': 0, 'recall50': 0, 'recall75': 0,
-                     'coord_xy_loss': 0.0, 'coord_wh_loss': 0.0, 'conf_loss': 0.0,
-                     'cls_loss': 0.0}
+                     'coord_loss': 0.0, 'conf_loss': 0.0, 'cls_loss': 0.0}
 
     def build_targets(self, pred_boxes, gt_targets, height, width, device):
         batch_size = len(gt_targets)
@@ -41,11 +40,11 @@ class Region2dLoss(YoloLoss):
                                     requires_grad=False, device=device)
         conf_mask = torch.ones(batch_size, self.anchor_count, height * width,
                                requires_grad=False, device=device) * self.noobject_weight
-        coord_mask = torch.zeros(batch_size, self.anchor_count, 1, height * width,
+        coord_mask = torch.zeros(batch_size, self.anchor_count, height * width, 1,
                                  requires_grad=False, device=device)
         cls_mask = torch.zeros(batch_size, self.anchor_count, height * width,
                                requires_grad=False, device=device).byte()
-        tcoord = torch.zeros(batch_size, self.anchor_count, 4, height * width,
+        tcoord = torch.zeros(batch_size, self.anchor_count, height * width, 4,
                              requires_grad=False, device=device)
         tconf = torch.zeros(batch_size, self.anchor_count, height * width,
                             requires_grad=False, device=device)
@@ -88,20 +87,20 @@ class Region2dLoss(YoloLoss):
                 recall75 += (iou > 0.75).item()
                 iou_sum += iou.item()
 
-                coord_mask[b][best_n][0][gj * width + gi] = 1
+                coord_mask[b][best_n][gj * width + gi][0] = 1
                 cls_mask[b][best_n][gj * width + gi] = 1
                 conf_mask[b][best_n][gj * width + gi] = self.object_weight
                 object_mask[b][best_n][gj * width + gi] = 1
                 no_object_mask[b][best_n][gj * width + gi] = 0
-                tcoord[b][best_n][0][gj * width + gi] = gt_box[i, 0] - gi
-                tcoord[b][best_n][1][gj * width + gi] = gt_box[i, 1] - gj
-                tcoord[b][best_n][2][gj * width + gi] = math.log(max(gt_box[i, 2], 1.0) /
+                tcoord[b][best_n][gj * width + gi][0] = gt_box[i, 0] - gi
+                tcoord[b][best_n][gj * width + gi][1] = gt_box[i, 1] - gj
+                tcoord[b][best_n][gj * width + gi][2] = math.log(max(gt_box[i, 2], 1.0) /
                                                                  self.anchor_sizes[best_n, 0])
-                tcoord[b][best_n][3][gj * width + gi] = math.log(max(gt_box[i, 3], 1.0) /
+                tcoord[b][best_n][gj * width + gi][3] = math.log(max(gt_box[i, 3], 1.0) /
                                                                  self.anchor_sizes[best_n, 1])
                 tconf[b][best_n][gj * width + gi] = iou
-                tcls[b][best_n][gj * width + gi] = int(anno[0])
-
+                tcls[b][best_n][gj * width + gi] = anno[0]
+        # informaion
         if object_count > 0:
             self.info['object_count'] = object_count
             self.info['average_iou'] = iou_sum / object_count
@@ -112,9 +111,8 @@ class Region2dLoss(YoloLoss):
                cls_mask, tcoord, tconf, tcls
 
     def forward(self, outputs, targets=None):
-        batch_size = outputs.data.size(0)
-        height = outputs.data.size(2)
-        width = outputs.data.size(3)
+        # Parameters
+        batch_size, C, height, width = outputs.size()
         device = outputs.device
         self.anchor_sizes = self.anchor_sizes.to(device)
 
@@ -122,31 +120,37 @@ class Region2dLoss(YoloLoss):
                                5 + self.class_number,
                                height, width)
         outputs = outputs.view(batch_size, self.anchor_count, -1,
-                               height * width).permute(0, 1, 3, 2).contiguous()
+                               height * width)
 
         # Get x,y,w,h,conf,cls
-        coord = outputs[:, :, :, :4]
-        coord[:, :, :, :2] = torch.sigmoid(outputs[:, :, :, :2])
-        coord = coord.view(batch_size, -1, 4)
-        conf = torch.sigmoid(outputs[:, :, :, 4]).view(batch_size, -1, 1)
-        cls = outputs[:, :, :, 5:].view(batch_size, -1, self.class_number)
-
+        coord = torch.zeros_like(outputs[:, :, :4, :])
+        coord[:, :, :2, :] = outputs[:, :, :2, :].sigmoid()  # tx,ty
+        coord[:, :, 2:4, :] = outputs[:, :, 2:4, :]  # tw,th
+        conf = outputs[:, :, 4, :].sigmoid()
+        conf = conf.transpose(2, 3).contiguous().view(batch_size, -1, 1)
+        cls = outputs[:, :, 5:, :].transpose(2, 3).contiguous().view(batch_size, -1, self.class_number)
         # Create prediction boxes
         pred_boxes = self.decode_predict_box(coord, batch_size, height, width, device)
         pred_boxes = pred_boxes.view(batch_size, -1, 4)
 
         if targets is None:
+            pred_boxes *= self.reduction
             cls = F.softmax(cls, 2)
             return torch.cat([pred_boxes, conf, cls], 2)
         else:
             coord_mask, conf_mask, object_mask, no_object_mask, cls_mask, tcoord, tconf, tcls = \
                 self.build_targets(pred_boxes, targets, height, width, device)
+            # coord
+            coord = coord.transpose(2, 3).contiguous()
             coord_mask = coord_mask.expand_as(tcoord)
+            # conf
+            conf = conf.view(batch_size, self.anchor_count, height * width)
+            conf_mask = conf_mask.sqrt()
+            # cls
+            cls = cls.view(-1, self.class_number)
             tcls = tcls[cls_mask].view(-1).long()
             cls_mask = cls_mask.view(-1, 1).repeat(1, self.class_number)
             cls = cls[cls_mask].view(-1, self.class_number)
-
-            conf_mask = conf_mask.sqrt()
 
             # Compute loss
             loss_coord = self.coord_weight * self.mse(coord * coord_mask, tcoord * coord_mask)
@@ -155,16 +159,7 @@ class Region2dLoss(YoloLoss):
             loss = loss_coord + loss_conf + loss_cls
 
             if self.info['object_count'] > 0:
-                self.info['coord_xy_loss'] = (self.mse(coord[:, :, 0:2, :] *
-                                                       coord_mask[:, :, 0:2, :],
-                                                       tcoord[:, :, 0:2, :] *
-                                                       coord_mask[:, :, 0:2, :])
-                                              ).item()
-                self.info['coord_wh_loss'] = (self.mse(coord[:, :, 2:4, :] *
-                                                       coord_mask[:, :, 2:4, :],
-                                                       tcoord[:, :, 2:4, :] *
-                                                       coord_mask[:, :, 2:4, :])
-                                              ).item()
+                self.info['coord_loss'] = loss_coord.item()
                 self.info['conf_loss'] = loss_conf.item()
                 self.info['cls_loss'] = loss_cls.item()
             self.print_info()

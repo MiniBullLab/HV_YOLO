@@ -5,7 +5,6 @@
 import os
 import torch
 from easyai.tasks.utility.base_inference import BaseInference
-from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.tasks.det2d.detect2d_result_process import Detect2dResultProcess
 from easyai.base_algorithm.non_max_suppression import NonMaxSuppression
 from easyai.base_algorithm.fast_non_max_suppression import FastNonMaxSuppression
@@ -20,7 +19,6 @@ class Detection2d(BaseInference):
         self.set_task_name(TaskName.Detect2d_Task)
         self.task_config = self.config_factory.get_config(self.task_name, self.config_path)
 
-        self.torchModelProcess = TorchModelProcess()
         self.result_process = Detect2dResultProcess()
         self.nms_process = FastNonMaxSuppression()
         self.result_show = DetectionShow()
@@ -32,11 +30,6 @@ class Detection2d(BaseInference):
         self.device = self.torchModelProcess.getDevice()
 
         self.src_size = (0, 0)
-
-    def load_weights(self, weights_path):
-        self.torchModelProcess.loadLatestModelWeight(weights_path, self.model)
-        self.model = self.torchModelProcess.modelTestInit(self.model)
-        self.model.eval()
 
     def process(self, input_path):
         dataloader = self.get_image_data_lodaer(input_path,

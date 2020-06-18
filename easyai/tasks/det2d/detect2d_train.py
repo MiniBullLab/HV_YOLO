@@ -4,11 +4,8 @@
 
 import os
 from easyai.data_loader.det2d.det2d_train_dataloader import DetectionTrainDataloader
-from easyai.torch_utility.torch_model_process import TorchModelProcess
-from easyai.torch_utility.torch_freeze_bn import TorchFreezeNormalization
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.solver.lr_factory import LrSchedulerFactory
-from easyai.utility.train_log import TrainLogger
 from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.det2d.detect2d_test import Detection2dTest
 from easyai.base_name.task_name import TaskName
@@ -17,17 +14,10 @@ from easyai.base_name.task_name import TaskName
 class Detection2dTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path)
-        self.set_task_name(TaskName.Detect2d_Task)
-        self.train_task_config = self.config_factory.get_config(self.task_name, self.config_path)
-
-        self.train_logger = TrainLogger(self.train_task_config.log_name,
-                                        self.train_task_config.root_save_dir)
-
-        self.torchModelProcess = TorchModelProcess()
-        self.freeze_normalization = TorchFreezeNormalization()
+        super().__init__(config_path, TaskName.Detect2d_Task)
 
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
+
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
                                                       default_args={
                                                           "data_channel": self.train_task_config.image_channel
@@ -37,13 +27,9 @@ class Detection2dTrain(BaseTrain):
         self.detect_test = Detection2dTest(cfg_path, gpu_id, config_path)
 
         self.total_images = 0
-        self.optimizer = None
         self.avg_loss = -1
         self.start_epoch = 0
         self.best_mAP = 0
-
-    def load_pretrain_model(self, weights_path):
-        self.torchModelProcess.loadPretainModel(weights_path, self.model)
 
     def load_latest_param(self, latest_weights_path):
         checkpoint = None

@@ -3,7 +3,7 @@
 # Author:
 
 import torch.utils.data as data
-from easyai.helper import XMLProcess
+from easyai.helper.json_process import JsonProcess
 from easyai.helper.imageProcess import ImageProcess
 from easyai.data_loader.det2d.det2d_sample import DetectionSample
 from easyai.data_loader.key_point2d.key_point2d_dataset_process import KeyPoint2dDataSetProcess
@@ -24,22 +24,20 @@ class KeyPoint2dDataLoader(data.Dataset):
                                                 False)
         self.detection_sample.read_sample()
 
-        self.xmlProcess = XMLProcess()
+        self.json_process = JsonProcess()
         self.image_process = ImageProcess()
         self.dataset_process = KeyPoint2dDataSetProcess(points_count)
 
     def __getitem__(self, index):
         img_path, label_path = self.detection_sample.get_sample_path(index)
         cv_image, src_image = self.read_src_image(img_path)
-        _, _, boxes = self.xmlProcess.parse_key_points_data(label_path)
+        _, boxes = self.json_process.parse_key_points_data(label_path)
         image, labels = self.dataset_process.resize_dataset(src_image,
                                                             self.image_size,
                                                             boxes,
                                                             self.class_name)
-        image, labels = self.dataset_process.normaliza_dataset(image,
-                                                               labels,
-                                                               self.image_size)
-
+        image = self.dataset_process.normaliza_image(image)
+        labels = self.dataset_process.normaliza_labels(labels, self.image_size)
         labels = self.dataset_process.change_outside_labels(labels)
 
         torch_label = self.dataset_process.numpy_to_torch(labels, flag=0)

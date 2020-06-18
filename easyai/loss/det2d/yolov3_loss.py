@@ -43,9 +43,9 @@ class YoloV3Loss(YoloLoss):
             self.ce_loss = nn.CrossEntropyLoss(size_average=False)
         self.fl_bce_loss = FocalBinaryLoss(gamma=2, reduce=False)
 
-        self.info = {'avg_iou': 0, 'class': 0, 'obj': 0, 'no_obj': 0,
-                     'recall50': 0, 'recall75': 0, 'obj_cur': 0, 'obj_all': 0,
-                     'coord_xy': 0, 'coord_wh': 0}
+        self.info = {'object_count': 0, 'average_iou': 0, 'recall50': 0, 'recall75': 0,
+                     'class': 0.0, 'obj': 0.0, 'no_obj': 0.0,
+                     'coord_xy': 0.0, 'coord_wh': 0.0}
 
     def init_loss(self, device):
         # criteria
@@ -66,11 +66,11 @@ class YoloV3Loss(YoloLoss):
                                   requires_grad=False, device=device)
         no_object_mask = torch.ones(batch_size, self.anchor_count, nPixels,
                                     requires_grad=False, device=device)
-        coord_mask = torch.zeros(batch_size, self.anchor_count, 1, nPixels,
+        coord_mask = torch.zeros(batch_size, self.anchor_count, nPixels, 1,
                                  requires_grad=False, device=device)
         cls_mask = torch.zeros(batch_size, self.anchor_count, nPixels,
                                requires_grad=False, dtype=torch.uint8, device=device)
-        tcoord = torch.zeros(batch_size, self.anchor_count, 4, nPixels,
+        tcoord = torch.zeros(batch_size, self.anchor_count, nPixels, 4,
                              requires_grad=False, device=device)
         tconf = torch.zeros(batch_size, self.anchor_count, nPixels,
                             requires_grad=False, device=device)
@@ -79,18 +79,14 @@ class YoloV3Loss(YoloLoss):
 
         recall50 = 0
         recall75 = 0
-        obj_all = 0
-        obj_cur = 0
+        object_count = 0
         iou_sum = 0
         for b in range(batch_size):
             gt_data = gt_targets[b]
             pred_box = pred_boxes[b]
-
             if len(gt_data) == 0:  # No gt for this image
                 continue
-
-            obj_all += len(gt_data)
-
+            object_count += len(gt_data)
             anchors = self.scale_anchor()
             gt = self.gt_process.scale_gt_box(gt_data, width, height).to(device)
 
@@ -102,7 +98,7 @@ class YoloV3Loss(YoloLoss):
 
             # Set confidence mask of matching detections to 0
             iou_gt_pred = torch_rect_box_ious(gt, pred_box)
-            mask = (iou_gt_pred > self.thresh).sum(0) >= 1
+            mask = (iou_gt_pred > self.iou_threshold).sum(0) >= 1
             no_object_mask[b][mask.view_as(no_object_mask[b])] = 0
 
             # Set masks and target values for each gt
@@ -113,30 +109,26 @@ class YoloV3Loss(YoloLoss):
                 best_n = best_index[i]
                 iou = iou_gt_pred[i][best_n * nPixels + gj * width + gi]
                 # debug information
-                obj_cur += 1
                 recall50 += (iou > 0.5).item()
                 recall75 += (iou > 0.75).item()
                 iou_sum += iou.item()
 
-                coord_mask[b][best_n][0][gj * width + gi] = 2 - anno[3] * anno[4] / (
-                            width * height * self.reduction * self.reduction)
-                cls_mask[b][best_n][gj * width + gi] = 1
                 object_mask[b][best_n][gj * width + gi] = 1
                 no_object_mask[b][best_n][gj * width + gi] = 0
-                tcoord[b][best_n][0][gj * width + gi] = gt[i, 0] - gi
-                tcoord[b][best_n][1][gj * width + gi] = gt[i, 1] - gj
-                tcoord[b][best_n][2][gj * width + gi] = math.log(gt[i, 2] / self.anchors[best_n, 0])
-                tcoord[b][best_n][3][gj * width + gi] = math.log(gt[i, 3] / self.anchors[best_n, 1])
+                coord_mask[b][best_n][gj * width + gi][0] = 2 - anno[3] * anno[4]
+                tcoord[b][best_n][gj * width + gi][0] = gt[i, 0] - gi
+                tcoord[b][best_n][gj * width + gi][1] = gt[i, 1] - gj
+                tcoord[b][best_n][gj * width + gi][2] = math.log(gt[i, 2] / self.anchors[best_n, 0])
+                tcoord[b][best_n][gj * width + gi][3] = math.log(gt[i, 3] / self.anchors[best_n, 1])
                 tconf[b][best_n][gj * width + gi] = 1
+                cls_mask[b][best_n][gj * width + gi] = 1
                 tcls[b][best_n][gj * width + gi] = anno[0]
-        # loss informaion
-        self.info['obj_cur'] = obj_cur
-        self.info['obj_all'] = obj_all
-        if obj_cur == 0:
-            obj_cur = 1
-        self.info['avg_iou'] = iou_sum / obj_cur
-        self.info['recall50'] = recall50 / obj_cur
-        self.info['recall75'] = recall75 / obj_cur
+        # informaion
+        if object_count > 0:
+            self.info['object_count'] = object_count
+            self.info['average_iou'] = iou_sum / object_count
+            self.info['recall50'] = recall50 / object_count
+            self.info['recall75'] = recall75 / object_count
 
         return coord_mask, object_mask, no_object_mask, \
                cls_mask, tcoord, tconf, tcls
@@ -145,26 +137,26 @@ class YoloV3Loss(YoloLoss):
         """ Compute Yolo loss.
         """
         # Parameters
-        N, C, H, W = outputs.size()
+        batch_size, C, height, width = outputs.size()
         device = outputs.device
         self.anchor_sizes = self.anchor_sizes.to(device)
 
-        outputs = outputs.view(N, self.anchor_count,
+        outputs = outputs.view(batch_size, self.anchor_count,
                                5 + self.class_number,
-                               H, W)
-        outputs = outputs.view(N, self.anchor_count, -1,
-                               H * W).permute(0, 1, 3, 2).contiguous()
+                               height, width)
+        outputs = outputs.view(batch_size, self.anchor_count, -1,
+                               height * width)
 
         # Get x,y,w,h,conf,cls
-        coord = outputs[:, :, :, :4]  # tx, ty, tw, th
-        coord[:, :, :2, :] = torch.sigmoid(outputs[:, :, :, :2]) # tx,ty
-        coord = coord.view(N, -1, 4)
-        conf = torch.sigmoid(outputs[:, :, :, 4]).view(N, -1, 1)
-        cls = outputs[:, :, :, 5:].view(N, -1, self.class_number)
-
+        coord = torch.zeros_like(outputs[:, :, :4, :])
+        coord[:, :, :2, :] = outputs[:, :, :2, :].sigmoid()  # tx,ty
+        coord[:, :, 2:4, :] = outputs[:, :, 2:4, :]  # tw,th
+        conf = outputs[:, :, 4, :].sigmoid()
+        conf = conf.transpose(2, 3).contiguous().view(batch_size, -1, 1)
+        cls = outputs[:, :, 5:, :].transpose(2, 3).contiguous().view(batch_size, -1, self.class_number)
         # Create prediction boxes
-        pred_boxes = self.decode_predict_box(coord, H, H, W, device)
-        pred_boxes = pred_boxes.view(N, -1, 4)
+        pred_boxes = self.decode_predict_box(coord, batch_size, height, width, device)
+        pred_boxes = pred_boxes.view(batch_size, -1, 4)
 
         if targets is None:
             pred_boxes *= self.reduction
@@ -172,15 +164,17 @@ class YoloV3Loss(YoloLoss):
             return torch.cat([pred_boxes, conf, cls], 2)
         else:
             coord_mask, object_mask, no_object_mask, \
-            cls_mask, tcoord, tconf, tcls = self.build_targets(pred_boxes, targets, H, W, device)
+            cls_mask, tcoord, tconf, tcls = self.build_targets(pred_boxes, targets, height, width, device)
 
             # coord
             # 0 = 1 = 2 = 3, only need first two element
-            coord_mask = coord_mask.expand_as(tcoord)[:, :, :2]
-            coord_center, tcoord_center = coord[:, :, :2], tcoord[:, :, :2]
-            coord_wh, tcoord_wh = coord[:, :, 2:], tcoord[:, :, 2:]
+            coord = coord.transpose(2, 3).contiguous()
+            coord_mask = coord_mask.expand_as(tcoord)[:, :, :, :2]
+            coord_center, tcoord_center = coord[:, :, :, :2], tcoord[:, :, :2]
+            coord_wh, tcoord_wh = coord[:, :, :, 2:], tcoord[:, :, :, 2:]
+            conf = conf.view(batch_size, self.anchor_count, height * width)
             if self.class_number > 1:
-                # tcls变成一维数组, 而cls还是变成[xx, nC]维
+                cls = cls.view(-1, self.class_number)
                 tcls = tcls[cls_mask].view(-1).long()
                 cls_mask = cls_mask.view(-1, 1).repeat(1, self.class_number)
                 cls = cls[cls_mask].view(-1, self.class_number)
@@ -208,12 +202,13 @@ class YoloV3Loss(YoloLoss):
                 loss_cls = torch.tensor(0.0, device=device)
                 class_prob = torch.tensor(0.0, device=device)
 
-            obj_cur = max(self.info['obj_cur'], 1)
-            self.info['class'] = class_prob.sum().item() / obj_cur
-            self.info['obj'] = (object_mask * conf).sum().item() / obj_cur
-            self.info['no_obj'] = (no_object_mask * conf).sum().item() / N * self.anchor_count * H * W
-            self.info['coord_xy'] = (coord_mask * self.mse_loss(coord_center, tcoord_center)).sum().item() / obj_cur
-            self.info['coord_wh'] = (coord_mask * self.mse_loss(coord_wh, tcoord_wh)).sum().item() / obj_cur
+            if self.info['object_count'] > 0:
+                self.info['class'] = class_prob.sum().item() / self.info['object_count']
+                self.info['obj'] = (object_mask * conf).sum().item() / self.info['object_count']
+                self.info['no_obj'] = (no_object_mask * conf).sum().item() / \
+                                      batch_size * self.anchor_count * height * width
+                self.info['coord_xy'] = (coord_mask * self.mse_loss(coord_center, tcoord_center)).sum().item() / self.info['object_count']
+                self.info['coord_wh'] = (coord_mask * self.mse_loss(coord_wh, tcoord_wh)).sum().item() / self.info['object_count']
             self.printInfo()
 
             all_loss = loss_coord + loss_conf + loss_cls

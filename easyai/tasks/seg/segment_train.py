@@ -6,9 +6,6 @@ import os
 from easyai.data_loader.seg.segment_dataloader import get_segment_train_dataloader
 from easyai.solver.lr_factory import LrSchedulerFactory
 from easyai.solver.torch_optimizer import TorchOptimizer
-from easyai.torch_utility.torch_freeze_bn import TorchFreezeNormalization
-from easyai.torch_utility.torch_model_process import TorchModelProcess
-from easyai.utility.train_log import TrainLogger
 from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.seg.segment_result_process import SegmentResultProcess
 from easyai.tasks.seg.segment_test import SegmentionTest
@@ -18,15 +15,7 @@ from easyai.base_name.task_name import TaskName
 class SegmentionTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path)
-        self.set_task_name(TaskName.Segment_Task)
-        self.train_task_config = self.config_factory.get_config(self.task_name, self.config_path)
-
-        self.train_logger = TrainLogger(self.train_task_config.log_name,
-                                        self.train_task_config.root_save_dir)
-
-        self.torchModelProcess = TorchModelProcess()
-        self.freeze_normalization = TorchFreezeNormalization()
+        super().__init__(config_path, TaskName.Segment_Task)
 
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
@@ -40,12 +29,8 @@ class SegmentionTrain(BaseTrain):
         self.segment_test = SegmentionTest(cfg_path, gpu_id, config_path)
 
         self.total_images = 0
-        self.optimizer = None
         self.start_epoch = 0
         self.bestmIoU = 0
-
-    def load_pretrain_model(self, weights_path):
-        self.torchModelProcess.loadPretainModel(weights_path, self.model)
 
     def load_latest_param(self, latest_weights_path):
         checkpoint = None

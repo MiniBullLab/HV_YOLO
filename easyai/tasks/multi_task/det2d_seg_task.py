@@ -6,7 +6,6 @@ import os
 import torch
 import numpy as np
 from easyai.tasks.utility.base_inference import BaseInference
-from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.tasks.det2d.detect2d_result_process import Detect2dResultProcess
 from easyai.tasks.seg.segment_result_process import SegmentResultProcess
 from easyai.base_algorithm.fast_non_max_suppression import FastNonMaxSuppression
@@ -21,7 +20,6 @@ class Det2dSegTask(BaseInference):
         self.set_task_name(TaskName.Det2d_Seg_Task)
         self.task_config = self.config_factory.get_config(self.task_name, self.config_path)
 
-        self.torchModelProcess = TorchModelProcess()
         self.det2d_result_process = Detect2dResultProcess()
         self.seg_result_process = SegmentResultProcess()
         self.nms_process = FastNonMaxSuppression()
@@ -35,11 +33,6 @@ class Det2dSegTask(BaseInference):
 
         self.threshold_seg = 0.5
         self.src_size = (0, 0)
-
-    def load_weights(self, weights_path):
-        self.torchModelProcess.loadLatestModelWeight(weights_path, self.model)
-        self.model = self.torchModelProcess.modelTestInit(self.model)
-        self.model.eval()
 
     def process(self, input_path):
         dataloader = self.get_image_data_lodaer(input_path,
