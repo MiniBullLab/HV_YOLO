@@ -2,24 +2,10 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-REGISTERED_LR_SCHEDULER_CLASSES = {}
+from easyai.utility.registry import Registry
+from easyai.utility.registry import build_from_cfg
 
-
-def register_lr_scheduler(cls, name=None):
-    global REGISTERED_LR_SCHEDULER_CLASSES
-    if name is None:
-        name = cls.__name__
-    assert name not in REGISTERED_LR_SCHEDULER_CLASSES, \
-        "exist class: {}".format(REGISTERED_LR_SCHEDULER_CLASSES)
-    REGISTERED_LR_SCHEDULER_CLASSES[name] = cls
-    return cls
-
-
-def get_lr_scheduler_class(name):
-    global REGISTERED_LR_SCHEDULER_CLASSES
-    assert name in REGISTERED_LR_SCHEDULER_CLASSES, \
-        "available class: {}".format(REGISTERED_LR_SCHEDULER_CLASSES)
-    return REGISTERED_LR_SCHEDULER_CLASSES[name]
+REGISTERED_LR_SCHEDULER = Registry("lr_scheduler")
 
 
 class LrSchedulerFactory():
@@ -31,29 +17,21 @@ class LrSchedulerFactory():
         self.total_iters = max_epochs * epoch_iteration
 
     def get_lr_scheduler(self, config):
-        lr_class_name = config['lr_type'].strip()
-        warm_epoch = config.get('warm_epoch', -1)
-        warmup_iters = config.get('warmup_iters', 2000)
-        lr_secheduler_cls = get_lr_scheduler_class(lr_class_name)
+        lr_class_name = config['type'].strip()
+        cfg = config.copy()
+        cfg['base_lr'] = self.base_lr
         result = None
         if lr_class_name == "LinearIncreaseLR":
-            end_lr = config['end_lr']
-            result = lr_secheduler_cls(self.base_lr, end_lr, self.total_iters,
-                                       warm_epoch, warmup_iters)
+            cfg['total_iters'] = self.total_iters
+            result = build_from_cfg(cfg, REGISTERED_LR_SCHEDULER)
         elif lr_class_name == "MultiStageLR":
-            lr_stages = config['lr_stages']
-            assert type(lr_stages) in [list, tuple] and \
-                   len(lr_stages[0]) == 2 and lr_stages[-1][0] == self.max_epochs, \
-                'lr_stages must be list or tuple, with [iters, lr] format'
-            result = lr_secheduler_cls(self.base_lr, lr_stages,
-                                       warm_epoch, warmup_iters)
+            result = build_from_cfg(cfg, REGISTERED_LR_SCHEDULER)
         elif lr_class_name == "PolyLR":
-            lr_power = config.get('lr_power', 0.9)
-            result = lr_secheduler_cls(self.base_lr, self.total_iters, lr_power,
-                                       warm_epoch, warmup_iters)
+            cfg['total_iters'] = self.total_iters
+            result = build_from_cfg(cfg, REGISTERED_LR_SCHEDULER)
         elif lr_class_name == "CosineLR":
-            result = lr_secheduler_cls(self.base_lr, self.total_iters,
-                                       warm_epoch, warmup_iters)
+            cfg['total_iters'] = self.total_iters
+            result = build_from_cfg(cfg, REGISTERED_LR_SCHEDULER)
         else:
             print("%s not exit" % lr_class_name)
         return result

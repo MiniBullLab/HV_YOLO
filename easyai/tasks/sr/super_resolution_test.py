@@ -14,10 +14,7 @@ from easyai.base_name.task_name import TaskName
 class SuperResolutionTest(BaseTest):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path)
-        self.set_task_name(TaskName.SuperResolution_Task)
-        self.test_task_config = self.config_factory.get_config(self.task_name, self.config_path)
-
+        super().__init__(config_path, TaskName.SuperResolution_Task)
         self.sr_inference = SuperResolution(cfg_path, gpu_id, config_path)
         self.model = self.sr_inference.model
         self.device = self.sr_inference.device

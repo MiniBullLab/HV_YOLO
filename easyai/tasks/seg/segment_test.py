@@ -15,10 +15,7 @@ from easyai.base_name.task_name import TaskName
 class SegmentionTest(BaseTest):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path)
-        self.set_task_name(TaskName.Segment_Task)
-        self.test_task_config = self.config_factory.get_config(self.task_name, self.config_path)
-
+        super().__init__(config_path, TaskName.Segment_Task)
         self.segment_inference = Segmentation(cfg_path, gpu_id, config_path)
         self.model = self.segment_inference.model
         self.device = self.segment_inference.device
@@ -28,7 +25,7 @@ class SegmentionTest(BaseTest):
         self.epoch_loss_average = AverageMeter()
 
         self.metric = SegmentionMetric(len(self.test_task_config.class_name))
-        self.threshold = 0.5
+        self.threshold = 0.5  # binary class threshold
 
     def load_weights(self, weights_path):
         self.segment_inference.load_weights(weights_path)

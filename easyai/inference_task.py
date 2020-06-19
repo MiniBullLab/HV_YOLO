@@ -6,6 +6,7 @@ from easyai.helper.arguments_parse import TaskArgumentsParse
 from easyai.tasks.cls.classify import Classify
 from easyai.tasks.det2d.detect2d import Detection2d
 from easyai.tasks.seg.segment import Segmentation
+from easyai.tasks.multi_task.det2d_seg_task import Det2dSegTask
 from easyai.base_name.task_name import TaskName
 
 
@@ -30,6 +31,11 @@ class InferenceTask():
         seg.load_weights(self.weight_path)
         seg.process(self.input_path)
 
+    def det2d_seg_task(self, cfg_path, gpu_id, config_path):
+        multi_det2d_seg = Det2dSegTask(cfg_path, gpu_id, config_path)
+        multi_det2d_seg.load_weights(self.weight_path)
+        multi_det2d_seg.process(self.input_path)
+
 
 def main():
     print("process start...")
@@ -41,6 +47,8 @@ def main():
         inference_task.detect2d_task(options.model, 0, options.config_path)
     elif options.task_name == TaskName.Segment_Task:
         inference_task.segment_task(options.model, 0, options.config_path)
+    elif options.task_name == TaskName.Det2d_Seg_Task:
+        inference_task.det2d_seg_task(options.model, 0, options.config_path)
     print("process end!")
 
 

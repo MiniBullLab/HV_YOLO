@@ -162,9 +162,9 @@ class KeyPoint2dConfig(ImageTaskConfig):
                                      'momentum': 0.9,
                                      'weight_decay': 5e-4}
                                  }
-        self.lr_scheduler_config = {'lr_type': 'MultiStageLR',
+        self.lr_scheduler_config = {'type': 'MultiStageLR',
                                     'lr_stages': [[50, 1], [70, 0.1], [100, 0.01]],
-                                    'warm_epoch': 0,
+                                    'is_warmpu': True,
                                     'warmup_iters': 1000}
         self.accumulated_batches = 1
         self.display = 20

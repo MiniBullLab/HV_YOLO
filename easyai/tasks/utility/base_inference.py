@@ -13,12 +13,15 @@ from easyai.tasks.utility.base_task import BaseTask
 
 class BaseInference(BaseTask):
 
-    def __init__(self, config_path):
+    def __init__(self, config_path, task_name):
         super().__init__()
+        self.set_task_name(task_name)
         self.timer = TimerProcess()
         self.torchModelProcess = TorchModelProcess()
         self.config_path = config_path
         self.model = None
+        self.src_size = (0, 0)
+        self.task_config = self.config_factory.get_config(self.task_name, self.config_path)
 
     @abc.abstractmethod
     def process(self, input_path):
@@ -43,3 +46,7 @@ class BaseInference(BaseTask):
         else:
             dataloader = VideoLoader(input_path, image_size, data_channel)
         return dataloader
+
+    def set_src_size(self, src_data):
+        shape = src_data.shape[:2]  # shape = [height, width]
+        self.src_size = (shape[1], shape[0])

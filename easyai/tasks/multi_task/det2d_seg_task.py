@@ -16,10 +16,7 @@ from easyai.base_name.task_name import TaskName
 class Det2dSegTask(BaseInference):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path)
-        self.set_task_name(TaskName.Det2d_Seg_Task)
-        self.task_config = self.config_factory.get_config(self.task_name, self.config_path)
-
+        super().__init__(config_path, TaskName.Det2d_Seg_Task)
         self.det2d_result_process = Detect2dResultProcess()
         self.seg_result_process = SegmentResultProcess()
         self.nms_process = FastNonMaxSuppression()
@@ -31,8 +28,7 @@ class Det2dSegTask(BaseInference):
                                                       })
         self.device = self.torchModelProcess.getDevice()
 
-        self.threshold_seg = 0.5
-        self.src_size = (0, 0)
+        self.threshold_seg = 0.5  # binary class threshold
 
     def process(self, input_path):
         dataloader = self.get_image_data_lodaer(input_path,
@@ -98,7 +94,3 @@ class Det2dSegTask(BaseInference):
         prediction_dets = torch.cat(pred_dets, 1)
         prediction_dets = prediction_dets.squeeze(0)
         return prediction_dets, prediction_seg
-
-    def set_src_size(self, src_data):
-        shape = src_data.shape[:2]  # shape = [height, width]
-        self.src_size = (shape[1], shape[0])

@@ -6,8 +6,8 @@ import abc
 
 
 class BaseLrSecheduler():
-    def __init__(self):
-        pass
+    def __init__(self, base_lr):
+        self.baseLr = base_lr
 
     @abc.abstractmethod
     def get_lr(self, cur_epoch, cur_iter):

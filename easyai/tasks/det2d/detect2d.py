@@ -6,7 +6,6 @@ import os
 import torch
 from easyai.tasks.utility.base_inference import BaseInference
 from easyai.tasks.det2d.detect2d_result_process import Detect2dResultProcess
-from easyai.base_algorithm.non_max_suppression import NonMaxSuppression
 from easyai.base_algorithm.fast_non_max_suppression import FastNonMaxSuppression
 from easyai.visualization.detect_show import DetectionShow
 from easyai.base_name.task_name import TaskName
@@ -15,9 +14,7 @@ from easyai.base_name.task_name import TaskName
 class Detection2d(BaseInference):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path)
-        self.set_task_name(TaskName.Detect2d_Task)
-        self.task_config = self.config_factory.get_config(self.task_name, self.config_path)
+        super().__init__(config_path, TaskName.Detect2d_Task)
 
         self.result_process = Detect2dResultProcess()
         self.nms_process = FastNonMaxSuppression()
@@ -28,8 +25,6 @@ class Detection2d(BaseInference):
                                                           "data_channel": self.task_config.image_channel
                                                       })
         self.device = self.torchModelProcess.getDevice()
-
-        self.src_size = (0, 0)
 
     def process(self, input_path):
         dataloader = self.get_image_data_lodaer(input_path,
@@ -62,7 +57,8 @@ class Detection2d(BaseInference):
         with torch.no_grad():
             output_list = self.model(input_data.to(self.device))
             output = self.compute_output(output_list)
-            result = self.result_process.get_detection_result(output, threshold)
+            result = self.result_process.get_detection_result(output, threshold,
+                                                              self.task_config.post_prcoess_type)
         return result
 
     def postprocess(self, result):
@@ -82,10 +78,6 @@ class Detection2d(BaseInference):
         prediction = torch.cat(preds, 1)
         prediction = prediction.squeeze(0)
         return prediction
-
-    def set_src_size(self, src_data):
-        shape = src_data.shape[:2]  # shape = [height, width]
-        self.src_size = (shape[1], shape[0])
 
 
 

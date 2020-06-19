@@ -1,7 +1,8 @@
 import numpy as np
 import caffe
 import cv2
-import os
+from easy_convert.helper.imageProcess import ImageProcess
+from easy_convert.helper.image_dataset_process import ImageDataSetProcess
 from easy_convert.inference.det2d import detection_utility
 from easy_convert.helper.dirProcess import DirProcess
 
@@ -10,45 +11,47 @@ class CaffeYoloV3Inference():
 
 	def __init__(self, model_def, model_weights):
 		self.dir_process = DirProcess()
-		self.image_size = (352, 640)  # h, w
-		self.feat1Name = '628'
-		self.feat2Name = '654'
-		self.feat3Name = '680'
-		self.class_list = ('bike', 'bus', 'car', 'motor', 'person', 'rider', 'truck')
-		self.classes = 1
+		self.image_process = ImageProcess()
+		self.dataset_process = ImageDataSetProcess()
+		self.image_size = (640, 352)   # w, h
+		self.output_node_1 = 'layer82-conv'
+		self.output_node_2 = 'layer94-conv'
+		self.output_node_3 = 'layer106-conv'
+		self.class_list = ('bike', 'bus', 'car', 'motor', 'person', 'truck')
+		self.classes = 6
 		self.nms_threshold = 0.45
 		self.thresh_conf = 0.24
 		self.box_of_each_grid = 3
-		self.biases = np.array([8.95, 8.57, 12.43, 26.71, 19.71, 14.43,
-								26.36, 58.52, 36.09, 25.55, 64.42, 42.90, 96.44,
-								79.10, 158.37, 115.59, 218.65, 192.90])
+		self.biases = np.array([8, 9, 12, 29, 18, 15, 26, 64, 33, 26,
+								61, 44, 58, 135, 150, 122, 208, 203])
+		self.image_pad_color = (0, 0, 0)
 		self.net = caffe.Net(model_def, model_weights, caffe.TEST)
 
 	def yolov3_detect(self, image_dir):
 		for img_path in self.dir_process.getDirFiles(image_dir):
-			im, img, img_shape = detection_utility.preProcess(img_path, self.image_size[1],
-															self.image_size[0])
-
-			#transformed_image = np.load('result.npy')
-
+			src_size, img = self.image_pre_process(img_path, self.image_size)
 			self.net.blobs['data'].data[...] = img
 			output = self.net.forward()
-			feat1 = self.net.blobs[self.feat1Name].data[0]
-			feat2 = self.net.blobs[self.feat2Name].data[0]
-			feat3 = self.net.blobs[self.feat3Name].data[0]
+			feature_list = []
+			feat1 = self.net.blobs[self.output_node_1].data[0]
+			feature_list.append(feat1)
+			feat2 = self.net.blobs[self.output_node_2].data[0]
+			feature_list.append(feat2)
+			feat3 = self.net.blobs[self.output_node_3].data[0]
+			feature_list.append(feat3)
 
 			totalBoxes = []
 			totalCount = 0
 			mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
-			for k in range(self.box_of_each_grid):
-				feat = eval('feat'+str(k+1))
-
+			for index, feat in enumerate(feature_list):
+				# n, c, h, w
 				boxes, count = detection_utility.get_yolo_detections(feat, feat.shape[2],
 																	feat.shape[1], self.biases,
 																	self.box_of_each_grid, self.classes,
-																	img_shape[1], img_shape[0],
+																	src_size[0], src_size[1],
 																	self.image_size[1], self.image_size[0],
-																	self.thresh_conf, mask[k], 0)  # n, c, h, w
+																	self.thresh_conf, mask[index], 0)
+
 				totalBoxes += boxes
 				totalCount += count
 			results = detection_utility.detectYolo(totalBoxes, totalCount, self.classes, self.nms_threshold)
@@ -57,16 +60,27 @@ class CaffeYoloV3Inference():
 			if key == 1048603 or key == 27:
 				break
 
+	def image_pre_process(self, image_path, input_size):
+		_, src_image = self.image_process.readRgbImage(image_path)
+		src_size = (src_image.shape[1], src_image.shape[0])  # [width, height]
+		ratio, pad_size = self.dataset_process.get_square_size(src_size, input_size)
+		image = self.dataset_process.image_resize_square(src_image, ratio, pad_size,
+														color=self.image_pad_color)
+		image = self.dataset_process.image_normaliza(image)
+		image = self.dataset_process.numpy_transpose(image)
+		return src_size, image
+
 
 def main():
 	caffe.set_device(0)
 	caffe.set_mode_gpu()
 
-	model_def = './data/caffe/yolov3.prototxt'
-	model_weights = './data/caffe/yolov3.caffemodel'
+	model_def = './data/caffe/yolov3_berkeley_6_classes.prototxt'
+	model_weights = './data/caffe/yolov3_berkeley_6_classes.caffemodel'
 	test = CaffeYoloV3Inference(model_def, model_weights)
-	test.yolov3_detect("./data/image")
+	test.yolov3_detect("/home/wfw/data/VOCdevkit/BKLdata/JPEGImages")
 
 
 if __name__ == "__main__":
 	main()
+

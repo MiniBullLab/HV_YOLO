@@ -29,12 +29,12 @@ class CreateDetectionAnchors():
         self.detection_sample = DetectionSample(train_path,
                                                 self.task_config.class_name)
         self.detection_sample.read_sample()
+
         self.dataset_process = DetectionDataSetProcess()
 
     def get_anchors(self, number):
         wh_numpy = self.get_width_height()
-
-        indices = [random.randrange(wh_numpy.shape[0]) for i in range(number)]
+        indices = [random.randrange(wh_numpy.shape[0]) for _ in range(number)]
         centroids = wh_numpy[indices]
         self.kmeans(wh_numpy, centroids)
 
@@ -45,7 +45,7 @@ class CreateDetectionAnchors():
         for index in range(count):
             img_path, label_path = self.detection_sample.get_sample_path(index)
             print("Loading : {}-{}".format(index, img_path))
-            src_image, rgb_image = self.image_process.readRgbImage(img_path)
+            _, rgb_image = self.image_process.readRgbImage(img_path)
             _, _, boxes = self.xmlProcess.parseRectData(label_path)
             rgb_image, labels = self.dataset_process.resize_dataset(rgb_image,
                                                                     self.task_config.image_size,
@@ -94,6 +94,22 @@ class CreateDetectionAnchors():
             prev_assignments = assignments.copy()
             old_dists = dists.copy()
 
+    def compute_iou(self, x, centroids):
+        similarities = []
+        for centroid in centroids:
+            centroid_w, centroid_h = centroid
+            width, height = x
+            if centroid_w >= width and centroid_h >= height:
+                similarity = width * height / (centroid_w * centroid_h)
+            elif centroid_w >= width and centroid_h <= height:
+                similarity = width * centroid_h / (width * height + (centroid_w - width) * centroid_h)
+            elif centroid_w <= width and centroid_h >= height:
+                similarity = centroid_w * height / (width * height + centroid_w * (centroid_h - height))
+            else:  # means both w,h are bigger than c_w and c_h respectively
+                similarity = (centroid_w * centroid_h) / (width * height)
+            similarities.append(similarity)  # will become (k,) shape
+        return np.array(similarities)
+
     def anchor_visual(self, centroids):
         anchors = centroids.copy()
 
@@ -111,22 +127,6 @@ class CreateDetectionAnchors():
         cv2.resizeWindow("image", int(img.shape[1] * 3.0), int(img.shape[0] * 3.0))
         cv2.imshow("image", img)
         cv2.waitKey()
-
-    def compute_iou(self, x, centroids):
-        similarities = []
-        for centroid in centroids:
-            centroid_w, centroid_h = centroid
-            width, height = x
-            if centroid_w >= width and centroid_h >= height:
-                similarity = width * height / (centroid_w * centroid_h)
-            elif centroid_w >= width and centroid_h <= height:
-                similarity = width * centroid_h / (width * height + (centroid_w - width) * centroid_h)
-            elif centroid_w <= width and centroid_h >= height:
-                similarity = centroid_w * height / (width * height + centroid_w * (centroid_h - height))
-            else:  # means both w,h are bigger than c_w and c_h respectively
-                similarity = (centroid_w * centroid_h) / (width * height)
-            similarities.append(similarity)  # will become (k,) shape
-        return np.array(similarities)
 
 
 def test():

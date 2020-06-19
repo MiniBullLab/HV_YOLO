@@ -13,9 +13,7 @@ from easyai.base_name.task_name import TaskName
 class Segmentation(BaseInference):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path)
-        self.set_task_name(TaskName.Segment_Task)
-        self.task_config = self.config_factory.get_config(self.task_name, self.config_path)
+        super().__init__(config_path, TaskName.Segment_Task)
 
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
                                                       default_args={
@@ -27,8 +25,7 @@ class Segmentation(BaseInference):
 
         self.result_show = SegmentionShow()
 
-        self.threshold = 0.5
-        self.src_size = (0, 0)
+        self.threshold = 0.5  # binary class threshold
 
     def process(self, input_path):
         dataloader = self.get_image_data_lodaer(input_path,
@@ -68,6 +65,3 @@ class Segmentation(BaseInference):
         prediction = np.squeeze(prediction.data.cpu().numpy())
         return prediction
 
-    def set_src_size(self, src_data):
-        shape = src_data.shape[:2]  # shape = [height, width]
-        self.src_size = (shape[1], shape[0])

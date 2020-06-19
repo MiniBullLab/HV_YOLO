@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
 import torch
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 from easyai.model.utility.model_factory import ModelFactory

@@ -17,7 +17,15 @@ class Detect2dResultProcess():
         self.use_new_confidence = False
         self.dataset_process = ImageDataSetProcess()
 
-    def get_detection_result(self, prediction, conf_thresh):
+    def get_detection_result(self, prediction, conf_thresh, flag=0):
+        result = None
+        if flag == 0:
+            result = self.get_yolo_result(prediction, conf_thresh)
+        elif flag == 1:
+            result = self.get_ssd_result(prediction, conf_thresh)
+        return result
+
+    def get_yolo_result(self, prediction, conf_thresh):
         result = []
         class_confidence, class_index = prediction[:, 5:].max(1)
         if self.use_new_confidence:
@@ -44,6 +52,31 @@ class Detect2dResultProcess():
             temp_object.classConfidence = class_confidence[index]
             temp_object.classIndex = class_index[index]
             result.append(temp_object)
+        return result
+
+    def get_ssd_result(self, prediction, conf_thresh):
+        result = []
+        class_confidence, class_index = prediction[:, 4:].max(1)
+        temp1_indexs = class_confidence > conf_thresh
+        temp2_indexs = (prediction[:, 2:4] > self.min_width).all(1)
+        temp3_indexs = torch.isfinite(prediction).all(1)
+        index_list = temp1_indexs & temp2_indexs & temp3_indexs
+        prediction = prediction[index_list]
+        class_confidence = class_confidence[index_list]
+        class_index = class_index[index_list]
+        # Box (center x, center y, width, height) to (x1, y1, x2, y2)
+        prediction[:, :4] = self.xywh2xyxy(prediction[:, :4])
+        for index, value in enumerate(prediction):
+            if class_index[index] != 0:
+                temp_object = DetectionObject()
+                temp_object.min_corner.x = value[0]
+                temp_object.min_corner.y = value[1]
+                temp_object.max_corner.x = value[2]
+                temp_object.max_corner.y = value[3]
+                temp_object.objectConfidence = class_confidence[index]
+                temp_object.classConfidence = class_confidence[index]
+                temp_object.classIndex = class_index[index] - 1
+                result.append(temp_object)
         return result
 
     def resize_detection_objects(self, src_size, image_size,

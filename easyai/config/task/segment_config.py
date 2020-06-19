@@ -144,8 +144,8 @@ class SegmentionConfig(ImageTaskConfig):
                                      'weight_decay': 0}
                                  }
 
-        self.lr_scheduler_config = {'lr_type': 'CosineLR',
-                                    'warm_epoch': -1,
+        self.lr_scheduler_config = {'type': 'CosineLR',
+                                    'is_warmpu': False,
                                     'warmup_iters': 2000}
         self.accumulated_batches = 1
         self.display = 20

@@ -14,10 +14,7 @@ from easyai.base_name.task_name import TaskName
 class Det2dSegTaskTest(BaseTest):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path)
-        self.set_task_name(TaskName.Det2d_Seg_Task)
-        self.test_task_config = self.config_factory.get_config(self.task_name, self.config_path)
-
+        super().__init__(config_path, TaskName.Det2d_Seg_Task)
         self.multi_task_inference = Det2dSegTask(cfg_path, gpu_id, config_path)
         self.threshold_det = 5e-3
         self.threshold_seg = 0.5

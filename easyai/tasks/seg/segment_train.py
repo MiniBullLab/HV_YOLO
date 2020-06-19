@@ -46,7 +46,6 @@ class SegmentionTrain(BaseTrain):
                                                    self.model,
                                                    self.train_task_config.freeze_layer_name,
                                                    self.train_task_config.freeze_layer_type)
-        self.torchOptimizer.print_freeze_layer(self.model)
         self.optimizer = self.torchOptimizer.getLatestModelOptimizer(checkpoint)
 
     def train(self, train_path, val_path):

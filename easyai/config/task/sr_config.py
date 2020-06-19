@@ -138,9 +138,9 @@ class SuperResolutionConfig(ImageTaskConfig):
                                      'weight_decay': 0}
                                  }
 
-        self.lr_scheduler_config = {'lr_type': 'MultiStageLR',
+        self.lr_scheduler_config = {'type': 'MultiStageLR',
                                     'lr_stages': [[50, 1], [70, 0.1], [100, 0.01]],
-                                    'warm_epoch': -1,
+                                    'is_warmpu': False,
                                     'warmup_iters': 1000}
         self.accumulated_batches = 1
         self.display = 20

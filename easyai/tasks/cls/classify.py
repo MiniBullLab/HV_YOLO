@@ -11,9 +11,7 @@ from easyai.base_name.task_name import TaskName
 class Classify(BaseInference):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path)
-        self.set_task_name(TaskName.Classify_Task)
-        self.task_config = self.config_factory.get_config(self.task_name, self.config_path)
+        super().__init__(config_path, TaskName.Classify_Task)
 
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
                                                       default_args={

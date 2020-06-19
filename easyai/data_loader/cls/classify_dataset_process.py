@@ -15,8 +15,8 @@ class ClassifyDatasetProcess(BaseDataSetProcess):
         self.mean = np.array(mean, dtype=np.float32)
         self.std = np.array(std, dtype=np.float32)
         self.torchvision_transform = self.torchvision_process.torch_normalize(flag=0,
-                                                                            mean=self.mean,
-                                                                            std=self.std)
+                                                                              mean=self.mean,
+                                                                              std=self.std)
 
     def normaliza_dataset(self, src_image, normaliza_type=0):
         result = None

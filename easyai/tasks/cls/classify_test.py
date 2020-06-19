@@ -12,10 +12,7 @@ from easyai.base_name.task_name import TaskName
 class ClassifyTest(BaseTest):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path)
-        self.set_task_name(TaskName.Classify_Task)
-        self.test_task_config = self.config_factory.get_config(self.task_name, self.config_path)
-
+        super().__init__(config_path, TaskName.Classify_Task)
         self.classify_inference = Classify(cfg_path, gpu_id, config_path)
         self.topK = (1,)
         self.evaluation = ClassifyAccuracy(top_k=self.topK)

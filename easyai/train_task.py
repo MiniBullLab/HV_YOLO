@@ -7,6 +7,7 @@ from easyai.tasks.cls.classify_train import ClassifyTrain
 from easyai.tasks.det2d.detect2d_train import Detection2dTrain
 from easyai.tasks.seg.segment_train import SegmentionTrain
 from easyai.tasks.sr.super_resolution_train import SuperResolutionTrain
+from easyai.tasks.multi_task.det2d_seg_task_train import Det2dSegTaskTrain
 from easyai.tools.model_to_onnx import ModelConverter
 from easyai.base_name.task_name import TaskName
 
@@ -43,9 +44,16 @@ class TrainTask():
         sr_train.train(self.train_path, self.val_path)
         self.image_model_convert(sr_train, cfg_path)
 
+    def det2d_seg_train(self, cfg_path, gpu_id, config_path):
+        multi_train = Det2dSegTaskTrain(cfg_path, gpu_id, config_path)
+        multi_train.load_pretrain_model(self.pretrain_model_path)
+        multi_train.train(self.train_path, self.val_path)
+        self.image_model_convert(multi_train, cfg_path)
+
     def image_model_convert(self, train_task, cfg_path):
         if self.is_convert:
-            converter = ModelConverter(train_task.train_task_config.image_size)
+            converter = ModelConverter(train_task.train_task_config.image_size,
+                                       train_task.train_task_config.image_channel)
             converter.model_convert(cfg_path, train_task.train_task_config.best_weights_file,
                                     train_task.train_task_config.snapshot_path)
 
@@ -60,6 +68,8 @@ def main():
         train_task.detect2d_train(options.model, 0, options.config_path)
     elif options.task_name == TaskName.Segment_Task:
         train_task.segment_train(options.model, 0, options.config_path)
+    elif options.task_name == TaskName.Det2d_Seg_Task:
+        train_task.det2d_seg_train(options.model, 0, options.config_path)
     print("process end!")
 
 

@@ -13,11 +13,9 @@ from easyai.base_name.task_name import TaskName
 class Detection2dTest(BaseTest):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path)
-        self.set_task_name(TaskName.Detect2d_Task)
-        self.test_task_config = self.config_factory.get_config(self.task_name, self.config_path)
-
+        super().__init__(config_path, TaskName.Detect2d_Task)
         self.detect_inference = Detection2d(cfg_path, gpu_id, config_path)
+        self.threshold_det = 5e-3
 
     def load_weights(self, weights_path):
         self.detect_inference.load_weights(weights_path)
@@ -39,7 +37,7 @@ class Detection2dTest(BaseTest):
 
             self.detect_inference.set_src_size(src_image.numpy()[0])
 
-            result = self.detect_inference.infer(input_image, 5e-3)
+            result = self.detect_inference.infer(input_image, self.threshold_det)
             detection_objects = self.detect_inference.postprocess(result)
 
             print('Batch %d... Done. (%.3fs)' % (i, self.timer.toc(True)))
