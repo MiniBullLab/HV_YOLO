@@ -23,4 +23,4 @@ class LossType():
 
     # seg
     EncNetLoss = "encNetLoss"
-    OhemCrossEntropy2d = "ohemCrossEntropy2d"
+    OhemCrossEntropy2d = "OhemCrossEntropy2d"
