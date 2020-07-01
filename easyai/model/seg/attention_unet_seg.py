@@ -9,7 +9,7 @@ from easyai.base_name.model_name import ModelName
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType
 from easyai.base_name.loss_name import LossType
-from easyai.loss.utility.bce_loss import BinaryCrossEntropy2d
+from easyai.loss.cls.bce_loss import BinaryCrossEntropy2d
 from easyai.model.base_block.seg.unet_blcok import UNetBlockName
 from easyai.model.base_block.seg.unet_blcok import DoubleConv2d, DownBlock
 from easyai.model.base_block.seg.unet_blcok import AttentionUpBlock

@@ -11,6 +11,7 @@ class DarknetBlockName():
 
     ReorgBlock = "reorg"
     BasicBlock = "basicBlock"
+    ResBlock = "ResBlock"
 
 
 class ReorgBlock(BaseBlock):
@@ -65,3 +66,34 @@ class BasicBlock(BaseBlock):
         out = self.conv2(out)
         out += residual
         return out
+
+
+# CSPdarknet
+class ResBlock(BaseBlock):
+    def __init__(self, channels, hidden_channels=None, stride=1, dilation=1,
+                 bnName=NormalizationType.BatchNormalize2d, activationName=ActivationType.Mish):
+        super().__init__(DarknetBlockName.ReorgBlock)
+
+        if hidden_channels is None:
+            hidden_channels = channels
+
+        self.block = nn.Sequential(
+            ConvBNActivationBlock(in_channels=channels,
+                                  out_channels=hidden_channels,
+                                  kernel_size=1,
+                                  stride=stride,
+                                  padding=0,
+                                  bnName=bnName,
+                                  activationName=activationName),
+            ConvBNActivationBlock(in_channels=hidden_channels,
+                                  out_channels=channels,
+                                  kernel_size=3,
+                                  stride=stride,
+                                  padding=1,
+                                  dilation=dilation,
+                                  bnName=bnName,
+                                  activationName=activationName)
+        )
+
+    def forward(self, x):
+        return x + self.block(x)

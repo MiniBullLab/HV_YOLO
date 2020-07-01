@@ -79,5 +79,7 @@ class ActivationFunction():
             return HardSigmoid(inplace=inplace)
         elif name == ActivationType.HardSwish:
             return HardSwish(inplace=inplace)
+        elif name == ActivationType.Mish:
+            return MishActivation()
         else:
             print("%s activation function error!" % name)

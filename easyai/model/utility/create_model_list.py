@@ -16,8 +16,8 @@ from easyai.model.base_block.utility.pooling_layer import MyMaxPool2d, GlobalAvg
 from easyai.model.base_block.utility.upsample_layer import Upsample
 from easyai.model.base_block.utility.detection_block import Detection2dBlock
 from easyai.model.base_block.cls.darknet_block import ReorgBlock, DarknetBlockName
-from easyai.loss.utility.ce2d_loss import CrossEntropy2d
-from easyai.loss.utility.bce_loss import BinaryCrossEntropy2d
+from easyai.loss.cls.ce2d_loss import CrossEntropy2d
+from easyai.loss.cls.bce_loss import BinaryCrossEntropy2d
 from easyai.loss.seg.ohem_cross_entropy2d import OhemCrossEntropy2d
 from easyai.loss.det2d.region2d_loss import Region2dLoss
 from easyai.loss.det2d.yolov3_loss import YoloV3Loss
@@ -147,6 +147,7 @@ class CreateModuleList():
             stride = int(module_def['stride'])
             pad = (kernel_size - 1) // 2 if int(module_def['pad']) else 0
             dilation = int(module_def.get('dilation', 1))
+            groups = int(module_def.get("groups", 1))
             if dilation > 1:
                 pad = dilation
             block = nn.Conv2d(in_channels=self.input_channels,
@@ -155,6 +156,7 @@ class CreateModuleList():
                               stride=stride,
                               padding=pad,
                               dilation=dilation,
+                              groups=groups,
                               bias=True)
             self.add_block_list(LayerType.Convolutional, block, self.filters)
             self.input_channels = self.filters
@@ -165,6 +167,7 @@ class CreateModuleList():
             pad = (kernel_size - 1) // 2 if int(module_def['pad']) else 0
             activationName = module_def['activation']
             dilation = int(module_def.get("dilation", 1))
+            groups = int(module_def.get("groups", 1))
             if dilation > 1:
                 pad = dilation
             block = ConvActivationBlock(in_channels=self.input_channels,
@@ -173,6 +176,7 @@ class CreateModuleList():
                                         stride=stride,
                                         padding=pad,
                                         dilation=dilation,
+                                        groups=groups,
                                         activationName=activationName)
             self.add_block_list(BlockType.ConvActivationBlock, block, self.filters)
             self.input_channels = self.filters
@@ -184,6 +188,7 @@ class CreateModuleList():
             pad = (kernel_size - 1) // 2 if int(module_def['pad']) else 0
             activationName = module_def['activation']
             dilation = int(module_def.get("dilation", 1))
+            groups = int(module_def.get("groups", 1))
             if dilation > 1:
                 pad = dilation
             block = ConvBNActivationBlock(in_channels=self.input_channels,
@@ -193,6 +198,7 @@ class CreateModuleList():
                                           padding=pad,
                                           bnName=bnName,
                                           dilation=dilation,
+                                          groups=groups,
                                           activationName=activationName)
             self.add_block_list(BlockType.ConvBNActivationBlock, block, self.filters)
             self.input_channels = self.filters

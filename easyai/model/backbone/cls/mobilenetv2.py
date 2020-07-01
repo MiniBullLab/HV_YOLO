@@ -17,7 +17,7 @@ class MobileNetV2(BaseBackbone):
     def __init__(self, data_channel=3, num_blocks=[1, 2, 3, 4, 3, 3, 1],
                  out_channels=[16, 24, 32, 64, 96, 160, 320], strides=[1, 2, 2, 2, 1, 2, 1],
                  dilations=[1, 1, 1, 1, 1, 1, 1], bnName=NormalizationType.BatchNormalize2d,
-                 activationName=ActivationType.ReLU, expand_ratios=[1, 6, 6, 6, 6, 6, 6]):
+                 activationName=ActivationType.ReLU6, expand_ratios=[1, 6, 6, 6, 6, 6, 6]):
         super().__init__()
         self.set_name(BackboneName.MobileNetV2_1_0)
         self.data_channel = data_channel

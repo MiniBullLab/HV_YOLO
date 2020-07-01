@@ -302,7 +302,7 @@ def _convert_gemm(node,graph,err):
     return layer
 
 
-def _convert_upsample(node,graph,err):
+def _convert_upsample(node, graph, err):
     factor = int(node.attrs["height_scale"])
     node_name = node.name
     input_name = str(node.inputs[0])
@@ -342,7 +342,7 @@ def _convert_upsample(node,graph,err):
     return layer
 
 
-def _convert_concat(node,graph,err):
+def _convert_concat(node, graph, err):
     node_name = node.name
     input_name_list = [str(i) for i in node.inputs]
     output_name = str(node.outputs[0])
@@ -360,7 +360,7 @@ def _convert_concat(node,graph,err):
     return layer
 
 
-def _convert_conv_transpose(node,graph,err):
+def _convert_conv_transpose(node, graph, err):
     input_name = str(node.inputs[0])
     output_name = str(node.outputs[0])
     node_name = node.name
@@ -386,8 +386,8 @@ def _convert_conv_transpose(node,graph,err):
     layer = myf('Deconvolution', node_name, [input_name], [output_name],
                 convolution_param=dict(
                     num_output=W.shape[1],
-                    kernel_h=kernel_shape[0],kernel_w=kernel_shape[1],
-                    stride_h=strides[0],stride_w = strides[1],
+                    kernel_h=kernel_shape[0], kernel_w=kernel_shape[1],
+                    stride_h=strides[0], stride_w=strides[1],
                     group=groups,
                     pad_h=pads[0], pad_w=pads[1],
                     bias_term=bias_flag,

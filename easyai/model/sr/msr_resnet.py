@@ -6,7 +6,7 @@ from easyai.base_name.model_name import ModelName
 from easyai.base_name.block_name import ActivationType
 from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
-from easyai.loss.utility.mse_loss import MeanSquaredErrorLoss
+from easyai.loss.utility.utility_loss import MeanSquaredErrorLoss
 from easyai.model.utility.base_model import *
 from easyai.model.base_block.utility.utility_block import ConvActivationBlock
 from easyai.model.base_block.sr.msr_resnet_block import ResidualBlockNoBN

@@ -1,5 +1,6 @@
 import random
 
+
 class ColorDefine():
 
     colors = [  # [  0,   0,   0],

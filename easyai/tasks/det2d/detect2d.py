@@ -7,7 +7,7 @@ import torch
 from easyai.tasks.utility.base_inference import BaseInference
 from easyai.tasks.det2d.detect2d_result_process import Detect2dResultProcess
 from easyai.base_algorithm.fast_non_max_suppression import FastNonMaxSuppression
-from easyai.visualization.detect_show import DetectionShow
+from easyai.visualization.task_show.detect2d_show import DetectionShow
 from easyai.base_name.task_name import TaskName
 
 

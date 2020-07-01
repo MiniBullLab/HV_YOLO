@@ -4,7 +4,7 @@
 
 import torch
 from easyai.tasks.utility.base_inference import BaseInference
-from easyai.visualization.classify_show import ClassifyShow
+from easyai.visualization.task_show.classify_show import ClassifyShow
 from easyai.base_name.task_name import TaskName
 
 

@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 # Author:
 
+import numpy as np
 from easyai.base_name.block_name import LayerType
 from easyai.base_name.block_name import ActivationType, NormalizationType
 from easyai.base_name.block_name import BlockType
@@ -121,3 +122,33 @@ class SeparableConv2dBNActivation(BaseBlock):
 
     def forward(self, x):
         return self.block(x)
+
+
+# MixConv: Mixed Depthwise Convolutional Kernels https://arxiv.org/abs/1907.09595
+class MixConv2dBlock(BaseBlock):
+    def __init__(self, in_channels, out_channels, kernel_size=(3, 5, 7), stride=1, padding=0,
+                 dilation=1, bias=True, method='equal_params'):
+        super().__init__(BlockType.MixConv2dBlock)
+
+        groups = len(kernel_size)
+        if method == 'equal_ch':  # equal channels per group
+            i = torch.linspace(0, groups - 1E-6, out_channels).floor()  # out_ch indices
+            ch = [(i == g).sum() for g in range(groups)]
+        else:  # 'equal_params': equal parameter count per group
+            b = [out_channels] + [0] * groups
+            a = np.eye(groups + 1, groups, k=-1)
+            a -= np.roll(a, 1, axis=1)
+            a *= np.array(kernel_size) ** 2
+            a[0] = 1
+            ch = np.linalg.lstsq(a, b, rcond=None)[0].round().astype(int)  # solve for equal weight indices, ax = b
+
+        self.block_list = nn.ModuleList([nn.Conv2d(in_channels=in_channels,
+                                         out_channels=ch[g],
+                                         kernel_size=kernel_size[g],
+                                         stride=stride,
+                                         padding=kernel_size[g] // 2,
+                                         dilation=dilation,
+                                         bias=bias) for g in range(groups)])
+
+    def forward(self, x):
+        return torch.cat([block(x) for block in self.block_list], 1)

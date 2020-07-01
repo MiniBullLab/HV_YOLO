@@ -3,7 +3,7 @@
 # Author:
 
 import numpy as np
-from easyai.base_name.block_name import LayerType
+from easyai.base_name.block_name import LayerType, BlockType
 from easyai.model.base_block.utility.base_block import *
 
 
@@ -43,3 +43,16 @@ class GlobalAvgPool2d(BaseBlock):
         #     return F.avg_pool2d(x, kernel_size=(h, w), stride=(h, w))
         # else:
         #     return F.avg_pool2d(x, kernel_size=(h, w), stride=(h, w))
+
+
+# SPP
+class SpatialPyramidPooling(BaseBlock):
+    def __init__(self, pool_sizes=(5, 9, 13)):
+        super().__init__(BlockType.SpatialPyramidPooling)
+        self.maxpools = nn.ModuleList([nn.MaxPool2d(pool_size, 1, pool_size//2)
+                                       for pool_size in pool_sizes])
+
+    def forward(self, x):
+        features = [maxpool(x) for maxpool in self.maxpools[::-1]]
+        features = torch.cat(features + [x], dim=1)
+        return features

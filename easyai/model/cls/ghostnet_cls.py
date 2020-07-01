@@ -7,7 +7,7 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
-from easyai.loss.utility.ce2d_loss import CrossEntropy2d
+from easyai.loss.cls.ce2d_loss import CrossEntropy2d
 from easyai.model.base_block.utility.utility_layer import FcLayer
 from easyai.model.base_block.utility.utility_layer import NormalizeLayer, ActivationLayer
 from easyai.model.utility.base_model import *

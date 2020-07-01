@@ -6,7 +6,7 @@ import torch
 import numpy as np
 from easyai.tasks.utility.base_inference import BaseInference
 from easyai.tasks.seg.segment_result_process import SegmentResultProcess
-from easyai.visualization.segment_show import SegmentionShow
+from easyai.visualization.task_show.segment_show import SegmentionShow
 from easyai.base_name.task_name import TaskName
 
 

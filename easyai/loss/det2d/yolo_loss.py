@@ -26,8 +26,8 @@ class YoloLoss(BaseLoss):
         pred_boxes = torch.zeros(all_count, 4, dtype=torch.float, device=device)
         lin_x = torch.linspace(0, W - 1, W).to(device).repeat(H, 1).view(H * W)
         lin_y = torch.linspace(0, H - 1, H).to(device).repeat(W, 1).t().contiguous().view(H * W)
-        anchor_w = self.anchors[:, 0].view(self.anchor_count, 1).to(device)
-        anchor_h = self.anchors[:, 1].view(self.anchor_count, 1).to(device)
+        anchor_w = self.anchor_sizes[:, 0].view(self.anchor_count, 1).to(device)
+        anchor_h = self.anchor_sizes[:, 1].view(self.anchor_count, 1).to(device)
 
         pred_boxes[:, 0] = (coord[:, :, 0].detach() + lin_x).view(-1)
         pred_boxes[:, 1] = (coord[:, :, 1].detach() + lin_y).view(-1)

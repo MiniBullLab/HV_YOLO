@@ -89,3 +89,4 @@ class BackboneName():
     HRnet_w44 = "hrnet_w44"
     HRnet_w48 = "hrnet_w48"
     HRnet_w64 = "hrnet_w64"
+    CSPDarknet53 = "csp_darknet53"

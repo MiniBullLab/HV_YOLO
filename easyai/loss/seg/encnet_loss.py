@@ -3,8 +3,8 @@
 # Author:
 
 from easyai.loss.utility.base_loss import *
-from easyai.loss.utility.ce2d_loss import CrossEntropy2d
-from easyai.loss.utility.bce_loss import BinaryCrossEntropy2d
+from easyai.loss.cls.ce2d_loss import CrossEntropy2d
+from easyai.loss.cls.bce_loss import BinaryCrossEntropy2d
 
 
 class EncNetLoss(BaseLoss):

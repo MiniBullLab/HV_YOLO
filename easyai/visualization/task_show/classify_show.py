@@ -3,7 +3,7 @@
 # Author:
 
 import cv2
-from easyai.visualization.image_drawing import ImageDrawing
+from easyai.visualization.utility.image_drawing import ImageDrawing
 
 
 class ClassifyShow():

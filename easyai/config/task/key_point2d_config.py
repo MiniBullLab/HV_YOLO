@@ -16,7 +16,7 @@ class KeyPoint2dConfig(ImageTaskConfig):
         self.class_name = None
         self.points_count = 0
         self.confidence_th = 1.0
-        self.nms_th = 1.0
+        self.post_prcoess_type = 0
         # test
         self.save_evaluation_path = os.path.join(self.root_save_dir, 'key_points2d_evaluation.txt')
         # train
@@ -55,8 +55,8 @@ class KeyPoint2dConfig(ImageTaskConfig):
             self.points_count = int(config_dict['points_count'])
         if config_dict.get('confidence_th', None) is not None:
             self.confidence_th = float(config_dict['confidence_th'])
-        if config_dict.get('nms_th', None) is not None:
-            self.nms_th = float(config_dict['nms_th'])
+        if config_dict.get('post_prcoess_type', None) is not None:
+            self.post_prcoess_type = int(config_dict['post_prcoess_type'])
 
     def save_data_value(self, config_dict):
         config_dict['image_size'] = self.image_size
@@ -64,7 +64,7 @@ class KeyPoint2dConfig(ImageTaskConfig):
         config_dict['class_name'] = self.class_name
         config_dict['points_count'] = self.points_count
         config_dict['confidence_th'] = self.confidence_th
-        config_dict['nms_th'] = self.nms_th
+        config_dict['post_prcoess_type'] = self.post_prcoess_type
 
     def load_test_value(self, config_dict):
         if config_dict.get('test_batch_size', None) is not None:
@@ -134,10 +134,10 @@ class KeyPoint2dConfig(ImageTaskConfig):
     def get_data_default_value(self):
         self.image_size = (640, 352)  # W * H
         self.image_channel = 3
-        self.class_name = ('bike', 'bus', 'car', 'motor', 'person', 'rider', 'truck')
+        self.class_name = ('bike', )
         self.points_count = 9
         self.confidence_th = 0.5
-        self.nms_th = 0.45
+        self.post_prcoess_type = 0
 
     def get_test_default_value(self):
         self.test_batch_size = 1

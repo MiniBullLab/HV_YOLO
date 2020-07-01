@@ -25,7 +25,7 @@ class ClassifyDatasetProcess(BaseDataSetProcess):
             image = self.dataset_process.numpy_normaliza(normaliza_image,
                                                          self.mean,
                                                          self.std)
-            image = self.dataset_process.numpy_transpose(image, image.dtype)
+            image = self.dataset_process.numpy_transpose(image, np.float32)
             result = self.numpy_to_torch(image, flag=0)
         elif normaliza_type == 1:  # torchvision normalize
             image = self.dataset_process.numpy_transpose(src_image, src_image.dtype)

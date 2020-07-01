@@ -28,9 +28,17 @@ class JsonProcess():
         boxes = []
         for rect_dict in rect_objects_list:
             class_name = rect_dict['class']
+            xmin = rect_dict['minX']
+            ymin = rect_dict['minY']
+            xmax = rect_dict['maxX']
+            ymax = rect_dict['maxY']
             point_count = rect_dict['pointCount']
             key_points_list = rect_dict['keyPoints']
             box = Rect2D()
+            box.min_corner.x = xmin
+            box.min_corner.y = ymin
+            box.max_corner.x = xmax
+            box.max_corner.y = ymax
             box.name = class_name
             box.clear_key_points()
             for index in range(0, point_count, 2):

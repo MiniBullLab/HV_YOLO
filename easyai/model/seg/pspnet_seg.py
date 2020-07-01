@@ -12,7 +12,7 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
-from easyai.loss.utility.ce2d_loss import CrossEntropy2d
+from easyai.loss.cls.ce2d_loss import CrossEntropy2d
 from easyai.model.base_block.utility.upsample_layer import Upsample
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.seg.pspnet_block import PyramidPooling

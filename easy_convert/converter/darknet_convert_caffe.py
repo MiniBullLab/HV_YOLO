@@ -55,7 +55,7 @@ class DarknetConvertCaffe():
         fp.close()
 
         layers = []
-        layer_id = 1
+        layer_id = 0
         start = 0
         for block in blocks:
             if start >= buf.size:
@@ -130,25 +130,25 @@ class DarknetConvertCaffe():
                 print('unknow layer type %s ' % block['type'])
                 layer_id = layer_id + 1
         print('save prototxt to %s' % protofile)
-        save_prototxt(net_info, protofile, region=True)
+        save_prototxt(net_info, protofile, region=False)
         print('save caffemodel to %s' % caffemodel)
         net.save(caffemodel)
 
     def load_conv2caffe(self, buf, start, conv_param):
         weight = conv_param[0].data
         bias = conv_param[1].data
-        conv_param[1].data[...] = np.reshape(buf[start:start + bias.size], bias.shape);
+        conv_param[1].data[...] = np.reshape(buf[start:start + bias.size], bias.shape)
         start = start + bias.size
-        conv_param[0].data[...] = np.reshape(buf[start:start + weight.size], weight.shape);
+        conv_param[0].data[...] = np.reshape(buf[start:start + weight.size], weight.shape)
         start = start + weight.size
         return start
 
     def load_fc2caffe(self, buf, start, fc_param):
         weight = fc_param[0].data
         bias = fc_param[1].data
-        fc_param[1].data[...] = np.reshape(buf[start:start + bias.size], bias.shape);
+        fc_param[1].data[...] = np.reshape(buf[start:start + bias.size], bias.shape)
         start = start + bias.size
-        fc_param[0].data[...] = np.reshape(buf[start:start + weight.size], weight.shape);
+        fc_param[0].data[...] = np.reshape(buf[start:start + weight.size], weight.shape)
         start = start + weight.size
         return start
 
@@ -158,26 +158,19 @@ class DarknetConvertCaffe():
         running_var = bn_param[1].data
         scale_weight = scale_param[0].data
         scale_bias = scale_param[1].data
-
-        scale_param[1].data[...] = np.reshape(buf[start:start + scale_bias.size], scale_bias.shape);
+        scale_param[1].data[...] = np.reshape(buf[start:start + scale_bias.size], scale_bias.shape)
         start = start + scale_bias.size
-        # print(scale_bias.size)
-        # print(scale_bias)
-
-        scale_param[0].data[...] = np.reshape(buf[start:start + scale_weight.size], scale_weight.shape);
+        scale_param[0].data[...] = np.reshape(buf[start:start + scale_weight.size], scale_weight.shape)
         start = start + scale_weight.size
-        # print(scale_weight.size)
-
-        bn_param[0].data[...] = np.reshape(buf[start:start + running_mean.size], running_mean.shape);
+        bn_param[0].data[...] = np.reshape(buf[start:start + running_mean.size], running_mean.shape)
         start = start + running_mean.size
-        # print(running_mean.size)
-
-        bn_param[1].data[...] = np.reshape(buf[start:start + running_var.size], running_var.shape);
+        bn_param[1].data[...] = np.reshape(buf[start:start + running_var.size], running_var.shape)
         start = start + running_var.size
         # print(running_var.size)
 
         bn_param[2].data[...] = np.array([1.0])
-        conv_param[0].data[...] = np.reshape(buf[start:start + conv_weight.size], conv_weight.shape);
+        # bn_param[2].data[...] = np.array(buf[start:start + 1]); start = start + 1
+        conv_param[0].data[...] = np.reshape(buf[start:start + conv_weight.size], conv_weight.shape)
         start = start + conv_weight.size
         # print(conv_weight.size)
 
@@ -190,7 +183,7 @@ class DarknetConvertCaffe():
         layers = []
         props = OrderedDict()
         bottom = 'data'
-        layer_id = 1
+        layer_id = 0
         topnames = dict()
         for block in blocks:
             if block['type'] == 'net':
@@ -385,27 +378,6 @@ class DarknetConvertCaffe():
                 bottom = avg_layer['top']
                 topnames[layer_id] = bottom
                 layer_id = layer_id + 1
-            elif block['type'] == 'region':
-                if True:
-                    region_layer = OrderedDict()
-                    region_layer['bottom'] = bottom
-                    if 'name' in block:
-                        region_layer['top'] = block['name']
-                        region_layer['name'] = block['name']
-                    else:
-                        region_layer['top'] = 'layer%d-region' % layer_id
-                        region_layer['name'] = 'layer%d-region' % layer_id
-                    region_layer['type'] = 'Region'
-                    region_param = OrderedDict()
-                    region_param['anchors'] = block['anchors'].strip()
-                    region_param['classes'] = block['classes']
-                    region_param['num'] = block['num']
-                    region_layer['region_param'] = region_param
-                    layers.append(region_layer)
-                    bottom = region_layer['top']
-                topnames[layer_id] = bottom
-                layer_id = layer_id + 1
-
             elif block['type'] == 'route':
                 from_layers = block['layers'].split(',')
                 bottom_tmp = []
@@ -527,8 +499,9 @@ class DarknetConvertCaffe():
                 convolution_param = OrderedDict()
                 convolution_param['num_output'] = conv_layer['convolution_param']['num_output']
                 convolution_param['group'] = conv_layer['convolution_param']['num_output']
-                convolution_param['kernel_size'] = stride
+                convolution_param['kernel_size'] = 2 * int(stride) - int(stride) % 2
                 convolution_param['stride'] = stride
+                convolution_param['pad'] = int(np.ceil((int(stride) - 1) / 2.0))
                 convolution_param['bias_term'] = 'false'
                 weight_filler_param = OrderedDict()
                 weight_filler_param['type'] = 'bilinear'
@@ -554,6 +527,26 @@ class DarknetConvertCaffe():
                 reorg_layer['reorg_param'] = reorg_param
                 layers.append(reorg_layer)
                 bottom = reorg_layer['top']
+                topnames[layer_id] = bottom
+                layer_id = layer_id + 1
+            elif block['type'] == 'region':
+                if True:
+                    region_layer = OrderedDict()
+                    region_layer['bottom'] = bottom
+                    if 'name' in block:
+                        region_layer['top'] = block['name']
+                        region_layer['name'] = block['name']
+                    else:
+                        region_layer['top'] = 'layer%d-region' % layer_id
+                        region_layer['name'] = 'layer%d-region' % layer_id
+                    region_layer['type'] = 'Region'
+                    region_param = OrderedDict()
+                    region_param['anchors'] = block['anchors'].strip()
+                    region_param['classes'] = block['classes']
+                    region_param['num'] = block['num']
+                    region_layer['region_param'] = region_param
+                    layers.append(region_layer)
+                    bottom = region_layer['top']
                 topnames[layer_id] = bottom
                 layer_id = layer_id + 1
 

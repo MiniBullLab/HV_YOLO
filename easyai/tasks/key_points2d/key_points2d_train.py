@@ -7,10 +7,11 @@ from easyai.data_loader.key_point2d.key_point2d_dataloader import get_key_points
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.solver.lr_factory import LrSchedulerFactory
 from easyai.tasks.utility.base_train import BaseTrain
+from easyai.tasks.key_points2d.key_points2d_test import KeyPoints2dTest
 from easyai.base_name.task_name import TaskName
 
 
-class KeyPoint2dTrain(BaseTrain):
+class KeyPoints2dTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
         super().__init__(config_path, TaskName.KeyPoints2d_Task)
@@ -23,10 +24,12 @@ class KeyPoint2dTrain(BaseTrain):
                                                       })
         self.device = self.torchModelProcess.getDevice()
 
+        self.keypoints_test = KeyPoints2dTest(cfg_path, gpu_id, config_path)
+
         self.total_images = 0
         self.avg_loss = -1
         self.start_epoch = 0
-        self.best_mAP = 0
+        self.best_accuracy = 0
 
     def load_latest_param(self, latest_weights_path):
         checkpoint = None
@@ -139,4 +142,12 @@ class KeyPoint2dTrain(BaseTrain):
         return save_model_path
 
     def test(self, val_path, epoch, save_model_path):
-        pass
+        if val_path is not None and os.path.exists(val_path):
+            self.keypoints_test.load_weights(save_model_path)
+            accuracy = self.keypoints_test.test(val_path)
+            self.keypoints_test.save_test_value(epoch, accuracy)
+            # save best model
+            self.best_accuracy = self.torchModelProcess.saveBestModel(accuracy, save_model_path,
+                                                                      self.train_task_config.best_weights_file)
+        else:
+            print("no test!")

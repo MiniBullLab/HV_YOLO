@@ -14,17 +14,17 @@ class CaffeYoloV3Inference():
 		self.image_process = ImageProcess()
 		self.dataset_process = ImageDataSetProcess()
 		self.image_size = (640, 352)   # w, h
-		self.output_node_1 = 'layer82-conv'
-		self.output_node_2 = 'layer94-conv'
-		self.output_node_3 = 'layer106-conv'
-		self.class_list = ('bike', 'bus', 'car', 'motor', 'person', 'truck')
+		self.output_node_1 = 'layer81-conv'
+		self.output_node_2 = 'layer93-conv'
+		self.output_node_3 = 'layer105-conv'
+		self.class_list = ('truck', 'person', 'bicycle', 'car', 'motorbike', 'bus')
 		self.classes = 6
 		self.nms_threshold = 0.45
 		self.thresh_conf = 0.24
 		self.box_of_each_grid = 3
 		self.biases = np.array([8, 9, 12, 29, 18, 15, 26, 64, 33, 26,
 								61, 44, 58, 135, 150, 122, 208, 203])
-		self.image_pad_color = (0, 0, 0)
+		self.image_pad_color = (127.5, 127.5, 127.5)
 		self.net = caffe.Net(model_def, model_weights, caffe.TEST)
 
 	def yolov3_detect(self, image_dir):
@@ -49,7 +49,7 @@ class CaffeYoloV3Inference():
 																	feat.shape[1], self.biases,
 																	self.box_of_each_grid, self.classes,
 																	src_size[0], src_size[1],
-																	self.image_size[1], self.image_size[0],
+																	self.image_size[0], self.image_size[1],
 																	self.thresh_conf, mask[index], 0)
 
 				totalBoxes += boxes
@@ -75,12 +75,11 @@ def main():
 	caffe.set_device(0)
 	caffe.set_mode_gpu()
 
-	model_def = './data/caffe/yolov3_berkeley_6_classes.prototxt'
-	model_weights = './data/caffe/yolov3_berkeley_6_classes.caffemodel'
+	model_def = './data/darknet/yolov3_berkeley_6_classes.prototxt'
+	model_weights = './data/darknet/yolov3_berkeley_6_classes.caffemodel'
 	test = CaffeYoloV3Inference(model_def, model_weights)
-	test.yolov3_detect("/home/wfw/data/VOCdevkit/BKLdata/JPEGImages")
+	test.yolov3_detect("/home/lpj/Desktop/test")
 
 
 if __name__ == "__main__":
 	main()
-

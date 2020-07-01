@@ -6,7 +6,7 @@
 from easyai.loss.utility.base_loss import *
 from easyai.loss.det2d.yolo_loss import YoloLoss
 import math
-from easyai.loss.cls.smooth_cross_entropy import SmoothCrossEntropy
+from easyai.loss.cls.label_smoothing_ce2d_loss import LabelSmoothCE2dLoss
 from easyai.loss.det2d.focal_loss import FocalBinaryLoss
 from easyai.torch_utility.box_utility import torch_rect_box_ious
 
@@ -38,7 +38,7 @@ class YoloV3Loss(YoloLoss):
         self.bce_loss = nn.BCELoss(reduce=False)
         self.smooth_l1_loss = nn.SmoothL1Loss(reduce=False)
         if self.smoothLabel:
-            self.ce_loss = SmoothCrossEntropy(reduction='sum')
+            self.ce_loss = LabelSmoothCE2dLoss(class_number, reduction='sum')
         else:
             self.ce_loss = nn.CrossEntropyLoss(size_average=False)
         self.fl_bce_loss = FocalBinaryLoss(gamma=2, reduce=False)

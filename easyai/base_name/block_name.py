@@ -41,12 +41,13 @@ class LayerType():
     RouteLayer = "route"
     ShortRouteLayer = "shortRoute"
     ShortcutLayer = "shortcut"
-    MyMaxPool2d = "maxpool"
 
     Upsample = "upsample"
     PixelShuffle = "pixelShuffle"
 
+    MyMaxPool2d = "maxpool"
     GlobalAvgPool = "globalavgpool"
+
     FcLayer = "fcLayer"
     Dropout = "dropout"
 
@@ -81,6 +82,7 @@ class BlockType():
     DepthwiseConv2dBlock = "depthwiseConv2dBlock"
     SeparableConv2dBNActivation = "separableConv2dBNActivation"
     ShuffleBlock = "shuffleBlock"
+    MixConv2dBlock = "mixConv2dBlock"
 
     ResidualBlock = "residualBlock"
     InvertedResidual = "invertedResidual"
@@ -88,4 +90,7 @@ class BlockType():
     SEBlock = "seBlock"
     SEConvBlock = "seConvBlock"
 
+    SpatialPyramidPooling = "SPPBlock"
+
     Detection2dBlock = "detection2dBlock"
+

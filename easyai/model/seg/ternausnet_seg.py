@@ -9,16 +9,10 @@
 """
 
 from easyai.base_name.model_name import ModelName
-from easyai.base_name.backbone_name import BackboneName
 from easyai.base_name.block_name import NormalizationType, ActivationType
-from easyai.base_name.block_name import LayerType, BlockType
-from easyai.base_name.loss_name import LossType
-from easyai.loss.utility.ce2d_loss import CrossEntropy2d
-from easyai.model.base_block.utility.utility_layer import RouteLayer
 from easyai.model.base_block.utility.utility_block import ConvActivationBlock
 from easyai.model.base_block.seg.ternausnet_block import DecoderBlock, DecoderBlockLinkNet
 from easyai.model.utility.base_model import *
-from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 import torchvision
 
 

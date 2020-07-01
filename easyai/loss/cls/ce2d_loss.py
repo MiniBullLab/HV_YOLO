@@ -28,12 +28,13 @@ class CrossEntropy2d(BaseLoss):
         weight = [float(x) for x in self.weight.split(',') if x]
         return loss
 
-    def forward(self, input_data, target=None):
+    def forward(self, outputs, target=None):
+        outputs = outputs.float()
         if target is not None:
-            loss = self.loss_function(input_data, target)
+            loss = self.loss_function(outputs, target)
             if self.weight_type != 0 and self.weight is not None:
                 loss = self.compute_loss_from_weight(loss, target)
         else:
-            loss = F.softmax(input_data, dim=1)
+            loss = F.softmax(outputs, dim=1)
         return loss
 
