@@ -16,6 +16,33 @@ class JsonProcess():
     def __init__(self):
         pass
 
+    def parse_rect_data(self, json_path):
+        if os.path.exists(json_path):
+            print("error:%s file not exists" % json_path)
+            return
+        with codecs.open(json_path, 'r', encoding='utf-8') as f:
+            data_dict = json.load(f)
+        image_name = data_dict['filename']
+        objects_dict = data_dict['objects']
+        rect_objects_list = objects_dict['rectObject']
+        boxes = []
+        for rect_dict in rect_objects_list:
+            class_name = rect_dict['class']
+            xmin = rect_dict['minX']
+            ymin = rect_dict['minY']
+            xmax = rect_dict['maxX']
+            ymax = rect_dict['maxY']
+            box = Rect2D()
+            box.min_corner.x = xmin
+            box.min_corner.y = ymin
+            box.max_corner.x = xmax
+            box.max_corner.y = ymax
+            box.name = class_name
+            if box.width() >= JsonProcess.MIN_WIDTH \
+                    and box.height() >= JsonProcess.MIN_HEIGHT:
+                boxes.append(box)
+        return image_name, boxes
+
     def parse_key_points_data(self, json_path):
         if os.path.exists(json_path):
             print("error:%s file not exists" % json_path)

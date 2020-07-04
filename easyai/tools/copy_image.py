@@ -29,7 +29,8 @@ class CopyImage():
         result = []
         path, _ = os.path.split(trainPath)
         imagesDir = os.path.join(path, "../JPEGImages")
-        for fileNameAndPost in self.dir_process.getFileData(trainPath):
+        for data in self.dir_process.getFileData(trainPath):
+            fileNameAndPost = data.split()[0]
             imagePath = os.path.join(imagesDir, fileNameAndPost)
             #print(imagePath)
             if os.path.exists(imagePath):

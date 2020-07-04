@@ -47,7 +47,7 @@ class XMLProcess():
             box.min_corner.y = yMin
             box.max_corner.x = xMax
             box.max_corner.y = yMax
-            if box.width() >= self.MIN_WIDTH and box.height() >= self.MIN_HEIGHT:
+            if box.width() >= XMLProcess.MIN_WIDTH and box.height() >= XMLProcess.MIN_HEIGHT:
                 boxes.append(box)
         return image_name, imageSize, boxes
 

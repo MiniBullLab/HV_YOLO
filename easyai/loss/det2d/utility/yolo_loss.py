@@ -3,7 +3,7 @@
 # Author:
 
 from easyai.loss.utility.base_loss import *
-from easyai.loss.det2d.det2d_gt_process import Det2dGroundTruthProcess
+from easyai.loss.det2d.utility.det2d_gt_process import Det2dGroundTruthProcess
 
 
 class YoloLoss(BaseLoss):

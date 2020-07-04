@@ -44,7 +44,7 @@ class LabelSmoothCE2dLossV2(BaseLoss):
         self.log_softmax = nn.LogSoftmax(dim=1)
         self.label_smoothing = LabelSmoothing(class_number, epsilon, ignore_index)
 
-    def forward(self, outputs, targets):
+    def forward(self, outputs, targets=None):
         outputs = outputs.float()
         if targets is None:
             loss = F.softmax(outputs, dim=1)

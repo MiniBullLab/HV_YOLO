@@ -5,8 +5,8 @@
 import numpy as np
 import math
 import random
-from easyai.helper import XMLProcess
-from easyai.helper import ImageProcess
+from easyai.helper.json_process import JsonProcess
+from easyai.helper.imageProcess import ImageProcess
 from easyai.data_loader.utility.data_loader import DataLoader
 from easyai.data_loader.det2d.det2d_sample import DetectionSample
 from easyai.data_loader.det2d.det2d_dataset_process import DetectionDataSetProcess
@@ -30,7 +30,7 @@ class DetectionTrainDataloader(DataLoader):
                                                 class_name,
                                                 balanced_sample)
         self.detection_sample.read_sample()
-        self.xmlProcess = XMLProcess()
+        self.json_process = JsonProcess()
         self.image_process = ImageProcess()
         self.dataset_process = DetectionDataSetProcess()
         self.dataset_augment = DetectionDataAugment()
@@ -60,7 +60,7 @@ class DetectionTrainDataloader(DataLoader):
         for temp_index in range(start_index, stop_index):
             img_path, label_path = self.detection_sample.get_sample_path(temp_index, class_index)
             src_image = self.read_src_image(img_path)
-            _, _, boxes = self.xmlProcess.parseRectData(label_path)
+            _, boxes = self.json_process.parse_rect_data(label_path)
 
             image, labels = self.dataset_process.resize_dataset(src_image,
                                                                 (width, height),

@@ -6,15 +6,14 @@
 class LossType():
 
     # utility
-    CrossEntropy2d = "crossEntropy2d"
-    BinaryCrossEntropy2d = "bceLoss"
     MeanSquaredErrorLoss = "mseLoss"
 
-    FocalLoss = "focalLoss"
-    FocalBinaryLoss = "focalBinaryLoss"
-
     # cls
+    CrossEntropy2d = "crossEntropy2d"
+    BinaryCrossEntropy2d = "bceLoss"
     LabelSmoothCE2dLoss = "LabelSmoothCE2dLoss"
+    FocalLoss = "FocalLoss"
+    FocalBinaryLoss = "FocalBinaryLoss"
 
     # det2d
     Region2dLoss = "Region2dLoss"

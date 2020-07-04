@@ -22,7 +22,7 @@ class DetectionSample():
         self.sample_count = 0
         self.balanced_file_index = np.zeros(len(self.class_name))
 
-        self.annotation_post = ".xml"
+        self.annotation_post = ".json"
         self.dirProcess = DirProcess()
 
     def read_sample(self):

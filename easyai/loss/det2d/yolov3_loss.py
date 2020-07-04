@@ -4,11 +4,10 @@
 
 
 from easyai.loss.utility.base_loss import *
-from easyai.loss.det2d.yolo_loss import YoloLoss
-import math
+from easyai.loss.det2d.utility.yolo_loss import YoloLoss
 from easyai.loss.cls.label_smoothing_ce2d_loss import LabelSmoothCE2dLoss
-from easyai.loss.det2d.focal_loss import FocalBinaryLoss
 from easyai.torch_utility.box_utility import torch_rect_box_ious
+import math
 
 
 __all__ = ['YoloV3Loss']
@@ -41,7 +40,6 @@ class YoloV3Loss(YoloLoss):
             self.ce_loss = LabelSmoothCE2dLoss(class_number, reduction='sum')
         else:
             self.ce_loss = nn.CrossEntropyLoss(size_average=False)
-        self.fl_bce_loss = FocalBinaryLoss(gamma=2, reduce=False)
 
         self.info = {'object_count': 0, 'average_iou': 0, 'recall50': 0, 'recall75': 0,
                      'class': 0.0, 'obj': 0.0, 'no_obj': 0.0,
@@ -53,7 +51,6 @@ class YoloV3Loss(YoloLoss):
         self.bce_loss = self.bce_loss.to(device)
         self.smooth_l1_loss = self.smooth_l1_loss.to(device)
         self.ce_loss = self.ce.to(device)
-        self.fl_bce_loss = self.fl_bce.to(device)
 
     def build_targets(self, pred_boxes, gt_targets, height, width, device):
         """ Compare prediction boxes and ground truths, convert ground truths to network output tensors """

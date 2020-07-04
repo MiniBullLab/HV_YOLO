@@ -3,7 +3,7 @@
 # Author:
 
 from easyai.loss.utility.base_loss import *
-from easyai.loss.det2d.yolo_loss import YoloLoss
+from easyai.loss.det2d.utility.yolo_loss import YoloLoss
 
 
 class KeyPoints2dRegionLoss(YoloLoss):
