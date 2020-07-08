@@ -67,8 +67,8 @@ class DetectionTrainDataloader(DataLoader):
                                                                 boxes,
                                                                 self.className)
             image, labels = self.dataset_augment.augment(image, labels)
-            image = self.dataset_process.normaliza_image(image)
-            labels = self.dataset_process.normaliza_labels(labels, (width, height))
+            image = self.dataset_process.normalize_image(image)
+            labels = self.dataset_process.normalize_labels(labels, (width, height))
             labels = self.dataset_process.change_outside_labels(labels)
 
             numpy_images.append(image)

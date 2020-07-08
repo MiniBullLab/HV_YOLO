@@ -14,10 +14,10 @@ class ImageDataSetProcess(BaseDataSetProcess):
     def __init__(self):
         super().__init__()
 
-    def image_normaliza(self, image):
+    def image_normalize(self, image):
         return image / 255.0
 
-    def numpy_normaliza(self, input_data, mean, std):
+    def numpy_normalize(self, input_data, mean, std):
         result = (input_data - mean) / std
         return result
 

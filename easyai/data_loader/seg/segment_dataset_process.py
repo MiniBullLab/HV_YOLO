@@ -15,8 +15,8 @@ class SegmentDatasetProcess(BaseDataSetProcess):
         self.image_pad_color = image_pad_color
         self.label_pad_color = 250
 
-    def normaliza_dataset(self, src_image):
-        image = self.dataset_process.image_normaliza(src_image)
+    def normalize_dataset(self, src_image):
+        image = self.dataset_process.image_normalize(src_image)
         image = self.dataset_process.numpy_transpose(image)
         return image
 

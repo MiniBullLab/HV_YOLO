@@ -37,12 +37,12 @@ class Det2dSegValDataloader(data.Dataset):
         segment_label = self.image_process.read_gray_image(segment_path)
         src_size = (src_image.shape[1], src_image.shape[0])  # [width, height]
         ratio, pad_size = self.image_dataset_process.get_square_size(src_size, self.image_size)
-        image, = self.image_dataset_process.image_resize_square(src_image, ratio, pad_size,
-                                                                color=self.image_pad_color)
+        image = self.image_dataset_process.image_resize_square(src_image, ratio, pad_size,
+                                                               color=self.image_pad_color)
         segment_label = self.seg_dataset_process.resize_lable(segment_label, ratio, pad_size)
         segment_label = self.seg_dataset_process.change_label(segment_label, self.seg_number_class)
 
-        image = self.det2d_dataset_process.normaliza_image(image)
+        image = self.det2d_dataset_process.normalize_image(image)
         image = self.det2d_dataset_process.numpy_to_torch(image, flag=0)
 
         torch_segment = self.seg_dataset_process.numpy_to_torch(segment_label).long()

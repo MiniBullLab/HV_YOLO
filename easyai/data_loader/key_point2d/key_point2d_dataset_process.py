@@ -16,12 +16,12 @@ class KeyPoint2dDataSetProcess(BaseDataSetProcess):
         self.dataset_process = ImageDataSetProcess()
         self.image_pad_color = (0, 0, 0)
 
-    def normaliza_image(self, src_image):
-        image = self.dataset_process.image_normaliza(src_image)
+    def normalize_image(self, src_image):
+        image = self.dataset_process.image_normalize(src_image)
         image = self.dataset_process.numpy_transpose(image)
         return image
 
-    def normaliza_labels(self, labels, image_size):
+    def normalize_labels(self, labels, image_size):
         result = np.zeros((len(labels), self.points_count * 2), dtype=np.float32)
         for index, rect2d in enumerate(labels):
             temp_data = []

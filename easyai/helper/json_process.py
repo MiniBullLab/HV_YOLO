@@ -17,7 +17,7 @@ class JsonProcess():
         pass
 
     def parse_rect_data(self, json_path):
-        if os.path.exists(json_path):
+        if not os.path.exists(json_path):
             print("error:%s file not exists" % json_path)
             return
         with codecs.open(json_path, 'r', encoding='utf-8') as f:
@@ -44,7 +44,7 @@ class JsonProcess():
         return image_name, boxes
 
     def parse_key_points_data(self, json_path):
-        if os.path.exists(json_path):
+        if not os.path.exists(json_path):
             print("error:%s file not exists" % json_path)
             return
         with codecs.open(json_path, 'r', encoding='utf-8') as f:

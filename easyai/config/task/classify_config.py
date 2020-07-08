@@ -145,7 +145,7 @@ class ClassifyConfig(ImageTaskConfig):
                                  }
         self.lr_scheduler_config = {'type': 'MultiStageLR',
                                     'lr_stages': [[60, 1], [120, 0.2], [160, 0.04], [200, 0.008]],
-                                    'is_warmpu': True,
+                                    'is_warmup': True,
                                     'warmup_iters': 390}
         self.accumulated_batches = 1
         self.display = 20

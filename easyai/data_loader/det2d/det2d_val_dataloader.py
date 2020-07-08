@@ -26,7 +26,7 @@ class DetectionValDataLoader(data.Dataset):
         cv_image, src_image = self.read_src_image(img_path)
         image = self.dataset_process.resize_src_image(src_image,
                                                       self.image_size)
-        image = self.dataset_process.normaliza_image(image)
+        image = self.dataset_process.normalize_image(image)
         image = self.dataset_process.numpy_to_torch(image, flag=0)
         return img_path, cv_image, image
 

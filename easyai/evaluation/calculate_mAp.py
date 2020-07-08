@@ -4,7 +4,7 @@
 
 import os.path
 import numpy as np
-from easyai.helper import XMLProcess
+from easyai.helper.json_process import JsonProcess
 from easyai.data_loader.det2d.det2d_sample import DetectionSample
 
 
@@ -12,7 +12,7 @@ class CalculateMeanAp():
 
     def __init__(self, val_path, class_names):
         self.class_names = class_names
-        self.xmlProcess = XMLProcess()
+        self.json_process = JsonProcess()
         self.detection_samples = DetectionSample(val_path, class_names)
         self.image_annotation_list = self.detection_samples.get_image_and_label_list(val_path)
         self.use_07_metric = False
@@ -68,7 +68,7 @@ class CalculateMeanAp():
         for image_path, annotation_path in self.image_annotation_list:
             path, filename_post = os.path.split(image_path)
             #fileName, post = os.path.splitext(fileNameAndPost)
-            _, _, boxes = self.xmlProcess.parseRectData(annotation_path)
+            _, boxes = self.json_process.parse_rect_data(annotation_path)
             recs[filename_post] = boxes
         return recs
 

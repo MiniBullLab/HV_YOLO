@@ -3,7 +3,7 @@
 # Author:
 
 from easy_convert.converter.tensorrt_utility import trt_helper
-from easy_convert.converter.tensorrt_utility  import trt_int8_calibration_helper as int8_helper
+from easy_convert.converter.tensorrt_utility import trt_int8_calibration_helper as int8_helper
 import time
 import numpy as np
 

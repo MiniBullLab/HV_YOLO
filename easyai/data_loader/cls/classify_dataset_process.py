@@ -18,18 +18,17 @@ class ClassifyDatasetProcess(BaseDataSetProcess):
                                                                               mean=self.mean,
                                                                               std=self.std)
 
-    def normaliza_dataset(self, src_image, normaliza_type=0):
+    def normalize_dataset(self, src_image, normaliza_type=0):
         result = None
         if normaliza_type == 0:  # numpy normalize
-            normaliza_image = self.dataset_process.image_normaliza(src_image)
-            image = self.dataset_process.numpy_normaliza(normaliza_image,
+            normaliza_image = self.dataset_process.image_normalize(src_image)
+            image = self.dataset_process.numpy_normalize(normaliza_image,
                                                          self.mean,
                                                          self.std)
             image = self.dataset_process.numpy_transpose(image, np.float32)
             result = self.numpy_to_torch(image, flag=0)
         elif normaliza_type == 1:  # torchvision normalize
-            image = self.dataset_process.numpy_transpose(src_image, src_image.dtype)
-            result = self.torchvision_transform(image)
+            result = self.torchvision_transform(src_image)
         return result
 
     def resize_image(self, src_image, image_size):

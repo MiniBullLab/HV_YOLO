@@ -28,10 +28,10 @@ class ClassifyDataloader(data.Dataset):
         image = self.dataset_process.resize_image(src_image, self.image_size)
         if self.is_augment:
             image = self.dataset_augment.augment(image)
-            image = self.dataset_process.normaliza_dataset(image, 1)
+            image = self.dataset_process.normalize_dataset(image, 1)
         else:
-            # rgb_image = self.dataset_process.normaliza_dataset(rgb_image, 0)
-            image = self.dataset_process.normaliza_dataset(image, 1)
+            # image = self.dataset_process.normaliza_dataset(image, 0)
+            image = self.dataset_process.normalize_dataset(image, 1)
         return image, label
 
     def __len__(self):

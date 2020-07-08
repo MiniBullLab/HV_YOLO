@@ -15,12 +15,12 @@ class DetectionDataSetProcess(BaseDataSetProcess):
         self.dataset_process = ImageDataSetProcess()
         self.image_pad_color = image_pad_color
 
-    def normaliza_image(self, src_image):
-        image = self.dataset_process.image_normaliza(src_image)
+    def normalize_image(self, src_image):
+        image = self.dataset_process.image_normalize(src_image)
         image = self.dataset_process.numpy_transpose(image)
         return image
 
-    def normaliza_labels(self, labels, image_size):
+    def normalize_labels(self, labels, image_size):
         result = np.zeros((len(labels), 5), dtype=np.float32)
         for index, rect in enumerate(labels):
             class_id = rect.class_id
@@ -30,6 +30,7 @@ class DetectionDataSetProcess(BaseDataSetProcess):
             width = rect.width() / image_size[0]
             height = rect.height() / image_size[1]
             result[index, :] = np.array([class_id, x, y, width, height])
+        return result
 
     def resize_dataset(self, src_image, image_size, boxes, class_name):
         src_size = (src_image.shape[1], src_image.shape[0])  # [width, height]
@@ -42,8 +43,8 @@ class DetectionDataSetProcess(BaseDataSetProcess):
     def resize_src_image(self, src_image, image_size):
         src_size = (src_image.shape[1], src_image.shape[0])  # [width, height]
         ratio, pad_size = self.dataset_process.get_square_size(src_size, image_size)
-        image, = self.dataset_process.image_resize_square(src_image, ratio, pad_size,
-                                                          color=self.image_pad_color)
+        image = self.dataset_process.image_resize_square(src_image, ratio, pad_size,
+                                                         color=self.image_pad_color)
         return image
 
     def resize_labels(self, boxes, class_name, ratio, pad_size):

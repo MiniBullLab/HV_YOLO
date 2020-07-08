@@ -5,7 +5,7 @@
 import numpy as np
 import math
 import random
-from easyai.helper import XMLProcess
+from easyai.helper.json_process import JsonProcess
 from easyai.helper import ImageProcess
 from easyai.data_loader.utility.data_loader import DataLoader
 from easyai.data_loader.multi_task.multi_task_sample import MultiTaskSample
@@ -35,7 +35,7 @@ class Det2dSegTrainDataloader(DataLoader):
                                                  det2d_class_name,
                                                  balanced_sample)
         self.multi_task_sample.read_sample()
-        self.xmlProcess = XMLProcess()
+        self.json_process = JsonProcess()
         self.image_process = ImageProcess()
         self.image_dataset_process = ImageDataSetProcess()
         self.det2d_dataset_process = DetectionDataSetProcess(self.image_pad_color)
@@ -70,20 +70,20 @@ class Det2dSegTrainDataloader(DataLoader):
             img_path, label_path, segment_path = self.multi_task_sample.get_sample_path(temp_index,
                                                                                         class_index)
             src_image = self.read_src_image(img_path)
-            _, _, boxes = self.xmlProcess.parseRectData(label_path)
+            _, boxes = self.json_process.parse_rect_data(label_path)
             segment_label = self.image_process.read_gray_image(segment_path)
 
             src_size = (src_image.shape[1], src_image.shape[0])  # [width, height]
             ratio, pad_size = self.image_dataset_process.get_square_size(src_size, (width, height))
-            image, = self.image_dataset_process.image_resize_square(src_image, ratio, pad_size,
-                                                                    color=self.image_pad_color)
+            image = self.image_dataset_process.image_resize_square(src_image, ratio, pad_size,
+                                                                   color=self.image_pad_color)
             boxes = self.det2d_dataset_process.resize_labels(boxes, self.det2d_class_name, ratio, pad_size)
             segment_label = self.seg_dataset_process.resize_lable(segment_label, ratio, pad_size)
             if self.is_augment:
                 image, boxes, segments = self.dataset_augment.augment(image, boxes, segment_label)
 
-            image = self.det2d_dataset_process.normaliza_image(image)
-            boxes = self.det2d_dataset_process.normaliza_labels(boxes, (width, height))
+            image = self.det2d_dataset_process.normalize_image(image)
+            boxes = self.det2d_dataset_process.normalize_labels(boxes, (width, height))
             boxes = self.det2d_dataset_process.change_outside_labels(boxes)
             segment_label = self.seg_dataset_process.change_label(segment_label, self.seg_number_class)
 

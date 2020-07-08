@@ -43,6 +43,5 @@ class MyBackbone(BaseBackbone):
                 x = block(layer_outputs)
             else:
                 x = block(x)
-            print(key, x.shape)
             layer_outputs.append(x)
         return layer_outputs
