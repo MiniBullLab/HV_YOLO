@@ -15,10 +15,10 @@ __all__ = ['YoloV3Loss']
 
 class YoloV3Loss(YoloLoss):
 
-    def __init__(self, class_number, anchor_sizes, reduction,
+    def __init__(self, class_number, anchor_sizes, anchor_mask, reduction,
                  coord_weight=1.0, noobject_weight=1.0,
                  object_weight=1.0, class_weight=1.0, iou_threshold=0.5):
-        super().__init__(LossType.YoloV3Loss, class_number, anchor_sizes)
+        super().__init__(LossType.YoloV3Loss, class_number, anchor_sizes, anchor_mask)
         self.reduction = reduction
         self.coord_xy_weight = 2.0 * 1.0 * coord_weight
         self.coord_wh_weight = 2.0 * 1.5 * coord_weight
@@ -41,7 +41,8 @@ class YoloV3Loss(YoloLoss):
         else:
             self.ce_loss = nn.CrossEntropyLoss(size_average=False)
 
-        self.info = {'object_count': 0, 'average_iou': 0, 'recall50': 0, 'recall75': 0,
+        self.info = {'object_count': 0, 'object_current': 0,
+                     'average_iou': 0, 'recall50': 0, 'recall75': 0,
                      'class': 0.0, 'obj': 0.0, 'no_obj': 0.0,
                      'coord_xy': 0.0, 'coord_wh': 0.0}
 
@@ -76,6 +77,7 @@ class YoloV3Loss(YoloLoss):
 
         recall50 = 0
         recall75 = 0
+        object_current = 0
         object_count = 0
         iou_sum = 0
         for b in range(batch_size):
@@ -104,15 +106,21 @@ class YoloV3Loss(YoloLoss):
                 gi = min(width - 1, max(0, int(gt[i, 0])))
                 gj = min(height - 1, max(0, int(gt[i, 1])))
                 best_n = best_index[i]
+                if best_n in self.anchor_mask:
+                    best_n = self.anchor_mask.index(best_n)
+                else:
+                    continue
                 iou = iou_gt_pred[i][best_n * nPixels + gj * width + gi]
                 # debug information
+                object_current += 1
                 recall50 += (iou > 0.5).item()
                 recall75 += (iou > 0.75).item()
                 iou_sum += iou.item()
 
                 object_mask[b][best_n][gj * width + gi] = 1
                 no_object_mask[b][best_n][gj * width + gi] = 0
-                coord_mask[b][best_n][gj * width + gi][0] = 2 - anno[3] * anno[4]
+                coord_mask[b][best_n][gj * width + gi][0] = (2 - anno[3] * anno[4]) / \
+                                                            (width * height * self.reduction * self.reduction)
                 tcoord[b][best_n][gj * width + gi][0] = gt[i, 0] - gi
                 tcoord[b][best_n][gj * width + gi][1] = gt[i, 1] - gj
                 tcoord[b][best_n][gj * width + gi][2] = math.log(gt[i, 2] / self.anchors[best_n, 0])
@@ -121,11 +129,12 @@ class YoloV3Loss(YoloLoss):
                 cls_mask[b][best_n][gj * width + gi] = 1
                 tcls[b][best_n][gj * width + gi] = anno[0]
         # informaion
-        if object_count > 0:
+        if object_current > 0:
             self.info['object_count'] = object_count
-            self.info['average_iou'] = iou_sum / object_count
-            self.info['recall50'] = recall50 / object_count
-            self.info['recall75'] = recall75 / object_count
+            self.info['object_current'] = object_current
+            self.info['average_iou'] = iou_sum / object_current
+            self.info['recall50'] = recall50 / object_current
+            self.info['recall75'] = recall75 / object_current
 
         return coord_mask, object_mask, no_object_mask, \
                cls_mask, tcoord, tconf, tcls
@@ -149,7 +158,7 @@ class YoloV3Loss(YoloLoss):
         coord[:, :, :2, :] = outputs[:, :, :2, :].sigmoid()  # tx,ty
         coord[:, :, 2:4, :] = outputs[:, :, 2:4, :]  # tw,th
         conf = outputs[:, :, 4, :].sigmoid()
-        conf = conf.contiguous().view(batch_size, -1, 1)
+        conf = conf.view(batch_size, -1, 1)
         cls = outputs[:, :, 5:, :].transpose(2, 3).contiguous().view(batch_size, -1, self.class_number)
         # Create prediction boxes
         pred_boxes = self.decode_predict_box(coord, batch_size, height, width, device)
@@ -200,12 +209,12 @@ class YoloV3Loss(YoloLoss):
                 class_prob = torch.tensor(0.0, device=device)
 
             if self.info['object_count'] > 0:
-                self.info['class'] = class_prob.sum().item() / self.info['object_count']
-                self.info['obj'] = (object_mask * conf).sum().item() / self.info['object_count']
+                self.info['class'] = class_prob.sum().item() / self.info['object_current']
+                self.info['obj'] = (object_mask * conf).sum().item() / self.info['object_current']
                 self.info['no_obj'] = (no_object_mask * conf).sum().item() / \
                                       batch_size * self.anchor_count * height * width
-                self.info['coord_xy'] = (coord_mask * self.mse_loss(coord_center, tcoord_center)).sum().item() / self.info['object_count']
-                self.info['coord_wh'] = (coord_mask * self.mse_loss(coord_wh, tcoord_wh)).sum().item() / self.info['object_count']
+                self.info['coord_xy'] = (coord_mask * self.mse_loss(coord_center, tcoord_center)).sum().item() / self.info['object_current']
+                self.info['coord_wh'] = (coord_mask * self.mse_loss(coord_wh, tcoord_wh)).sum().item() / self.info['object_current']
             self.printInfo()
 
             all_loss = loss_coord + loss_conf + loss_cls

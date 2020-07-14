@@ -254,6 +254,7 @@ class CreateModuleList():
             self.input_channels = self.filters
         elif module_def['type'] == LossType.YoloV3Loss:
             anchor_sizes_str = (x for x in module_def['anchor_sizes'].split('|') if x.strip())
+            anchor_mask = [int(x) for x in module_def['anchor_mask'].split(',')]
             anchor_sizes = []
             for data in anchor_sizes_str:
                 temp_value = [float(x) for x in data.split(',') if x.strip()]
@@ -265,7 +266,7 @@ class CreateModuleList():
             object_weight = float(module_def['object_weight'])
             class_weight = float(module_def['class_weight'])
             iou_threshold = float(module_def['iou_threshold'])
-            yolo_layer = YoloV3Loss(class_number, anchor_sizes, reduction,
+            yolo_layer = YoloV3Loss(class_number, anchor_sizes, anchor_mask, reduction,
                                     coord_weight=coord_weight, noobject_weight=noobject_weight,
                                     object_weight=object_weight, class_weight=class_weight,
                                     iou_threshold=iou_threshold)

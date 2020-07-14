@@ -8,15 +8,18 @@ from easyai.loss.det2d.utility.det2d_gt_process import Det2dGroundTruthProcess
 
 class YoloLoss(BaseLoss):
 
-    def __init__(self, name, class_number, anchor_sizes=None):
+    def __init__(self, name, class_number, anchor_sizes=None, anchor_mask=None):
         super().__init__(name)
         self.class_number = class_number
         if anchor_sizes is not None:
             self.anchor_sizes = torch.Tensor(anchor_sizes)
             self.anchor_count = len(anchor_sizes)
             self.anchor_step = len(anchor_sizes[0])
+            self.anchor_mask = anchor_mask
+            self.anchor_count = len(anchor_mask)
         else:
             self.anchor_sizes = ()
+            self.anchor_mask = None
             self.anchor_count = 0
             self.anchor_step = 0
         self.gt_process = Det2dGroundTruthProcess()
@@ -26,9 +29,12 @@ class YoloLoss(BaseLoss):
         pred_boxes = torch.zeros(all_count, 4, dtype=torch.float, device=device)
         lin_x = torch.linspace(0, W - 1, W).to(device).repeat(H, 1).view(H * W)
         lin_y = torch.linspace(0, H - 1, H).to(device).repeat(W, 1).t().contiguous().view(H * W)
-        anchor_w = self.anchor_sizes[:, 0].view(self.anchor_count, 1).to(device)
-        anchor_h = self.anchor_sizes[:, 1].view(self.anchor_count, 1).to(device)
-
+        if self.anchor_mask is None:
+            anchor_w = self.anchor_sizes[:, 0].view(self.anchor_count, 1).to(device)
+            anchor_h = self.anchor_sizes[:, 1].view(self.anchor_count, 1).to(device)
+        else:
+            anchor_w = self.anchor_sizes[self.anchor_mask, 0].view(self.anchor_count, 1).to(device)
+            anchor_h = self.anchor_sizes[self.anchor_mask, 1].view(self.anchor_count, 1).to(device)
         pred_boxes[:, 0] = (coord[:, :, 0].detach() + lin_x).view(-1)
         pred_boxes[:, 1] = (coord[:, :, 1].detach() + lin_y).view(-1)
         pred_boxes[:, 2] = (coord[:, :, 2].detach().exp() * anchor_w).view(-1)
