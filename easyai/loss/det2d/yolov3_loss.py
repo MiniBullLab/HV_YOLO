@@ -51,7 +51,7 @@ class YoloV3Loss(YoloLoss):
         self.mse_loss = self.mse_loss.to(device)
         self.bce_loss = self.bce_loss.to(device)
         self.smooth_l1_loss = self.smooth_l1_loss.to(device)
-        self.ce_loss = self.ce.to(device)
+        self.ce_loss = self.ce_loss.to(device)
 
     def build_targets(self, pred_boxes, gt_targets, height, width, device):
         """ Compare prediction boxes and ground truths, convert ground truths to network output tensors """
@@ -107,27 +107,27 @@ class YoloV3Loss(YoloLoss):
                 gj = min(height - 1, max(0, int(gt[i, 1])))
                 best_n = best_index[i]
                 if best_n in self.anchor_mask:
-                    best_n = self.anchor_mask.index(best_n)
+                    anchor_index = self.anchor_mask.index(best_n)
                 else:
                     continue
-                iou = iou_gt_pred[i][best_n * nPixels + gj * width + gi]
+                iou = iou_gt_pred[i][anchor_index * nPixels + gj * width + gi]
                 # debug information
                 object_current += 1
                 recall50 += (iou > 0.5).item()
                 recall75 += (iou > 0.75).item()
                 iou_sum += iou.item()
 
-                object_mask[b][best_n][gj * width + gi] = 1
-                no_object_mask[b][best_n][gj * width + gi] = 0
-                coord_mask[b][best_n][gj * width + gi][0] = (2 - anno[3] * anno[4]) / \
-                                                            (width * height * self.reduction * self.reduction)
-                tcoord[b][best_n][gj * width + gi][0] = gt[i, 0] - gi
-                tcoord[b][best_n][gj * width + gi][1] = gt[i, 1] - gj
-                tcoord[b][best_n][gj * width + gi][2] = math.log(gt[i, 2] / self.anchors[best_n, 0])
-                tcoord[b][best_n][gj * width + gi][3] = math.log(gt[i, 3] / self.anchors[best_n, 1])
-                tconf[b][best_n][gj * width + gi] = 1
-                cls_mask[b][best_n][gj * width + gi] = 1
-                tcls[b][best_n][gj * width + gi] = anno[0]
+                object_mask[b][anchor_index][gj * width + gi] = 1
+                no_object_mask[b][anchor_index][gj * width + gi] = 0
+                coord_mask[b][anchor_index][gj * width + gi][0] = 2 - anno[3] * anno[4] / \
+                                                                  (width * height * self.reduction * self.reduction)
+                tcoord[b][anchor_index][gj * width + gi][0] = gt[i, 0] - gi
+                tcoord[b][anchor_index][gj * width + gi][1] = gt[i, 1] - gj
+                tcoord[b][anchor_index][gj * width + gi][2] = math.log(gt[i, 2] / self.anchor_sizes[best_n, 0])
+                tcoord[b][anchor_index][gj * width + gi][3] = math.log(gt[i, 3] / self.anchor_sizes[best_n, 1])
+                tconf[b][anchor_index][gj * width + gi] = 1
+                cls_mask[b][anchor_index][gj * width + gi] = 1
+                tcls[b][anchor_index][gj * width + gi] = anno[0]
         # informaion
         if object_current > 0:
             self.info['object_count'] = object_count
@@ -176,7 +176,7 @@ class YoloV3Loss(YoloLoss):
             # 0 = 1 = 2 = 3, only need first two element
             coord = coord.transpose(2, 3).contiguous()
             coord_mask = coord_mask.expand_as(tcoord)[:, :, :, :2]
-            coord_center, tcoord_center = coord[:, :, :, :2], tcoord[:, :, :2]
+            coord_center, tcoord_center = coord[:, :, :, :2], tcoord[:, :, :, :2]
             coord_wh, tcoord_wh = coord[:, :, :, 2:], tcoord[:, :, :, 2:]
             conf = conf.view(batch_size, self.anchor_count, height * width)
             if self.class_number > 1:
@@ -212,10 +212,10 @@ class YoloV3Loss(YoloLoss):
                 self.info['class'] = class_prob.sum().item() / self.info['object_current']
                 self.info['obj'] = (object_mask * conf).sum().item() / self.info['object_current']
                 self.info['no_obj'] = (no_object_mask * conf).sum().item() / \
-                                      batch_size * self.anchor_count * height * width
+                                      (batch_size * self.anchor_count * height * width)
                 self.info['coord_xy'] = (coord_mask * self.mse_loss(coord_center, tcoord_center)).sum().item() / self.info['object_current']
                 self.info['coord_wh'] = (coord_mask * self.mse_loss(coord_wh, tcoord_wh)).sum().item() / self.info['object_current']
-            self.printInfo()
+            self.print_info()
 
             all_loss = loss_coord + loss_conf + loss_cls
             return all_loss

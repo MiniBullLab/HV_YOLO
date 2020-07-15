@@ -66,6 +66,6 @@ class YoloLoss(BaseLoss):
 
     def print_info(self):
         info_str = ''
-        for key, value in self.info:
-            info_str += "%s: %.5f|" % value
+        for key, value in self.info.items():
+            info_str += "%s: %.5f|" % (key, value)
         print('%s' % info_str)
