@@ -19,17 +19,15 @@ from easyai.model.base_block.utility.utility_layer import RouteLayer
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.seg.encnet_block import EncNetBlockName
 from easyai.model.base_block.seg.encnet_block import JPUBlock, EncBlock, FCNHeadBlock
-from easyai.model.utility.base_model import *
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
+from easyai.model.utility.base_classify_model import *
 
 
-class EncNetSeg(BaseModel):
+class EncNetSeg(BaseClassifyModel):
 
-    def __init__(self, data_channel=3, class_num=150):
-        super().__init__()
+    def __init__(self, data_channel=3, class_number=150):
+        super().__init__(data_channel, class_number)
         self.set_name(ModelName.EncNetSeg)
-        self.data_channel = data_channel
-        self.class_number = class_num
         self.is_jpu = True
         self.lateral = False
         self.is_se_loss = True
@@ -43,7 +41,7 @@ class EncNetSeg(BaseModel):
     def create_block_list(self):
         self.clear_list()
 
-        backbone = self.factory.get_base_model(BackboneName.ResNet50)
+        backbone = self.factory.get_base_model(BackboneName.ResNet50, self.model_args)
         base_out_channels = backbone.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])
 

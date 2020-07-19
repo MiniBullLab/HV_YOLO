@@ -30,6 +30,8 @@ class ModelName():
     SENetCls = "SENetCls"
     GhostNetCls = "GhostNetCls"
 
+    YoloV3Det2d = "YoloV3Det2d"
+
     MSRResNet = "MSRResNet"
     SmallSRNet = "SmallSRNet"
 

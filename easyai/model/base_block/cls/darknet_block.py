@@ -44,10 +44,10 @@ class BasicBlock(BaseBlock):
 
         self.conv1 = ConvBNActivationBlock(in_channels=in_channels,
                                            out_channels=planes[0],
-                                           kernel_size=3,
+                                           kernel_size=1,
                                            stride=stride,
-                                           padding=dilation,
-                                           dilation=dilation,
+                                           padding=0,
+                                           dilation=1,
                                            bnName=bnName,
                                            activationName=activationName)
 
@@ -64,7 +64,7 @@ class BasicBlock(BaseBlock):
         residual = x
         out = self.conv1(x)
         out = self.conv2(out)
-        out += residual
+        out = out + residual
         return out
 
 

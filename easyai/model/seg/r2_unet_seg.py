@@ -13,16 +13,14 @@ from easyai.loss.cls.bce_loss import BinaryCrossEntropy2d
 from easyai.model.base_block.seg.unet_blcok import UNetBlockName
 from easyai.model.base_block.seg.unet_blcok import UpBlock
 from easyai.model.base_block.seg.unet_blcok import RRCNNBlock
-from easyai.model.utility.base_model import *
+from easyai.model.utility.base_classify_model import *
 
 
-class R2UNetSeg(BaseModel):
+class R2UNetSeg(BaseClassifyModel):
 
-    def __init__(self, data_channel=3, class_num=1):
-        super().__init__()
+    def __init__(self, data_channel=3, class_number=1):
+        super().__init__(data_channel, class_number)
         self.set_name(ModelName.R2UNetSeg)
-        self.data_channel = data_channel
-        self.class_number = class_num
         self.t = 2
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU

@@ -18,17 +18,15 @@ from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.seg.pspnet_block import PyramidPooling
 from easyai.model.base_block.seg.encnet_block import EncNetBlockName
 from easyai.model.base_block.seg.encnet_block import JPUBlock
-from easyai.model.utility.base_model import *
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
+from easyai.model.utility.base_classify_model import *
 
 
-class PSPNetSeg(BaseModel):
+class PSPNetSeg(BaseClassifyModel):
 
-    def __init__(self, data_channel=3, class_num=2):
-        super().__init__()
+    def __init__(self, data_channel=3, class_number=2):
+        super().__init__(data_channel, class_number)
         self.set_name(ModelName.PSPNetSeg)
-        self.data_channel = data_channel
-        self.class_number = class_num
         self.is_jpu = True
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
@@ -39,7 +37,7 @@ class PSPNetSeg(BaseModel):
     def create_block_list(self):
         self.clear_list()
 
-        backbone = self.factory.get_base_model(BackboneName.ResNet101)
+        backbone = self.factory.get_base_model(BackboneName.ResNet101, self.model_args)
         base_out_channels = backbone.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])
 

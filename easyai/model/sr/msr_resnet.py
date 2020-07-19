@@ -15,9 +15,8 @@ from easyai.model.base_block.sr.msr_resnet_block import ResidualBlockNoBN
 class MSRResNet(BaseModel):
 
     def __init__(self, data_channel=1, upscale_factor=3):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(ModelName.MSRResNet)
-        self.data_channel = data_channel
         self.upscale_factor = upscale_factor
         self.out_channel = 64
         self.num_block = 3

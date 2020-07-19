@@ -14,12 +14,11 @@ __all__ = ['resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152']
 
 
 class ResNet(BaseBackbone):
-    def __init__(self, data_channel=3, num_blocks=[2, 2, 2, 2], out_channels=[64, 128, 256, 512],
-                 strides=[1, 2, 2, 2], dilations=[1, 1, 1, 1], bnName=NormalizationType.BatchNormalize2d,
+    def __init__(self, data_channel=3, num_blocks=(2, 2, 2, 2), out_channels=(64, 128, 256, 512),
+                 strides=(1, 2, 2, 2), dilations=(1, 1, 1, 1), bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU, block_flag=0):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.ResNet18)
-        self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.out_channels = out_channels
         self.strides = strides

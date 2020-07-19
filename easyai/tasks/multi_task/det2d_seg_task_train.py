@@ -17,10 +17,9 @@ class Det2dSegTaskTrain(BaseTrain):
         super().__init__(config_path, TaskName.Det2d_Seg_Task)
 
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
+
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
-                                                      default_args={
-                                                          "data_channel": self.train_task_config.image_channel
-                                                      })
+                                                      default_args=self.model_args)
         self.device = self.torchModelProcess.getDevice()
 
         self.multi_task_test = Det2dSegTaskTest(cfg_path, gpu_id, config_path)

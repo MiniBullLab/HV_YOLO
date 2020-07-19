@@ -19,9 +19,8 @@ class WiderResNet(BaseBackbone):
     def __init__(self, data_channel=3, num_blocks=(1, 1, 1, 1, 1, 1),
                  bn_name=NormalizationType.BatchNormalize2d,
                  activation_name=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.wider_resnet16)
-        self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.out_channels = [(128, 128), (256, 256), (512, 512), (512, 1024),
                              (512, 1024, 2048), (1024, 2048, 4096)]

@@ -15,13 +15,12 @@ __all__ = ['darknet21', 'darknet53',
 
 
 class DarkNet(BaseBackbone):
-    def __init__(self, data_channel=3, num_blocks=[1, 2, 8, 8, 4],
-                 out_channels=[64, 128, 256, 512, 1024], strides=[2, 2, 2, 2, 2],
-                 dilations=[1, 1, 1, 1, 1], bnName=NormalizationType.BatchNormalize2d,
+    def __init__(self, data_channel=3, num_blocks=(1, 2, 8, 8, 4),
+                 out_channels=(64, 128, 256, 512, 1024), strides=(2, 2, 2, 2, 2),
+                 dilations=(1, 1, 1, 1, 1), bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.LeakyReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.Darknet53)
-        self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.out_channels = out_channels
         self.strides = strides
@@ -39,7 +38,7 @@ class DarkNet(BaseBackbone):
         layer1 = ConvBNActivationBlock(in_channels=self.data_channel,
                                        out_channels=self.first_output,
                                        kernel_size=3,
-                                       stride=2,
+                                       stride=1,
                                        padding=1,
                                        bnName=self.bnName,
                                        activationName=self.activationName)

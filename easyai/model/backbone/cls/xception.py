@@ -23,9 +23,8 @@ class Xception(BaseBackbone):
                  block=MiddleFLowBlock,
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.Xception)
-        self.data_channel = data_channel
         self.block = block
         self.block_number = 8
         self.activation_name = activationName

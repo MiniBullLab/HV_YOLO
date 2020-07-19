@@ -2,10 +2,8 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.utility.registry import Registry
 from easyai.utility.registry import build_from_cfg
-
-REGISTERED_LR_SCHEDULER = Registry("lr_scheduler")
+from easyai.solver.registry import REGISTERED_LR_SCHEDULER
 
 
 class LrSchedulerFactory():

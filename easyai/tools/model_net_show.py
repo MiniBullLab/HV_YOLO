@@ -18,15 +18,13 @@ class ModelNetShow():
     def model_show(self, model_path):
         input_x = torch.randn(1, 3, 512, 512)
         self.show_process.set_input(input_x)
-        model = self.model_factory.get_model(model_path,
-                                             default_args={"data_channel": 3})
+        model = self.model_factory.get_model(model_path)
         self.show_process.show_from_model(model)
 
     def backbone_show(self, backbone_path):
         input_x = torch.randn(1, 3, 224, 224)
         self.show_process.set_input(input_x)
-        model = self.backbone_factory.get_base_model(backbone_path,
-                                                     default_args={"data_channel": 3})
+        model = self.backbone_factory.get_base_model(backbone_path)
         self.show_process.show_from_model(model)
 
     def onnx_show(self, onnx_path):

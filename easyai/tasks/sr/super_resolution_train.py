@@ -17,11 +17,9 @@ class SuperResolutionTrain(BaseTrain):
         super().__init__(config_path, TaskName.SuperResolution_Task)
 
         self.torch_optimizer = TorchOptimizer(self.train_task_config.optimizer_config)
+        self.model_args['upscale_factor'] = self.train_task_config.upscale_factor
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
-                                                      default_args={
-                                                          "data_channel": self.train_task_config.image_channel,
-                                                          "upscale_factor": self.train_task_config.upscale_factor
-                                                      })
+                                                      default_args=self.model_args)
         self.device = self.torchModelProcess.getDevice()
 
         self.sr_test = SuperResolutionTest(cfg_path, gpu_id, config_path)

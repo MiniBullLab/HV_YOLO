@@ -145,7 +145,10 @@ class CreateModuleList():
             self.filters = int(module_def['filters'])
             kernel_size = int(module_def['size'])
             stride = int(module_def['stride'])
-            pad = (kernel_size - 1) // 2 if int(module_def['pad']) else 0
+            pad = int(module_def.get("pad", None))
+            if pad is None:
+                pad = ((kernel_size - 1) // 2)
+            assert pad == ((kernel_size - 1) // 2)
             dilation = int(module_def.get('dilation', 1))
             groups = int(module_def.get("groups", 1))
             if dilation > 1:

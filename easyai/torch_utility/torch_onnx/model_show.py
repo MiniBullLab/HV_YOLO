@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
 import netron
 from easyai.torch_utility.torch_onnx.torch_to_onnx import TorchConvertOnnx
 
@@ -15,5 +19,7 @@ class ModelShow():
         self.converter.set_input(input_torch)
 
     def show_from_model(self, model):
+        if model is None:
+            return
         save_onnx_path = self.converter.torch2onnx(model)
         self.show_from_onnx(save_onnx_path)

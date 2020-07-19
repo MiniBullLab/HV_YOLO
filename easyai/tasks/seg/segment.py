@@ -15,10 +15,9 @@ class Segmentation(BaseInference):
     def __init__(self, cfg_path, gpu_id, config_path=None):
         super().__init__(config_path, TaskName.Segment_Task)
 
+        self.model_args['class_number'] = len(self.task_config.class_name)
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
-                                                      default_args={
-                                                          "data_channel": self.task_config.image_channel
-                                                      })
+                                                      default_args=self.model_args)
         self.device = self.torchModelProcess.getDevice()
 
         self.result_process = SegmentResultProcess()

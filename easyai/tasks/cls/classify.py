@@ -14,9 +14,7 @@ class Classify(BaseInference):
         super().__init__(config_path, TaskName.Classify_Task)
 
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
-                                                      default_args={
-                                                          "data_channel": self.task_config.image_channel
-                                                      })
+                                                      default_args=self.model_args)
         self.device = self.torchModelProcess.getDevice()
         self.result_show = ClassifyShow()
 

@@ -36,9 +36,8 @@ class VGG(BaseBackbone):
     def __init__(self, data_channel=3, vgg_name=BackboneName.Vgg19,
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU, is_norm=False):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.Vgg19)
-        self.data_channel = data_channel
         self.activationName = activationName
         self.bnName = bnName
         self.is_norm = is_norm

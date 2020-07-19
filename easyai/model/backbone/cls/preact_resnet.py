@@ -25,9 +25,8 @@ class PreActResNet(BaseBackbone):
                  block=PreActBasic, num_blocks=(2, 2, 2, 2),
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.PreActResNet18)
-        self.data_channel = data_channel
         self.block = block
         self.num_blocks = num_blocks
         self.out_channels = (64, 128, 256, 512)

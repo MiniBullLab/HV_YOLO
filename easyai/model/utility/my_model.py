@@ -13,7 +13,7 @@ from easyai.model.utility.base_model import *
 class MyModel(BaseModel):
 
     def __init__(self, model_defines, cfg_dir, default_args=None):
-        super().__init__()
+        super().__init__(None, None)
         self.backbone_factory = BackboneFactory()
         self.createTaskList = CreateModuleList()
         self.model_defines = model_defines
@@ -112,5 +112,6 @@ class MyModel(BaseModel):
                 output.extend(multi_output)
             else:
                 x = block(x)
+            # print(key, x.shape)
             layer_outputs.append(x)
         return output

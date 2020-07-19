@@ -10,7 +10,7 @@ from easyai.model.utility.create_model_list import CreateModuleList
 class MyBackbone(BaseBackbone):
 
     def __init__(self, model_defines):
-        super().__init__()
+        super().__init__(None)
         self.createTaskList = CreateModuleList()
         self.model_defines = model_defines
         self.create_block_list()

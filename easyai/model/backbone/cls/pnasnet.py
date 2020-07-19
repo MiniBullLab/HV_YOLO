@@ -20,9 +20,8 @@ class PNASNet(BaseBackbone):
                  num_planes=44, block=CellA,
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.PNASNetA)
-        self.data_channel = data_channel
         self.num_cells = num_cells
         self.block = block
         self.activation_name = activationName

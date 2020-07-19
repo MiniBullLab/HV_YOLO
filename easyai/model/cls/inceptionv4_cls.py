@@ -9,17 +9,17 @@ from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
 from easyai.loss.cls.ce2d_loss import CrossEntropy2d
 from easyai.model.base_block.utility.utility_layer import FcLayer
-from easyai.model.utility.base_model import *
+from easyai.model.utility.base_classify_model import *
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
+from easyai.model.utility.registry import REGISTERED_CLS_MODEL
 
 
-class Inceptionv4Cls(BaseModel):
+@REGISTERED_CLS_MODEL.register_module(ModelName.Inceptionv4Cls)
+class Inceptionv4Cls(BaseClassifyModel):
 
-    def __init__(self, data_channel=3, class_num=100):
-        super().__init__()
+    def __init__(self, data_channel=3, class_number=100):
+        super().__init__(data_channel, class_number)
         self.set_name(ModelName.Inceptionv4Cls)
-        self.data_channel = data_channel
-        self.class_number = class_num
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
 
@@ -29,7 +29,7 @@ class Inceptionv4Cls(BaseModel):
     def create_block_list(self):
         self.clear_list()
 
-        backbone = self.factory.get_base_model(BackboneName.InceptionV4, self.data_channel)
+        backbone = self.factory.get_base_model(BackboneName.InceptionV4, self.model_args)
         base_out_channels = backbone.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])
 

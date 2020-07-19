@@ -78,6 +78,11 @@ class RouteLayer(BaseBlock):
         super().__init__(LayerType.RouteLayer)
         self.layers = [int(x) for x in layers.split(',') if x.strip()]
 
+    def get_output_channel(self, base_out_channels, block_out_channels):
+        output_channel = sum([base_out_channels[i] if i >= 0
+                              else block_out_channels[i] for i in self.layers])
+        return output_channel
+
     def forward(self, layer_outputs, base_outputs):
         # print(self.layers)
         temp_layer_outputs = [layer_outputs[i] if i < 0 else base_outputs[i]

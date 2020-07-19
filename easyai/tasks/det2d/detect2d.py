@@ -20,10 +20,9 @@ class Detection2d(BaseInference):
         self.nms_process = FastNonMaxSuppression()
         self.result_show = DetectionShow()
 
+        self.model_args['class_number'] = len(self.task_config.class_name)
         self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
-                                                      default_args={
-                                                          "data_channel": self.task_config.image_channel
-                                                      })
+                                                      default_args=self.model_args)
         self.device = self.torchModelProcess.getDevice()
 
     def process(self, input_path):

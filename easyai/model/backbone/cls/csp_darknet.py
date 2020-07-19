@@ -20,9 +20,8 @@ class CSPDarkNet(BaseBackbone):
                  out_channels=(64, 128, 256, 512, 1024), strides=(2, 2, 2, 2, 2),
                  dilations=(1, 1, 1, 1, 1), bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.Mish):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.CSPDarknet53)
-        self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.out_channels = out_channels
         self.strides = strides

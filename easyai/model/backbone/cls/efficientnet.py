@@ -23,9 +23,8 @@ class EfficientNet(BaseBackbone):
                  scale=1., dropout_ratio=0.2,
                  bn_name=NormalizationType.BatchNormalize2d,
                  activation_name=ActivationType.Swish):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.Efficientnet_b0)
-        self.data_channel = data_channel
         out_channels = (32, 16, 24, 40, 80, 112, 192, 320, 1280)
         repeats = (1, 2, 2, 3, 3, 4, 1)
         self.out_channels = tuple((round(x * width_coef) for x in out_channels))

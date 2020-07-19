@@ -20,9 +20,8 @@ class HighResolutionNet(BaseBackbone):
     def __init__(self, cfgs, data_channel=3,
                  bn_name=NormalizationType.BatchNormalize2d,
                  activation_name=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.HRnet_w18_small)
-        self.data_channel = data_channel
         self.cfgs = cfgs
         self.activation_name = activation_name
         self.bn_name = bn_name

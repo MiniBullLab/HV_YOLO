@@ -24,9 +24,8 @@ class NasNet(BaseBackbone):
     def __init__(self, data_channel=3,
                  repeat_cell_num=4, reduction_num=2,
                  filters=44):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.NasNet)
-        self.data_channel = data_channel
         self.filters = filters
         self.repeat_cell_num = repeat_cell_num
         self.reduction_num = reduction_num

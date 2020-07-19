@@ -4,7 +4,7 @@
 
 import math
 from easyai.solver.base_lr_secheduler import BaseLrSecheduler
-from easyai.solver.lr_factory import REGISTERED_LR_SCHEDULER
+from easyai.solver.registry import REGISTERED_LR_SCHEDULER
 
 
 @REGISTERED_LR_SCHEDULER.register_module

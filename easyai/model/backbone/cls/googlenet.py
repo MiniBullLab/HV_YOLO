@@ -17,9 +17,8 @@ class GoogleNet(BaseBackbone):
 
     def __init__(self, data_channel=3, bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.GoogleNet)
-        self.data_channel = data_channel
         self.activationName = activationName
         self.bnName = bnName
         self.first_output = 192

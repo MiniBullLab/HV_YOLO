@@ -13,9 +13,8 @@ from easyai.model.base_block.utility.utility_block import ConvActivationBlock
 
 class SmallSRNet(BaseModel):
     def __init__(self, data_channel=1, upscale_factor=3):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(ModelName.SmallSRNet)
-        self.data_channel = data_channel
         self.upscale_factor = upscale_factor
         self.activation_name = ActivationType.ReLU
 

@@ -25,9 +25,8 @@ class AttentionNet(BaseBackbone):
     def __init__(self, data_channel=3, num_blocks=(1, 1, 1),
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.AttentionNet56)
-        self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.out_channels = (256, 512, 1024)
         self.in_channels = (64, 256, 512)

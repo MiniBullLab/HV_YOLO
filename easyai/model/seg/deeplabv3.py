@@ -13,17 +13,15 @@ from easyai.model.base_block.utility.upsample_layer import Upsample
 from easyai.model.base_block.utility.utility_layer import RouteLayer
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.deeplab_block import ASPPBlock
-from easyai.model.utility.base_model import *
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
+from easyai.model.utility.base_classify_model import *
 
 
-class DeepLabV3(BaseModel):
+class DeepLabV3(BaseClassifyModel):
 
-    def __init__(self, data_channel=3, class_num=19):
-        super().__init__()
+    def __init__(self, data_channel=3, class_number=19):
+        super().__init__(data_channel, class_number)
         self.set_name(ModelName.DeepLabV3)
-        self.data_channel = data_channel
-        self.class_number = class_num
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
         self.factory = BackboneFactory()
@@ -34,7 +32,7 @@ class DeepLabV3(BaseModel):
         self.clear_list()
         self.lossList = []
 
-        backbone = self.factory.get_base_model(BackboneName.ResNet50)
+        backbone = self.factory.get_base_model(BackboneName.ResNet50, self.model_args)
         base_out_channels = backbone.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])
 

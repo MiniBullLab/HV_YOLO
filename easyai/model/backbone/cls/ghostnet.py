@@ -23,11 +23,10 @@ class GhostNet(BaseBackbone):
     def __init__(self, cfgs, data_channel=3, width_mult=1.,
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.GhostNet)
         # setting of inverted residual blocks
         self.cfgs = cfgs
-        self.data_channel = data_channel
         self.width_mult = width_mult
         self.activation_name = activationName
         self.bn_name = bnName

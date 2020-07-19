@@ -15,7 +15,7 @@ class MixNet(BaseBackbone):
 
     def __init__(self, cfgs, net_type='mixnet_s', data_channel=3,
                  bn_name=NormalizationType.BatchNormalize2d):
-        super(MixNet, self).__init__()
+        super(MixNet, self).__init__(data_channel)
         self.set_name(BackboneName.mixnet_l)
         self.depth_multiplier = 1.0
         if net_type == 'mixnet_s':
@@ -32,7 +32,6 @@ class MixNet(BaseBackbone):
             raise TypeError('Unsupported MixNet type')
 
         self.cfgs = cfgs
-        self.data_channel = data_channel
         self.feature_size = 1536
         self.bn_name = bn_name
         self.create_block_list()
