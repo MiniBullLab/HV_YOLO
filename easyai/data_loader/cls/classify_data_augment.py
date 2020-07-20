@@ -8,10 +8,12 @@ from easyai.data_loader.utility.image_data_augment import ImageDataAugment
 
 class ClassifyDataAugment():
 
-    def __init__(self):
+    def __init__(self, image_size):
         torchvision_process = TorchVisionProcess()
-        self.augment_transform = torchvision_process.torch_data_augment()
+        self.augment_transform = torchvision_process.torch_data_augment((image_size[1],
+                                                                         image_size[0]))
         self.image_augment = ImageDataAugment()
+        self.image_size = image_size
         self.is_torchvision_augment = True
         self.is_augment_hsv = True
         self.is_augment_affine = True

@@ -44,6 +44,7 @@ class BinaryCrossEntropy2d(BaseLoss):
 
     def forward(self, input_data, target=None):
         if target is not None:
+            target = target.type(input_data.dtype)
             loss = self.loss_function(input_data, target)
             if self.weight_type != 0:
                 loss = self.compute_loss_from_weight(loss, target)

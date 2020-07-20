@@ -20,7 +20,7 @@ class ClassifyDataloader(data.Dataset):
         self.classify_sample.read_sample(flag=0)
         self.image_process = ImageProcess()
         self.dataset_process = ClassifyDatasetProcess(mean, std)
-        self.dataset_augment = ClassifyDataAugment()
+        self.dataset_augment = ClassifyDataAugment(image_size)
 
     def __getitem__(self, index):
         img_path, label = self.classify_sample.get_sample_path(index)

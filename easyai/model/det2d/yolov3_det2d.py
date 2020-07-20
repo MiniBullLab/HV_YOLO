@@ -23,9 +23,9 @@ class YoloV3Det2d(BaseDetectionModel):
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.LeakyReLU
 
-        self.anchor_sizes = [[10, 13], [16, 30], [33, 23],
-                             [30, 61], [62, 45], [59, 119],
-                             [116, 90], [156, 198], [373, 326]]
+        self.anchor_sizes = [[8.95, 8.57], [12.43, 26.71], [19.71, 14.43],
+                             [26.36, 58.52], [36.09, 25.55], [64.42, 42.90],
+                             [96.44, 79.10], [158.37, 115.59], [218.65, 192.90]]
 
         self.factory = BackboneFactory()
         self.create_block_list()
@@ -85,9 +85,9 @@ class YoloV3Det2d(BaseDetectionModel):
 
         layer6 = ConvBNActivationBlock(in_channels=self.block_out_channels[-1],
                                        out_channels=1024,
-                                       kernel_size=1,
+                                       kernel_size=3,
                                        stride=1,
-                                       padding=0,
+                                       padding=1,
                                        bnName=self.bn_name,
                                        activationName=self.activation_name)
         self.add_block_list(layer6.get_name(), layer6, 1024)

@@ -13,7 +13,7 @@ from easyai.model.utility.base_model import *
 class MyModel(BaseModel):
 
     def __init__(self, model_defines, cfg_dir, default_args=None):
-        super().__init__(None, None)
+        super().__init__(None)
         self.backbone_factory = BackboneFactory()
         self.createTaskList = CreateModuleList()
         self.model_defines = model_defines
