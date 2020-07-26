@@ -11,10 +11,9 @@ class SegmentionShow():
     def __init__(self):
         self.drawing = ImageDrawing()
 
-    def show(self, src_image, result,
-             is_gray, class_name, scale=0.5):
+    def show(self, src_image, result, class_name, scale=0.5):
         segment_image = self.drawing.draw_segment_result(src_image, result,
-                                                         is_gray, class_name)
+                                                         class_name)
 
         cv2.namedWindow("image", 0)
         cv2.resizeWindow("image", int(segment_image.shape[1] * scale), int(segment_image.shape[0] * scale))

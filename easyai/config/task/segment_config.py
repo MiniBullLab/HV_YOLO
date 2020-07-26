@@ -13,7 +13,7 @@ class SegmentionConfig(ImageTaskConfig):
         super().__init__()
         self.set_task_name(TaskName.Segment_Task)
         # data
-        self.label_is_gray = None
+        self.label_type = None
         self.class_name = None
         # test
         self.save_evaluation_path = os.path.join(self.root_save_dir, 'seg_evaluation.txt')
@@ -45,15 +45,15 @@ class SegmentionConfig(ImageTaskConfig):
             self.image_size = tuple(config_dict['image_size'])
         if config_dict.get('image_channel', None) is not None:
             self.image_channel = int(config_dict['image_channel'])
-        if config_dict.get('label_is_gray', None) is not None:
-            self.label_is_gray = bool(config_dict['label_is_gray'])
+        if config_dict.get('label_type', None) is not None:
+            self.label_type = int(config_dict['label_type'])
         if config_dict.get('class_name', None) is not None:
             self.class_name = list(config_dict['class_name'])
 
     def save_data_value(self, config_dict):
         config_dict['image_size'] = self.image_size
         config_dict['image_channel'] = self.image_channel
-        config_dict['label_is_gray'] = self.label_is_gray
+        config_dict['label_type'] = self.label_type
         config_dict['class_name'] = self.class_name
 
     def load_test_value(self, config_dict):
@@ -118,7 +118,7 @@ class SegmentionConfig(ImageTaskConfig):
     def get_data_default_value(self):
         self.image_size = (500, 400)  # w * H
         self.image_channel = 3
-        self.label_is_gray = True
+        self.label_type = 1
         self.class_name = [('background', '255'),
                            ('lane', '0')]
 
@@ -145,7 +145,7 @@ class SegmentionConfig(ImageTaskConfig):
                                  }
 
         self.lr_scheduler_config = {'type': 'CosineLR',
-                                    'is_warmpu': False,
+                                    'is_warmup': False,
                                     'warmup_iters': 2000}
         self.accumulated_batches = 1
         self.display = 20

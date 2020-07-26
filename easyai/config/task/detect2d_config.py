@@ -135,8 +135,17 @@ class Detect2dConfig(ImageTaskConfig):
     def get_data_default_value(self):
         self.image_size = (640, 352)  # W * H
         self.image_channel = 3
-        self.class_name = ('bike', 'bus', 'car', 'motor', 'person', 'rider', 'truck')
-        self.confidence_th = 0.5
+        self.class_name = ("bike",
+        "bus",
+        "car",
+        "motor",
+        "person",
+        "rider",
+        "traffic light",
+        "traffic sign",
+        "train",
+        "truck")
+        self.confidence_th = 0.24
         self.nms_th = 0.45
         self.post_prcoess_type = 0
 
@@ -165,13 +174,13 @@ class Detect2dConfig(ImageTaskConfig):
                                  }
         self.lr_scheduler_config = {'type': 'MultiStageLR',
                                     'lr_stages': [[50, 1], [70, 0.1], [100, 0.01]],
-                                    'is_warmpu': True,
+                                    'is_warmup': True,
                                     'warmup_iters': 1000}
         self.accumulated_batches = 1
         self.display = 20
 
-        self.freeze_layer_type = 0
-        self.freeze_layer_name = "route_0"
+        self.freeze_layer_type = 1
+        self.freeze_layer_name = "baseNet_0"
 
         self.freeze_bn_type = 0
         self.freeze_bn_layer_name = "route_0"

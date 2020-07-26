@@ -121,7 +121,7 @@ class ClassifyConfig(ImageTaskConfig):
         config_dict['freeze_bn_layer_name'] = self.freeze_bn_layer_name
 
     def get_data_default_value(self):
-        self.image_size = (32, 32)
+        self.image_size = (224, 224)
         self.image_channel = 3
         self.class_name = ('cls1', 'cls2')
         self.data_mean = (0.5070751592371323, 0.48654887331495095, 0.4409178433670343)
@@ -132,7 +132,7 @@ class ClassifyConfig(ImageTaskConfig):
 
     def get_train_default_value(self):
         self.train_data_augment = True
-        self.train_batch_size = 64
+        self.train_batch_size = 16
         self.enable_mixed_precision = False
         self.is_save_epoch_model = False
         self.latest_weights_name = 'cls_latest.pt'

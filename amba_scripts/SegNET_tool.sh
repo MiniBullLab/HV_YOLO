@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rm -rf ./.log/segment*
-python3 -m easyai.easy_ai --task SegNET --gpu 0 -i /home/minibull/lipeijie/dataset/CAR_segment/ImageSets/train.txt -v /home/minibull/lipeijie/dataset/CAR_segment/ImageSets/val.txt
+python3 -m easyai.easy_ai --task SegNET --gpu 0 -i /home/minibull/dataset/LED_segment/ImageSets/train.txt -v /home/minibull/dataset/LED_segment/ImageSets/val.txt
 # python3 -m easy_convert.easy_convert --task SegNET --input ./.log/snapshot/segnet.onnx
 
 set -v

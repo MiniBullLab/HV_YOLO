@@ -37,7 +37,6 @@ class Segmentation(BaseInference):
             result = self.postprocess(prediction)
             print('Batch %d... Done. (%.3fs)' % (index, self.timer.toc()))
             if not self.result_show.show(src_image, result,
-                                         self.task_config.label_is_gray,
                                          self.task_config.class_name):
                 break
 

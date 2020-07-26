@@ -41,9 +41,10 @@ class SegmentResultProcess():
         nt, ht, wt = target.size()
         # Handle inconsistent size between input and target
         if h > ht and w > wt:  # upsample labels
-            target = target.unsequeeze(1)
+            target = target.type(input_data.dtype)
+            target = target.unsqueeze(1)
             target = torch.nn.functional.upsample(target, size=(h, w), mode='nearest')
-            target = target.sequeeze(1)
+            target = target.squeeze(1).long()
         elif h < ht and w < wt:  # upsample images
             input_data = torch.nn.functional.upsample(input_data, size=(ht, wt), mode='bilinear')
         elif h == ht and w == wt:

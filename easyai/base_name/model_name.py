@@ -26,6 +26,7 @@ class ModelName():
     ComplexYOLO = "ComplexYOLO"
 
     VggNetCls = "VggNetCls"
+    ResNetCls = "ResNetCls"
     Inceptionv4Cls = "Inceptionv4Cls"
     SENetCls = "SENetCls"
     GhostNetCls = "GhostNetCls"

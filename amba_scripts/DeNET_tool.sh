@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rm -rf ./.log/detect2d*
-python3 -m easyai.easy_ai --task DeNET --gpu 0 --trainPath /home/minibull/lipeijie/dataset/Dashboard_detection/ImageSets/train.txt --valPath /home/minibull/lipeijie/dataset/Dashboard_detection/ImageSets/val.txt
+python3 -m easyai.easy_ai --task DeNET --gpu 0 --trainPath /home/minibull/dataset/Fruit_detection/ImageSets/train.txt --valPath /home/minibull/dataset/Fruit_detection/ImageSets/val.txt
 python3 -m easy_convert.easy_convert --task DeNET --input ./.log/snapshot/detnet.onnx
 
 set -v
@@ -13,10 +13,10 @@ caffeNetName=detnet
 outNetName=detnet
 
 inputColorFormat=0
-outputShape=1,3,416,416
-outputLayerName="o:637|odf:fp32"
-outputLayerName1="o:663|odf:fp32"
-outputLayerName2="o:689|odf:fp32"
+outputShape=1,3,352,640
+outputLayerName="o:636|odf:fp32"
+outputLayerName1="o:662|odf:fp32"
+outputLayerName2="o:688|odf:fp32"
 inputDataFormat=0,0,8,0
 
 mean=0.0

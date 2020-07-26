@@ -19,23 +19,25 @@ class ImageDrawing():
             index = object.classIndex
             cv2.rectangle(src_image, point1, point2, ColorDefine.colors[index], 2)
 
-    def draw_segment_result(self, src_image, result,
-                            is_gray, class_list):
+    def draw_segment_result(self, src_image, result, class_list):
         r = result.copy()
         g = result.copy()
         b = result.copy()
         for index, value_data in enumerate(class_list):
             value = value_data[1]
-            if is_gray:
-                gray_value = int(value.strip())
-                r[result == index] = gray_value
-                g[result == index] = gray_value
-                b[result == index] = gray_value
-            else:
-                color_list = [int(x) for x in value.split(',') if x.strip()]
+            color_list = [int(x) for x in value.split(',') if x.strip()]
+            if len(color_list) == 1:
+                r[result == index] = color_list[0]
+                g[result == index] = color_list[0]
+                b[result == index] = color_list[0]
+            elif len(color_list) == 3:
                 r[result == index] = color_list[0]
                 g[result == index] = color_list[1]
                 b[result == index] = color_list[2]
+            else:
+                r[result == index] = 0
+                g[result == index] = 0
+                b[result == index] = 0
 
         rgb = np.zeros((result.shape[0], result.shape[1], 3))
 

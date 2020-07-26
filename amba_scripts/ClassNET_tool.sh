@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rm -rf ./.log/classify*
-python3 -m easyai.easy_ai --task ClassNet --gpu 0 -i /home/minibull/lipeijie/dataset/Tree_Ring_classify/ImageSets/train.txt -v /home/minibull/lipeijie/dataset/Tree_Ring_classify/ImageSets/val.txt
+python3 -m easyai.easy_ai --task ClassNet --gpu 0 -i /home/minibull/dataset/Tree_Ring_classify/ImageSets/train.txt -v //home/minibull/dataset/Tree_Ring_classify/ImageSets/val.txt
 
 set -v
 root_path=$(pwd)
@@ -13,7 +13,7 @@ outNetName=classnet
 
 inputColorFormat=1
 outputShape=1,3,224,224
-outputLayerName="o:465|ot:0,1,2,3|odf:fp32"
+outputLayerName="o:192|ot:0,1,2,3|odf:fp32"
 inputDataFormat=0,0,0,0
 
 mean=0.0

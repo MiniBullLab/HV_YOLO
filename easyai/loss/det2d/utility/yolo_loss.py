@@ -11,12 +11,16 @@ class YoloLoss(BaseLoss):
     def __init__(self, name, class_number, anchor_sizes=None, anchor_mask=None):
         super().__init__(name)
         self.class_number = class_number
-        if anchor_sizes is not None:
+        if anchor_sizes is not None and anchor_mask is not None:
+            self.anchor_sizes = torch.Tensor(anchor_sizes)
+            self.anchor_step = len(anchor_sizes[0])
+            self.anchor_mask = anchor_mask
+            self.anchor_count = len(anchor_mask)
+        elif anchor_sizes is not None:
             self.anchor_sizes = torch.Tensor(anchor_sizes)
             self.anchor_count = len(anchor_sizes)
             self.anchor_step = len(anchor_sizes[0])
             self.anchor_mask = anchor_mask
-            self.anchor_count = len(anchor_mask)
         else:
             self.anchor_sizes = ()
             self.anchor_mask = None

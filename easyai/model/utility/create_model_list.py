@@ -13,6 +13,7 @@ from easyai.model.base_block.utility.utility_layer import RouteLayer, ShortRoute
 from easyai.model.base_block.utility.utility_layer import ShortcutLayer
 from easyai.model.base_block.utility.utility_layer import FcLayer
 from easyai.model.base_block.utility.pooling_layer import MyMaxPool2d, GlobalAvgPool2d
+from easyai.model.base_block.utility.pooling_layer import SpatialPyramidPooling
 from easyai.model.base_block.utility.upsample_layer import Upsample
 from easyai.model.base_block.utility.detection_block import Detection2dBlock
 from easyai.model.base_block.cls.darknet_block import ReorgBlock, DarknetBlockName

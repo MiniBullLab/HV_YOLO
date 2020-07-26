@@ -49,8 +49,8 @@ class SegmentionTrain(BaseTrain):
         self.optimizer = self.torchOptimizer.getLatestModelOptimizer(checkpoint)
 
     def train(self, train_path, val_path):
-        number_class = len(self.train_task_config.class_name)
-        dataloader = get_segment_train_dataloader(train_path, number_class,
+        dataloader = get_segment_train_dataloader(train_path, self.train_task_config.class_name,
+                                                  self.train_task_config.label_type,
                                                   self.train_task_config.image_size,
                                                   self.train_task_config.image_channel,
                                                   self.train_task_config.train_batch_size,

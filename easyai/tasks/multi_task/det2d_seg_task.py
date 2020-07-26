@@ -41,7 +41,7 @@ class Det2dSegTask(BaseInference):
             det2d_objects, segment_image = self.postprocess((result_dets, result_seg))
             print('Batch %d... Done. (%.3fs)' % (i, self.timer.toc()))
 
-            if not self.result_show.show(src_image, segment_image, self.task_config.label_is_gray, \
+            if not self.result_show.show(src_image, segment_image,
                                          self.task_config.segment_name, det2d_objects):
                 break
 

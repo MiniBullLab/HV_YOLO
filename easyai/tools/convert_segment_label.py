@@ -25,27 +25,29 @@ class ConvertSegmentionLable():
         self.dirProcess = DirProcess()
         self.image_process = ImageProcess()
 
-    def convert_segment_label(self, label_dir, is_gray, class_list):
-        output_dir = os.path.join(label_dir, "../%s" % self.save_label_dir)
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        for label_path in self.dirProcess.getDirFiles(label_dir, "*.*"):
-            path, file_name_and_post = os.path.split(label_path)
-            print(label_path)
-            mask = self.process_segment_label(label_path, is_gray, class_list)
-            if mask is not None:
-                save_path = os.path.join(output_dir, file_name_and_post)
-                cv2.imwrite(save_path, mask)
+    def convert_segment_label(self, label_dir, label_type, class_list):
+        if label_type != 0:
+            output_dir = os.path.join(label_dir, "../%s" % self.save_label_dir)
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+            for label_path in self.dirProcess.getDirFiles(label_dir, "*.*"):
+                path, file_name_and_post = os.path.split(label_path)
+                print(label_path)
+                mask = self.process_segment_label(label_path, label_type, class_list)
+                if mask is not None:
+                    save_path = os.path.join(output_dir, file_name_and_post)
+                    cv2.imwrite(save_path, mask)
 
-    def process_segment_label(self, label_path, is_gray, class_list):
-        if is_gray:
+    def process_segment_label(self, label_path, label_type, class_list):
+        mask = None
+        if label_type == 1:  # gray
             mask = self.image_process.read_gray_image(label_path)
-        else:
+        elif label_type == 2:  # rgb
             _, mask = self.image_process.readRgbImage(label_path)
         if mask is not None:
-            if is_gray:
+            if label_type == 1:  # gray
                 mask = self.convert_gray_label(mask, class_list)
-            else:
+            elif label_type == 2:  # rgb
                 mask = self.convert_color_label(mask, class_list)
         return mask
 
@@ -87,7 +89,7 @@ def main():
     config_factory = ConfigFactory()
     task_config = config_factory.get_config(TaskName.Segment_Task, config_path=options.config_path)
     test.convert_segment_label(options.inputPath,
-                               task_config.label_is_gray,
+                               task_config.label_type,
                                task_config.class_name)
     print("End of game, have a nice day!")
 

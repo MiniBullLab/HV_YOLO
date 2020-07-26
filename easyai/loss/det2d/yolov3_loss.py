@@ -179,11 +179,6 @@ class YoloV3Loss(YoloLoss):
             coord_center, tcoord_center = coord[:, :, :, :2], tcoord[:, :, :, :2]
             coord_wh, tcoord_wh = coord[:, :, :, 2:], tcoord[:, :, :, 2:]
             conf = conf.view(batch_size, self.anchor_count, height * width)
-            if self.class_number > 1:
-                cls = cls.view(-1, self.class_number)
-                tcls = tcls[cls_mask].view(-1).long()
-                cls_mask = cls_mask.view(-1, 1).repeat(1, self.class_number)
-                cls = cls[cls_mask].view(-1, self.class_number)
 
             self.init_loss(device)
 
@@ -199,7 +194,12 @@ class YoloV3Loss(YoloLoss):
             loss_conf_neg = self.noobject_weight * (no_object_mask * self.bce_loss(conf, tconf)).sum()
             loss_conf = loss_conf_pos + loss_conf_neg
 
-            if self.class_number > 1:
+            if self.class_number > 1 and cls_mask.sum().item() > 0:
+                cls = cls.view(-1, self.class_number)
+                tcls = tcls[cls_mask].view(-1).long()
+                cls_mask = cls_mask.view(-1, 1).repeat(1, self.class_number)
+                cls = cls[cls_mask].view(-1, self.class_number)
+
                 loss_cls = self.class_weight * self.ce_loss(cls, tcls)
                 cls_softmax = F.softmax(cls, 1)
                 t_ind = torch.unsqueeze(tcls, 1).expand_as(cls_softmax)

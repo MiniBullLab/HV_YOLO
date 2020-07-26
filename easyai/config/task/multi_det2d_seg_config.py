@@ -13,7 +13,7 @@ class MultiDet2dSegConfig(ImageTaskConfig):
         super().__init__()
         self.set_task_name(TaskName.Det2d_Seg_Task)
         # data
-        self.label_is_gray = None
+        self.seg_label_type = None
         self.detect_name = None
         self.segment_name = None
         self.confidence_th = 1.0
@@ -51,8 +51,8 @@ class MultiDet2dSegConfig(ImageTaskConfig):
             self.image_size = tuple(config_dict['image_size'])
         if config_dict.get('image_channel', None) is not None:
             self.image_channel = int(config_dict['image_channel'])
-        if config_dict.get('label_is_gray', None) is not None:
-            self.label_is_gray = bool(config_dict['label_is_gray'])
+        if config_dict.get('seg_label_type', None) is not None:
+            self.seg_label_type = int(config_dict['seg_label_type'])
         if config_dict.get('detect_name', None) is not None:
             self.detect_name = tuple(config_dict['detect_name'])
         if config_dict.get('segment_name', None) is not None:
@@ -65,7 +65,7 @@ class MultiDet2dSegConfig(ImageTaskConfig):
     def save_data_value(self, config_dict):
         config_dict['image_size'] = self.image_size
         config_dict['image_channel'] = self.image_channel
-        config_dict['label_is_gray'] = self.label_is_gray
+        config_dict['seg_label_type'] = self.seg_label_type
         config_dict['detect_name'] = self.detect_name
         config_dict['segment_name'] = self.segment_name
         config_dict['confidence_th'] = self.confidence_th
@@ -142,7 +142,7 @@ class MultiDet2dSegConfig(ImageTaskConfig):
         self.detect_name = ("car", )
         self.segment_name = [('background', '255'),
                              ('lane', '0')]
-        self.label_is_gray = True
+        self.seg_label_type = 1
         self.confidence_th = 0.5
         self.nms_th = 0.45
 
@@ -171,7 +171,7 @@ class MultiDet2dSegConfig(ImageTaskConfig):
                                  }
         self.lr_scheduler_config = {'type': 'MultiStageLR',
                                     'lr_stages': [[50, 1], [70, 0.1], [100, 0.01]],
-                                    'is_warmpu': True,
+                                    'is_warmup': True,
                                     'warmup_iters': 1000}
         self.accumulated_batches = 1
         self.display = 20
