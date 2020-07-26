@@ -27,7 +27,7 @@ class VideoProcess():
             result = self.videoCapture.get(cv2.CAP_PROP_FRAME_COUNT)
         return result
 
-    def readFrame(self):
+    def read_frame(self):
         success = False
         frame = None
         if self.videoCapture is not None:

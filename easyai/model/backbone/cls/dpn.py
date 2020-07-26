@@ -15,14 +15,13 @@ __all__ = ['dpn26', 'dpn92']
 class DPN(BaseBackbone):
 
     def __init__(self, data_channel=3, num_blocks=(2, 2, 2, 2),
-                 in_planes=(96, 192,384, 768),
+                 in_planes=(96, 192, 384, 768),
                  out_channels=(256, 512, 1024, 2048),
                  dense_depths=(16, 32, 24, 128),
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.DPN26)
-        self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.in_planes = in_planes
         self.out_channels = out_channels

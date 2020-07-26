@@ -14,10 +14,10 @@ class ImageDataSetProcess(BaseDataSetProcess):
     def __init__(self):
         super().__init__()
 
-    def image_normaliza(self, image):
+    def image_normalize(self, image):
         return image / 255.0
 
-    def numpy_normaliza(self, input_data, mean, std):
+    def numpy_normalize(self, input_data, mean, std):
         result = (input_data - mean) / std
         return result
 
@@ -25,6 +25,8 @@ class ImageDataSetProcess(BaseDataSetProcess):
         result = None
         if images is None:
             result = None
+        elif images.ndim == 2:
+            result = images[np.newaxis, :, :]
         elif images.ndim == 3:
             image = images.transpose(2, 0, 1)
             result = np.ascontiguousarray(image, dtype=dtype)
@@ -33,14 +35,20 @@ class ImageDataSetProcess(BaseDataSetProcess):
             result = np.ascontiguousarray(img_all, dtype=dtype)
         return result
 
-    def image_resize(self, src_image, image_size):
+    def cv_image_resize(self, src_image, image_size):
         image = cv2.resize(src_image, image_size, interpolation=cv2.INTER_NEAREST)
         return image
 
-    def image_resize_square(self, src_image, image_size, color=(0, 0, 0)): # src_image h, w, c
+    def cv_image_color_convert(self, src_image, flag):
+        result = None
+        if flag == 0:
+            result = cv2.cvtColor(src_image, cv2.COLOR_BGR2GRAY)
+        elif flag == 1:
+            result = cv2.cvtColor(src_image, cv2.COLOR_BGR2RGB)
+        return result
+
+    def image_resize_square(self, src_image, ratio, pad_size, color=(0, 0, 0)):
         shape = src_image.shape[:2]  # shape = [height, width]
-        src_size = (shape[1], shape[0])
-        ratio, pad_size = self.resize_square_size(src_size, image_size)
         new_shape = (round(shape[0] * ratio), round(shape[1] * ratio))
         top = pad_size[1] // 2
         bottom = pad_size[1] - (pad_size[1] // 2)
@@ -50,9 +58,9 @@ class ImageDataSetProcess(BaseDataSetProcess):
                            interpolation=cv2.INTER_AREA)  # resized, no border
         image = cv2.copyMakeBorder(image, top, bottom, left, right,
                                    cv2.BORDER_CONSTANT, value=color)
-        return image, ratio, pad_size
+        return image
 
-    def resize_square_size(self, src_size, dst_size):
+    def get_square_size(self, src_size, dst_size):
         # ratio  = old / new
         ratio = min(float(dst_size[0]) / src_size[0], float(dst_size[1]) / src_size[1])
         new_shape = (round(src_size[0] * ratio), round(src_size[1] * ratio))

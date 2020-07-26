@@ -25,10 +25,10 @@ class TorchVisionProcess():
             ])
         return transform
 
-    def torch_data_augment(self):
+    def torch_data_augment(self, input_size):
         transform_augment = transforms.Compose([
             transforms.ToPILImage(),
-            transforms.RandomCrop(32, padding=4),
+            transforms.RandomCrop(input_size, padding=4),
             transforms.RandomHorizontalFlip(),
             transforms.RandomRotation(15),
         ])

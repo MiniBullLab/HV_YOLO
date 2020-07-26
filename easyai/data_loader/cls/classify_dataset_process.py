@@ -14,23 +14,23 @@ class ClassifyDatasetProcess(BaseDataSetProcess):
         self.dataset_process = ImageDataSetProcess()
         self.mean = np.array(mean, dtype=np.float32)
         self.std = np.array(std, dtype=np.float32)
-        self.normalize_transform = self.torchvision_process.torch_normalize(flag=0,
-                                                                            mean=self.mean,
-                                                                            std=self.std)
+        self.torchvision_transform = self.torchvision_process.torch_normalize(flag=0,
+                                                                              mean=self.mean,
+                                                                              std=self.std)
 
-    def normaliza_dataset(self, src_image, normaliza_type=0):
+    def normalize_dataset(self, src_image, normaliza_type=0):
         result = None
         if normaliza_type == 0:  # numpy normalize
-            normaliza_image = self.dataset_process.image_normaliza(src_image)
-            image = self.dataset_process.numpy_normaliza(normaliza_image,
+            normaliza_image = self.dataset_process.image_normalize(src_image)
+            image = self.dataset_process.numpy_normalize(normaliza_image,
                                                          self.mean,
                                                          self.std)
-            image = self.dataset_process.numpy_transpose(image, image.dtype)
+            image = self.dataset_process.numpy_transpose(image, np.float32)
             result = self.numpy_to_torch(image, flag=0)
         elif normaliza_type == 1:  # torchvision normalize
-            result = self.normalize_transform(src_image)
+            result = self.torchvision_transform(src_image)
         return result
 
     def resize_image(self, src_image, image_size):
-        image = self.dataset_process.image_resize(src_image, image_size)
+        image = self.dataset_process.cv_image_resize(src_image, image_size)
         return image

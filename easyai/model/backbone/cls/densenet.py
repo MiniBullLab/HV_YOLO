@@ -32,9 +32,8 @@ class DenseNet(BaseBackbone):
                  num_blocks=(6, 12, 24, 16), dilations=(1, 1, 1, 1), bn_size=4, drop_rate=0,
                  bnName=NormalizationType.BatchNormalize2d, activationName=ActivationType.ReLU):
 
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.Densenet121)
-        self.data_channel = data_channel
         self.num_init_features = num_init_features
         self.growth_rate = growth_rate
         self.num_blocks = num_blocks

@@ -23,9 +23,8 @@ class ResNext(BaseBackbone):
                  block=ResNextBottleNeck, num_blocks=(3, 4, 6, 3),
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.ResNext50)
-        self.data_channel = data_channel
         self.block = block
         self.num_blocks = num_blocks
         self.out_channels = (64, 128, 256, 512)

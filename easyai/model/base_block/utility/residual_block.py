@@ -33,7 +33,7 @@ class ResidualBlock(BaseBlock):
                                       padding=dilation,
                                       dilation=dilation,
                                       bnName=bn_name,
-                                      activationName=activation_name)
+                                      activationName=ActivationType.Linear)
             )
         elif flag == 1:
             self.residual = nn.Sequential(
@@ -54,7 +54,7 @@ class ResidualBlock(BaseBlock):
                                       out_channels=out_channels * expansion,
                                       kernel_size=1,
                                       bnName=bn_name,
-                                      activationName=activation_name)
+                                      activationName=ActivationType.Linear)
             )
 
         self.shortcut = nn.Sequential()

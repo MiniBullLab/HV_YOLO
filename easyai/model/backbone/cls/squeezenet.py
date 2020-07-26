@@ -17,9 +17,8 @@ class SqueezeNet(BaseBackbone):
 
     def __init__(self, data_channel=3, bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-        super(SqueezeNet, self).__init__()
+        super(SqueezeNet, self).__init__(data_channel)
         self.set_name(BackboneName.SqueezeNet)
-        self.data_channel = data_channel
         self.activationName = activationName
         self.bnName = bnName
         self.first_output = 64

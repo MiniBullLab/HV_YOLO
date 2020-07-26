@@ -2,7 +2,6 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-import random
 import numpy as np
 from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
 from easyai.data_loader.utility.image_data_augment import ImageDataAugment
@@ -14,6 +13,7 @@ class SegmentDataAugment():
         self.is_augment_hsv = True
         self.is_augment_affine = True
         self.is_lr_flip = True
+        self.label_border_value = 250
         self.dataset_process = ImageDataSetProcess()
         self.image_augment = ImageDataAugment()
 
@@ -23,28 +23,26 @@ class SegmentDataAugment():
         if self.is_augment_hsv:
             image = self.image_augment.augment_hsv(image_rgb)
         if self.is_augment_affine:
-            image, target = self.augment_affine(image, target)
+            image, matrix, _ = self.image_augment.augment_affine(image)
+            target = self.label_affine(label, matrix)
         if self.is_lr_flip:
-            image, target = self.augment_lr_flip(image, target)
+            image, is_lr = self.image_augment.augment_lr_flip(image)
+            target = self.label_lr_flip(target, is_lr)
         return image, target
 
-    def augment_affine(self, src_image, label):
-        image_size = (src_image.shape[1], src_image.shape[0])
-        matrix, degree = self.dataset_process.affine_matrix(image_size,
-                                                            degrees=(-5, 5),
-                                                            translate=(0.1, 0.1),
-                                                            scale=(0.8, 1.1),
-                                                            shear=(-3, 3))
-        image = self.dataset_process.image_affine(src_image, matrix,
-                                                  border_value=(127.5, 127.5, 127.5))
+    def label_affine(self, label, matrix):
         target = self.dataset_process.image_affine(label, matrix,
-                                                   border_value=250)
-        return image, target
+                                                   border_value=self.label_border_value)
+        return target
 
-    def augment_lr_flip(self, src_image, label):
-        image = src_image[:]
+    def label_lr_flip(self, label, is_lr):
         target = label[:]
-        if random.random() > 0.5:
-            image = np.fliplr(image)
+        if is_lr:
             target = np.fliplr(target)
-        return image, target
+        return target
+
+    def label_up_flip(self, label, is_up):
+        target = label[:]
+        if is_up:
+            target = np.flipud(target)
+        return target

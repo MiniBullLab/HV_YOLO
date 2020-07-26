@@ -1,7 +1,12 @@
-from .dataType import *
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
+from easyai.helper.dataType import *
 import xml.dom
 import xml.dom.minidom
 import xml.etree.ElementTree as ElementTree
+
 
 class XMLProcess():
 
@@ -42,7 +47,7 @@ class XMLProcess():
             box.min_corner.y = yMin
             box.max_corner.x = xMax
             box.max_corner.y = yMax
-            if box.width() >= self.MIN_WIDTH and box.height() >= self.MIN_HEIGHT:
+            if box.width() >= XMLProcess.MIN_WIDTH and box.height() >= XMLProcess.MIN_HEIGHT:
                 boxes.append(box)
         return image_name, imageSize, boxes
 
@@ -94,7 +99,7 @@ class XMLProcess():
         root.appendChild(nodeSegmented)
 
         for box in boxes:
-            nodeObject = doc.createElement("object")
+            nodeObject = doc.createElement("rectObject")
             nodeObjectName = doc.createElement("name")
             nodeObjectName.appendChild(doc.createTextNode(str(box.name)))
             nodeObjectPose = doc.createElement("pose")

@@ -21,9 +21,8 @@ class Xception65(BaseBackbone):
     def __init__(self, data_channel=3, output_stride=16,
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.Xception65)
-        self.data_channel = data_channel
         self.output_stride = output_stride
         self.block_number = 16
         self.activation_name = activationName

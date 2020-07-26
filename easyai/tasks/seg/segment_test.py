@@ -15,10 +15,7 @@ from easyai.base_name.task_name import TaskName
 class SegmentionTest(BaseTest):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path)
-        self.set_task_name(TaskName.Segment_Task)
-        self.test_task_config = self.config_factory.get_config(self.task_name, self.config_path)
-
+        super().__init__(config_path, TaskName.Segment_Task)
         self.segment_inference = Segmentation(cfg_path, gpu_id, config_path)
         self.model = self.segment_inference.model
         self.device = self.segment_inference.device
@@ -28,13 +25,16 @@ class SegmentionTest(BaseTest):
         self.epoch_loss_average = AverageMeter()
 
         self.metric = SegmentionMetric(len(self.test_task_config.class_name))
-        self.threshold = 0.5
+        self.threshold = 0.5  # binary class threshold
 
     def load_weights(self, weights_path):
         self.segment_inference.load_weights(weights_path)
 
     def test(self, val_path):
-        dataloader = get_segment_val_dataloader(val_path, self.test_task_config.image_size,
+        dataloader = get_segment_val_dataloader(val_path, self.test_task_config.class_name,
+                                                self.test_task_config.label_type,
+                                                self.test_task_config.image_size,
+                                                self.test_task_config.image_channel,
                                                 self.test_task_config.test_batch_size)
         print("Eval data num: {}".format(len(dataloader)))
         self.timer.tic()
@@ -63,11 +63,20 @@ class SegmentionTest(BaseTest):
     def compute_loss(self, output_list, targets):
         loss = 0
         loss_count = len(self.model.lossList)
+        output_count = len(output_list)
         targets = targets.to(self.device)
         with torch.no_grad():
-            for k in range(0, loss_count):
-                output, target = self.output_process.output_feature_map_resize(output_list[k], targets)
-                loss += self.model.lossList[k](output, target)
+            if loss_count == 1 and output_count == 1:
+                output, target = self.output_process.output_feature_map_resize(output_list[0], targets)
+                loss = self.model.lossList[0](output, target)
+            elif loss_count == 1 and output_count > 1:
+                loss = self.model.lossList[0](output_list, targets)
+            elif loss_count > 1 and loss_count == output_count:
+                for k in range(0, loss_count):
+                    output, target = self.output_process.output_feature_map_resize(output_list[k], targets)
+                    loss += self.model.lossList[k](output, target)
+            else:
+                print("compute loss error")
         return loss
 
     def metirc_loss(self, step, loss):

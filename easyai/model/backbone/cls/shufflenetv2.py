@@ -18,14 +18,13 @@ __all__ = ['shufflenetv2_1_0']
 
 class ShuffleNetV2(BaseBackbone):
 
-    def __init__(self, data_channel=3, num_blocks=[3, 7, 3], out_channels=(116, 232, 464),
-                 strides=[2, 2, 2], dilations=[1, 1, 1],
+    def __init__(self, data_channel=3, num_blocks=(3, 7, 3), out_channels=(116, 232, 464),
+                 strides=(2, 2, 2), dilations=(1, 1, 1),
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.LeakyReLU):
-        super().__init__()
+        super().__init__(data_channel)
         # init param
         self.set_name(BackboneName.ShuffleNetV2_1_0)
-        self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.out_channels = out_channels
         self.strides = strides

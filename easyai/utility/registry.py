@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
 import inspect
 from easyai.utility import misc
 
@@ -24,24 +28,26 @@ class Registry(object):
     def get(self, key):
         return self._module_dict.get(key, None)
 
-    def _register_module(self, module_class):
+    def _register_module(self, module_class, cls_name=None):
         """Register a module.
         Args:
             module (:obj:`nn.Module`): Module to be registered.
+
         """
         if not inspect.isclass(module_class):
             raise TypeError(
                 "module must be a class, but got {}".format(type(module_class))
             )
-        module_name = module_class.__name__
-        if module_name in self._module_dict:
+        if cls_name is None:
+            cls_name = module_class.__name__
+        if cls_name in self._module_dict:
             raise KeyError(
-                "{} is already registered in {}".format(module_name, self.name)
+                "{} is already registered in {}".format(cls_name, self.name)
             )
-        self._module_dict[module_name] = module_class
+        self._module_dict[cls_name] = module_class
 
-    def register_module(self, cls):
-        self._register_module(cls)
+    def register_module(self, cls, cls_name=None):
+        self._register_module(cls, cls_name)
         return cls
 
 

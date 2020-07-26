@@ -17,9 +17,8 @@ class DFNet(BaseBackbone):
                  out_channels=(64, 128, 256, 512), strides=(2, 2, 2, 1),
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.DFNetV1)
-        self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.out_channels = out_channels
         self.strides = strides

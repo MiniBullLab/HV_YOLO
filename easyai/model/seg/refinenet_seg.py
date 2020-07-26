@@ -7,22 +7,20 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
-from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
+from easyai.loss.cls.ce2d_loss import CrossEntropy2d
 from easyai.model.base_block.utility.upsample_layer import Upsample
 from easyai.model.base_block.utility.utility_layer import RouteLayer
 from easyai.model.base_block.seg.refinenet_block import RefineNetBlockName
 from easyai.model.base_block.seg.refinenet_block import CRPBlock, RefineNetBlock
-from easyai.model.utility.base_model import *
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
+from easyai.model.utility.base_classify_model import *
 
 
-class RefineNetSeg(BaseModel):
+class RefineNetSeg(BaseClassifyModel):
 
-    def __init__(self, data_channel=3, class_num=2):
-        super().__init__()
+    def __init__(self, data_channel=3, class_number=2):
+        super().__init__(data_channel, class_number)
         self.set_name(ModelName.RefineNetSeg)
-        self.data_channel = data_channel
-        self.class_number = class_num
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
 
@@ -33,7 +31,7 @@ class RefineNetSeg(BaseModel):
         self.block_out_channels = []
         self.index = 0
 
-        backbone = self.factory.get_base_model(BackboneName.ResNet101)
+        backbone = self.factory.get_base_model(BackboneName.ResNet101, self.model_args)
         base_out_channels = backbone.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])
 

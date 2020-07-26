@@ -10,23 +10,21 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
-from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
+from easyai.loss.cls.ce2d_loss import CrossEntropy2d
 from easyai.model.base_block.utility.upsample_layer import Upsample
 from easyai.model.base_block.utility.utility_layer import RouteLayer
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.seg.icnet_block import ICNetBlockName
 from easyai.model.base_block.seg.icnet_block import InputDownSample, CascadeFeatureFusion
-from easyai.model.utility.base_model import *
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
+from easyai.model.utility.base_classify_model import *
 
 
-class ICNet(BaseModel):
+class ICNet(BaseClassifyModel):
 
-    def __init__(self, data_channel=3, class_num=19):
-        super().__init__()
+    def __init__(self, data_channel=3, class_number=2):
+        super().__init__(data_channel, class_number)
         self.set_name(ModelName.ICNet)
-        self.data_channel = data_channel
-        self.class_number = class_num
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
         self.factory = BackboneFactory()
@@ -68,7 +66,7 @@ class ICNet(BaseModel):
                                       activationName=self.activation_name)
         self.add_block_list(conv3.get_name(), conv3, 64)
 
-        backbone1 = self.factory.get_base_model(BackboneName.ResNet50, data_channel=self.data_channel)
+        backbone1 = self.factory.get_base_model(BackboneName.ResNet50, self.model_args)
         base_out_channels1 = backbone1.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone1, base_out_channels1[-1])
 
@@ -77,7 +75,7 @@ class ICNet(BaseModel):
                               else self.block_out_channels[i] for i in layer1.layers])
         self.add_block_list(layer1.get_name(), layer1, output_channel)
 
-        backbone2 = self.factory.get_base_model(BackboneName.ResNet50, data_channel=self.data_channel)
+        backbone2 = self.factory.get_base_model(BackboneName.ResNet50, self.model_args)
         base_out_channels2 = backbone2.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone2, base_out_channels2[-1])
 

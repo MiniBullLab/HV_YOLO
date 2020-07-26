@@ -3,8 +3,6 @@
 # Author:
 
 import os
-import codecs
-import json
 from easyai.base_name.task_name import TaskName
 from easyai.config.utility.image_task_config import ImageTaskConfig
 
@@ -18,6 +16,7 @@ class Detect2dConfig(ImageTaskConfig):
         self.class_name = None
         self.confidence_th = 1.0
         self.nms_th = 1.0
+        self.post_prcoess_type = 0
         # test
         self.save_result_dir = os.path.join(self.root_save_dir, 'det2d_results')
         self.save_evaluation_path = os.path.join(self.root_save_dir, 'det2d_evaluation.txt')
@@ -46,42 +45,27 @@ class Detect2dConfig(ImageTaskConfig):
         self.get_test_default_value()
         self.get_train_default_value()
 
-    def load_config(self, config_path):
-        if config_path is not None and os.path.exists(config_path):
-            self.config_path = config_path
-        if os.path.exists(self.config_path):
-            with codecs.open(self.config_path, 'r', encoding='utf-8') as f:
-                config_dict = json.load(f)
-            self.load_data_value(config_dict)
-            self.load_test_value(config_dict)
-            self.load_train_value(config_dict)
-        else:
-            print("{} not exits".format(self.config_path))
-
-    def save_config(self):
-        super().save_config()
-        config_dict = {}
-        self.save_data_value(config_dict)
-        self.save_test_value(config_dict)
-        self.save_train_value(config_dict)
-        with codecs.open(self.config_path, 'w', encoding='utf-8') as f:
-            json.dump(config_dict, f, sort_keys=True, indent=4, ensure_ascii=False)
-
     def load_data_value(self, config_dict):
         if config_dict.get('image_size', None) is not None:
             self.image_size = tuple(config_dict['image_size'])
+        if config_dict.get('image_channel', None) is not None:
+            self.image_channel = int(config_dict['image_channel'])
         if config_dict.get('class_name', None) is not None:
             self.class_name = tuple(config_dict['class_name'])
         if config_dict.get('confidence_th', None) is not None:
             self.confidence_th = float(config_dict['confidence_th'])
         if config_dict.get('nms_th', None) is not None:
             self.nms_th = float(config_dict['nms_th'])
+        if config_dict.get('post_prcoess_type', None) is not None:
+            self.post_prcoess_type = int(config_dict['post_prcoess_type'])
 
     def save_data_value(self, config_dict):
         config_dict['image_size'] = self.image_size
+        config_dict['image_channel'] = self.image_channel
         config_dict['class_name'] = self.class_name
         config_dict['confidence_th'] = self.confidence_th
         config_dict['nms_th'] = self.nms_th
+        config_dict['post_prcoess_type'] = self.post_prcoess_type
 
     def load_test_value(self, config_dict):
         if config_dict.get('test_batch_size', None) is not None:
@@ -150,9 +134,20 @@ class Detect2dConfig(ImageTaskConfig):
 
     def get_data_default_value(self):
         self.image_size = (640, 352)  # W * H
-        self.class_name = ('object',)
-        self.confidence_th = 0.5
+        self.image_channel = 3
+        self.class_name = ("bike",
+        "bus",
+        "car",
+        "motor",
+        "person",
+        "rider",
+        "traffic light",
+        "traffic sign",
+        "train",
+        "truck")
+        self.confidence_th = 0.24
         self.nms_th = 0.45
+        self.post_prcoess_type = 0
 
     def get_test_default_value(self):
         self.test_batch_size = 1
@@ -162,13 +157,13 @@ class Detect2dConfig(ImageTaskConfig):
         self.train_data_augment = True
         self.train_multi_scale = False
         self.balanced_sample = False
-        self.train_batch_size = 1
+        self.train_batch_size = 16
         self.enable_mixed_precision = False
         self.is_save_epoch_model = False
         self.latest_weights_name = 'det2d_latest.pt'
         self.best_weights_name = 'det2d_best.pt'
-        self.latest_weights_file = os.path.join(self.snapshot_path, self.latest_weights_name)
-        self.best_weights_file = os.path.join(self.snapshot_path, self.best_weights_name)
+        self.latest_weights_file = os.path.join(self.snapshot_dir, self.latest_weights_name)
+        self.best_weights_file = os.path.join(self.snapshot_dir, self.best_weights_name)
 
         self.max_epochs = 100
 
@@ -177,15 +172,15 @@ class Detect2dConfig(ImageTaskConfig):
                                      'momentum': 0.9,
                                      'weight_decay': 5e-4}
                                  }
-        self.lr_scheduler_config = {'lr_type': 'MultiStageLR',
+        self.lr_scheduler_config = {'type': 'MultiStageLR',
                                     'lr_stages': [[50, 1], [70, 0.1], [100, 0.01]],
-                                    'warm_epoch': 0,
+                                    'is_warmup': True,
                                     'warmup_iters': 1000}
         self.accumulated_batches = 1
         self.display = 20
 
-        self.freeze_layer_type = 0
-        self.freeze_layer_name = "route_0"
+        self.freeze_layer_type = 1
+        self.freeze_layer_name = "baseNet_0"
 
         self.freeze_bn_type = 0
         self.freeze_bn_layer_name = "route_0"

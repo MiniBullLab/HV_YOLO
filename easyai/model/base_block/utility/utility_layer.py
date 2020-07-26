@@ -22,7 +22,7 @@ class MultiplyLayer(BaseBlock):
 
     def __init__(self, layers):
         super().__init__(LayerType.MultiplyLayer)
-        self.layers = [int(x) for x in layers.split(',') if x]
+        self.layers = [int(x) for x in layers.split(',') if x.strip()]
         assert len(self.layers) >= 2
 
     def forward(self, layer_outputs, base_outputs):
@@ -38,7 +38,7 @@ class AddLayer(BaseBlock):
 
     def __init__(self, layers):
         super().__init__(LayerType.AddLayer)
-        self.layers = [int(x) for x in layers.split(',') if x]
+        self.layers = [int(x) for x in layers.split(',') if x.strip()]
         assert len(self.layers) >= 2
 
     def forward(self, layer_outputs, base_outputs):
@@ -76,7 +76,12 @@ class RouteLayer(BaseBlock):
 
     def __init__(self, layers):
         super().__init__(LayerType.RouteLayer)
-        self.layers = [int(x) for x in layers.split(',') if x]
+        self.layers = [int(x) for x in layers.split(',') if x.strip()]
+
+    def get_output_channel(self, base_out_channels, block_out_channels):
+        output_channel = sum([base_out_channels[i] if i >= 0
+                              else block_out_channels[i] for i in self.layers])
+        return output_channel
 
     def forward(self, layer_outputs, base_outputs):
         # print(self.layers)
@@ -114,14 +119,24 @@ class ShortcutLayer(BaseBlock):
 
 
 class FcLayer(BaseBlock):
-    def __init__(self, in_channels, out_channels):
+    def __init__(self, in_channels, out_channels, bias=True):
         super().__init__(LayerType.FcLayer)
-        self.linear = nn.Linear(in_channels, out_channels)
+        self.linear = nn.Linear(in_channels, out_channels, bias=bias)
 
     def forward(self, x):
         x = x.view(x.size(0), -1)
         x = self.linear(x)
         return x
+
+
+class MeanLayer(BaseBlock):
+    def __init__(self, dim, keep_dim=False):
+        super().__init__(LayerType.MeanLayer)
+        self.dim = dim
+        self.keep_dim = keep_dim
+
+    def forward(self, x):
+        return x.mean(self.dim, self.keep_dim)
 
 
 if __name__ == "__main__":

@@ -7,20 +7,20 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
-from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
+from easyai.loss.cls.ce2d_loss import CrossEntropy2d
 from easyai.model.base_block.utility.utility_layer import FcLayer
 from easyai.model.base_block.utility.utility_layer import NormalizeLayer, ActivationLayer
-from easyai.model.utility.base_model import *
+from easyai.model.utility.base_classify_model import *
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
+from easyai.model.utility.registry import REGISTERED_CLS_MODEL
 
 
-class GhostNetCls(BaseModel):
+@REGISTERED_CLS_MODEL.register_module(ModelName.GhostNetCls)
+class GhostNetCls(BaseClassifyModel):
 
-    def __init__(self, data_channel=3, class_num=100):
-        super().__init__()
+    def __init__(self, data_channel=3, class_number=100):
+        super().__init__(data_channel, class_number)
         self.set_name(ModelName.GhostNetCls)
-        self.data_channel = data_channel
-        self.class_number = class_num
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
 
@@ -30,7 +30,7 @@ class GhostNetCls(BaseModel):
     def create_block_list(self):
         self.clear_list()
 
-        backbone = self.factory.get_base_model(BackboneName.GhostNet, self.data_channel)
+        backbone = self.factory.get_base_model(BackboneName.GhostNet, self.model_args)
         base_out_channels = backbone.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])
 

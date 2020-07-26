@@ -5,71 +5,134 @@
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
+import cv2
 import numpy as np
-from scipy import cluster
-from easyai.data_loader.det.detection_dataset_process import DetectionDataSetProcess
-from easyai.data_loader.det.detection_sample import DetectionSample
+import random
+from easyai.data_loader.det2d.det2d_dataset_process import DetectionDataSetProcess
+from easyai.data_loader.det2d.det2d_sample import DetectionSample
 from easyai.helper import XMLProcess
 from easyai.helper import ImageProcess
-from easyai.config.task import detect2d_config
+from easyai.base_name.task_name import TaskName
+from easyai.config.utility.config_factory import ConfigFactory
 
 
 class CreateDetectionAnchors():
 
-    def __init__(self, train_path):
+    def __init__(self, train_path, config_path):
+        self.config_factory = ConfigFactory()
+        self.task_config = self.config_factory.get_config(TaskName.Detect2d_Task, config_path)
+
+        # image & label process
         self.xmlProcess = XMLProcess()
         self.image_process = ImageProcess()
+
         self.detection_sample = DetectionSample(train_path,
-                                                detect2d_config.className)
+                                                self.task_config.class_name)
         self.detection_sample.read_sample()
+
         self.dataset_process = DetectionDataSetProcess()
 
     def get_anchors(self, number):
         wh_numpy = self.get_width_height()
-        # Kmeans calculation
-        k = cluster.vq.kmeans(wh_numpy, number)[0]
-        k = k[np.argsort(k.prod(1))]  # sort small to large
-        # Measure IoUs
-        iou = np.stack([self.compute_iou(wh_numpy, x) for x in k], 0)
-        biou = iou.max(0)[0]  # closest anchor IoU
-        print('Best possible recall: %.3f' % (biou > 0.2635).float().mean())  # BPR (best possible recall)
-
-        # Print
-        print('kmeans anchors (n=%g, img_size=%g, IoU=%.2f/%.2f/%.2f-min/mean/best): ' %
-              (number, detect2d_config.imgSize, biou.min(), iou.mean(), biou.mean()), end='')
-        for i, x in enumerate(k):
-            print('%i,%i' % (round(x[0]), round(x[1])), end=',  ' if i < len(k) - 1 else '\n')
+        indices = [random.randrange(wh_numpy.shape[0]) for _ in range(number)]
+        centroids = wh_numpy[indices]
+        self.kmeans(wh_numpy, centroids)
 
     def get_width_height(self):
         count = self.detection_sample.get_sample_count()
         result = []
+        print("count: {}".format(count))
         for index in range(count):
             img_path, label_path = self.detection_sample.get_sample_path(index)
-            src_image, rgb_image = self.image_process.readRgbImage(img_path)
+            print("Loading : {}-{}".format(index, img_path))
+            _, rgb_image = self.image_process.readRgbImage(img_path)
             _, _, boxes = self.xmlProcess.parseRectData(label_path)
             rgb_image, labels = self.dataset_process.resize_dataset(rgb_image,
-                                                                    detect2d_config.imgSize,
+                                                                    self.task_config.image_size,
                                                                     boxes,
-                                                                    detect2d_config.className)
+                                                                    self.task_config.class_name)
+
             temp = np.zeros((len(labels), 2), dtype=np.float32)
             for index, object in enumerate(labels):
                 temp[index, :] = np.array([object.width(), object.height()])
             result.append(temp)
+
         return np.concatenate(result, axis=0)
 
-    def compute_iou(self, list_x, x2):
-        result = np.zeros((len(list_x), 1), dtype=np.float32)
-        for index, x1 in enumerate(list_x):
-            min_w = min(x1[0], x2[0])
-            min_h = min(x1[0], x2[1])
-            iou = (min_w * min_h) / (x1[0] * x1[1] + x2[0] * x2[1] - min_w * min_h)
-            result[index] = iou
-        return result
+    def kmeans(self, wh_numpy, centroids):
+
+        num_boxes = wh_numpy.shape[0]
+        k, dim = centroids.shape
+        prev_assignments = np.ones(num_boxes) * (-1)
+        iteration = 0
+        old_dists = np.zeros((num_boxes, k))
+
+        while True:
+            dists = []
+            iteration += 1
+            for i in range(num_boxes):
+                d = 1 - self.compute_iou(wh_numpy[i], centroids)
+                dists.append(d)
+            dists = np.array(dists)  # dists.shape = (num_boxes, k)
+
+            print("iteration {}: distance = {}".format(iteration, np.sum(np.abs(old_dists - dists))))
+
+            # assign samples to centroids
+            assignments = np.argmin(dists, axis=1)
+
+            if (assignments == prev_assignments).all():
+                self.anchor_visual(centroids)
+                return
+
+            # calculate new centroids
+            centroid_sums = np.zeros((k, dim), np.float)
+            for i in range(num_boxes):
+                centroid_sums[assignments[i]] += wh_numpy[i]
+            for j in range(k):
+                centroids[j] = centroid_sums[j] / (np.sum(assignments == j))
+
+            prev_assignments = assignments.copy()
+            old_dists = dists.copy()
+
+    def compute_iou(self, x, centroids):
+        similarities = []
+        for centroid in centroids:
+            centroid_w, centroid_h = centroid
+            width, height = x
+            if centroid_w >= width and centroid_h >= height:
+                similarity = width * height / (centroid_w * centroid_h)
+            elif centroid_w >= width and centroid_h <= height:
+                similarity = width * centroid_h / (width * height + (centroid_w - width) * centroid_h)
+            elif centroid_w <= width and centroid_h >= height:
+                similarity = centroid_w * height / (width * height + centroid_w * (centroid_h - height))
+            else:  # means both w,h are bigger than c_w and c_h respectively
+                similarity = (centroid_w * centroid_h) / (width * height)
+            similarities.append(similarity)  # will become (k,) shape
+        return np.array(similarities)
+
+    def anchor_visual(self, centroids):
+        anchors = centroids.copy()
+
+        widths = anchors[:, 0]
+        sorted_indices = np.argsort(widths)
+
+        print('Anchors = ', anchors[sorted_indices])
+
+        # draw all anchors
+        img = np.zeros([300, 300, 3])
+        for i in range(anchors.shape[0]):
+            cv2.rectangle(img, (int(150 - anchors[i][0] / 2.0), int(150 - anchors[i][1] / 2.0)),
+                          (int(150 + anchors[i][0] / 2.0), int(150 + anchors[i][1] / 2.0)), (0, 0, 255), 1)
+        cv2.namedWindow("image", 0)
+        cv2.resizeWindow("image", int(img.shape[1] * 3.0), int(img.shape[0] * 3.0))
+        cv2.imshow("image", img)
+        cv2.waitKey()
 
 
 def test():
     print("start...")
-    test = CreateDetectionAnchors("/home/lpj/github/data/Berkeley/ImageSets/train.txt")
+    test = CreateDetectionAnchors("/home/wfw/data/VOCdevkit/BerkeleyDet/ImageSets/train.txt",
+                                  "/home/wfw/EDGE/HV_YOLO/log/config/detection2d_config.json")
     test.get_anchors(9)
     print("End of game, have a nice day!")
 

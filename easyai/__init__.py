@@ -1,4 +1,4 @@
-__version__ = "0.2"
+__version__ = "0.3"
 __author__ = "Lipeijie"
 __producer__ = "easyai"
 __producer_version__ = __version__

@@ -3,8 +3,6 @@
 # Author:
 
 import os
-import codecs
-import json
 from easyai.base_name.task_name import TaskName
 from easyai.config.utility.image_task_config import ImageTaskConfig
 
@@ -15,6 +13,7 @@ class ClassifyConfig(ImageTaskConfig):
         super().__init__()
         self.set_task_name(TaskName.Classify_Task)
         # data
+        self.class_name = None
         self.data_mean = None
         self.data_std = None
         # test
@@ -43,30 +42,13 @@ class ClassifyConfig(ImageTaskConfig):
         self.get_test_default_value()
         self.get_train_default_value()
 
-    def load_config(self, config_path):
-        if config_path is not None and os.path.exists(config_path):
-            self.config_path = config_path
-        if os.path.exists(self.config_path):
-            with codecs.open(self.config_path, 'r', encoding='utf-8') as f:
-                config_dict = json.load(f)
-            self.load_data_value(config_dict)
-            self.load_test_value(config_dict)
-            self.load_train_value(config_dict)
-        else:
-            print("{} not exits".format(self.config_path))
-
-    def save_config(self):
-        super().save_config()
-        config_dict = {}
-        self.save_data_value(config_dict)
-        self.save_test_value(config_dict)
-        self.save_train_value(config_dict)
-        with codecs.open(self.config_path, 'w', encoding='utf-8') as f:
-            json.dump(config_dict, f, sort_keys=True, indent=4, ensure_ascii=False)
-
     def load_data_value(self, config_dict):
         if config_dict.get('image_size', None) is not None:
             self.image_size = tuple(config_dict['image_size'])
+        if config_dict.get('image_channel', None) is not None:
+            self.image_channel = int(config_dict['image_channel'])
+        if config_dict.get('class_name', None) is not None:
+            self.class_name = tuple(config_dict['class_name'])
         if config_dict.get('data_mean', None) is not None:
             self.data_mean = tuple(config_dict['data_mean'])
         if config_dict.get('data_std', None) is not None:
@@ -74,6 +56,8 @@ class ClassifyConfig(ImageTaskConfig):
 
     def save_data_value(self, config_dict):
         config_dict['image_size'] = self.image_size
+        config_dict['image_channel'] = self.image_channel
+        config_dict['class_name'] = self.class_name
         config_dict['data_mean'] = self.data_mean
         config_dict['data_std'] = self.data_std
 
@@ -137,7 +121,9 @@ class ClassifyConfig(ImageTaskConfig):
         config_dict['freeze_bn_layer_name'] = self.freeze_bn_layer_name
 
     def get_data_default_value(self):
-        self.image_size = (32, 32)
+        self.image_size = (224, 224)
+        self.image_channel = 3
+        self.class_name = ('cls1', 'cls2')
         self.data_mean = (0.5070751592371323, 0.48654887331495095, 0.4409178433670343)
         self.data_std = (0.2673342858792401, 0.2564384629170883, 0.27615047132568404)
 
@@ -146,14 +132,14 @@ class ClassifyConfig(ImageTaskConfig):
 
     def get_train_default_value(self):
         self.train_data_augment = True
-        self.train_batch_size = 64
+        self.train_batch_size = 16
         self.enable_mixed_precision = False
         self.is_save_epoch_model = False
         self.latest_weights_name = 'cls_latest.pt'
         self.best_weights_name = 'cls_best.pt'
 
-        self.latest_weights_file = os.path.join(self.snapshot_path, self.latest_weights_name)
-        self.best_weights_file = os.path.join(self.snapshot_path, self.best_weights_name)
+        self.latest_weights_file = os.path.join(self.snapshot_dir, self.latest_weights_name)
+        self.best_weights_file = os.path.join(self.snapshot_dir, self.best_weights_name)
 
         self.max_epochs = 200
 
@@ -162,9 +148,9 @@ class ClassifyConfig(ImageTaskConfig):
                                      'momentum': 0.9,
                                      'weight_decay': 5e-4}
                                  }
-        self.lr_scheduler_config = {'lr_type': 'MultiStageLR',
+        self.lr_scheduler_config = {'type': 'MultiStageLR',
                                     'lr_stages': [[60, 1], [120, 0.2], [160, 0.04], [200, 0.008]],
-                                    'warm_epoch': 0,
+                                    'is_warmup': True,
                                     'warmup_iters': 390}
         self.accumulated_batches = 1
         self.display = 20

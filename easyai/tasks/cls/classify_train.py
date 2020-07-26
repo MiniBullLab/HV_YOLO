@@ -4,11 +4,8 @@
 
 import os
 from easyai.data_loader.cls.classify_dataloader import get_classify_train_dataloader
-from easyai.torch_utility.torch_model_process import TorchModelProcess
-from easyai.torch_utility.torch_freeze_bn import TorchFreezeNormalization
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.solver.lr_factory import LrSchedulerFactory
-from easyai.utility.train_log import TrainLogger
 from easyai.tasks.utility.base_task import DelayedKeyboardInterrupt
 from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.cls.classify_test import ClassifyTest
@@ -18,18 +15,13 @@ from easyai.base_name.task_name import TaskName
 class ClassifyTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path)
-        self.set_task_name(TaskName.Classify_Task)
-        self.train_task_config = self.config_factory.get_config(self.task_name, self.config_path)
+        super().__init__(config_path, TaskName.Classify_Task)
 
-        self.train_logger = TrainLogger(self.train_task_config.log_name,
-                                        self.train_task_config.root_save_dir)
-
-        self.torchModelProcess = TorchModelProcess()
-        self.freeze_normalization = TorchFreezeNormalization()
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
 
-        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id)
+        self.model_args['class_number'] = len(self.train_task_config.class_name)
+        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
+                                                      default_args=self.model_args)
         self.device = self.torchModelProcess.getDevice()
 
         self.classify_test = ClassifyTest(cfg_path, gpu_id, config_path)
@@ -37,10 +29,6 @@ class ClassifyTrain(BaseTrain):
         self.total_images = 0
         self.start_epoch = 0
         self.best_precision = 0
-        self.optimizer = None
-
-    def load_pretrain_model(self, weights_path):
-        self.torchModelProcess.loadPretainModel(weights_path, self.model)
 
     def load_latest_param(self, latest_weights_path):
         checkpoint = None
@@ -65,6 +53,7 @@ class ClassifyTrain(BaseTrain):
                                                    self.train_task_config.data_mean,
                                                    self.train_task_config.data_std,
                                                    self.train_task_config.image_size,
+                                                   self.train_task_config.image_channel,
                                                    self.train_task_config.train_batch_size,
                                                    self.train_task_config.train_data_augment)
 
@@ -116,9 +105,17 @@ class ClassifyTrain(BaseTrain):
     def compute_loss(self, output_list, targets):
         loss = 0
         loss_count = len(self.model.lossList)
+        output_count = len(output_list)
         targets = targets.to(self.device)
-        for k in range(0, loss_count):
-            loss += self.model.lossList[k](output_list[k], targets)
+        if loss_count == 1 and output_count == 1:
+            loss = self.model.lossList[0](output_list[0], targets)
+        elif loss_count == 1 and output_count > 1:
+            loss = self.model.lossList[0](output_list, targets)
+        elif loss_count > 1 and loss_count == output_count:
+            for k in range(0, loss_count):
+                loss += self.model.lossList[k](output_list[k], targets)
+        else:
+            print("compute loss error")
         return loss
 
     def update_logger(self, index, total, epoch, loss):
@@ -149,11 +146,14 @@ class ClassifyTrain(BaseTrain):
         return save_model_path
 
     def test(self, val_path, epoch, save_model_path):
-        self.classify_test.load_weights(save_model_path)
-        precision = self.classify_test.test(val_path)
-        self.classify_test.save_test_value(epoch)
+        if val_path is not None and os.path.exists(val_path):
+            self.classify_test.load_weights(save_model_path)
+            precision = self.classify_test.test(val_path)
+            self.classify_test.save_test_value(epoch)
 
-        # save best model
-        self.best_precision = self.torchModelProcess.saveBestModel(precision,
-                                                                   save_model_path,
-                                                                   self.train_task_config.best_weights_file)
+            # save best model
+            self.best_precision = self.torchModelProcess.saveBestModel(precision,
+                                                                       save_model_path,
+                                                                       self.train_task_config.best_weights_file)
+        else:
+            print("no test!")

@@ -6,23 +6,22 @@ from easyai.base_name.model_name import ModelName
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType, BlockType
 from easyai.base_name.loss_name import LossType
-from easyai.loss.utility.cross_entropy2d import CrossEntropy2d
+from easyai.base_name.backbone_name import BackboneName
+from easyai.loss.cls.ce2d_loss import CrossEntropy2d
 from easyai.model.base_block.utility.upsample_layer import Upsample
 from easyai.model.base_block.utility.utility_layer import RouteLayer
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.utility.utility_block import ConvActivationBlock
-from easyai.model.backbone.cls.mobilenetv2 import MobileNetV2
-from easyai.model.utility.base_model import *
+from easyai.model.utility.base_classify_model import *
 
 
-class MobileV2FCN(BaseModel):
+class MobileV2FCN(BaseClassifyModel):
 
-    def __init__(self, data_channel=3, class_num=2):
-        super().__init__()
+    def __init__(self, data_channel=3, class_number=2):
+        super().__init__(data_channel, class_number)
         self.set_name(ModelName.MobileV2FCN)
-        self.class_number = class_num
         self.bn_name = NormalizationType.BatchNormalize2d
-        self.activation_name = ActivationType.ReLU
+        self.activation_name = ActivationType.ReLU6
 
         self.create_block_list()
 
@@ -30,9 +29,9 @@ class MobileV2FCN(BaseModel):
         self.block_out_channels = []
         self.index = 0
 
-        basic_model = MobileNetV2(bnName=self.bn_name, activationName=self.activation_name)
-        base_out_channels = basic_model.get_outchannel_list()
-        self.add_block_list(BlockType.BaseNet, basic_model, base_out_channels[-1])
+        backbone = self.factory.get_base_model(BackboneName.MobileNetV2_1_0, self.model_args)
+        base_out_channels = backbone.get_outchannel_list()
+        self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])
 
         input_channel = self.block_out_channels[-1]
         output_channel = base_out_channels[-1] // 2
@@ -125,8 +124,6 @@ class MobileV2FCN(BaseModel):
                 x = block(layer_outputs, base_outputs)
             elif LayerType.ShortcutLayer in key:
                 x = block(layer_outputs)
-            elif LossType.YoloLoss in key:
-                output.append(x)
             elif LossType.CrossEntropy2d in key:
                 output.append(x)
             else:

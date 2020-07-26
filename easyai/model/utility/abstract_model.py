@@ -30,10 +30,13 @@ class AbstractModel(nn.Module):
         self.block_out_channels = []
         self.index = 0
 
-    def add_block_list(self, block_name, block, output_channel):
-        block_name = "%s_%d" % (block_name, self.index)
-        self.add_module(block_name, block)
-        self.index += 1
+    def add_block_list(self, block_name, block, output_channel, flag=0):
+        if flag == 0:
+            block_name = "%s_%d" % (block_name, self.index)
+            self.add_module(block_name, block)
+            self.index += 1
+        elif flag == 1:
+            self.add_module(block_name, block)
         self.block_out_channels.append(output_channel)
 
     def print_block_name(self):

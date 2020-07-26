@@ -14,9 +14,11 @@ class ModelName():
     LinkNet34 = "LinkNet34"
     RefineNetSeg = "RefineNetSeg"
     PSPNetSeg = "PSPNetSeg"
+    EncNetSeg = "EncNetSeg"
     BiSeNet = "BiSeNet"
     FastSCNN = "FastSCNN"
     ICNet = "ICNet"
+    DeepLabV3 = "DeepLabV3"
     DeepLabV3Plus = "DeepLabV3Plus"
     MobilenetDeepLabV3Plus = "MobilenetDeepLabV3Plus"
     MobileV2FCN = "MobileV2FCN"
@@ -24,12 +26,15 @@ class ModelName():
     ComplexYOLO = "ComplexYOLO"
 
     VggNetCls = "VggNetCls"
+    ResNetCls = "ResNetCls"
     Inceptionv4Cls = "Inceptionv4Cls"
     SENetCls = "SENetCls"
     GhostNetCls = "GhostNetCls"
 
+    YoloV3Det2d = "detnet"
+
     MSRResNet = "MSRResNet"
-    MySRModel = "MySRModel"
+    SmallSRNet = "SmallSRNet"
 
 
 

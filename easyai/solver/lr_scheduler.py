@@ -4,42 +4,40 @@
 
 import math
 from easyai.solver.base_lr_secheduler import BaseLrSecheduler
-from easyai.solver.lr_factory import register_lr_scheduler
+from easyai.solver.registry import REGISTERED_LR_SCHEDULER
 
 
-@register_lr_scheduler
+@REGISTERED_LR_SCHEDULER.register_module
 class LinearIncreaseLR(BaseLrSecheduler):
     def __init__(self, base_lr, end_lr, total_iters,
-                 warm_epoch=-1, warmup_iters=2000):
-        super().__init__()
-        self.baseLr = base_lr
+                 is_warmup=False, warmup_iters=2000):
+        super().__init__(base_lr)
         self.endLr = end_lr
-        self.warm_epoch = warm_epoch
+        self.is_warmup = is_warmup
         self.warmup_iters = warmup_iters
         self.total_iters = total_iters + 0.0
 
     def get_lr(self, cur_epoch, cur_iter):
-        if (cur_epoch == self.warm_epoch) and (cur_iter <= self.warmup_iters):
+        if self.is_warmup and (cur_iter <= self.warmup_iters):
             lr = self.baseLr * (cur_iter / self.warmup_iters) ** 4
             return lr
         else:
             return self.endLr + (self.baseLr - self.endLr) * (1 - float(cur_iter) / self.total_iters)
 
 
-@register_lr_scheduler
+@REGISTERED_LR_SCHEDULER.register_module
 class MultiStageLR(BaseLrSecheduler):
     def __init__(self, base_lr, lr_stages,
-                 warm_epoch=-1, warmup_iters=2000):
-        super().__init__()
+                 is_warmup=False, warmup_iters=2000):
+        super().__init__(base_lr)
         assert type(lr_stages) in [list, tuple] and len(lr_stages[0]) == 2, \
             'lr_stages must be list or tuple, with [iters, lr] format'
-        self.baseLr = base_lr
         self.lr_stages_list = lr_stages
-        self.warm_epoch = warm_epoch
+        self.is_warmup = is_warmup
         self.warmup_iters = warmup_iters
 
     def get_lr(self, cur_epoch, cur_iter):
-        if (cur_epoch == self.warm_epoch) and (cur_iter <= self.warmup_iters):
+        if self.is_warmup and (cur_iter <= self.warmup_iters):
             lr = self.baseLr * (cur_iter / self.warmup_iters) ** 4
             return lr
         else:
@@ -48,39 +46,37 @@ class MultiStageLR(BaseLrSecheduler):
                     return self.baseLr * it_lr[1]
 
 
-@register_lr_scheduler
+@REGISTERED_LR_SCHEDULER.register_module
 class PolyLR(BaseLrSecheduler):
     def __init__(self, base_lr, total_iters, lr_power=0.9,
-                 warm_epoch=-1, warmup_iters=2000):
-        super().__init__()
-        self.baseLr = base_lr
+                 is_warmup=False, warmup_iters=2000):
+        super().__init__(base_lr)
         self.lr_power = lr_power
         self.total_iters = total_iters + 0.0
 
-        self.warm_epoch = warm_epoch
+        self.is_warmup = is_warmup
         self.warmup_iters = warmup_iters
 
     def get_lr(self, cur_epoch, cur_iter):
-        if (cur_epoch == self.warm_epoch) and (cur_iter <= self.warmup_iters):
+        if self.is_warmup and (cur_iter <= self.warmup_iters):
             lr = self.baseLr * (cur_iter / self.warmup_iters) ** 4
             return lr
         else:
             return self.baseLr * ((1 - float(cur_iter) / self.total_iters) ** self.lr_power)
 
 
-@register_lr_scheduler
+@REGISTERED_LR_SCHEDULER.register_module
 class CosineLR(BaseLrSecheduler):
     def __init__(self, base_lr, total_iters,
-                 warm_epoch=-1, warmup_iters=5):
-        super().__init__()
-        self.baseLr = base_lr
+                 is_warmup=False, warmup_iters=5):
+        super().__init__(base_lr)
         self.total_iters = total_iters + 0.0
 
-        self.warm_epoch = warm_epoch
+        self.is_warmup = is_warmup
         self.warmup_iters = warmup_iters
 
     def get_lr(self, cur_epoch, cur_iter):
-        if (cur_epoch == self.warm_epoch) and (cur_iter <= self.warmup_iters):
+        if self.is_warmup and (cur_iter <= self.warmup_iters):
             lr = self.baseLr * (cur_iter / self.warmup_iters) ** 4
             return lr
         else:

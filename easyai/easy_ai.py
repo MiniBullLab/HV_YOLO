@@ -30,6 +30,10 @@ def parse_arguments():
                       metavar="PATH", type="string", default="./val.txt",
                       help="path to data config file")
 
+    parser.add_option("-c", "--config", dest="config_path",
+                      metavar="PATH", type="string", default=None,
+                      help="config path")
+
     (options, args) = parser.parse_args()
 
     if options.trainPath:
@@ -51,15 +55,21 @@ def main():
     train_task = TrainTask(options.trainPath, options.valPath, True)
     current_path = inspect.getfile(inspect.currentframe())
     dir_name = os.path.dirname(current_path)
-    if options.task_name.strip() == "DeNET":
-        cfg_path = os.path.join(dir_name, "./data/detnet.cfg")
-        train_task.detect2d_train(cfg_path, options.gpu_id, None)
+    if options.task_name.strip() == "ClassNet":
+        cfg_path = os.path.join(dir_name, "./data/classnet.cfg")
+        pretrain_model_path = os.path.join(dir_name, "./data/classnet.pt")
+        train_task.classify_train(cfg_path, options.gpu_id, options.config_path, pretrain_model_path)
+        save_image_dir = os.path.join(config.root_save_dir, "cls_img")
+        copy_process.copy(options.trainPath, save_image_dir)
+    elif options.task_name.strip() == "DeNET":
+        pretrain_model_path = os.path.join(dir_name, "./data/detnet.pt")
+        train_task.detect2d_train("detnet", options.gpu_id, options.config_path, pretrain_model_path)
         save_image_dir = os.path.join(config.root_save_dir, "det_img")
         copy_process.copy(options.trainPath, save_image_dir)
     elif options.task_name.strip() == "SegNET":
-        pretrain_model_path = os.path.join(dir_name, "./data/vgg16_segnet.pt")
+        pretrain_model_path = os.path.join(dir_name, "./data/segnet.pt")
         cfg_path = os.path.join(dir_name, "./data/segnet.cfg")
-        train_task.segment_train(cfg_path, options.gpu_id, pretrain_model_path)
+        train_task.segment_train(cfg_path, options.gpu_id, options.config_path, pretrain_model_path)
         save_image_dir = os.path.join(config.root_save_dir, "seg_img")
         copy_process.copy(options.trainPath, save_image_dir)
     else:

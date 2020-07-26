@@ -3,8 +3,6 @@
 # Author:
 
 import os
-import codecs
-import json
 from easyai.base_name.task_name import TaskName
 from easyai.config.utility.image_task_config import ImageTaskConfig
 
@@ -15,7 +13,7 @@ class SegmentionConfig(ImageTaskConfig):
         super().__init__()
         self.set_task_name(TaskName.Segment_Task)
         # data
-        self.label_is_gray = None
+        self.label_type = None
         self.class_name = None
         # test
         self.save_evaluation_path = os.path.join(self.root_save_dir, 'seg_evaluation.txt')
@@ -42,38 +40,20 @@ class SegmentionConfig(ImageTaskConfig):
         self.get_test_default_value()
         self.get_train_default_value()
 
-    def load_config(self, config_path):
-        if config_path is not None and os.path.exists(config_path):
-            self.config_path = config_path
-        if os.path.exists(self.config_path):
-            with codecs.open(self.config_path, 'r', encoding='utf-8') as f:
-                config_dict = json.load(f)
-            self.load_data_value(config_dict)
-            self.load_test_value(config_dict)
-            self.load_train_value(config_dict)
-        else:
-            print("{} not exits".format(self.config_path))
-
-    def save_config(self):
-        super().save_config()
-        config_dict = {}
-        self.save_data_value(config_dict)
-        self.save_test_value(config_dict)
-        self.save_train_value(config_dict)
-        with codecs.open(self.config_path, 'w', encoding='utf-8') as f:
-            json.dump(config_dict, f, sort_keys=True, indent=4, ensure_ascii=False)
-
     def load_data_value(self, config_dict):
         if config_dict.get('image_size', None) is not None:
             self.image_size = tuple(config_dict['image_size'])
-        if config_dict.get('label_is_gray', None) is not None:
-            self.label_is_gray = bool(config_dict['label_is_gray'])
+        if config_dict.get('image_channel', None) is not None:
+            self.image_channel = int(config_dict['image_channel'])
+        if config_dict.get('label_type', None) is not None:
+            self.label_type = int(config_dict['label_type'])
         if config_dict.get('class_name', None) is not None:
             self.class_name = list(config_dict['class_name'])
 
     def save_data_value(self, config_dict):
         config_dict['image_size'] = self.image_size
-        config_dict['label_is_gray'] = self.label_is_gray
+        config_dict['image_channel'] = self.image_channel
+        config_dict['label_type'] = self.label_type
         config_dict['class_name'] = self.class_name
 
     def load_test_value(self, config_dict):
@@ -137,7 +117,8 @@ class SegmentionConfig(ImageTaskConfig):
 
     def get_data_default_value(self):
         self.image_size = (500, 400)  # w * H
-        self.label_is_gray = True
+        self.image_channel = 3
+        self.label_type = 1
         self.class_name = [('background', '255'),
                            ('lane', '0')]
 
@@ -152,8 +133,8 @@ class SegmentionConfig(ImageTaskConfig):
         self.is_save_epoch_model = False
         self.latest_weights_name = 'seg_latest.pt'
         self.best_weights_name = 'seg_best.pt'
-        self.latest_weights_file = os.path.join(self.snapshot_path, self.latest_weights_name)
-        self.best_weights_file = os.path.join(self.snapshot_path, self.best_weights_name)
+        self.latest_weights_file = os.path.join(self.snapshot_dir, self.latest_weights_name)
+        self.best_weights_file = os.path.join(self.snapshot_dir, self.best_weights_name)
         self.max_epochs = 100
 
         self.base_lr = 0.001
@@ -163,8 +144,8 @@ class SegmentionConfig(ImageTaskConfig):
                                      'weight_decay': 0}
                                  }
 
-        self.lr_scheduler_config = {'lr_type': 'CosineLR',
-                                    'warm_epoch': -1,
+        self.lr_scheduler_config = {'type': 'CosineLR',
+                                    'is_warmup': False,
                                     'warmup_iters': 2000}
         self.accumulated_batches = 1
         self.display = 20

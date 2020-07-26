@@ -5,7 +5,7 @@
 import os
 from easyai.tasks.utility.base_test import BaseTest
 from easyai.evaluation.calculate_mAp import CalculateMeanAp
-from easyai.data_loader.det.detection_val_dataloader import get_detection_val_dataloader
+from easyai.data_loader.det2d.det2d_val_dataloader import get_detection_val_dataloader
 from easyai.tasks.det2d.detect2d import Detection2d
 from easyai.base_name.task_name import TaskName
 
@@ -13,11 +13,9 @@ from easyai.base_name.task_name import TaskName
 class Detection2dTest(BaseTest):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path)
-        self.set_task_name(TaskName.Detect2d_Task)
-        self.test_task_config = self.config_factory.get_config(self.task_name, self.config_path)
-
+        super().__init__(config_path, TaskName.Detect2d_Task)
         self.detect_inference = Detection2d(cfg_path, gpu_id, config_path)
+        self.threshold_det = 5e-3
 
     def load_weights(self, weights_path):
         self.detect_inference.load_weights(weights_path)
@@ -26,9 +24,11 @@ class Detection2dTest(BaseTest):
         os.system('rm -rf ' + self.test_task_config.save_result_dir)
         os.makedirs(self.test_task_config.save_result_dir, exist_ok=True)
 
-        dataloader = get_detection_val_dataloader(val_path, self.test_task_config.class_name,
-                                                  batch_size=1,
-                                                  image_size=self.test_task_config.image_size)
+        dataloader = get_detection_val_dataloader(val_path,
+                                                  self.test_task_config.class_name,
+                                                  image_size=self.test_task_config.image_size,
+                                                  data_channel=self.test_task_config.image_channel,
+                                                  batch_size=1)
         evaluator = CalculateMeanAp(val_path, self.test_task_config.class_name)
 
         self.timer.tic()
@@ -37,7 +37,7 @@ class Detection2dTest(BaseTest):
 
             self.detect_inference.set_src_size(src_image.numpy()[0])
 
-            result = self.detect_inference.infer(input_image, 5e-3)
+            result = self.detect_inference.infer(input_image, self.threshold_det)
             detection_objects = self.detect_inference.postprocess(result)
 
             print('Batch %d... Done. (%.3fs)' % (i, self.timer.toc(True)))

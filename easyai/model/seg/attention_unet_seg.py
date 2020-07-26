@@ -9,20 +9,18 @@ from easyai.base_name.model_name import ModelName
 from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.base_name.block_name import LayerType
 from easyai.base_name.loss_name import LossType
-from easyai.loss.utility.bce_loss import BinaryCrossEntropy2d
+from easyai.loss.cls.bce_loss import BinaryCrossEntropy2d
 from easyai.model.base_block.seg.unet_blcok import UNetBlockName
 from easyai.model.base_block.seg.unet_blcok import DoubleConv2d, DownBlock
 from easyai.model.base_block.seg.unet_blcok import AttentionUpBlock
-from easyai.model.utility.base_model import *
+from easyai.model.utility.base_classify_model import *
 
 
-class AttentionUnetSeg(BaseModel):
+class AttentionUnetSeg(BaseClassifyModel):
 
-    def __init__(self, data_channel=3, class_num=1):
-        super().__init__()
+    def __init__(self, data_channel=3, class_number=1):
+        super().__init__(data_channel, class_number)
         self.set_name(ModelName.UNetSeg)
-        self.data_channel = data_channel
-        self.class_number = class_num
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
 

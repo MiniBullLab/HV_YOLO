@@ -15,6 +15,16 @@ class LinearActivation(BaseBlock):
         return x
 
 
+class SwishActivation(BaseBlock):
+
+    def __init__(self):
+        super().__init__(ActivationType.Swish)
+
+    def forward(self, x):
+        x = x * torch.sigmoid(x)
+        return x
+
+
 class MishActivation(BaseBlock):
 
     def __init__(self):
@@ -25,22 +35,22 @@ class MishActivation(BaseBlock):
         return x
 
 
-class HSigmoid(BaseBlock):
+class HardSigmoid(BaseBlock):
     def __init__(self, inplace=True):
-        super().__init__(ActivationType.HSigmoid)
-        self.relu = nn.ReLU6(inplace=inplace)
+        super().__init__(ActivationType.HardSigmoid)
+        self.relu6 = nn.ReLU6(inplace=inplace)
 
     def forward(self, x):
-        return self.relu(x + 3) / 6
+        return (self.relu6(x + 3)) / 6
 
 
-class HSwish(BaseBlock):
+class HardSwish(BaseBlock):
     def __init__(self, inplace=True):
-        super().__init__(ActivationType.HSwish)
-        self.sigmoid = HSigmoid(inplace=inplace)
+        super(HardSwish, self).__init__(ActivationType.HardSigmoid)
+        self.relu6 = nn.ReLU6(inplace=inplace)
 
     def forward(self, x):
-        return x * self.sigmoid(x)
+        return x * (self.relu6(x+3)) / 6
 
 
 class ActivationFunction():
@@ -63,9 +73,13 @@ class ActivationFunction():
             return nn.LeakyReLU(0.1, inplace=inplace)
         elif name == ActivationType.Sigmoid:
             return nn.Sigmoid()
-        elif name == ActivationType.HSigmoid:
-            return HSigmoid(inplace=inplace)
-        elif name == ActivationType.HSwish:
-            return HSwish(inplace=inplace)
+        elif name == ActivationType.Swish:
+            return SwishActivation()
+        elif name == ActivationType.HardSigmoid:
+            return HardSigmoid(inplace=inplace)
+        elif name == ActivationType.HardSwish:
+            return HardSwish(inplace=inplace)
+        elif name == ActivationType.Mish:
+            return MishActivation()
         else:
             print("%s activation function error!" % name)

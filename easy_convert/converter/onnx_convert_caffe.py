@@ -36,6 +36,7 @@ def parse_arguments():
 
     return options
 
+
 class OnnxConvertCaffe():
 
     transformers = [

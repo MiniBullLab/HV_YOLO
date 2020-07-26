@@ -5,7 +5,6 @@ from torch import nn
 from collections import OrderedDict
 from easyai.torch_utility.torch_device_process import TorchDeviceProcess
 from easyai.model.utility.model_factory import ModelFactory
-from easyai.model.utility.mode_weight_init import ModelWeightInit
 
 
 class TorchModelProcess():
@@ -13,16 +12,15 @@ class TorchModelProcess():
     def __init__(self):
         self.torchDeviceProcess = TorchDeviceProcess()
         self.modelFactory = ModelFactory()
-        self.modelWeightInit = ModelWeightInit()
+
         self.torchDeviceProcess.initTorch()
         self.best_value = 0
         self.is_multi_gpu = False
 
-    def initModel(self, cfgPath, gpuId, is_multi_gpu=False):
+    def initModel(self, cfgPath, gpuId, is_multi_gpu=False, default_args=None):
         self.is_multi_gpu = is_multi_gpu
         self.torchDeviceProcess.setGpuId(gpuId)
-        model = self.modelFactory.get_model(cfgPath)
-        self.modelWeightInit.initWeight(model)
+        model = self.modelFactory.get_model(cfgPath, default_args)
         return model
 
     def loadPretainModel(self, weightPath, model):
@@ -60,13 +58,20 @@ class TorchModelProcess():
             print("Loading %s fail" % weightPath)
         return checkpoint
 
-    def saveLatestModel(self, latestWeightsFile, model, optimizer, epoch=0, best_value=0):
+    def saveLatestModel(self, weights_path, model,
+                        optimizer=None, epoch=0, best_value=0):
         # Save latest checkpoint
-        checkpoint = {'epoch': epoch,
-                      'best_value': best_value,
-                      'model': model.state_dict(),
-                      'optimizer': optimizer.state_dict()}
-        torch.save(checkpoint, latestWeightsFile)
+        if optimizer is None:
+            checkpoint = {'epoch': epoch,
+                          'best_value': best_value,
+                          'model': model.state_dict()
+                          }
+        else:
+            checkpoint = {'epoch': epoch,
+                          'best_value': best_value,
+                          'model': model.state_dict(),
+                          'optimizer': optimizer.state_dict()}
+        torch.save(checkpoint, weights_path)
 
     def getLatestModelValue(self, checkpoint):
         start_epoch = 0

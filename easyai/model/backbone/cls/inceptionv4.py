@@ -30,10 +30,8 @@ class InceptionV4(BaseBackbone):
                  out_channels=(192, 224, 256, 384, 96),
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.InceptionV4)
-        self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.out_channels = out_channels
         self.activation_name = activationName

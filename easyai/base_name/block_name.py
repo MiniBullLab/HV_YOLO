@@ -12,9 +12,11 @@ class ActivationType():
     LeakyReLU = "leaky"
     Sigmoid = "sigmoid"
 
+    Swish = "swish"
     Mish = "mish"
-    HSigmoid = "h_sigmoid"
-    HSwish = "h_swish"
+
+    HardSigmoid = "hard_sigmoid"
+    HardSwish = "hard_swish"
 
 
 class NormalizationType():
@@ -39,9 +41,13 @@ class LayerType():
     RouteLayer = "route"
     ShortRouteLayer = "shortRoute"
     ShortcutLayer = "shortcut"
-    MyMaxPool2d = "maxpool"
+
     Upsample = "upsample"
+    PixelShuffle = "pixelShuffle"
+
+    MyMaxPool2d = "maxpool"
     GlobalAvgPool = "globalavgpool"
+
     FcLayer = "fcLayer"
     Dropout = "dropout"
 
@@ -50,6 +56,8 @@ class LayerType():
     Convolutional1d = "convolutional1d"
 
     Convolutional = "convolutional"
+
+    MeanLayer = "mean"
 
 
 class BlockType():
@@ -70,12 +78,19 @@ class BlockType():
 
     InceptionBlock = "inceptionBlock"
 
-    SeparableConv2dBNActivation = "separableConv2dBNActivation"
     SeperableConv2dBlock = "seperableConv2dBlock"
+    DepthwiseConv2dBlock = "depthwiseConv2dBlock"
+    SeparableConv2dBNActivation = "separableConv2dBNActivation"
     ShuffleBlock = "shuffleBlock"
+    MixConv2dBlock = "mixConv2dBlock"
 
     ResidualBlock = "residualBlock"
     InvertedResidual = "invertedResidual"
 
     SEBlock = "seBlock"
     SEConvBlock = "seConvBlock"
+
+    SpatialPyramidPooling = "SPPBlock"
+
+    Detection2dBlock = "detection2dBlock"
+

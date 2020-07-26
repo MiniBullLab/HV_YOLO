@@ -3,18 +3,18 @@
 # Author:
 
 import numpy as np
-from easyai.base_name.block_name import LayerType
+from easyai.base_name.block_name import LayerType, BlockType
 from easyai.model.base_block.utility.base_block import *
 
 
 class MyMaxPool2d(BaseBlock):
 
-    def __init__(self, kernel_size, stride):
+    def __init__(self, kernel_size, stride, ceil_mode=False):
         super().__init__(LayerType.MyMaxPool2d)
         layers = OrderedDict()
         maxpool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride,
                                padding=int((kernel_size - 1) // 2),
-                               ceil_mode=False)
+                               ceil_mode=ceil_mode)
         if kernel_size == 2 and stride == 1:
             layer1 = nn.ZeroPad2d((0, 1, 0, 1))
             layers["pad2d"] = layer1
@@ -43,3 +43,16 @@ class GlobalAvgPool2d(BaseBlock):
         #     return F.avg_pool2d(x, kernel_size=(h, w), stride=(h, w))
         # else:
         #     return F.avg_pool2d(x, kernel_size=(h, w), stride=(h, w))
+
+
+# SPP
+class SpatialPyramidPooling(BaseBlock):
+    def __init__(self, pool_sizes=(5, 9, 13)):
+        super().__init__(BlockType.SpatialPyramidPooling)
+        self.maxpools = nn.ModuleList([nn.MaxPool2d(pool_size, 1, pool_size//2)
+                                       for pool_size in pool_sizes])
+
+    def forward(self, x):
+        features = [maxpool(x) for maxpool in self.maxpools[::-1]]
+        features = torch.cat(features + [x], dim=1)
+        return features

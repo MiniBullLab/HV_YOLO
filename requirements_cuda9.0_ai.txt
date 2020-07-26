@@ -14,3 +14,5 @@ pandas
 tabulate
 pydot
 netron
+graphviz
+flashtorch
