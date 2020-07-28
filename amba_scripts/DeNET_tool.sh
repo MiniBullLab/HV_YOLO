@@ -1,6 +1,12 @@
 #!/bin/bash
 
 rm -rf ./.log/detect2d*
+#cuda10
+export PATH=/usr/local/cuda/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+
+#caffe
+export PYTHONPATH=/home/minibull/Software/caffe/python:$PYTHONPATH
 python3 -m easyai.easy_ai --task DeNET --gpu 0 --trainPath /home/minibull/dataset/Fruit_detection/ImageSets/train.txt --valPath /home/minibull/dataset/Fruit_detection/ImageSets/val.txt
 python3 -m easy_convert.easy_convert --task DeNET --input ./.log/snapshot/detnet.onnx
 
@@ -13,7 +19,7 @@ caffeNetName=detnet
 outNetName=detnet
 
 inputColorFormat=0
-outputShape=1,3,352,640
+outputShape=1,3,416,416
 outputLayerName="o:636|odf:fp32"
 outputLayerName1="o:662|odf:fp32"
 outputLayerName2="o:688|odf:fp32"
