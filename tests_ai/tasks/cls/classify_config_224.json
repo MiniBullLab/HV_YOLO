@@ -1,0 +1,65 @@
+{
+    "accumulated_batches": 1,
+    "base_lr": 0.01,
+    "best_weights_name": "cls_best.pt",
+    "class_name": [
+        "cls1",
+        "cls2"
+    ],
+    "data_mean": [
+        0.5070751592371323,
+        0.48654887331495095,
+        0.4409178433670343
+    ],
+    "data_std": [
+        0.2673342858792401,
+        0.2564384629170883,
+        0.27615047132568404
+    ],
+    "display": 20,
+    "freeze_bn_layer_name": "route_0",
+    "freeze_bn_type": 0,
+    "freeze_layer_name": "route_0",
+    "freeze_layer_type": 0,
+    "image_channel": 3,
+    "image_size": [
+        224,
+        224
+    ],
+    "is_save_epoch_model": false,
+    "latest_weights_name": "cls_latest.pt",
+    "lr_scheduler_config": {
+        "is_warmup": true,
+        "lr_stages": [
+            [
+                60,
+                1
+            ],
+            [
+                120,
+                0.2
+            ],
+            [
+                160,
+                0.04
+            ],
+            [
+                200,
+                0.008
+            ]
+        ],
+        "type": "MultiStageLR",
+        "warmup_iters": 500
+    },
+    "max_epochs": 200,
+    "optimizer_config": {
+        "0": {
+            "momentum": 0.9,
+            "optimizer": "SGD",
+            "weight_decay": 0.0005
+        }
+    },
+    "test_batch_size": 100,
+    "train_batch_size": 16,
+    "train_data_augment": true
+}

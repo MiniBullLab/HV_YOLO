@@ -1,0 +1,64 @@
+{
+    "accumulated_batches": 1,
+    "balanced_sample": false,
+    "base_lr": 0.0002,
+    "best_weights_name": "det2d_best.pt",
+    "class_name": [
+        "bike",
+        "bus",
+        "car",
+        "motor",
+        "person",
+        "rider",
+        "traffic light",
+        "traffic sign",
+        "train",
+        "truck"
+    ],
+    "confidence_th": 0.24,
+    "display": 20,
+    "freeze_bn_layer_name": "route_0",
+    "freeze_bn_type": 0,
+    "freeze_layer_name": "route_0",
+    "freeze_layer_type": 1,
+    "image_channel": 3,
+    "image_size": [
+        640,
+        352
+    ],
+    "is_save_epoch_model": false,
+    "latest_weights_name": "det2d_latest.pt",
+    "lr_scheduler_config": {
+        "is_warmup": true,
+        "lr_stages": [
+            [
+                50,
+                1
+            ],
+            [
+                70,
+                0.1
+            ],
+            [
+                100,
+                0.01
+            ]
+        ],
+        "type": "MultiStageLR",
+        "warmup_iters": 1000
+    },
+    "max_epochs": 100,
+    "nms_th": 0.45,
+    "optimizer_config": {
+        "0": {
+            "momentum": 0.9,
+            "optimizer": "SGD",
+            "weight_decay": 0.0005
+        }
+    },
+    "post_prcoess_type": 0,
+    "test_batch_size": 1,
+    "train_batch_size": 16,
+    "train_data_augment": true,
+    "train_multi_scale": false
+}

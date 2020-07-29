@@ -54,6 +54,8 @@ class MyModel(BaseModel):
                 self.lossList.append(block)
             elif LossType.MultiBoxLoss in key:
                 self.lossList.append(block)
+            elif LossType.KeyPoints2dRegionLoss in key:
+                self.lossList.append(block)
 
     def creat_backbone(self):
         input_name = ''
@@ -103,6 +105,8 @@ class MyModel(BaseModel):
             elif LossType.BinaryCrossEntropy2d in key:
                 output.append(x)
             elif LossType.OhemCrossEntropy2d in key:
+                output.append(x)
+            elif LossType.KeyPoints2dRegionLoss in key:
                 output.append(x)
             elif LossType.Region2dLoss in key:
                 output.append(x)

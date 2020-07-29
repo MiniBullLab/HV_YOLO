@@ -59,6 +59,12 @@ class CreateModuleList():
                 self.filters = block.stride * block.stride * self.outChannelList[-1]
                 self.add_block_list(DarknetBlockName.ReorgBlock, block, self.filters)
                 self.input_channels = self.filters
+            elif block_def['type'] == BlockType.SpatialPyramidPooling:
+                pool_sizes = [int(x) for x in block_def['pool_sizes'].split(',') if x.strip()]
+                block = SpatialPyramidPooling(pool_sizes=pool_sizes)
+                self.filters = (len(pool_sizes) + 1) * self.outChannelList[-1]
+                self.add_block_list(BlockType.SpatialPyramidPooling, block, self.filters)
+                self.input_channels = self.filters
             elif block_def['type'] == BlockType.Detection2dBlock:
                 anchor_number = int(block_def['anchor_number'])
                 class_number = int(block_def['class_number'])
@@ -168,7 +174,10 @@ class CreateModuleList():
             self.filters = int(module_def['filters'])
             kernel_size = int(module_def['size'])
             stride = int(module_def['stride'])
-            pad = (kernel_size - 1) // 2 if int(module_def['pad']) else 0
+            pad = int(module_def.get("pad", None))
+            if pad is None:
+                pad = ((kernel_size - 1) // 2)
+            assert pad == ((kernel_size - 1) // 2)
             activationName = module_def['activation']
             dilation = int(module_def.get("dilation", 1))
             groups = int(module_def.get("groups", 1))
@@ -189,7 +198,10 @@ class CreateModuleList():
             self.filters = int(module_def['filters'])
             kernel_size = int(module_def['size'])
             stride = int(module_def['stride'])
-            pad = (kernel_size - 1) // 2 if int(module_def['pad']) else 0
+            pad = int(module_def.get("pad", None))
+            if pad is None:
+                pad = ((kernel_size - 1) // 2)
+            assert pad == ((kernel_size - 1) // 2)
             activationName = module_def['activation']
             dilation = int(module_def.get("dilation", 1))
             groups = int(module_def.get("groups", 1))

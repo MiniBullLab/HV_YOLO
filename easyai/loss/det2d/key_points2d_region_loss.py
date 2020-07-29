@@ -28,7 +28,7 @@ class KeyPoints2dRegionLoss(YoloLoss):
 
     def normaliza_points(self, pred_corners, batch_size, H, W):
         for index in range(batch_size):
-            for i in range(0, self.point_count, 2):
+            for i in range(0, self.loc_count, 2):
                 pred_corners[index, :, i] = pred_corners[i] / W
                 pred_corners[index, :, i + 1] = pred_corners[i + 1] / H
 

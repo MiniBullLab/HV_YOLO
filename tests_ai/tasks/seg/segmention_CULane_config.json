@@ -1,0 +1,44 @@
+{
+    "accumulated_batches": 1,
+    "base_lr": 0.01,
+    "best_weights_name": "seg_best.pt",
+    "class_name": [
+        [
+            "background",
+            "255"
+        ],
+        [
+            "lane",
+            "0"
+        ]
+    ],
+    "display": 20,
+    "freeze_bn_layer_name": "route_0",
+    "freeze_bn_type": 0,
+    "freeze_layer_name": "route_0",
+    "freeze_layer_type": 0,
+    "image_channel": 3,
+    "image_size": [
+        640,
+        352
+    ],
+    "is_save_epoch_model": false,
+    "label_is_gray": true,
+    "latest_weights_name": "seg_latest.pt",
+    "lr_scheduler_config": {
+        "is_warmup": true,
+        "type": "PolyLR",
+        "warmup_iters": 1000
+    },
+    "max_epochs": 100,
+    "optimizer_config": {
+        "0": {
+            "momentum": 0.9,
+            "optimizer": "SGD",
+            "weight_decay": 0.0005
+        }
+    },
+    "test_batch_size": 1,
+    "train_batch_size": 16,
+    "train_data_augment": false
+}

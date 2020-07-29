@@ -54,8 +54,8 @@ class ImageDataSetProcess(BaseDataSetProcess):
         bottom = pad_size[1] - (pad_size[1] // 2)
         left = pad_size[0] // 2
         right = pad_size[0] - (pad_size[0] // 2)
-        image = cv2.resize(src_image, (new_shape[1], new_shape[0]),
-                           interpolation=cv2.INTER_AREA)  # resized, no border
+        new_size = (new_shape[1], new_shape[0])
+        image = self.cv_image_resize(src_image, new_size)
         image = cv2.copyMakeBorder(image, top, bottom, left, right,
                                    cv2.BORDER_CONSTANT, value=color)
         return image
@@ -76,7 +76,7 @@ class ImageDataSetProcess(BaseDataSetProcess):
         if src_image is not None:
             result = cv2.warpPerspective(src_image, matrix,
                                          dsize=(width, height),
-                                         flags=cv2.INTER_LINEAR,
+                                         flags=cv2.INTER_NEAREST,
                                          borderValue=border_value)
         return result
 

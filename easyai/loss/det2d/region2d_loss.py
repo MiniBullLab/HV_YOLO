@@ -23,7 +23,7 @@ class Region2dLoss(YoloLoss):
         self.class_weight = class_weight
         self.iou_threshold = iou_threshold
 
-        self.anchor_sizes = anchor_sizes / float(self.reduction)
+        self.anchor_sizes = self.anchor_sizes / float(self.reduction)
 
         self.mse = nn.MSELoss()
         self.ce = nn.CrossEntropyLoss()
