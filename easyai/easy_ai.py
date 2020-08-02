@@ -8,6 +8,7 @@ from optparse import OptionParser
 from easyai.tools.copy_image import CopyImage
 from easyai.train_task import TrainTask
 from easyai.config.utility.image_task_config import ImageTaskConfig
+from easy_convert.convert_task import easy_model_convert
 
 
 def parse_arguments():
@@ -64,6 +65,7 @@ def main():
     elif options.task_name.strip() == "DeNET":
         pretrain_model_path = os.path.join(dir_name, "./data/detnet.pt")
         train_task.detect2d_train("YoloV3Det2d", options.gpu_id, options.config_path, pretrain_model_path)
+        easy_model_convert(options.task_name, train_task.save_onnx_path)
         save_image_dir = os.path.join(config.root_save_dir, "det_img")
         copy_process.copy(options.trainPath, save_image_dir)
     elif options.task_name.strip() == "SegNET":

@@ -7,8 +7,8 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 
 #caffe
 export PYTHONPATH=/home/minibull/Software/caffe/python:$PYTHONPATH
+
 python3 -m easyai.easy_ai --task DeNET --gpu 0 --trainPath /home/minibull/dataset/Fruit_detection/ImageSets/train.txt --valPath /home/minibull/dataset/Fruit_detection/ImageSets/val.txt
-python3 -m easy_convert.easy_convert --task DeNET --input ./.log/snapshot/detnet.onnx
 
 set -v
 root_path=$(pwd)

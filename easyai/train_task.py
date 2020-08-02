@@ -18,6 +18,7 @@ class TrainTask():
         self.train_path = train_path
         self.val_path = val_path
         self.is_convert = is_convert
+        self.save_onnx_path = None
 
     def classify_train(self, cfg_path, gpu_id, config_path, pretrain_model_path):
         cls_train_task = ClassifyTrain(cfg_path, gpu_id, config_path)
@@ -53,8 +54,9 @@ class TrainTask():
         if self.is_convert:
             converter = ModelConverter(train_task.train_task_config.image_size,
                                        model_args)
-            converter.model_convert(cfg_path, train_task.train_task_config.best_weights_file,
-                                    train_task.train_task_config.snapshot_dir)
+            self.save_onnx_path = converter.model_convert(cfg_path,
+                                                          train_task.train_task_config.best_weights_file,
+                                                          train_task.train_task_config.snapshot_dir)
 
 
 def main():

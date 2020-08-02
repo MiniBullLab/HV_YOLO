@@ -6,7 +6,7 @@
 import os
 import inspect
 from optparse import OptionParser
-from easy_convert.main_convert import model_convert
+from easy_convert.convert_task import easy_model_convert
 
 
 def parse_arguments():
@@ -39,7 +39,7 @@ def main():
     current_path = inspect.getfile(inspect.currentframe())
     dir_name = os.path.dirname(current_path)
     options = parse_arguments()
-    model_convert(options.task_name, options.input_path)
+    easy_model_convert(options.task_name, options.input_path)
     print("process end!")
 
 
