@@ -143,15 +143,15 @@ class ClassifyConfig(ImageTaskConfig):
 
         self.max_epochs = 200
 
-        self.base_lr = 0.1
+        self.base_lr = 0.01
         self.optimizer_config = {0: {'optimizer': 'SGD',
                                      'momentum': 0.9,
                                      'weight_decay': 5e-4}
                                  }
         self.lr_scheduler_config = {'type': 'MultiStageLR',
                                     'lr_stages': [[60, 1], [120, 0.2], [160, 0.04], [200, 0.008]],
-                                    'is_warmup': True,
-                                    'warmup_iters': 390}
+                                    'warmup_type': 2,
+                                    'warmup_iters': 5}
         self.accumulated_batches = 1
         self.display = 20
 

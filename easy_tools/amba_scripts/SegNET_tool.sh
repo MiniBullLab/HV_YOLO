@@ -1,19 +1,19 @@
 #!/bin/bash
 
-rm -rf ./.log/classify*
-python3 -m easyai.easy_ai --task ClassNet --gpu 0 -i /home/minibull/dataset/Tree_Ring_classify/ImageSets/train.txt -v //home/minibull/dataset/Tree_Ring_classify/ImageSets/val.txt
+rm -rf ./.log/segment*
+python3 -m easyai.easy_ai --task SegNET --gpu 0 --trainPath $1 --valPath $2
 
 set -v
 root_path=$(pwd)
 modelDir="./.log/snapshot"
-imageDir="./.log/cls_img"
+imageDir="./.log/seg_img"
 outDir="${root_path}/.log/out"
-modelName=classnet
-outNetName=classnet
+modelName=segnet
+outNetName=segnet
 
 inputColorFormat=1
-outputShape=1,3,224,224
-outputLayerName="o:192|ot:0,1,2,3|odf:fp32"
+outputShape=1,3,400,500
+outputLayerName="o:507|ot:0,1,2,3|odf:fp32"
 inputDataFormat=0,0,0,0
 
 mean=0.0
@@ -49,7 +49,8 @@ onnxparser.py -m $modelDir/${modelName}.onnx \
                 -is $outputShape \
                 -im $mean -ic $scale \
                 -iq -idf $inputDataFormat \
-                -odst $outputLayerName
+                -odst $outputLayerName \
+                -c act-allow-fp16,coeff-force-fx16
 
 cd $outDir/out_parser;vas -auto -show-progress $outNetName.vas
 

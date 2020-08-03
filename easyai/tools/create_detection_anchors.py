@@ -11,6 +11,7 @@ import random
 from easyai.data_loader.det2d.det2d_dataset_process import DetectionDataSetProcess
 from easyai.data_loader.det2d.det2d_sample import DetectionSample
 from easyai.helper import XMLProcess
+from easyai.helper.json_process import JsonProcess
 from easyai.helper import ImageProcess
 from easyai.base_name.task_name import TaskName
 from easyai.config.utility.config_factory import ConfigFactory
@@ -23,7 +24,7 @@ class CreateDetectionAnchors():
         self.task_config = self.config_factory.get_config(TaskName.Detect2d_Task, config_path)
 
         # image & label process
-        self.xmlProcess = XMLProcess()
+        self.json_process = JsonProcess()
         self.image_process = ImageProcess()
 
         self.detection_sample = DetectionSample(train_path,
@@ -46,7 +47,7 @@ class CreateDetectionAnchors():
             img_path, label_path = self.detection_sample.get_sample_path(index)
             print("Loading : {}-{}".format(index, img_path))
             _, rgb_image = self.image_process.readRgbImage(img_path)
-            _, _, boxes = self.xmlProcess.parseRectData(label_path)
+            _, boxes = self.json_process.parse_rect_data(label_path)
             rgb_image, labels = self.dataset_process.resize_dataset(rgb_image,
                                                                     self.task_config.image_size,
                                                                     boxes,

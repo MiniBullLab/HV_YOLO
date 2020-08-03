@@ -4,24 +4,26 @@ sys.path.insert(0, os.getcwd() + "/..")
 import random
 import cv2
 import numpy as np
-from easyai.helper import DirProcess, XMLProcess
-from easyai.config.task import detect2d_config
+from easyai.helper import DirProcess
+from easyai.helper.json_process import JsonProcess
+from easyai.config.utility.config_factory import ConfigFactory
+from easyai.base_name.task_name import TaskName
 
 
 class CreateDetectionSample():
 
-    def __init__(self):
+    def __init__(self,):
         self.dirProcess = DirProcess()
-        self.xmlProcess = XMLProcess()
-        self.annotation_post = ".xml"
+        self.json_process = JsonProcess()
+        self.annotation_post = ".json"
 
-    def createBalanceSample(self, inputTrainPath, outputPath):
+    def createBalanceSample(self, inputTrainPath, outputPath, class_name):
         if not os.path.exists(outputPath):
             os.makedirs(outputPath)
         path, _ = os.path.split(inputTrainPath)
         annotationDir = os.path.join(path, "../Annotations")
         imagesDir = os.path.join(path, "../JPEGImages")
-        writeFile = self.createWriteFile(outputPath)
+        writeFile = self.createWriteFile(outputPath, class_name)
         for fileNameAndPost in self.dirProcess.getFileData(inputTrainPath):
             fileName, post = os.path.splitext(fileNameAndPost)
             annotationFileName = fileName + self.annotation_post
@@ -30,8 +32,8 @@ class CreateDetectionSample():
             print(imagePath, annotationPath)
             if os.path.exists(annotationPath) and \
                os.path.exists(imagePath):
-                _, _, boxes = self.xmlProcess.parseRectData(annotationPath)
-                allNames = [box.name for box in boxes if box.name in detect2d_config.className]
+                _, boxes = self.json_process.parse_rect_data(annotationPath)
+                allNames = [box.name for box in boxes if box.name in class_name]
                 names = set(allNames)
                 print(names)
                 for className in names:
@@ -61,9 +63,9 @@ class CreateDetectionSample():
         saveTrainFilePath.close()
         saveTestFilePath.close()
 
-    def createWriteFile(self, outputPath):
+    def createWriteFile(self, outputPath, class_name):
         result = {}
-        for className in detect2d_config.className:
+        for className in class_name:
             classImagePath = os.path.join(outputPath, className + ".txt")
             result[className] = open(classImagePath, "w")
         return result
@@ -71,11 +73,14 @@ class CreateDetectionSample():
 
 def test():
     print("start...")
+    config_factory = ConfigFactory()
+    task_config = config_factory.get_config(TaskName.Det2d_Seg_Task)
     test = CreateDetectionSample()
     test.createBalanceSample("/home/lpj/github/data/Berkeley/ImageSets/train.txt",
-                "/home/lpj/github/data/Berkeley/ImageSets")
+                "/home/lpj/github/data/Berkeley/ImageSets", task_config.class_name)
     print("End of game, have a nice day!")
 
 
 if __name__ == "__main__":
    test()
+

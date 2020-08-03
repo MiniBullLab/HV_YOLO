@@ -11,7 +11,6 @@ from easyai.helper.imageProcess import ImageProcess
 from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
 from easyai.helper.arguments_parse import ToolArgumentsParse
 from easyai.config.utility.config_factory import ConfigFactory
-from easyai.base_name.task_name import TaskName
 
 
 class ComputeImagesMean():
@@ -32,7 +31,7 @@ class ComputeImagesMean():
                 image_path = os.path.join(images_dir, data_list[0])
                 src_image, rgb_image = self.image_process.readRgbImage(image_path)
                 rgb_image = self.dataset_process.cv_image_resize(rgb_image, self.image_size)
-                normaliza_image = self.dataset_process.image_normaliza(rgb_image)
+                normaliza_image = self.dataset_process.image_normalize(rgb_image)
                 numpy_images.append(normaliza_image)
             else:
                 print("read %s image path error!" % data_list)

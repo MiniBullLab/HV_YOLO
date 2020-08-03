@@ -133,18 +133,18 @@ class Detect2dConfig(ImageTaskConfig):
         config_dict['freeze_bn_layer_name'] = self.freeze_bn_layer_name
 
     def get_data_default_value(self):
-        self.image_size = (640, 352)  # W * H
+        self.image_size = (416, 416)  # W * H
         self.image_channel = 3
         self.class_name = ("bike",
-        "bus",
-        "car",
-        "motor",
-        "person",
-        "rider",
-        "traffic light",
-        "traffic sign",
-        "train",
-        "truck")
+                           "bus",
+                           "car",
+                           "motor",
+                           "person",
+                           "rider",
+                           "traffic light",
+                           "traffic sign",
+                           "train",
+                           "truck")
         self.confidence_th = 0.24
         self.nms_th = 0.45
         self.post_prcoess_type = 0
@@ -157,7 +157,7 @@ class Detect2dConfig(ImageTaskConfig):
         self.train_data_augment = True
         self.train_multi_scale = False
         self.balanced_sample = False
-        self.train_batch_size = 16
+        self.train_batch_size = 1
         self.enable_mixed_precision = False
         self.is_save_epoch_model = False
         self.latest_weights_name = 'det2d_latest.pt'
@@ -174,8 +174,8 @@ class Detect2dConfig(ImageTaskConfig):
                                  }
         self.lr_scheduler_config = {'type': 'MultiStageLR',
                                     'lr_stages': [[50, 1], [70, 0.1], [100, 0.01]],
-                                    'is_warmup': True,
-                                    'warmup_iters': 1000}
+                                    'warmup_type': 2,
+                                    'warmup_iters': 5}
         self.accumulated_batches = 1
         self.display = 20
 

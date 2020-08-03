@@ -9,6 +9,7 @@ from easyai.solver.lr_factory import LrSchedulerFactory
 from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.det2d.detect2d_test import Detection2dTest
 from easyai.base_name.task_name import TaskName
+from easyai.tools.detection_sample_process import DetectionSampleProcess
 
 
 class Detection2dTrain(BaseTrain):
@@ -24,6 +25,8 @@ class Detection2dTrain(BaseTrain):
         self.device = self.torchModelProcess.getDevice()
 
         self.detect_test = Detection2dTest(cfg_path, gpu_id, config_path)
+
+        self.sample_process = DetectionSampleProcess()
 
         self.total_images = 0
         self.avg_loss = -1
@@ -47,6 +50,9 @@ class Detection2dTrain(BaseTrain):
         self.optimizer = self.torchOptimizer.getLatestModelOptimizer(checkpoint)
 
     def train(self, train_path, val_path):
+
+        self.train_task_config.class_name = self.sample_process.get_detection_class(train_path)
+
         dataloader = DetectionTrainDataloader(train_path, self.train_task_config.class_name,
                                               self.train_task_config.train_batch_size,
                                               self.train_task_config.image_size,

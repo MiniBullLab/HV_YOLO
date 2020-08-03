@@ -1,20 +1,29 @@
 #!/bin/bash
 
-rm -rf ./.log/segment*
-python3 -m easyai.easy_ai --task SegNET --gpu 0 -i /home/minibull/dataset/LED_segment/ImageSets/train.txt -v /home/minibull/dataset/LED_segment/ImageSets/val.txt
+rm -rf ./.log/detect2d*
+#cuda10
+export PATH=/usr/local/cuda/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+
+#caffe
+export PYTHONPATH=/home/minibull/Software/caffe/python:$PYTHONPATH
+
+python3 -m easyai.easy_ai --task DeNET --gpu 0 --trainPath $1 --valPath $2
 
 set -v
 root_path=$(pwd)
 modelDir="./.log/snapshot"
-imageDir="./.log/seg_img"
+imageDir="./.log/det_img"
 outDir="${root_path}/.log/out"
-modelName=segnet
-outNetName=segnet
+caffeNetName=detnet
+outNetName=detnet
 
-inputColorFormat=1
-outputShape=1,3,400,500
-outputLayerName="o:507|ot:0,1,2,3|odf:fp32"
-inputDataFormat=0,0,0,0
+inputColorFormat=0
+outputShape=1,3,416,416
+outputLayerName="o:636|odf:fp32"
+outputLayerName1="o:662|odf:fp32"
+outputLayerName2="o:688|odf:fp32"
+inputDataFormat=0,0,8,0
 
 mean=0.0
 scale=255.0
@@ -34,6 +43,7 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 export PYTHONPATH=/home/minibull/Software/caffe/python:$PYTHONPATH
 
 ls $imageDir/*.* > $imageDir/img_list.txt
+
 imgtobin.py -i $imageDir/img_list.txt \
             -o $outDir/dra_image_bin \
             -c $inputColorFormat \
@@ -42,15 +52,13 @@ imgtobin.py -i $imageDir/img_list.txt \
 
 ls $outDir/dra_image_bin/*.bin > $outDir/dra_image_bin/dra_bin_list.txt
 
-onnxparser.py -m $modelDir/${modelName}.onnx \
-                -i $outDir/dra_image_bin/dra_bin_list.txt \
-                -o $outNetName \
-                -of $outDir/out_parser \
-                -is $outputShape \
-                -im $mean -ic $scale \
-                -iq -idf $inputDataFormat \
-                -odst $outputLayerName \
-                -c act-allow-fp16,coeff-force-fx16
+caffeparser.py -p $modelDir/$caffeNetName.prototxt \
+               -m $modelDir/$caffeNetName.caffemodel \
+               -i $outDir/dra_image_bin/dra_bin_list.txt \
+               -o $outNetName \
+               -of $outDir/out_parser \
+               -it 0,1,2,3 \
+               -iq -idf $inputDataFormat -odst $outputLayerName -odst $outputLayerName1 -odst $outputLayerName2 # -c act-force-fx16,coeff-force-fx16 
 
 cd $outDir/out_parser;vas -auto -show-progress $outNetName.vas
 

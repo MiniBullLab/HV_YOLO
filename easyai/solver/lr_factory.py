@@ -15,6 +15,7 @@ class LrSchedulerFactory():
         self.total_iters = max_epochs * epoch_iteration
 
     def get_lr_scheduler(self, config):
+        self.process_warmup(config)
         lr_class_name = config['type'].strip()
         cfg = config.copy()
         cfg['base_lr'] = self.base_lr
@@ -33,3 +34,10 @@ class LrSchedulerFactory():
         else:
             print("%s not exit" % lr_class_name)
         return result
+
+    def process_warmup(self, config):
+        warmup_type = int(config.get('warmup_type', 0))
+        if warmup_type == 2:
+            warmup_iters = int(config.get('warmup_iters', 0))
+            warmup_iters = warmup_iters * self.epoch_iteration
+            config['warmup_iters'] = warmup_iters

@@ -171,8 +171,8 @@ class MultiDet2dSegConfig(ImageTaskConfig):
                                  }
         self.lr_scheduler_config = {'type': 'MultiStageLR',
                                     'lr_stages': [[50, 1], [70, 0.1], [100, 0.01]],
-                                    'is_warmup': True,
-                                    'warmup_iters': 1000}
+                                    'warmup_type': 2,
+                                    'warmup_iters': 5}
         self.accumulated_batches = 1
         self.display = 20
 
