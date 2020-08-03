@@ -1,6 +1,8 @@
 # easy ai
 easy ai
 
+![logo](./logo.png)
+
 [代码规范](http://www.imooc.com/article/19184?block_id=tuijian_wz#child_5_1)
 
 # Annotations
