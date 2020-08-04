@@ -151,7 +151,7 @@ class SegmentionConfig(ImageTaskConfig):
         self.display = 20
 
         self.freeze_layer_type = 2
-        self.freeze_layer_name = "base_convActivationBlock_8"
+        self.freeze_layer_name = "base_convActivationBlock_38"
 
         self.freeze_bn_type = 0
         self.freeze_bn_layer_name = "route_0"

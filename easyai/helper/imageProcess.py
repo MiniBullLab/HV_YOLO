@@ -28,7 +28,7 @@ class ImageProcess():
         return srcImage, rgbImage
 
     def read_gray_image(self, image_path):
-        gray_image = cv2.imread(image_path, cv2.COLOR_BGR2GRAY)
+        gray_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
         # cv2.imdecode(np.fromfile(image_path, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
         return gray_image
 
