@@ -20,9 +20,11 @@ class BinaryCrossEntropy2d(BaseLoss):
             self.loss_function = torch.nn.BCELoss(weight=self.weight, reduce=self.reduce,
                                                   reduction=self.reduction)
         else:
-            self.loss_function = torch.nn.BCELoss(reduce=self.reduce, reduction=self.reduction)
+            self.loss_function = torch.nn.BCELoss(reduce=False, reduction=self.reduction)
 
     def compute_loss_from_weight(self, loss, target):
+        ignore = target == self.ignore_index
+        valid_count = (ignore == 0).sum()
         if self.weight_type == 1:
             weights = [float(x) for x in self.weight.split(',') if x]
             result = weights[0] * target.eq(0).type(loss.dtype) * loss + \
@@ -36,7 +38,7 @@ class BinaryCrossEntropy2d(BaseLoss):
             result = loss
         result = target.ne(self.ignore_index).type(loss.dtype) * result
         if self.reduction == 'mean':
-            return result.mean()
+            return result.sum() / valid_count
         elif self.reduction == 'sum':
             return result.sum()
         else:
