@@ -51,8 +51,6 @@ class Detection2dTrain(BaseTrain):
 
     def train(self, train_path, val_path):
 
-        self.train_task_config.class_name = self.sample_process.get_detection_class(train_path)
-
         dataloader = DetectionTrainDataloader(train_path, self.train_task_config.class_name,
                                               self.train_task_config.train_batch_size,
                                               self.train_task_config.image_size,

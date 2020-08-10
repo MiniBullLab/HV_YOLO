@@ -5,6 +5,7 @@
 import os
 from easyai.helper import DirProcess
 from easyai.helper.json_process import JsonProcess
+from easyai.config.utility.config_factory import ConfigFactory
 
 
 class DetectionSampleProcess():
@@ -12,6 +13,7 @@ class DetectionSampleProcess():
     def __init__(self):
         self.json_process = JsonProcess()
         self.dir_process = DirProcess()
+        self.config_factory = ConfigFactory()
         self.annotation_post = "*.json"
 
     def get_detection_class(self, train_path):
@@ -25,3 +27,8 @@ class DetectionSampleProcess():
             all_names.extend(temp_names)
         class_names = set(all_names)
         return tuple(class_names)
+
+    def create_class_names(self, train_path, task_name):
+        train_task_config = self.config_factory.get_config(task_name)
+        train_task_config.class_name = self.get_detection_class(train_path)
+        train_task_config.save_config()

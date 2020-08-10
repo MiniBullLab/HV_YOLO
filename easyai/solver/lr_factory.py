@@ -15,9 +15,9 @@ class LrSchedulerFactory():
         self.total_iters = max_epochs * epoch_iteration
 
     def get_lr_scheduler(self, config):
-        self.process_warmup(config)
         lr_class_name = config['type'].strip()
         cfg = config.copy()
+        self.process_warmup(cfg)
         cfg['base_lr'] = self.base_lr
         result = None
         if lr_class_name == "LinearIncreaseLR":
