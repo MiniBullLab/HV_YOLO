@@ -6,9 +6,9 @@
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
-from easy_convert.keras_models.utility.keras_model_name import KerasModelName
-from easy_convert.keras_models.utility.keras_model_factory import KerasModelFactory
-from easy_convert.keras_models.utility.keras_model_process import KerasModelProcess
+from easy_converter.keras_models.utility.keras_model_name import KerasModelName
+from easy_converter.keras_models.utility.keras_model_factory import KerasModelFactory
+from easy_converter.keras_models.utility.keras_model_process import KerasModelProcess
 
 
 def print_model(h5_path, model_name):

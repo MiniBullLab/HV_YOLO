@@ -16,7 +16,7 @@ assert packages
 
 # read version from the package file.
 version_str = '1.0.0'
-with (open(os.path.join(this, 'easy_convert/__init__.py'), "r")) as f:
+with (open(os.path.join(this, 'easy_converter/__init__.py'), "r")) as f:
     line = [_ for _ in [_.strip("\r\n ")
                                 for _ in f.readlines()] if _.startswith("__version__")]
     if len(line) > 0:
@@ -27,7 +27,7 @@ with open(README) as f:
     long_description = f.read()
 
 setup(
-    name='easy_convert',
+    name='easy_converter',
     version=version_str,
     description="Develop deep learning networks is easy",
     long_description=long_description,

@@ -1,4 +1,4 @@
 include README.md
 include requirements.txt
 include LICENSE
-recursive-include easy_convert *.py *.so *.cfg *.h5 *.pt
+recursive-include easy_converter *.py *.so *.cfg *.h5 *.pt
