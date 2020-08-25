@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#cuda10
+export PATH=/usr/local/cuda/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+
+#caffe
+export PYTHONPATH=/opt/caffe/python:$PYTHONPATH
+
 rm -rf ./.log/segment*
 python3 -m easyai.easy_ai --task SegNET --gpu 0 --trainPath $1 --valPath $2
 
@@ -31,7 +38,7 @@ export PATH=/usr/local/cuda/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 
 #caffe
-export PYTHONPATH=/home/minibull/Software/caffe/python:$PYTHONPATH
+export PYTHONPATH=/opt/caffe/python:$PYTHONPATH
 
 ls $imageDir/*.* > $imageDir/img_list.txt
 imgtobin.py -i $imageDir/img_list.txt \
