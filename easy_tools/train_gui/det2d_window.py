@@ -6,6 +6,7 @@ import os
 import inspect
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from easyai.tools.detection_sample_process import DetectionSampleProcess
 
 
 class Detection2dTrainWindow(QWidget):
@@ -20,7 +21,8 @@ class Detection2dTrainWindow(QWidget):
         self.save_log = "detect2d_log.txt"
         current_path = inspect.getfile(inspect.currentframe())
         dir_name = os.path.dirname(current_path)
-        self.cmd_str = os.path.join(dir_name, "../amba_scripts/ClassNET_tool.sh")
+        self.cmd_str = os.path.join(dir_name, "../amba_scripts/DeNET_tool.sh")
+        self.sample_process = DetectionSampleProcess()
 
     def init_ui(self):
         self.train_data_button = QPushButton('open train dataset')
@@ -43,6 +45,17 @@ class Detection2dTrainWindow(QWidget):
         layout2.addWidget(self.val_data_button)
         layout2.addWidget(self.val_data_txt)
 
+        self.obtain_class_button = QPushButton('obtain class')
+        self.obtain_class_button.setCheckable(True)
+        self.obtain_class_button.setEnabled(False)
+        self.obtain_class_button.clicked[bool].connect(self.obtain_class)
+        self.class_data_txt = QLineEdit()
+        self.class_data_txt.setEnabled(False)
+        layout3 = QHBoxLayout()
+        layout3.setSpacing(20)
+        layout3.addWidget(self.obtain_class_button)
+        layout3.addWidget(self.class_data_txt)
+
         self.start_train_button = QPushButton('start train')
         self.start_train_button.setCheckable(True)
         self.start_train_button.setEnabled(False)
@@ -63,17 +76,18 @@ class Detection2dTrainWindow(QWidget):
         convert_model_button.setEnabled(False)
         convert_model_button.clicked[bool].connect(self.arm_model_convert)
 
-        layout3 = QHBoxLayout()
-        layout3.setSpacing(20)
-        layout3.addWidget(self.start_train_button)
-        layout3.addWidget(self.continue_train_button)
-        layout3.addWidget(self.stop_train_button)
+        layout4 = QHBoxLayout()
+        layout4.setSpacing(20)
+        layout4.addWidget(self.start_train_button)
+        layout4.addWidget(self.continue_train_button)
+        layout4.addWidget(self.stop_train_button)
 
         top_layout = QVBoxLayout()
         top_layout.setSpacing(20)
         top_layout.addLayout(layout1)
         top_layout.addLayout(layout2)
         top_layout.addLayout(layout3)
+        top_layout.addLayout(layout4)
 
         self.text_browser = QTextBrowser()
         self.text_browser.setReadOnly(True)
@@ -89,8 +103,9 @@ class Detection2dTrainWindow(QWidget):
         txt_path, _ = QFileDialog.getOpenFileName(self, "open train dataset", self.dir_path, "txt files(*.txt)")
         if txt_path.strip():
             self.train_data_txt.setText(txt_path.strip())
-            self.start_train_button.setEnabled(True)
-            self.continue_train_button.setEnabled(True)
+            self.obtain_class_button.setEnabled(True)
+            self.start_train_button.setEnabled(False)
+            self.continue_train_button.setEnabled(False)
             self.dir_path, _ = os.path.split(txt_path)
         else:
             print("%s error" % txt_path)
@@ -104,6 +119,18 @@ class Detection2dTrainWindow(QWidget):
         else:
             print("%s error" % txt_path)
             return
+
+    def obtain_class(self, pressed):
+        class_names = self.sample_process.create_class_names(self.train_data_txt.text())
+        if len(class_names) > 0:
+            str_name = ",".join(class_names)
+            self.class_data_txt.setText(str_name)
+            self.start_train_button.setEnabled(True)
+            self.continue_train_button.setEnabled(True)
+        else:
+            reply = QMessageBox.information(self, "obtain class",
+                                            "obtain class fail!")
+            print(reply)
 
     def start_train(self, pressed):
         os.system("rm -rf ./log/snapshot/det2d_latest.pt")
@@ -124,6 +151,7 @@ class Detection2dTrainWindow(QWidget):
         # self.process.waitForFinished(-1)
         self.train_data_button.setEnabled(False)
         self.val_data_button.setEnabled(False)
+        self.obtain_class_button.setEnabled(False)
         self.start_train_button.setEnabled(False)
         self.continue_train_button.setEnabled(False)
         self.stop_train_button.setEnabled(True)
@@ -148,6 +176,7 @@ class Detection2dTrainWindow(QWidget):
         # self.process.waitForFinished(-1)
         self.train_data_button.setEnabled(False)
         self.val_data_button.setEnabled(False)
+        self.obtain_class_button.setEnabled(False)
         self.start_train_button.setEnabled(False)
         self.continue_train_button.setEnabled(False)
         self.stop_train_button.setEnabled(True)

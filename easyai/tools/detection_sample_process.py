@@ -6,6 +6,7 @@ import os
 from easyai.helper import DirProcess
 from easyai.helper.json_process import JsonProcess
 from easyai.config.utility.config_factory import ConfigFactory
+from easyai.base_name.task_name import TaskName
 
 
 class DetectionSampleProcess():
@@ -28,7 +29,8 @@ class DetectionSampleProcess():
         class_names = set(all_names)
         return tuple(class_names)
 
-    def create_class_names(self, train_path, task_name):
+    def create_class_names(self, train_path, task_name=TaskName.Detect2d_Task):
         train_task_config = self.config_factory.get_config(task_name)
         train_task_config.class_name = self.get_detection_class(train_path)
         train_task_config.save_config()
+        return train_task_config.class_name
