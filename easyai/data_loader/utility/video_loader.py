@@ -16,6 +16,7 @@ class VideoLoader(DataLoader):
         if not self.video_process.isVideoFile(video_path) or \
                 not self.video_process.openVideo(video_path):
             raise Exception("Invalid path!", video_path)
+        self.video_path = video_path
         self.image_size = image_size
         self.data_channel = data_channel
         self.count = int(self.video_process.getFrameCount())
@@ -41,7 +42,8 @@ class VideoLoader(DataLoader):
         image = self.dataset_process.image_normalize(image)
         numpy_image = self.dataset_process.numpy_transpose(image)
         torch_image = self.all_numpy_to_tensor(numpy_image)
-        return cv_image, torch_image
+        video_name = self.video_path + "_%d" % self.index
+        return video_name, cv_image, torch_image
 
     def __len__(self):
         return self.count

@@ -40,7 +40,7 @@ class ImagesLoader(DataLoader):
         image = self.dataset_process.image_normalize(image)
         numpy_image = self.dataset_process.numpy_transpose(image)
         torch_image = self.all_numpy_to_tensor(numpy_image)
-        return cv_image, torch_image
+        return image_path, cv_image, torch_image
 
     def __len__(self):
         return self.count

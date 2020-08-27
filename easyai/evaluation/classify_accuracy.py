@@ -3,6 +3,7 @@
 # Author:
 
 from easyai.helper.average_meter import AverageMeter
+import numpy as np
 
 
 class ClassifyAccuracy():
@@ -11,6 +12,7 @@ class ClassifyAccuracy():
         self.top1 = AverageMeter()
         self.topK = AverageMeter()
         self.param_top = top_k
+        self.clean_data()
 
     def torch_eval(self, output, target):
         precision = self.accuracy(output, target, self.param_top)
@@ -21,23 +23,26 @@ class ClassifyAccuracy():
         else:
             self.top1.update(precision[0].item(), batch_size)
 
-    def eval(self, outputs, targets):
-        pass
-        # batch_size = (outputs.shape)[0]
-        # maxk = max(self.param_top)
-        # preds = -outputs
-        # preds = preds.argsort()[:maxk]
-        # targets = targets.repeat(preds.shape, axis=1)
-        # correct = preds == targets
-        # res = []
-        # for k in self.param_top:
-        #     correct_k = correct[:k].sum(0)
-        #     res.append(correct_k.mul_(100.0 / batch_size))
-        # if len(res) > 1:
-        #     self.top1.update(res[0], 1)
-        #     self.topK.update(res[1], 1)
-        # else:
-        #     self.top1.update(res[0], 1)
+    def numpy_eval(self, outputs, targets):
+        maxk = max(self.param_top)
+        preds = np.argsort(-outputs)[:maxk]
+        targets = targets.repeat(preds.shape, axis=1)
+        correct = preds == targets
+        res = []
+        for k in self.param_top:
+            correct_k = correct[:k].sum(0)
+            res.append(correct_k.mul_(100))
+        if len(res) > 1:
+            self.top1.update(res[0], 1)
+            self.topK.update(res[1], 1)
+        else:
+            self.top1.update(res[0], 1)
+
+    def result_eval(self, x, y):
+        if x == y:
+            self.top1.update(1, 1)
+        else:
+            self.top1.update(0, 1)
 
     def clean_data(self):
         self.top1.reset()

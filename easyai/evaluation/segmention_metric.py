@@ -14,7 +14,7 @@ class SegmentionMetric():
     def reset(self):
         self.confusion_matrix = np.zeros((self.number_class, self.number_class))
 
-    def eval(self, label_pred, label_gt):
+    def numpy_eval(self, label_pred, label_gt):
         label_pred = label_pred.astype(label_gt.dtype)
         self.confusion_matrix += self.fast_hist(label_gt.flatten(), label_pred.flatten(), self.number_class)
 

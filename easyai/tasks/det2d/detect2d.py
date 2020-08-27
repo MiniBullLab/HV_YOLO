@@ -26,10 +26,11 @@ class Detection2d(BaseInference):
         self.device = self.torchModelProcess.getDevice()
 
     def process(self, input_path):
+        os.system('rm -rf ' + self.task_config.save_result_path)
         dataloader = self.get_image_data_lodaer(input_path,
                                                 self.task_config.image_size,
                                                 self.task_config.image_channel)
-        for i, (src_image, img) in enumerate(dataloader):
+        for i, (file_path, src_image, img) in enumerate(dataloader):
             print('%g/%g' % (i + 1, len(dataloader)), end=' ')
             self.set_src_size(src_image)
 
@@ -37,20 +38,36 @@ class Detection2d(BaseInference):
             result = self.infer(img, self.task_config.confidence_th)
             detection_objects = self.postprocess(result)
             print('Batch %d... Done. (%.3fs)' % (i, self.timer.toc()))
-
+            self.save_result(file_path, detection_objects, 0)
             if not self.result_show.show(src_image, detection_objects):
                 break
 
-    def save_result(self, filename, detection_objects):
-        for object in detection_objects:
-            confidence = object.classConfidence * object.objectConfidence
-            x1 = object.min_corner.x
-            y1 = object.min_corner.y
-            x2 = object.max_corner.x
-            y2 = object.max_corner.y
-            temp_save_path = os.path.join(self.task_config.save_result_dir, "%s.txt" % object.name)
-            with open(temp_save_path, 'a') as file:
-                file.write("{} {} {} {} {} {}\n".format(filename, confidence, x1, y1, x2, y2))
+    def save_result(self, file_path, detection_objects, flag=0):
+        path, filename_post = os.path.split(file_path)
+        if flag == 0:
+            save_data = filename_post + "|"
+            for temp_object in detection_objects:
+                confidence = temp_object.classConfidence * temp_object.objectConfidence
+                x1 = temp_object.min_corner.x
+                y1 = temp_object.min_corner.y
+                x2 = temp_object.max_corner.x
+                y2 = temp_object.max_corner.y
+                save_data = save_data + "{} {} {} {} {}|".format(temp_object.name,
+                                                                 confidence,
+                                                                 x1, y1, x2, y2)
+            save_data += "\n"
+            with open(self.task_config.save_result_path, 'a') as file:
+                file.write(self.task_config.save_result_path)
+        elif flag == 1:
+            for temp_object in detection_objects:
+                confidence = temp_object.classConfidence * temp_object.objectConfidence
+                x1 = temp_object.min_corner.x
+                y1 = temp_object.min_corner.y
+                x2 = temp_object.max_corner.x
+                y2 = temp_object.max_corner.y
+                temp_save_path = os.path.join(self.task_config.save_result_dir, "%s.txt" % temp_object.name)
+                with open(temp_save_path, 'a') as file:
+                    file.write("{} {} {} {} {} {}\n".format(filename_post, confidence, x1, y1, x2, y2))
 
     def infer(self, input_data, threshold=0.0):
         with torch.no_grad():

@@ -16,9 +16,11 @@ class ClassifyConfig(ImageTaskConfig):
         self.class_name = None
         self.data_mean = None
         self.data_std = None
+        self.save_result_name = "classify_result.txt"
+        self.save_result_path = os.path.join(self.root_save_dir, self.save_result_name)
         # test
-        self.test_resul_name = 'cls_evaluation.txt'
-        self.test_result_path = os.path.join(self.root_save_dir, self.test_resul_name)
+        self.test_result_name = 'cls_evaluation.txt'
+        self.test_result_path = os.path.join(self.root_save_dir, self.test_result_name)
         # train
         self.log_name = "classify"
         self.train_data_augment = True

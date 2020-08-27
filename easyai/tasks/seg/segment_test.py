@@ -44,7 +44,7 @@ class SegmentionTest(BaseTest):
             prediction, output_list = self.segment_inference.infer(images, self.threshold)
             loss = self.compute_loss(output_list, segment_targets)
             gt = segment_targets[0].data.cpu().numpy()
-            self.metric.eval(prediction, gt)
+            self.metric.numpy_eval(prediction, gt)
             self.metirc_loss(i, loss)
 
         score, class_score = self.metric.get_score()

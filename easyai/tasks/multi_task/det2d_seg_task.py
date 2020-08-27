@@ -32,7 +32,7 @@ class Det2dSegTask(BaseInference):
         dataloader = self.get_image_data_lodaer(input_path,
                                                 self.task_config.image_size,
                                                 self.task_config.image_channel)
-        for i, (src_image, img) in enumerate(dataloader):
+        for i, (file_path, src_image, img) in enumerate(dataloader):
             print('%g/%g' % (i + 1, len(dataloader)), end=' ')
             self.set_src_size(src_image)
 

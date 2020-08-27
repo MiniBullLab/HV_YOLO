@@ -15,6 +15,7 @@ class SegmentionConfig(ImageTaskConfig):
         # data
         self.label_type = None
         self.class_name = None
+        self.save_result_dir = os.path.join(self.root_save_dir, 'segment_results')
         # test
         self.save_evaluation_path = os.path.join(self.root_save_dir, 'seg_evaluation.txt')
         # train

@@ -15,6 +15,7 @@ class Detection2dTest(BaseTest):
     def __init__(self, cfg_path, gpu_id, config_path=None):
         super().__init__(config_path, TaskName.Detect2d_Task)
         self.detect_inference = Detection2d(cfg_path, gpu_id, config_path)
+        self.evaluator = CalculateMeanAp(self.test_task_config.class_name)
         self.threshold_det = 5e-3
 
     def load_weights(self, weights_path):
@@ -29,8 +30,6 @@ class Detection2dTest(BaseTest):
                                                   image_size=self.test_task_config.image_size,
                                                   data_channel=self.test_task_config.image_channel,
                                                   batch_size=1)
-        evaluator = CalculateMeanAp(val_path, self.test_task_config.class_name)
-
         self.timer.tic()
         for i, (image_path, src_image, input_image) in enumerate(dataloader):
             print('%g/%g' % (i + 1, len(dataloader)), end=' ')
@@ -41,11 +40,9 @@ class Detection2dTest(BaseTest):
             detection_objects = self.detect_inference.postprocess(result)
 
             print('Batch %d... Done. (%.3fs)' % (i, self.timer.toc(True)))
+            self.detect_inference.save_result(image_path[0], detection_objects, 1)
 
-            path, filename_post = os.path.split(image_path[0])
-            self.detect_inference.save_result(filename_post, detection_objects)
-
-        mAP, aps = evaluator.eval(self.test_task_config.save_result_dir)
+        mAP, aps = self.evaluator.eval(self.test_task_config.save_result_dir, val_path)
         return mAP, aps
 
     def save_test_value(self, epoch, mAP, aps):

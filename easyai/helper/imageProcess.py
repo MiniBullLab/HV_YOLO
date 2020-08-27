@@ -35,3 +35,6 @@ class ImageProcess():
     def opencvImageRead(self, imagePath):
         img = cv2.imread(imagePath)  # BGR
         return img
+
+    def opencv_save_image(self, image_path, image_data):
+        cv2.imwrite(image_path, image_data)

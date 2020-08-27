@@ -4,30 +4,44 @@
 
 import os.path
 import numpy as np
+from easyai.helper.dataType import DetectionObject
+from easyai.helper.dirProcess import DirProcess
 from easyai.helper.json_process import JsonProcess
 from easyai.data_loader.det2d.det2d_sample import DetectionSample
 
 
 class CalculateMeanAp():
 
-    def __init__(self, val_path, class_names):
+    def __init__(self, class_names):
         self.class_names = class_names
+        self.dir_process = DirProcess()
         self.json_process = JsonProcess()
-        self.detection_samples = DetectionSample(val_path, class_names)
-        self.image_annotation_list = self.detection_samples.get_image_and_label_list(val_path)
         self.use_07_metric = False
 
-    def eval(self, result_dir):
+    def eval(self, result_dir, val_path):
         aps = []
-        ious = []
-        for i, name in enumerate(self.class_names):
-            if name == '__background__':
-                continue
+        for index, name in enumerate(self.class_names):
             file_path = os.path.join(result_dir, "%s.txt" % name)
-            recall, precision, ap = self.calculate_ap(file_path, name, 0.5)
-            aps += [ap]
-            # ious += [avg_iou]
+            if not os.path.exists(file_path):
+                aps.append(0)
+            else:
+                gt_boxes = self.get_gt_boxes(val_path, name)
+                detect_boxes = self.get_detect_boxes(file_path)
+                recall, precision, ap = self.calculate_ap(gt_boxes, detect_boxes, 0.5)
+                aps += [ap]
+        self.print_evaluation(aps)
+        return np.mean(aps), aps
 
+    def result_eval(self, result_path, val_path):
+        aps = []
+        for index, name in enumerate(self.class_names):
+            gt_boxes = self.get_gt_boxes(val_path, name)
+            detect_boxes = self.get_detect_boxes(result_path, name)
+            if len(detect_boxes) == 0:
+                aps.append(0)
+            else:
+                recall, precision, ap = self.calculate_ap(gt_boxes, detect_boxes, 0.5)
+                aps += [ap]
         self.print_evaluation(aps)
         return np.mean(aps), aps
 
@@ -38,19 +52,57 @@ class CalculateMeanAp():
         for i, ap in enumerate(aps):
             print(self.class_names[i] + ': ' + '{:.3f}'.format(ap))
             # print(self.className[i] + '_iou: ' + '{:.3f}'.format(ious[aps.index(ap)]))
-
         print('mAP: ' + '{:.3f}'.format(np.mean(aps)))
         # print('Iou acc: ' + '{:.3f}'.format(np.mean(ious)))
         print('~~~~~~~~')
 
-    def calculate_ap(self, result_path, class_name, iou_thresh=0.5):
-        if not os.path.exists(result_path):
-            return 0, 0, 0
+    def get_gt_boxes(self, val_path, class_name):
+        result = {}
+        detection_samples = DetectionSample(val_path, self.class_names)
+        image_annotation_list = detection_samples.get_image_and_label_list(val_path)
+        for image_path, annotation_path in image_annotation_list:
+            path, filename_post = os.path.split(image_path)
+            _, boxes = self.json_process.parse_rect_data(annotation_path)
+            result_boxes = [box for box in boxes if box.name == class_name]
+            result[filename_post] = result_boxes
+        return result
 
-        recs = self.get_data_boxes()
-        class_recs, npos = self.get_gt_boxes(recs, class_name)
-        image_ids, sorted_scores, BB = self.get_detect_result(result_path)
-        tp, fp, iou = self.get_tp_fp(image_ids, class_recs, BB, iou_thresh)
+    def get_detect_boxes(self, result_path, class_name=None):
+        result = []
+        if class_name is None:
+            for line_data in self.dir_process.getFileData(result_path):
+                split_datas = [x.strip().split(' ') for x in line_data if x.strip()]
+                filename_post = split_datas[0].strip()
+                # print(filename_post)
+                temp_object = DetectionObject()
+                temp_object.objectConfidence = float(split_datas[1])
+                temp_object.min_corner.x = int(split_datas[2])
+                temp_object.min_corner.y = int(split_datas[3])
+                temp_object.max_corner.x = int(split_datas[4])
+                temp_object.max_corner.y = int(split_datas[5])
+                result.append({filename_post, temp_object})
+        else:
+            for line_data in self.dir_process.getFileData(result_path):
+                split_datas = [x.strip().split('|') for x in line_data if x.strip()]
+                filename_post = split_datas[0].strip()
+                # print(filename_post)
+                for temp_box in split_datas[1:]:
+                    box_datas = [x.strip().split(' ') for x in temp_box if x.strip()]
+                    if box_datas[0] != class_name:
+                        continue
+                    temp_object = DetectionObject()
+                    temp_object.objectConfidence = float(box_datas[1])
+                    temp_object.min_corner.x = int(box_datas[2])
+                    temp_object.min_corner.y = int(box_datas[3])
+                    temp_object.max_corner.x = int(box_datas[4])
+                    temp_object.max_corner.y = int(box_datas[5])
+                    result.append({filename_post, temp_object})
+        return result
+
+    def calculate_ap(self, gt_boxes, detect_boxes, iou_thresh=0.5):
+        class_recs, npos = self.process_gt_boxes(gt_boxes)
+        image_ids, sorted_scores, boxes = self.process_detect_result(detect_boxes)
+        tp, fp, iou = self.get_tp_fp(image_ids, class_recs, boxes, iou_thresh)
 
         # compute precision recall
         fp = np.cumsum(fp)
@@ -63,46 +115,41 @@ class CalculateMeanAp():
         ap = self.get_ap(recall, precision)
         return recall, precision, ap
 
-    def get_data_boxes(self):
-        recs = {}
-        for image_path, annotation_path in self.image_annotation_list:
-            path, filename_post = os.path.split(image_path)
-            #fileName, post = os.path.splitext(fileNameAndPost)
-            _, boxes = self.json_process.parse_rect_data(annotation_path)
-            recs[filename_post] = boxes
-        return recs
-
-    def get_gt_boxes(self, recs, class_name):
-        # extract gt objects for this class
+    def process_gt_boxes(self, gt_boxes):
         class_recs = {}
         npos = 0
-        for imageName in recs.keys():
-            R = [box for box in recs[imageName] if box.name == class_name]
-            bbox = np.array([x.getVector() for x in R])
-            difficult = np.array([x.difficult for x in R]).astype(np.bool)
-            det = [False] * len(R)
+        for filename_post, boxes in gt_boxes.items():
+            bbox = np.array([x.getVector() for x in boxes])
+            difficult = np.array([x.difficult for x in boxes]).astype(np.bool)
+            det = [False] * len(boxes)
             npos = npos + sum(~difficult)
-            class_recs[imageName] = {'bbox': bbox,
-                                     'difficult': difficult,
-                                     'det2d': det}
+            class_recs[filename_post] = {'bbox': bbox,
+                                         'difficult': difficult,
+                                         'det2d': det}
         return class_recs, npos
 
-    def get_detect_result(self, result_path):
-        # read dets
-        with open(result_path, 'r') as f:
-            lines = f.readlines()
-
-        splitlines = [x.strip().split(' ') for x in lines]
-        image_ids = [x[0] for x in splitlines]
-        confidence = np.array([float(x[1]) for x in splitlines])
-        BB = np.array([[float(z) for z in x[2:]] for x in splitlines])
+    def process_detect_result(self, detect_boxes):
+        image_ids = []
+        confidence = []
+        boxes = []
+        for image_id, temp_object in detect_boxes:
+            image_ids.append(image_id)
+            confidence.append(temp_object.objectConfidence)
+            boxes.append([
+                float(temp_object.min_corner.x),
+                float(temp_object.min_corner.y),
+                float(temp_object.max_corner.x),
+                float(temp_object.max_corner.y)
+            ])
+        confidence = np.array(confidence)
+        boxes = np.array(boxes)
 
         # sort by confidence
         sorted_ind = np.argsort(-confidence)
         sorted_scores = np.sort(-confidence)
-        BB = BB[sorted_ind, :]
+        boxes = boxes[sorted_ind, :]
         image_ids = [image_ids[x] for x in sorted_ind]
-        return image_ids, sorted_scores, BB
+        return image_ids, sorted_scores, boxes
 
     def calculate_iou(self, BBGT, bb):
         ovmax = -np.inf

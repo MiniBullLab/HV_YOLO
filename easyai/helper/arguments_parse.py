@@ -148,9 +148,46 @@ class ToolArgumentsParse():
             if not os.path.exists(options.inputPath):
                 parser.error("Could not find the input file")
             else:
-                options.input_path = os.path.normpath(options.inputPath)
+                options.inputPath = os.path.normpath(options.inputPath)
         else:
             parser.error("'input' option is required to run this program")
+
+        return options
+
+    @classmethod
+    def test_path_parse(cls):
+        parser = OptionParser()
+        parser.description = "This program test"
+
+        parser.add_option("-i", "--input", dest="inputPath",
+                          metavar="PATH", type="string", default=None,
+                          help="test images")
+
+        parser.add_option("-t", "--target", dest="targetPath",
+                          metavar="PATH", type="string", default=None,
+                          help="target images")
+
+        parser.add_option("-c", "--config", dest="config_path",
+                          metavar="PATH", type="string", default=None,
+                          help="config path")
+
+        (options, args) = parser.parse_args()
+
+        if options.inputPath:
+            if not os.path.exists(options.inputPath):
+                parser.error("Could not find the input file")
+            else:
+                options.inputPath = os.path.normpath(options.inputPath)
+        else:
+            parser.error("'input' option is required to run this program")
+
+        if options.targetPath:
+            if not os.path.exists(options.targetPath):
+                parser.error("Could not find the input file")
+            else:
+                options.targetPath = os.path.normpath(options.targetPath)
+        else:
+            parser.error("'target' option is required to run this program")
 
         return options
 

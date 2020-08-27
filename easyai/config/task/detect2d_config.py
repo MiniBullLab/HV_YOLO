@@ -17,6 +17,8 @@ class Detect2dConfig(ImageTaskConfig):
         self.confidence_th = 1.0
         self.nms_th = 1.0
         self.post_prcoess_type = 0
+        self.save_result_name = "det2d_result.txt"
+        self.save_result_path = os.path.join(self.root_save_dir, self.save_result_name)
         # test
         self.save_result_dir = os.path.join(self.root_save_dir, 'det2d_results')
         self.save_evaluation_path = os.path.join(self.root_save_dir, 'det2d_evaluation.txt')
