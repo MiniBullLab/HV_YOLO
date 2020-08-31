@@ -24,80 +24,15 @@ class Detection2dTrainWindow(QWidget):
         self.cmd_str = os.path.join(dir_name, "../amba_scripts/DeNET_tool.sh")
         self.sample_process = DetectionSampleProcess()
 
-    def init_ui(self):
-        self.train_data_button = QPushButton('open train dataset')
-        self.train_data_button.setCheckable(True)
-        self.train_data_button.clicked[bool].connect(self.open_train_dataset)
-        self.train_data_txt = QLineEdit()
-        self.train_data_txt.setEnabled(False)
-        layout1 = QHBoxLayout()
-        layout1.setSpacing(20)
-        layout1.addWidget(self.train_data_button)
-        layout1.addWidget(self.train_data_txt)
-
-        self.val_data_button = QPushButton('open val dataset')
-        self.val_data_button.setCheckable(True)
-        self.val_data_button.clicked[bool].connect(self.open_val_dataset)
-        self.val_data_txt = QLineEdit()
-        self.val_data_txt.setEnabled(False)
-        layout2 = QHBoxLayout()
-        layout2.setSpacing(20)
-        layout2.addWidget(self.val_data_button)
-        layout2.addWidget(self.val_data_txt)
-
-        self.obtain_class_button = QPushButton('obtain class')
-        self.obtain_class_button.setCheckable(True)
-        self.obtain_class_button.setEnabled(False)
-        self.obtain_class_button.clicked[bool].connect(self.obtain_class)
-        self.class_data_txt = QLineEdit()
-        self.class_data_txt.setEnabled(False)
-        layout3 = QHBoxLayout()
-        layout3.setSpacing(20)
-        layout3.addWidget(self.obtain_class_button)
-        layout3.addWidget(self.class_data_txt)
-
-        self.start_train_button = QPushButton('start train')
-        self.start_train_button.setCheckable(True)
-        self.start_train_button.setEnabled(False)
-        self.start_train_button.clicked[bool].connect(self.start_train)
-
-        self.continue_train_button = QPushButton('continue train')
-        self.continue_train_button.setCheckable(True)
-        self.continue_train_button.setEnabled(False)
-        self.continue_train_button.clicked[bool].connect(self.continue_train)
-
-        self.stop_train_button = QPushButton('stop train')
-        self.stop_train_button.setCheckable(True)
-        self.stop_train_button.setEnabled(False)
-        self.stop_train_button.clicked[bool].connect(self.stop_train)
-
-        convert_model_button = QPushButton('model convert')
-        convert_model_button.setCheckable(True)
-        convert_model_button.setEnabled(False)
-        convert_model_button.clicked[bool].connect(self.arm_model_convert)
-
-        layout4 = QHBoxLayout()
-        layout4.setSpacing(20)
-        layout4.addWidget(self.start_train_button)
-        layout4.addWidget(self.continue_train_button)
-        layout4.addWidget(self.stop_train_button)
-
-        top_layout = QVBoxLayout()
-        top_layout.setSpacing(20)
-        top_layout.addLayout(layout1)
-        top_layout.addLayout(layout2)
-        top_layout.addLayout(layout3)
-        top_layout.addLayout(layout4)
-
-        self.text_browser = QTextBrowser()
-        self.text_browser.setReadOnly(True)
-
-        main_layout = QVBoxLayout()
-        main_layout.setSpacing(20)
-        main_layout.addLayout(top_layout, 1)
-        main_layout.addWidget(self.text_browser, 3)
-
-        self.setLayout(main_layout)
+    def closeEvent(self, event):
+        # reply = QMessageBox.question(self, 'Message', "Are you sure to quit?",
+        #                              QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        # if reply == QMessageBox.Yes:
+        #     event.accept()
+        # else:
+        #     event.ignore()
+        self.kill_process()
+        self.write_log_text()
 
     def open_train_dataset(self, pressed):
         txt_path, _ = QFileDialog.getOpenFileName(self, "open train dataset", self.dir_path, "txt files(*.txt)")
@@ -207,6 +142,10 @@ class Detection2dTrainWindow(QWidget):
             self.text_browser.append("detection train end!")
         self.process.close()
         self.write_log_text()
+        self.text_browser.clear()
+
+    def arm_model_convert(self, pressed):
+        pass
 
     def process_standard_output(self):
         temp_str = self.process.readAllStandardOutput().data().decode('utf-8')
@@ -218,7 +157,7 @@ class Detection2dTrainWindow(QWidget):
 
     def kill_process(self):
         if self.process is not None:
-            print("det kill pid:", self.process.processId())
+            self.text_browser.append("det kill pid: %d" % self.process.processId())
             self.process.kill()
             self.process.waitForFinished(-1)
 
@@ -227,8 +166,82 @@ class Detection2dTrainWindow(QWidget):
             if self.write_file is not None:
                 str_text = self.textBrowser.toPlainText()
                 temp = str(str_text)
-                print(self.write_file.write('{}'.format(temp)))
+                self.write_file.write('{}'.format(temp))
                 self.write_file.close()
         except Exception as e:
             print(e)
 
+    def init_ui(self):
+        self.train_data_button = QPushButton('open train dataset')
+        self.train_data_button.setCheckable(True)
+        self.train_data_button.clicked[bool].connect(self.open_train_dataset)
+        self.train_data_txt = QLineEdit()
+        self.train_data_txt.setEnabled(False)
+        layout1 = QHBoxLayout()
+        layout1.setSpacing(20)
+        layout1.addWidget(self.train_data_button)
+        layout1.addWidget(self.train_data_txt)
+
+        self.val_data_button = QPushButton('open val dataset')
+        self.val_data_button.setCheckable(True)
+        self.val_data_button.clicked[bool].connect(self.open_val_dataset)
+        self.val_data_txt = QLineEdit()
+        self.val_data_txt.setEnabled(False)
+        layout2 = QHBoxLayout()
+        layout2.setSpacing(20)
+        layout2.addWidget(self.val_data_button)
+        layout2.addWidget(self.val_data_txt)
+
+        self.obtain_class_button = QPushButton('obtain class')
+        self.obtain_class_button.setCheckable(True)
+        self.obtain_class_button.setEnabled(False)
+        self.obtain_class_button.clicked[bool].connect(self.obtain_class)
+        self.class_data_txt = QLineEdit()
+        self.class_data_txt.setEnabled(False)
+        layout3 = QHBoxLayout()
+        layout3.setSpacing(20)
+        layout3.addWidget(self.obtain_class_button)
+        layout3.addWidget(self.class_data_txt)
+
+        self.start_train_button = QPushButton('start train')
+        self.start_train_button.setCheckable(True)
+        self.start_train_button.setEnabled(False)
+        self.start_train_button.clicked[bool].connect(self.start_train)
+
+        self.continue_train_button = QPushButton('continue train')
+        self.continue_train_button.setCheckable(True)
+        self.continue_train_button.setEnabled(False)
+        self.continue_train_button.clicked[bool].connect(self.continue_train)
+
+        self.stop_train_button = QPushButton('stop train')
+        self.stop_train_button.setCheckable(True)
+        self.stop_train_button.setEnabled(False)
+        self.stop_train_button.clicked[bool].connect(self.stop_train)
+
+        convert_model_button = QPushButton('model convert')
+        convert_model_button.setCheckable(True)
+        convert_model_button.setEnabled(False)
+        convert_model_button.clicked[bool].connect(self.arm_model_convert)
+
+        layout4 = QHBoxLayout()
+        layout4.setSpacing(20)
+        layout4.addWidget(self.start_train_button)
+        layout4.addWidget(self.continue_train_button)
+        layout4.addWidget(self.stop_train_button)
+
+        top_layout = QVBoxLayout()
+        top_layout.setSpacing(20)
+        top_layout.addLayout(layout1)
+        top_layout.addLayout(layout2)
+        top_layout.addLayout(layout3)
+        top_layout.addLayout(layout4)
+
+        self.text_browser = QTextBrowser()
+        self.text_browser.setReadOnly(True)
+
+        main_layout = QVBoxLayout()
+        main_layout.setSpacing(20)
+        main_layout.addLayout(top_layout, 1)
+        main_layout.addWidget(self.text_browser, 3)
+
+        self.setLayout(main_layout)

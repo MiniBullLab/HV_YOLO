@@ -192,7 +192,7 @@ class ClassifyTrainWindow(QWidget):
 
     def kill_process(self):
         if self.process is not None:
-            print("cls kill pid:", self.process.processId())
+            self.text_browser.append("classify kill pid: %d" % self.process.processId())
             self.process.kill()
             self.process.waitForFinished(-1)
 
@@ -201,7 +201,7 @@ class ClassifyTrainWindow(QWidget):
             if self.write_file is not None:
                 str_text = self.textBrowser.toPlainText()
                 temp = str(str_text)
-                print(self.write_file.write('{}'.format(temp)))
+                self.write_file.write('{}'.format(temp))
                 self.write_file.close()
         except Exception as e:
             print(e)
