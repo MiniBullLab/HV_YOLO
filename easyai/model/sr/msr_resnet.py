@@ -10,8 +10,10 @@ from easyai.loss.utility.utility_loss import MeanSquaredErrorLoss
 from easyai.model.utility.base_model import *
 from easyai.model.base_block.utility.utility_block import ConvActivationBlock
 from easyai.model.base_block.sr.msr_resnet_block import ResidualBlockNoBN
+from easyai.model.utility.registry import REGISTERED_SR_MODEL
 
 
+@REGISTERED_SR_MODEL.register_module(ModelName.MSRResNet)
 class MSRResNet(BaseModel):
 
     def __init__(self, data_channel=1, upscale_factor=3):

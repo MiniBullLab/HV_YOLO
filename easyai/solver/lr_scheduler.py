@@ -7,7 +7,7 @@ from easyai.solver.base_lr_secheduler import BaseLrSecheduler
 from easyai.solver.registry import REGISTERED_LR_SCHEDULER
 
 
-@REGISTERED_LR_SCHEDULER.register_module
+@REGISTERED_LR_SCHEDULER.register_module()
 class LinearIncreaseLR(BaseLrSecheduler):
     def __init__(self, base_lr, end_lr, total_iters,
                  warmup_type=0, warmup_iters=2000):
@@ -23,7 +23,7 @@ class LinearIncreaseLR(BaseLrSecheduler):
             return self.endLr + (self.baseLr - self.endLr) * (1 - float(cur_iter) / self.total_iters)
 
 
-@REGISTERED_LR_SCHEDULER.register_module
+@REGISTERED_LR_SCHEDULER.register_module()
 class MultiStageLR(BaseLrSecheduler):
     def __init__(self, base_lr, lr_stages,
                  warmup_type=0, warmup_iters=2000):
@@ -42,7 +42,7 @@ class MultiStageLR(BaseLrSecheduler):
                     return self.baseLr * it_lr[1]
 
 
-@REGISTERED_LR_SCHEDULER.register_module
+@REGISTERED_LR_SCHEDULER.register_module()
 class PolyLR(BaseLrSecheduler):
     def __init__(self, base_lr, total_iters, lr_power=0.9,
                  warmup_type=0, warmup_iters=2000):
@@ -58,7 +58,7 @@ class PolyLR(BaseLrSecheduler):
             return self.baseLr * ((1 - float(cur_iter) / self.total_iters) ** self.lr_power)
 
 
-@REGISTERED_LR_SCHEDULER.register_module
+@REGISTERED_LR_SCHEDULER.register_module()
 class CosineLR(BaseLrSecheduler):
     def __init__(self, base_lr, total_iters,
                  warmup_type=0, warmup_iters=5):

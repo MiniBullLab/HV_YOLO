@@ -14,8 +14,10 @@ from easyai.model.base_block.utility.separable_conv_block import SeparableConv2d
 from easyai.model.base_block.seg.fast_scnn_block import FastSCNNBlockName
 from easyai.model.base_block.seg.fast_scnn_block import GlobalFeatureExtractor, FeatureFusionBlock
 from easyai.model.utility.base_classify_model import *
+from easyai.model.utility.registry import REGISTERED_SEG_MODEL
 
 
+@REGISTERED_SEG_MODEL.register_module(ModelName.FastSCNN)
 class FastSCNN(BaseClassifyModel):
 
     def __init__(self, data_channel=3, class_number=2):

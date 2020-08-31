@@ -21,8 +21,10 @@ from easyai.model.base_block.seg.encnet_block import EncNetBlockName
 from easyai.model.base_block.seg.encnet_block import JPUBlock, EncBlock, FCNHeadBlock
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 from easyai.model.utility.base_classify_model import *
+from easyai.model.utility.registry import REGISTERED_SEG_MODEL
 
 
+@REGISTERED_SEG_MODEL.register_module(ModelName.EncNetSeg)
 class EncNetSeg(BaseClassifyModel):
 
     def __init__(self, data_channel=3, class_number=150):

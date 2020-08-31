@@ -14,8 +14,8 @@ class SuperResolution(BaseInference):
         super().__init__(config_path, TaskName.Segment_Task)
 
         self.model_args['upscale_factor'] = self.task_config.upscale_factor
-        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
-                                                      default_args=self.model_args)
+        self.model_args['type'] = cfg_path
+        self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
     def process(self, input_path):

@@ -13,8 +13,10 @@ from easyai.loss.cls.bce_loss import BinaryCrossEntropy2d
 from easyai.model.base_block.seg.unet_blcok import UNetBlockName
 from easyai.model.base_block.seg.unet_blcok import DoubleConv2d, DownBlock, UpBlock
 from easyai.model.utility.base_classify_model import *
+from easyai.model.utility.registry import REGISTERED_SEG_MODEL
 
 
+@REGISTERED_SEG_MODEL.register_module(ModelName.UNetSeg)
 class UNetSeg(BaseClassifyModel):
 
     def __init__(self, data_channel=3, class_number=1):

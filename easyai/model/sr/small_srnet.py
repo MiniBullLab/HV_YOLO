@@ -9,8 +9,10 @@ from easyai.base_name.loss_name import LossType
 from easyai.loss.utility.utility_loss import MeanSquaredErrorLoss
 from easyai.model.utility.base_model import *
 from easyai.model.base_block.utility.utility_block import ConvActivationBlock
+from easyai.model.utility.registry import REGISTERED_SR_MODEL
 
 
+@REGISTERED_SR_MODEL.register_module(ModelName.SmallSRNet)
 class SmallSRNet(BaseModel):
     def __init__(self, data_channel=1, upscale_factor=3):
         super().__init__(data_channel)

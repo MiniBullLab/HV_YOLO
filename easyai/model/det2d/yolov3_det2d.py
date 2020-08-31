@@ -13,8 +13,10 @@ from easyai.model.base_block.utility.upsample_layer import Upsample
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock, ConvActivationBlock
 from easyai.model.utility.base_det_model import *
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
+from easyai.model.utility.registry import REGISTERED_Det2D_MODEL
 
 
+@REGISTERED_Det2D_MODEL.register_module(ModelName.YoloV3Det2d)
 class YoloV3Det2d(BaseDetectionModel):
 
     def __init__(self, data_channel=3, class_number=1):

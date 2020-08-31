@@ -4,9 +4,11 @@
 
 import os
 import abc
+from pathlib import Path
 from easyai.helper.timer_process import TimerProcess
 from easyai.data_loader.utility.images_loader import ImagesLoader
 from easyai.data_loader.utility.video_loader import VideoLoader
+from easyai.data_loader.utility.text_data_loader import TextDataLoader
 from easyai.torch_utility.torch_model_process import TorchModelProcess
 from easyai.tasks.utility.base_task import BaseTask
 
@@ -42,8 +44,12 @@ class BaseInference(BaseTask):
         self.model.eval()
 
     def get_image_data_lodaer(self, input_path, image_size, data_channel):
-        if os.path.isdir(input_path):
+        if not os.path.exists(input_path):
+            return None
+        if Path(input_path).is_dir():
             dataloader = ImagesLoader(input_path, image_size, data_channel)
+        elif Path(input_path).suffix in ['.txt', '.text']:
+            dataloader = TextDataLoader(input_path, image_size, data_channel)
         else:
             dataloader = VideoLoader(input_path, image_size, data_channel)
         return dataloader

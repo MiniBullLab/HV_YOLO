@@ -15,8 +15,10 @@ from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.deeplab_block import ASPPBlock
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 from easyai.model.utility.base_classify_model import *
+from easyai.model.utility.registry import REGISTERED_SEG_MODEL
 
 
+@REGISTERED_SEG_MODEL.register_module(ModelName.DeepLabV3)
 class DeepLabV3(BaseClassifyModel):
 
     def __init__(self, data_channel=3, class_number=19):

@@ -14,23 +14,23 @@ class LrSchedulerFactory():
         self.epoch_iteration = epoch_iteration
         self.total_iters = max_epochs * epoch_iteration
 
-    def get_lr_scheduler(self, config):
-        lr_class_name = config['type'].strip()
-        cfg = config.copy()
-        self.process_warmup(cfg)
-        cfg['base_lr'] = self.base_lr
+    def get_lr_scheduler(self, lr_config):
+        lr_class_name = lr_config['type'].strip()
+        config = lr_config.copy()
+        self.process_warmup(config)
+        config['base_lr'] = self.base_lr
         result = None
         if lr_class_name == "LinearIncreaseLR":
-            cfg['total_iters'] = self.total_iters
-            result = build_from_cfg(cfg, REGISTERED_LR_SCHEDULER)
+            config['total_iters'] = self.total_iters
+            result = build_from_cfg(config, REGISTERED_LR_SCHEDULER)
         elif lr_class_name == "MultiStageLR":
-            result = build_from_cfg(cfg, REGISTERED_LR_SCHEDULER)
+            result = build_from_cfg(config, REGISTERED_LR_SCHEDULER)
         elif lr_class_name == "PolyLR":
-            cfg['total_iters'] = self.total_iters
-            result = build_from_cfg(cfg, REGISTERED_LR_SCHEDULER)
+            config['total_iters'] = self.total_iters
+            result = build_from_cfg(config, REGISTERED_LR_SCHEDULER)
         elif lr_class_name == "CosineLR":
-            cfg['total_iters'] = self.total_iters
-            result = build_from_cfg(cfg, REGISTERED_LR_SCHEDULER)
+            config['total_iters'] = self.total_iters
+            result = build_from_cfg(config, REGISTERED_LR_SCHEDULER)
         else:
             print("%s not exit" % lr_class_name)
         return result

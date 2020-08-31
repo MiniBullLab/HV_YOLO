@@ -28,6 +28,10 @@ class Registry(object):
     def get(self, key):
         return self._module_dict.get(key, None)
 
+    def has_class(self, key):
+        result = key in self._module_dict
+        return result
+
     def _register_module(self, module_class, cls_name=None):
         """Register a module.
         Args:
@@ -45,10 +49,13 @@ class Registry(object):
                 "{} is already registered in {}".format(cls_name, self.name)
             )
         self._module_dict[cls_name] = module_class
+        print(module_class, "register name: %s" % cls_name)
 
-    def register_module(self, cls, cls_name=None):
-        self._register_module(cls, cls_name)
-        return cls
+    def register_module(self, cls_name=None):
+        def deco(cls):
+            self._register_module(cls, cls_name)
+            return cls
+        return deco
 
 
 def build_from_cfg(cfg, registry, default_args=None):

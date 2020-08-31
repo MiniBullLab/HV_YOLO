@@ -22,8 +22,8 @@ class Det2dSegTask(BaseInference):
         self.nms_process = FastNonMaxSuppression()
         self.result_show = Det2dSegTaskShow()
 
-        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
-                                                      default_args=self.model_args)
+        self.model_args['type'] = cfg_path
+        self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
         self.threshold_seg = 0.5  # binary class threshold

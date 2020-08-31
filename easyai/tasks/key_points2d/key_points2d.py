@@ -17,8 +17,8 @@ class KeyPoints2d(BaseInference):
         self.result_process = KeyPoints2dResultProcess(self.task_config.points_count)
         self.result_show = KeyPointsShow()
 
-        self.model = self.torchModelProcess.initModel(cfg_path, gpu_id,
-                                                      default_args=self.model_args)
+        self.model_args['type'] = cfg_path
+        self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
     def process(self, input_path):

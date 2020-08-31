@@ -14,8 +14,10 @@ from easyai.model.base_block.utility.utility_layer import AddLayer
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.backbone.utility.backbone_factory import BackboneFactory
 from easyai.model.utility.base_classify_model import *
+from easyai.model.utility.registry import REGISTERED_SEG_MODEL
 
 
+@REGISTERED_SEG_MODEL.register_module(ModelName.FCNSeg)
 class FCN8sSeg(BaseClassifyModel):
 
     def __init__(self, data_channel=3, class_number=2):

@@ -17,10 +17,10 @@ class TorchModelProcess():
         self.best_value = 0
         self.is_multi_gpu = False
 
-    def initModel(self, cfgPath, gpuId, is_multi_gpu=False, default_args=None):
+    def initModel(self, model_config, gpuId, is_multi_gpu=False):
         self.is_multi_gpu = is_multi_gpu
         self.torchDeviceProcess.setGpuId(gpuId)
-        model = self.modelFactory.get_model(cfgPath, default_args)
+        model = self.modelFactory.get_model(model_config)
         return model
 
     def loadPretainModel(self, weightPath, model):

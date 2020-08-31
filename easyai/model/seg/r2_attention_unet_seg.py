@@ -14,13 +14,15 @@ from easyai.model.base_block.seg.unet_blcok import UNetBlockName
 from easyai.model.base_block.seg.unet_blcok import AttentionUpBlock
 from easyai.model.base_block.seg.unet_blcok import RRCNNBlock
 from easyai.model.utility.base_classify_model import *
+from easyai.model.utility.registry import REGISTERED_SEG_MODEL
 
 
-class R2UNetSeg(BaseClassifyModel):
+@REGISTERED_SEG_MODEL.register_module(ModelName.R2AttentionUNetSeg)
+class R2AttentionUNetSeg(BaseClassifyModel):
 
     def __init__(self, data_channel=3, class_number=1):
         super().__init__(data_channel, class_number)
-        self.set_name(ModelName.R2UNetSeg)
+        self.set_name(ModelName.R2AttentionUNetSeg)
         self.t = 2
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU

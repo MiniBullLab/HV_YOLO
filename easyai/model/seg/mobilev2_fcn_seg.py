@@ -13,8 +13,10 @@ from easyai.model.base_block.utility.utility_layer import RouteLayer
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.utility.utility_block import ConvActivationBlock
 from easyai.model.utility.base_classify_model import *
+from easyai.model.utility.registry import REGISTERED_SEG_MODEL
 
 
+@REGISTERED_SEG_MODEL.register_module(ModelName.MobileV2FCN)
 class MobileV2FCN(BaseClassifyModel):
 
     def __init__(self, data_channel=3, class_number=2):
