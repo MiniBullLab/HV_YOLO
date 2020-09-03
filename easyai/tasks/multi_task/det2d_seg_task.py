@@ -16,13 +16,12 @@ from easyai.base_name.task_name import TaskName
 class Det2dSegTask(BaseInference):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path, TaskName.Det2d_Seg_Task)
+        super().__init__(cfg_path, config_path, TaskName.Det2d_Seg_Task)
         self.det2d_result_process = Detect2dResultProcess()
         self.seg_result_process = SegmentResultProcess()
         self.nms_process = FastNonMaxSuppression()
         self.result_show = Det2dSegTaskShow()
 
-        self.model_args['type'] = cfg_path
         self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 

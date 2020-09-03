@@ -12,7 +12,7 @@ from easyai.tasks.utility.base_task import BaseTask
 
 class BaseTrain(BaseTask):
 
-    def __init__(self, config_path, task_name):
+    def __init__(self, model_name, config_path, task_name):
         super().__init__()
         self.set_task_name(task_name)
         self.timer = TimerProcess()
@@ -28,7 +28,9 @@ class BaseTrain(BaseTask):
         self.train_logger = TrainLogger(self.train_task_config.log_name,
                                         self.train_task_config.root_save_dir)
 
-        self.model_args = {"data_channel": self.train_task_config.image_channel}
+        self.model_args = {"type": model_name,
+                           "data_channel": self.train_task_config.image_channel
+                           }
 
     @abc.abstractmethod
     def load_latest_param(self, latest_weights_path):

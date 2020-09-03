@@ -14,11 +14,10 @@ from easyai.base_name.task_name import TaskName
 class KeyPoints2dTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path, TaskName.KeyPoints2d_Task)
+        super().__init__(cfg_path, config_path, TaskName.KeyPoints2d_Task)
 
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
 
-        self.model_args['type'] = cfg_path
         self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 

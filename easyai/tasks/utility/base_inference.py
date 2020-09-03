@@ -15,7 +15,7 @@ from easyai.tasks.utility.base_task import BaseTask
 
 class BaseInference(BaseTask):
 
-    def __init__(self, config_path, task_name):
+    def __init__(self, model_name, config_path, task_name):
         super().__init__()
         self.set_task_name(task_name)
         self.timer = TimerProcess()
@@ -24,7 +24,9 @@ class BaseInference(BaseTask):
         self.model = None
         self.src_size = (0, 0)
         self.task_config = self.config_factory.get_config(self.task_name, self.config_path)
-        self.model_args = {"data_channel": self.task_config.image_channel}
+        self.model_args = {"type": model_name,
+                           "data_channel": self.task_config.image_channel
+                           }
 
     @abc.abstractmethod
     def process(self, input_path):

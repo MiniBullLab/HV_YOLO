@@ -14,13 +14,12 @@ from easyai.base_name.task_name import TaskName
 class Detection2d(BaseInference):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path, TaskName.Detect2d_Task)
+        super().__init__(cfg_path, config_path, TaskName.Detect2d_Task)
 
         self.result_process = Detect2dResultProcess()
         self.nms_process = FastNonMaxSuppression()
         self.result_show = DetectionShow()
 
-        self.model_args['type'] = cfg_path
         self.model_args['class_number'] = len(self.task_config.class_name)
         self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()

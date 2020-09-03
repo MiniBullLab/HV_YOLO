@@ -24,7 +24,8 @@ def backbone_model_print(model_name):
 def model_print(model_name):
     model_factory = ModelFactory()
     input_x = torch.randn(1, 3, 32, 32)
-    model = model_factory.get_model(model_name)
+    model_config = {"type": model_name}
+    model = model_factory.get_model(model_config)
     if model is not None:
         model.print_block_name()
         for k, value in model.named_children():

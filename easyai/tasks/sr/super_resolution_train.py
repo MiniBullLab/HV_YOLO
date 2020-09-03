@@ -14,11 +14,10 @@ from easyai.base_name.task_name import TaskName
 class SuperResolutionTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path, TaskName.SuperResolution_Task)
+        super().__init__(cfg_path, config_path, TaskName.SuperResolution_Task)
 
         self.torch_optimizer = TorchOptimizer(self.train_task_config.optimizer_config)
         self.model_args['upscale_factor'] = self.train_task_config.upscale_factor
-        self.model_args['type'] = cfg_path
         self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
@@ -43,7 +42,6 @@ class SuperResolutionTrain(BaseTrain):
                                                     self.model,
                                                     self.train_task_config.freeze_layer_name,
                                                     self.train_task_config.freeze_layer_type)
-        self.torch_optimizer.print_freeze_layer(self.model)
         self.optimizer = self.torch_optimizer.getLatestModelOptimizer(checkpoint)
 
     def train(self, train_path, val_path):

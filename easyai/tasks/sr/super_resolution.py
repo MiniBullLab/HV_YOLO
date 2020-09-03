@@ -11,10 +11,9 @@ from easyai.base_name.task_name import TaskName
 class SuperResolution(BaseInference):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path, TaskName.Segment_Task)
+        super().__init__(cfg_path, config_path, TaskName.Segment_Task)
 
         self.model_args['upscale_factor'] = self.task_config.upscale_factor
-        self.model_args['type'] = cfg_path
         self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 

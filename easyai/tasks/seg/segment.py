@@ -15,10 +15,9 @@ from easyai.base_name.task_name import TaskName
 class Segmentation(BaseInference):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path, TaskName.Segment_Task)
+        super().__init__(cfg_path, config_path, TaskName.Segment_Task)
 
         self.model_args['class_number'] = len(self.task_config.class_name)
-        self.model_args['type'] = cfg_path
         self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 

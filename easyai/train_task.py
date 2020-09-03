@@ -24,37 +24,36 @@ class TrainTask():
         cls_train_task = ClassifyTrain(cfg_path, gpu_id, config_path)
         cls_train_task.load_pretrain_model(pretrain_model_path)
         cls_train_task.train(self.train_path, self.val_path)
-        self.image_model_convert(cls_train_task, cfg_path, cls_train_task.model_args)
+        self.image_model_convert(cls_train_task, cls_train_task.model_args)
 
     def detect2d_train(self, cfg_path, gpu_id, config_path, pretrain_model_path):
         det2d_train = Detection2dTrain(cfg_path, gpu_id, config_path)
         det2d_train.load_pretrain_model(pretrain_model_path)
         det2d_train.train(self.train_path, self.val_path)
-        self.image_model_convert(det2d_train, cfg_path, det2d_train.model_args)
+        self.image_model_convert(det2d_train, det2d_train.model_args)
 
     def segment_train(self, cfg_path, gpu_id, config_path, pretrain_model_path):
         seg_train = SegmentionTrain(cfg_path, gpu_id, config_path)
         seg_train.load_pretrain_model(pretrain_model_path)
         seg_train.train(self.train_path, self.val_path)
-        self.image_model_convert(seg_train, cfg_path, seg_train.model_args)
+        self.image_model_convert(seg_train, seg_train.model_args)
 
     def super_resolution_train(self, cfg_path, gpu_id, config_path, pretrain_model_path):
         sr_train = SuperResolutionTrain(cfg_path, gpu_id, config_path)
         sr_train.load_pretrain_model(pretrain_model_path)
         sr_train.train(self.train_path, self.val_path)
-        self.image_model_convert(sr_train, cfg_path, sr_train.model_args)
+        self.image_model_convert(sr_train, sr_train.model_args)
 
     def det2d_seg_train(self, cfg_path, gpu_id, config_path, pretrain_model_path):
         multi_train = Det2dSegTaskTrain(cfg_path, gpu_id, config_path)
         multi_train.load_pretrain_model(pretrain_model_path)
         multi_train.train(self.train_path, self.val_path)
-        self.image_model_convert(multi_train, cfg_path, multi_train.model_args)
+        self.image_model_convert(multi_train, multi_train.model_args)
 
-    def image_model_convert(self, train_task, cfg_path, model_args):
+    def image_model_convert(self, train_task, model_args):
         if self.is_convert:
-            converter = ModelConverter(train_task.train_task_config.image_size,
-                                       model_args)
-            self.save_onnx_path = converter.model_convert(cfg_path,
+            converter = ModelConverter(train_task.train_task_config.image_size)
+            self.save_onnx_path = converter.model_convert(model_args,
                                                           train_task.train_task_config.best_weights_file,
                                                           train_task.train_task_config.snapshot_dir)
 

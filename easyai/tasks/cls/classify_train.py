@@ -15,11 +15,10 @@ from easyai.base_name.task_name import TaskName
 class ClassifyTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
-        super().__init__(config_path, TaskName.Classify_Task)
+        super().__init__(cfg_path, config_path, TaskName.Classify_Task)
 
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
 
-        self.model_args['type'] = cfg_path
         self.model_args['class_number'] = len(self.train_task_config.class_name)
         self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()
