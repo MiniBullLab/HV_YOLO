@@ -127,7 +127,7 @@ class ClassifyConfig(ImageTaskConfig):
         self.image_channel = 3
         self.class_name = ('cls1', 'cls2')
         self.data_mean = (0.5070751592371323, 0.48654887331495095, 0.4409178433670343)
-        self.data_std = (0.2673342858792401, 0.2564384629170883, 0.27615047132568404)
+        self.data_std = (0.2666410733740041, 0.2666410733740041, 0.2666410733740041)
 
     def get_test_default_value(self):
         self.test_batch_size = 1

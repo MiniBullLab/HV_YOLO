@@ -199,7 +199,7 @@ class ClassifyTrainWindow(QWidget):
     def write_log_text(self):
         try:
             if self.write_file is not None:
-                str_text = self.textBrowser.toPlainText()
+                str_text = self.text_browser.toPlainText()
                 temp = str(str_text)
                 self.write_file.write('{}'.format(temp))
                 self.write_file.close()

@@ -23,8 +23,8 @@ outputShape=1,3,224,224
 outputLayerName="o:192|ot:0,1,2,3|odf:fp32"
 inputDataFormat=0,0,0,0
 
-mean=129.285,124.0575,99.2025
-scale=67.9809
+mean=129.3041,124.0699,112.4340
+scale=67.9934
 
 rm -rf $outDir
 mkdir $outDir

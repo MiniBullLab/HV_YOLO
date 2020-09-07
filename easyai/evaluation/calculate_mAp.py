@@ -71,15 +71,15 @@ class CalculateMeanAp():
         result = []
         if class_name is None:
             for line_data in self.dir_process.getFileData(result_path):
-                split_datas = [x.strip().split(' ') for x in line_data if x.strip()]
+                split_datas = [x.strip() for x in line_data.split(' ') if x.strip()]
                 filename_post = split_datas[0].strip()
                 # print(filename_post)
                 temp_object = DetectionObject()
                 temp_object.objectConfidence = float(split_datas[1])
-                temp_object.min_corner.x = int(split_datas[2])
-                temp_object.min_corner.y = int(split_datas[3])
-                temp_object.max_corner.x = int(split_datas[4])
-                temp_object.max_corner.y = int(split_datas[5])
+                temp_object.min_corner.x = float(split_datas[2])
+                temp_object.min_corner.y = float(split_datas[3])
+                temp_object.max_corner.x = float(split_datas[4])
+                temp_object.max_corner.y = float(split_datas[5])
                 result.append({filename_post, temp_object})
         else:
             for line_data in self.dir_process.getFileData(result_path):
