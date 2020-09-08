@@ -29,7 +29,7 @@ class Segmentation(BaseInference):
 
         self.threshold = 0.5  # binary class threshold
 
-    def process(self, input_path):
+    def process(self, input_path, is_show=False):
         os.system('rm -rf ' + self.task_config.save_result_dir)
         os.makedirs(self.task_config.save_result_dir, exist_ok=True)
 
@@ -41,11 +41,13 @@ class Segmentation(BaseInference):
             self.set_src_size(src_image)
             prediction, _ = self.infer(image, self.threshold)
             result = self.postprocess(prediction)
-            self.save_result(file_path, result)
             print('Batch %d... Done. (%.3fs)' % (index, self.timer.toc()))
-            if not self.result_show.show(src_image, result,
-                                         self.task_config.class_name):
-                break
+            if is_show:
+                if not self.result_show.show(src_image, result,
+                                             self.task_config.class_name):
+                    break
+            else:
+                self.save_result(file_path, result)
 
     def save_result(self, file_path, prediction):
         path, filename_post = os.path.split(file_path)

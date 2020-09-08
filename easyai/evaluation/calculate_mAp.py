@@ -80,7 +80,7 @@ class CalculateMeanAp():
                 temp_object.min_corner.y = float(split_datas[3])
                 temp_object.max_corner.x = float(split_datas[4])
                 temp_object.max_corner.y = float(split_datas[5])
-                result.append({filename_post, temp_object})
+                result.append((filename_post, temp_object))
         else:
             for line_data in self.dir_process.getFileData(result_path):
                 split_datas = [x.strip().split('|') for x in line_data if x.strip()]
@@ -96,7 +96,7 @@ class CalculateMeanAp():
                     temp_object.min_corner.y = int(box_datas[3])
                     temp_object.max_corner.x = int(box_datas[4])
                     temp_object.max_corner.y = int(box_datas[5])
-                    result.append({filename_post, temp_object})
+                    result.append((filename_post, temp_object))
         return result
 
     def calculate_ap(self, gt_boxes, detect_boxes, iou_thresh=0.5):

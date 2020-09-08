@@ -22,7 +22,7 @@ class DetectionSampleProcess():
         path, _ = os.path.split(train_path)
         annotation_dir = os.path.join(path, "../Annotations")
         for label_path in self.dir_process.getDirFiles(annotation_dir, self.annotation_post):
-            print(label_path)
+            # print(label_path)
             _, boxes = self.json_process.parse_rect_data(label_path)
             temp_names = [box.name for box in boxes if box.name.strip()]
             all_names.extend(temp_names)

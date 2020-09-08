@@ -47,7 +47,7 @@ def parse_arguments():
     return options
 
 
-def main():
+def train_main():
     print("process start...")
     options = parse_arguments()
     copy_process = CopyImage()
@@ -79,4 +79,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    train_main()

@@ -24,7 +24,7 @@ class Detection2d(BaseInference):
         self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
-    def process(self, input_path):
+    def process(self, input_path, is_show=False):
         os.system('rm -rf ' + self.task_config.save_result_path)
         dataloader = self.get_image_data_lodaer(input_path,
                                                 self.task_config.image_size,
@@ -37,9 +37,11 @@ class Detection2d(BaseInference):
             result = self.infer(img, self.task_config.confidence_th)
             detection_objects = self.postprocess(result)
             print('Batch %d... Done. (%.3fs)' % (i, self.timer.toc()))
-            self.save_result(file_path, detection_objects, 0)
-            if not self.result_show.show(src_image, detection_objects):
-                break
+            if is_show:
+                if not self.result_show.show(src_image, detection_objects):
+                    break
+            else:
+                self.save_result(file_path, detection_objects, 0)
 
     def save_result(self, file_path, detection_objects, flag=0):
         path, filename_post = os.path.split(file_path)

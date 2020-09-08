@@ -111,6 +111,11 @@ class TaskArgumentsParse():
                           metavar="PATH", type="string", default=None,
                           help="config path")
 
+        parser.add_option("-s", "--show", action="store_true",
+                          dest="show",
+                          default=False,
+                          help="show result")
+
         (options, args) = parser.parse_args()
 
         if options.inputPath:

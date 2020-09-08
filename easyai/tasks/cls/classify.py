@@ -18,7 +18,7 @@ class Classify(BaseInference):
         self.device = self.torchModelProcess.getDevice()
         self.result_show = ClassifyShow()
 
-    def process(self, input_path):
+    def process(self, input_path, is_show=False):
         os.system('rm -rf ' + self.task_config.save_result_path)
         dataloader = self.get_image_data_lodaer(input_path,
                                                 self.task_config.image_size,
@@ -28,11 +28,13 @@ class Classify(BaseInference):
             prediction, _ = self.infer(image)
             result = self.postprocess(prediction)
             print('Batch %d... Done. (%.3fs)' % (index, self.timer.toc()))
-            self.save_result(file_path, result)
-            if not self.result_show.show(src_image,
-                                         result,
-                                         self.task_config.class_name):
-                break
+            if is_show:
+                if not self.result_show.show(src_image,
+                                             result,
+                                             self.task_config.class_name):
+                    break
+            else:
+                self.save_result(file_path, result)
 
     def save_result(self, file_path, class_index):
         path, filename_post = os.path.split(file_path[0])

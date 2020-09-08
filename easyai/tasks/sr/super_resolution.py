@@ -17,7 +17,7 @@ class SuperResolution(BaseInference):
         self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
-    def process(self, input_path):
+    def process(self, input_path, is_show=False):
         pass
         # for i, (oriImg, imgs) in enumerate(dataloader):
         #     img_pil = Image.fromarray(cv2.cvtColor(oriImg, cv2.COLOR_BGR2RGB))

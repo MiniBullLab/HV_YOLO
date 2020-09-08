@@ -12,34 +12,35 @@ from easyai.base_name.task_name import TaskName
 
 class InferenceTask():
 
-    def __init__(self, input_path):
+    def __init__(self, input_path, is_show=False):
         self.input_path = input_path
+        self.is_show = is_show
 
     def classify_task(self, cfg_path, gpu_id, weight_path, config_path):
         cls = Classify(cfg_path, gpu_id, config_path)
         cls.load_weights(weight_path)
-        cls.process(self.input_path)
+        cls.process(self.input_path, self.is_show)
 
     def detect2d_task(self, cfg_path, gpu_id, weight_path, config_path):
         det2d = Detection2d(cfg_path, gpu_id, config_path)
         det2d.load_weights(weight_path)
-        det2d.process(self.input_path)
+        det2d.process(self.input_path, self.is_show)
 
     def segment_task(self, cfg_path, gpu_id, weight_path, config_path):
         seg = Segmentation(cfg_path, gpu_id, config_path)
         seg.load_weights(weight_path)
-        seg.process(self.input_path)
+        seg.process(self.input_path, self.is_show)
 
     def det2d_seg_task(self, cfg_path, gpu_id, weight_path, config_path):
         multi_det2d_seg = Det2dSegTask(cfg_path, gpu_id, config_path)
         multi_det2d_seg.load_weights(weight_path)
-        multi_det2d_seg.process(self.input_path)
+        multi_det2d_seg.process(self.input_path, self.is_show)
 
 
 def main():
     print("process start...")
     options = TaskArgumentsParse.inference_parse_arguments()
-    inference_task = InferenceTask(options.inputPath)
+    inference_task = InferenceTask(options.inputPath, options.show)
     if options.task_name == TaskName.Classify_Task:
         inference_task.classify_task(options.model, 0, options.weights, options.config_path)
     if options.task_name == TaskName.Detect2d_Task:

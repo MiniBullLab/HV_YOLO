@@ -28,6 +28,7 @@ def parse_arguments():
 
     return options
 
+
 def parseRectData(xmlPath):
     xmlTree = ElementTree.parse(xmlPath)
     root = xmlTree.getroot()
@@ -65,6 +66,7 @@ def parseRectData(xmlPath):
         boxes.append(box)
     return image_name, image_size, boxes, num
 
+
 def json_write(database, file_name, file_path, image_size, num, boxes):
     annotation = {}
     # annotation
@@ -95,6 +97,7 @@ def json_write(database, file_name, file_path, image_size, num, boxes):
     f.write(a)
     f.close()
 
+
 def main():
     print("process start...")
     options = parse_arguments()
@@ -103,11 +106,12 @@ def main():
     for img_name in os.listdir(options.inputPath):
         img_path = os.path.join(options.inputPath, img_name)
         xml_path = img_path.replace("JPEGImages", "Annotations").replace(".jpg", ".xml").replace(".png", ".xml")
-        print(img_path)
+        print(xml_path)
         if not os.path.exists(xml_path):
             continue
         image_name, image_size, boxes, num = parseRectData(xml_path)
         json_write("DataSet", image_name, img_path, image_size, num, boxes)
+
 
 if __name__ == "__main__":
     main()

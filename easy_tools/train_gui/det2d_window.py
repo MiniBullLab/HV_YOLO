@@ -6,6 +6,7 @@ import os
 import inspect
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from easy_tools.train_gui.process_status import ProcessStatus
 from easyai.tools.detection_sample_process import DetectionSampleProcess
 
 
@@ -16,7 +17,7 @@ class Detection2dTrainWindow(QWidget):
         self.init_ui()
         self.process = None
         self.dir_path = "."
-        self.is_status = -1
+        self.is_status = ProcessStatus.UNKNOW
         self.write_file = None
         self.save_log = "detect2d_log.txt"
         current_path = inspect.getfile(inspect.currentframe())
@@ -25,14 +26,20 @@ class Detection2dTrainWindow(QWidget):
         self.sample_process = DetectionSampleProcess()
 
     def closeEvent(self, event):
-        # reply = QMessageBox.question(self, 'Message', "Are you sure to quit?",
-        #                              QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        # if reply == QMessageBox.Yes:
-        #     event.accept()
-        # else:
-        #     event.ignore()
-        self.kill_process()
-        self.write_log_text()
+        if self.is_status == ProcessStatus.UNKNOW:
+            pass
+        elif (self.is_status == ProcessStatus.START_TRAIN or
+              self.is_status == ProcessStatus.CONTINUE_TRAIN):
+            reply = QMessageBox.question(self, 'Message', "Are you sure to quit?",
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                event.accept()
+                self.kill_process()
+                self.write_log_text()
+            else:
+                event.ignore()
+        elif self.is_status != ProcessStatus.THREAD_STOP:
+            self.write_log_text()
 
     def open_train_dataset(self, pressed):
         txt_path, _ = QFileDialog.getOpenFileName(self, "open train dataset", self.dir_path, "txt files(*.txt)")
@@ -90,7 +97,8 @@ class Detection2dTrainWindow(QWidget):
         self.start_train_button.setEnabled(False)
         self.continue_train_button.setEnabled(False)
         self.stop_train_button.setEnabled(True)
-        self.is_status = 0
+        self.is_status = ProcessStatus.START_TRAIN
+        self.text_browser.clear()
         self.text_browser.append("classify start train!")
         try:
             self.write_file = open(self.save_log, 'w')
@@ -115,7 +123,7 @@ class Detection2dTrainWindow(QWidget):
         self.start_train_button.setEnabled(False)
         self.continue_train_button.setEnabled(False)
         self.stop_train_button.setEnabled(True)
-        self.is_status = 1
+        self.is_status = ProcessStatus.CONTINUE_TRAIN
         self.text_browser.append("detection continue train!")
         try:
             self.write_file = open(self.save_log, 'a')
@@ -124,7 +132,7 @@ class Detection2dTrainWindow(QWidget):
 
     def stop_train(self, pressed):
         self.kill_process()
-        self.is_status = 2
+        self.is_status = ProcessStatus.STOP_TRAIN
         self.train_data_button.setEnabled(True)
         self.val_data_button.setEnabled(True)
         self.start_train_button.setEnabled(True)
@@ -133,7 +141,7 @@ class Detection2dTrainWindow(QWidget):
         self.text_browser.append("detection stop train!")
 
     def process_finished(self):
-        if self.is_status != 1:
+        if self.is_status != ProcessStatus.CONTINUE_TRAIN:
             self.train_data_button.setEnabled(True)
             self.val_data_button.setEnabled(True)
             self.start_train_button.setEnabled(True)
@@ -142,7 +150,7 @@ class Detection2dTrainWindow(QWidget):
             self.text_browser.append("detection train end!")
         self.process.close()
         self.write_log_text()
-        self.text_browser.clear()
+        self.is_status = ProcessStatus.THREAD_STOP
 
     def arm_model_convert(self, pressed):
         pass
