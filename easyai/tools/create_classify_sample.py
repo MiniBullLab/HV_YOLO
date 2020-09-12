@@ -100,8 +100,8 @@ class CreateClassifySample():
 def main():
     print("start...")
     test = CreateClassifySample()
-    test.process_sample("/home/lpj/github/data/cifar100/JPEGImages",
-                        "/home/lpj/github/data/cifar100/ImageSets",
+    test.process_sample("/home/lpj/github/dataset/indoorCVPR_09/JPEGImages",
+                        "/home/lpj/github/dataset/indoorCVPR_09/ImageSets",
                         "train_val",
                         10)
     print("End of game, have a nice day!")
