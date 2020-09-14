@@ -48,7 +48,7 @@ def main():
     options = ToolArgumentsParse.test_path_parse()
     test = OfflineClassifyEvaluation()
     value = test.process(options.inputPath, options.targetPath)
-    print("Classify Accuracy: %.5f", value)
+    print("Classify Accuracy: {:.3f}%".format(value * 100))
     print("End of game, have a nice day!")
 
 

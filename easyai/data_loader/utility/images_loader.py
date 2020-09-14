@@ -10,10 +10,14 @@ from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
 
 class ImagesLoader(DataLoader):
 
-    def __init__(self, input_dir, image_size=(416, 416), data_channel=3):
+    def __init__(self, input_dir, image_size=(416, 416), data_channel=3,
+                 normalize_type=0, mean=0, std=1):
         super().__init__()
         self.image_size = image_size
         self.data_channel = data_channel
+        self.normalize_type = normalize_type
+        self.mean = mean
+        self.std = std
         self.image_process = ImageProcess()
         self.dirProcess = DirProcess()
         self.dataset_process = ImageDataSetProcess()
@@ -37,7 +41,9 @@ class ImagesLoader(DataLoader):
         ratio, pad_size = self.dataset_process.get_square_size(src_size, self.image_size)
         image = self.dataset_process.image_resize_square(src_image, ratio, pad_size,
                                                          color=self.image_pad_color)
-        image = self.dataset_process.image_normalize(image)
+        image = self.dataset_process.normalize(input_data=image,
+                                               normalize_type=self.normalize_type,
+                                               mean=self.mean, std=self.std)
         numpy_image = self.dataset_process.numpy_transpose(image)
         torch_image = self.all_numpy_to_tensor(numpy_image)
         return image_path, cv_image, torch_image

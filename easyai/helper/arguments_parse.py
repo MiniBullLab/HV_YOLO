@@ -288,3 +288,39 @@ class ToolArgumentsParse():
         parser.add_option("-c", "--config", dest="config_path",
                           metavar="PATH", type="string", default=None,
                           help="config path")
+        (options, args) = parser.parse_args()
+        return options
+
+    @classmethod
+    def process_sample_parse(cls):
+        parser = OptionParser()
+        parser.description = "This program process sample"
+
+        parser.add_option("-i", "--input", dest="inputPath",
+                          metavar="PATH", type="string", default=None,
+                          help="images dir")
+
+        parser.add_option("-o", "--output", dest="outputPath",
+                          metavar="PATH", type="string", default=None,
+                          help="save txt dir")
+
+        parser.add_option("-t", "--type", dest="type",
+                          metavar="PATH", type="string", default="train_val",
+                          help="create sample type")
+
+        parser.add_option("-p", '--probability', dest='probability', type='int',
+                          default=10, metavar='EVICTINTERVAL',
+                          help='Sample probability'
+                               'default=%default')
+        (options, args) = parser.parse_args()
+
+        if options.inputPath:
+            if not os.path.exists(options.inputPath):
+                parser.error("Could not find the input file")
+            else:
+                options.input_path = os.path.normpath(options.inputPath)
+        else:
+            parser.error("'input' option is required to run this program")
+
+        return options
+

@@ -33,9 +33,7 @@ class Segmentation(BaseInference):
         os.system('rm -rf ' + self.task_config.save_result_dir)
         os.makedirs(self.task_config.save_result_dir, exist_ok=True)
 
-        dataloader = self.get_image_data_lodaer(input_path,
-                                                self.task_config.image_size,
-                                                self.task_config.image_channel)
+        dataloader = self.get_image_data_lodaer(input_path, 0)
         for index, (file_path, src_image, image) in enumerate(dataloader):
             self.timer.tic()
             self.set_src_size(src_image)

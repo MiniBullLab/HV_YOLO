@@ -15,6 +15,8 @@ class ImageTaskConfig(BaseConfig):
         # data
         self.image_size = None  # W * H
         self.image_channel = 3
+        self.data_mean = None
+        self.data_std = None
         # test
         self.test_batch_size = 1
         # train

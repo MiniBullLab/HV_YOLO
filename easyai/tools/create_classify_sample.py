@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author:
+
 import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
@@ -6,8 +10,9 @@ import codecs
 import json
 import random
 import numpy as np
-from easyai.helper.dirProcess import DirProcess
 import cv2
+from easyai.helper.dirProcess import DirProcess
+from easyai.helper.arguments_parse import ToolArgumentsParse
 
 
 class CreateClassifySample():
@@ -99,11 +104,12 @@ class CreateClassifySample():
 
 def main():
     print("start...")
+    options = ToolArgumentsParse.process_sample_parse()
     test = CreateClassifySample()
-    test.process_sample("/home/lpj/github/dataset/indoorCVPR_09/JPEGImages",
-                        "/home/lpj/github/dataset/indoorCVPR_09/ImageSets",
-                        "train_val",
-                        10)
+    test.process_sample(options.inputPath,
+                        options.outputPath,
+                        options.type,
+                        options.probability)
     print("End of game, have a nice day!")
 
 

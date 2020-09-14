@@ -9,7 +9,8 @@ from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
 
 class VideoLoader(DataLoader):
 
-    def __init__(self, video_path, image_size=(416, 416), data_channel=3):
+    def __init__(self, video_path, image_size=(416, 416), data_channel=3,
+                 normalize_type=0, mean=0, std=1):
         super().__init__()
         self.video_process = VideoProcess()
         self.dataset_process = ImageDataSetProcess()
@@ -19,6 +20,9 @@ class VideoLoader(DataLoader):
         self.video_path = video_path
         self.image_size = image_size
         self.data_channel = data_channel
+        self.normalize_type = normalize_type
+        self.mean = mean
+        self.std = std
         self.count = int(self.video_process.getFrameCount())
         self.image_pad_color = (0, 0, 0)
 
@@ -39,7 +43,9 @@ class VideoLoader(DataLoader):
         ratio, pad_size = self.dataset_process.get_square_size(src_size, self.image_size)
         image = self.dataset_process.image_resize_square(src_image, ratio, pad_size,
                                                          color=self.image_pad_color)
-        image = self.dataset_process.image_normalize(image)
+        image = self.dataset_process.normalize(input_data=image,
+                                               normalize_type=self.normalize_type,
+                                               mean=self.mean, std=self.std)
         numpy_image = self.dataset_process.numpy_transpose(image)
         torch_image = self.all_numpy_to_tensor(numpy_image)
         video_name = self.video_path + "_%d" % self.index

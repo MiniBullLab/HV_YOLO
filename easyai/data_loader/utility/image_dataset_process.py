@@ -14,12 +14,19 @@ class ImageDataSetProcess(BaseDataSetProcess):
     def __init__(self):
         super().__init__()
 
+    def normalize(self, input_data, normalize_type, **param):
+        result = None
+        if normalize_type == 0:
+            result = self.image_normalize(input_data)
+        elif normalize_type == 1:
+            result = self.numpy_normalize(input_data, **param)
+        return result
+
     def image_normalize(self, image):
         return image / 255.0
 
     def numpy_normalize(self, input_data, mean, std):
-        result = (input_data - mean) / std
-        return result
+        return (input_data - mean) / std
 
     def numpy_transpose(self, images, dtype=np.float32):
         result = None

@@ -21,9 +21,7 @@ class KeyPoints2d(BaseInference):
         self.device = self.torchModelProcess.getDevice()
 
     def process(self, input_path, is_show=False):
-        dataloader = self.get_image_data_lodaer(input_path,
-                                                self.task_config.image_size,
-                                                self.task_config.image_channel)
+        dataloader = self.get_image_data_lodaer(input_path, 0)
         for i, (file_path, src_image, img) in enumerate(dataloader):
             print('%g/%g' % (i + 1, len(dataloader)), end=' ')
             self.set_src_size(src_image)

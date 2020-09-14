@@ -26,9 +26,7 @@ class Detection2d(BaseInference):
 
     def process(self, input_path, is_show=False):
         os.system('rm -rf ' + self.task_config.save_result_path)
-        dataloader = self.get_image_data_lodaer(input_path,
-                                                self.task_config.image_size,
-                                                self.task_config.image_channel)
+        dataloader = self.get_image_data_lodaer(input_path, 0)
         for i, (file_path, src_image, img) in enumerate(dataloader):
             print('%g/%g' % (i + 1, len(dataloader)), end=' ')
             self.set_src_size(src_image)
@@ -53,13 +51,16 @@ class Detection2d(BaseInference):
                 y1 = temp_object.min_corner.y
                 x2 = temp_object.max_corner.x
                 y2 = temp_object.max_corner.y
-                save_data = save_data + "{} {} {} {} {}|".format(temp_object.name,
+                save_data = save_data + "{} {} {} {} {} {}|".format(temp_object.name,
                                                                  confidence,
                                                                  x1, y1, x2, y2)
             save_data += "\n"
             with open(self.task_config.save_result_path, 'a') as file:
-                file.write(self.task_config.save_result_path)
+                file.write(save_data)
         elif flag == 1:
+            if self.task_config.save_result_dir is not None and \
+                    not os.path.exists(self.task_config.save_result_dir):
+                os.makedirs(self.task_config.save_result_dir, exist_ok=True)
             for temp_object in detection_objects:
                 confidence = temp_object.classConfidence * temp_object.objectConfidence
                 x1 = temp_object.min_corner.x

@@ -14,8 +14,6 @@ class ClassifyConfig(ImageTaskConfig):
         self.set_task_name(TaskName.Classify_Task)
         # data
         self.class_name = None
-        self.data_mean = None
-        self.data_std = None
         self.save_result_name = "classify_result.txt"
         self.save_result_path = os.path.join(self.root_save_dir, self.save_result_name)
         # test

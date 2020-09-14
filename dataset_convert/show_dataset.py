@@ -3,11 +3,11 @@ import cv2
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from PIL import Image
-from .processDataSet import getDataClass, getDirFiles
+from dataset_convert.process_caffe_data import getDataClass, getDirFiles
 
 plt.rcParams['font.sans-serif']=['SimHei'] #用来正常显示中文标签
 plt.rcParams['axes.unicode_minus']=False #用来正常显示负号
+
 
 def plotPoint(xDatas, yDatas, maxX, maxY):
     plt.scatter(xDatas, yDatas, cmap=plt.cm.Blues, edgecolors='none', s=2)
@@ -24,6 +24,7 @@ def plotPoint(xDatas, yDatas, maxX, maxY):
     plt.savefig("point.png")
     plt.show()
 
+
 def plotLine(xDatas, yDatas, xLabels):
     plt.figure(figsize=(20, 5))
     plt.plot(xDatas, yDatas, linewidth=2, color='r', marker='o', label="class")
@@ -36,6 +37,7 @@ def plotLine(xDatas, yDatas, xLabels):
     plt.grid(xDatas)
     plt.savefig("line.png")
     plt.show()
+
 
 def showAllImageClass(inputPath, imagePost):
     classLabels = []
@@ -50,6 +52,7 @@ def showAllImageClass(inputPath, imagePost):
             datasX.append(index)
             datasY.append(imageCount)
     plotLine(datasX, datasY, classLabels)
+
 
 def showAllImageSize(inputPath, imagePost):
     datasWidth = []
@@ -74,6 +77,7 @@ def showAllImageSize(inputPath, imagePost):
                 datasWidth.append(imageWidth)
                 datasHeight.append(imageHeight)
     plotPoint(datasWidth, datasHeight, 1000, 1000)
+
 
 if __name__ == "__main__":
     print("start...")
