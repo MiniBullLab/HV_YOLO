@@ -22,11 +22,12 @@ class ModelFactory():
 
     def get_model(self, model_config):
         input_name = model_config['type'].strip()
+        model_args = model_config.copy()
         if input_name.endswith("cfg"):
-            model_config.pop("type")
-            result = self.get_model_from_cfg(input_name, model_config)
+            model_args.pop("type")
+            result = self.get_model_from_cfg(input_name, model_args)
         else:
-            result = self.get_model_from_name(model_config)
+            result = self.get_model_from_name(model_args)
             if result is None:
                 print("%s model error!" % input_name)
         self.model_weight_init.init_weight(result)

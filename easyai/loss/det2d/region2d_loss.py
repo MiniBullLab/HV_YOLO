@@ -127,7 +127,7 @@ class Region2dLoss(YoloLoss):
         coord[:, :, :2, :] = outputs[:, :, :2, :].sigmoid()  # tx,ty
         coord[:, :, 2:4, :] = outputs[:, :, 2:4, :]  # tw,th
         conf = outputs[:, :, 4, :].sigmoid()
-        conf = conf.transpose(2, 3).contiguous().view(batch_size, -1, 1)
+        conf = conf.view(batch_size, -1, 1)
         cls = outputs[:, :, 5:, :].transpose(2, 3).contiguous().view(batch_size, -1, self.class_number)
         # Create prediction boxes
         pred_boxes = self.decode_predict_box(coord, batch_size, height, width, device)

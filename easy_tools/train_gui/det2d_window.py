@@ -22,7 +22,7 @@ class Detection2dTrainWindow(QWidget):
         self.save_log = "detect2d_log.txt"
         current_path = inspect.getfile(inspect.currentframe())
         dir_name = os.path.dirname(current_path)
-        self.cmd_str = os.path.join(dir_name, "../amba_scripts/DeNET_tool.sh")
+        self.cmd_str = os.path.join(dir_name, "../train_scripts/DeNET_tool.sh")
         self.sample_process = DetectionSampleProcess()
 
     def closeEvent(self, event):
@@ -75,8 +75,8 @@ class Detection2dTrainWindow(QWidget):
             print(reply)
 
     def start_train(self, pressed):
-        os.system("rm -rf ./log/snapshot/det2d_latest.pt")
-        os.system("rm -rf ./log/snapshot/det2d_best.pt")
+        os.system("rm -rf ./.log/snapshot/det2d_latest.pt")
+        os.system("rm -rf ./.log/snapshot/det2d_best.pt")
         os.system("rm -rf %s" % self.save_log)
         arguments = [self.train_data_txt.text(), self.val_data_txt.text()]
         env = QProcessEnvironment.systemEnvironment()

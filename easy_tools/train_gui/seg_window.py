@@ -21,7 +21,7 @@ class SegmentTrainWindow(QWidget):
         self.save_log = "segmentation_log.txt"
         current_path = inspect.getfile(inspect.currentframe())
         dir_name = os.path.dirname(current_path)
-        self.cmd_str = os.path.join(dir_name, "../amba_scripts/SegNET_tool.sh")
+        self.cmd_str = os.path.join(dir_name, "../train_scripts/SegNET_tool.sh")
 
     def closeEvent(self, event):
         if self.is_status == ProcessStatus.UNKNOW:
@@ -60,8 +60,8 @@ class SegmentTrainWindow(QWidget):
             return
 
     def start_train(self, pressed):
-        os.system("rm -rf ./log/snapshot/seg_latest.pt")
-        os.system("rm -rf ./log/snapshot/seg_best.pt")
+        os.system("rm -rf ./.log/snapshot/seg_latest.pt")
+        os.system("rm -rf ./.log/snapshot/seg_best.pt")
         os.system("rm -rf %s" % self.save_log)
         arguments = [self.train_data_txt.text(), self.val_data_txt.text()]
         env = QProcessEnvironment.systemEnvironment()

@@ -21,7 +21,7 @@ class ClassifyTrainWindow(QWidget):
         self.save_log = "classify_log.txt"
         current_path = inspect.getfile(inspect.currentframe())
         dir_name = os.path.dirname(current_path)
-        self.cmd_str = os.path.join(dir_name, "../amba_scripts/ClassNET_tool.sh")
+        self.cmd_str = os.path.join(dir_name, "../train_scripts/ClassNET_tool.sh")
 
     def closeEvent(self, event):
         if self.is_status == ProcessStatus.UNKNOW:
@@ -60,8 +60,8 @@ class ClassifyTrainWindow(QWidget):
             return
 
     def start_train(self, pressed):
-        os.system("rm -rf ./log/snapshot/cls_latest.pt")
-        os.system("rm -rf ./log/snapshot/cls_best.pt")
+        os.system("rm -rf ./.log/snapshot/cls_latest.pt")
+        os.system("rm -rf ./.log/snapshot/cls_best.pt")
         os.system("rm -rf %s" % self.save_log)
         arguments = [self.train_data_txt.text(), self.val_data_txt.text()]
         env = QProcessEnvironment.systemEnvironment()
