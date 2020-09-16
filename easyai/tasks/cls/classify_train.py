@@ -10,8 +10,10 @@ from easyai.tasks.utility.base_task import DelayedKeyboardInterrupt
 from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.cls.classify_test import ClassifyTest
 from easyai.base_name.task_name import TaskName
+from easyai.tasks.utility.registry import REGISTERED_TRAIN_TASK
 
 
+@REGISTERED_TRAIN_TASK.register_module(TaskName.Classify_Task)
 class ClassifyTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
@@ -49,12 +51,7 @@ class ClassifyTrain(BaseTrain):
     def train(self, train_path, val_path):
 
         dataloader = get_classify_train_dataloader(train_path,
-                                                   self.train_task_config.data_mean,
-                                                   self.train_task_config.data_std,
-                                                   self.train_task_config.image_size,
-                                                   self.train_task_config.image_channel,
-                                                   self.train_task_config.train_batch_size,
-                                                   self.train_task_config.train_data_augment)
+                                                   self.train_task_config)
 
         self.total_images = len(dataloader)
 
@@ -63,7 +60,7 @@ class ClassifyTrain(BaseTrain):
                                         self.total_images)
         lr_scheduler = lr_factory.get_lr_scheduler(self.train_task_config.lr_scheduler_config)
 
-        self.load_latest_param(self.train_task_config.latest_weights_file)
+        self.load_latest_param(self.train_task_config.latest_weights_path)
 
         self.train_task_config.save_config()
         self.timer.tic()
@@ -138,7 +135,7 @@ class ClassifyTrain(BaseTrain):
                 save_model_path = os.path.join(self.train_task_config.snapshot_path,
                                                "cls_model_epoch_%d.pt" % epoch)
             else:
-                save_model_path = self.train_task_config.latest_weights_file
+                save_model_path = self.train_task_config.latest_weights_path
             self.torchModelProcess.saveLatestModel(save_model_path, self.model,
                                                    self.optimizer, epoch,
                                                    self.best_precision)
@@ -153,6 +150,6 @@ class ClassifyTrain(BaseTrain):
             # save best model
             self.best_precision = self.torchModelProcess.saveBestModel(precision,
                                                                        save_model_path,
-                                                                       self.train_task_config.best_weights_file)
+                                                                       self.train_task_config.best_weights_path)
         else:
             print("no test!")

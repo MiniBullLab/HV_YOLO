@@ -2,53 +2,36 @@
 # -*- coding:utf-8 -*-
 # Author:lipeijie
 
+from easyai.tasks.utility.registry import REGISTERED_INFERENCE_TASK
+from easyai.utility.registry import build_from_cfg
 from easyai.helper.arguments_parse import TaskArgumentsParse
-from easyai.tasks.cls.classify import Classify
-from easyai.tasks.det2d.detect2d import Detection2d
-from easyai.tasks.seg.segment import Segmentation
-from easyai.tasks.multi_task.det2d_seg_task import Det2dSegTask
-from easyai.base_name.task_name import TaskName
 
 
 class InferenceTask():
 
-    def __init__(self, input_path, is_show=False):
+    def __init__(self, task_name, input_path, is_show=False):
+        self.task_name = task_name
         self.input_path = input_path
         self.is_show = is_show
 
-    def classify_task(self, cfg_path, gpu_id, weight_path, config_path):
-        cls = Classify(cfg_path, gpu_id, config_path)
-        cls.load_weights(weight_path)
-        cls.process(self.input_path, self.is_show)
-
-    def detect2d_task(self, cfg_path, gpu_id, weight_path, config_path):
-        det2d = Detection2d(cfg_path, gpu_id, config_path)
-        det2d.load_weights(weight_path)
-        det2d.process(self.input_path, self.is_show)
-
-    def segment_task(self, cfg_path, gpu_id, weight_path, config_path):
-        seg = Segmentation(cfg_path, gpu_id, config_path)
-        seg.load_weights(weight_path)
-        seg.process(self.input_path, self.is_show)
-
-    def det2d_seg_task(self, cfg_path, gpu_id, weight_path, config_path):
-        multi_det2d_seg = Det2dSegTask(cfg_path, gpu_id, config_path)
-        multi_det2d_seg.load_weights(weight_path)
-        multi_det2d_seg.process(self.input_path, self.is_show)
+    def infer(self, cfg_path, gpu_id, weight_path, config_path):
+        task_args = {'type': self.task_name,
+                     'cfg_path': cfg_path,
+                     'gpu_id': gpu_id,
+                     'config_path': config_path}
+        if REGISTERED_INFERENCE_TASK.has_class(self.task_name):
+            task = build_from_cfg(task_args, REGISTERED_INFERENCE_TASK)
+            task.load_weights(weight_path)
+            task.process(self.input_path, self.is_show)
+        else:
+            print("This task(%s) not exits!" % self.task_name)
 
 
 def main():
     print("process start...")
     options = TaskArgumentsParse.inference_parse_arguments()
-    inference_task = InferenceTask(options.inputPath, options.show)
-    if options.task_name == TaskName.Classify_Task:
-        inference_task.classify_task(options.model, 0, options.weights, options.config_path)
-    if options.task_name == TaskName.Detect2d_Task:
-        inference_task.detect2d_task(options.model, 0, options.weights, options.config_path)
-    elif options.task_name == TaskName.Segment_Task:
-        inference_task.segment_task(options.model, 0, options.weights, options.config_path)
-    elif options.task_name == TaskName.Det2d_Seg_Task:
-        inference_task.det2d_seg_task(options.model, 0, options.weights, options.config_path)
+    inference_task = InferenceTask(options.task_name, options.inputPath, options.show)
+    inference_task.infer(options.model, 0, options.weights, options.config_path)
     print("process end!")
 
 

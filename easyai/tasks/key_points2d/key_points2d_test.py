@@ -7,15 +7,17 @@ from easyai.evaluation.key_point_accuracy import KeyPointAccuracy
 from easyai.data_loader.key_point2d.key_point2d_dataloader import get_key_points2d_val_dataloader
 from easyai.tasks.key_points2d.key_points2d import KeyPoints2d
 from easyai.base_name.task_name import TaskName
+from easyai.tasks.utility.registry import REGISTERED_TEST_TASK
 
 
+@REGISTERED_TEST_TASK.register_module(TaskName.KeyPoints2d_Task)
 class KeyPoints2dTest(BaseTest):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
         super().__init__(config_path, TaskName.KeyPoints2d_Task)
         self.inference = KeyPoints2d(cfg_path, gpu_id, config_path)
         self.evaluator = KeyPointAccuracy(self.test_task_config.points_count,
-                                          self.test_task_config.class_name)
+                                          self.test_task_config.points_class)
 
         self.conf_threshold = 5e-3
 
@@ -24,11 +26,7 @@ class KeyPoints2dTest(BaseTest):
 
     def test(self, val_path):
         dataloader = get_key_points2d_val_dataloader(val_path,
-                                                     self.test_task_config.class_name,
-                                                     image_size=self.test_task_config.image_size,
-                                                     data_channel=self.test_task_config.image_channel,
-                                                     points_count=self.test_task_config.points_count,
-                                                     batch_size=1)
+                                                     self.test_task_config)
 
         self.timer.tic()
         self.evaluator.reset()
@@ -44,6 +42,6 @@ class KeyPoints2dTest(BaseTest):
 
     def save_test_value(self, epoch, accuracy):
         # Write epoch results
-        with open(self.test_task_config.save_evaluation_path, 'a') as file:
+        with open(self.test_task_config.evaluation_result_path, 'a') as file:
             file.write("Epoch: {} | accuracy: {:.3f}".format(epoch, accuracy))
             file.write("\n")

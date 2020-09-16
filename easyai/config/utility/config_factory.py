@@ -2,13 +2,8 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.base_name.task_name import TaskName
-from easyai.config.task.classify_config import ClassifyConfig
-from easyai.config.task.detect2d_config import Detect2dConfig
-from easyai.config.task.segment_config import SegmentionConfig
-from easyai.config.task.sr_config import SuperResolutionConfig
-from easyai.config.task.multi_det2d_seg_config import MultiDet2dSegConfig
-from easyai.config.task.key_point2d_config import KeyPoint2dConfig
+from easyai.config.utility.registry import REGISTERED_TASK_CONFIG
+from easyai.utility.registry import build_from_cfg
 
 
 class ConfigFactory():
@@ -19,23 +14,9 @@ class ConfigFactory():
     def get_config(self, task_name, config_path=None):
         task_name = task_name.strip()
         result = None
-        if task_name == TaskName.Classify_Task:
-            result = ClassifyConfig()
-            result.load_config(config_path)
-        elif task_name == TaskName.Detect2d_Task:
-            result = Detect2dConfig()
-            result.load_config(config_path)
-        elif task_name == TaskName.Segment_Task:
-            result = SegmentionConfig()
-            result.load_config(config_path)
-        elif task_name == TaskName.SuperResolution_Task:
-            result = SuperResolutionConfig()
-            result.load_config(config_path)
-        elif task_name == TaskName.Det2d_Seg_Task:
-            result = MultiDet2dSegConfig()
-            result.load_config(config_path)
-        elif task_name == TaskName.KeyPoints2d_Task:
-            result = KeyPoint2dConfig()
+        config_args = {'type': task_name}
+        if REGISTERED_TASK_CONFIG.has_class(task_name):
+            result = build_from_cfg(config_args, REGISTERED_TASK_CONFIG)
             result.load_config(config_path)
         else:
             print("%s task not exits" % task_name)

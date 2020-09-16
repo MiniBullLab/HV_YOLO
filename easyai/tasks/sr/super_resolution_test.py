@@ -9,8 +9,10 @@ from easyai.data_loader.sr.super_resolution_dataloader import get_sr_val_dataloa
 from easyai.tasks.sr.super_resolution import SuperResolution
 from easyai.helper.average_meter import AverageMeter
 from easyai.base_name.task_name import TaskName
+from easyai.tasks.utility.registry import REGISTERED_TEST_TASK
 
 
+@REGISTERED_TEST_TASK.register_module(TaskName.SuperResolution_Task)
 class SuperResolutionTest(BaseTest):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
@@ -26,10 +28,7 @@ class SuperResolutionTest(BaseTest):
         self.sr_inference.load_weights(weights_path)
 
     def test(self, val_path):
-        dataloader = get_sr_val_dataloader(val_path, self.test_task_config.image_size,
-                                           self.test_task_config.image_channel,
-                                           self.test_task_config.upscale_factor,
-                                           self.test_task_config.test_batch_size)
+        dataloader = get_sr_val_dataloader(val_path, self.test_task_config)
         print("Eval data num: {}".format(len(dataloader)))
         self.timer.tic()
         self.epoch_avg_psnr.reset()
@@ -47,7 +46,7 @@ class SuperResolutionTest(BaseTest):
 
     def save_test_value(self, epoch, score):
         # write epoch results
-        with open(self.test_task_config.save_evaluation_path, 'a') as file:
+        with open(self.test_task_config.evaluation_result_path, 'a') as file:
             file.write("Epoch: {} | psnr: {:.5f} | ".format(epoch, score))
             file.write("\n")
 

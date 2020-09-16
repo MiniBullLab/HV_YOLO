@@ -6,7 +6,6 @@ import numpy as np
 import math
 import random
 from easyai.helper.json_process import JsonProcess
-from easyai.helper import ImageProcess
 from easyai.data_loader.utility.data_loader import DataLoader
 from easyai.data_loader.multi_task.multi_task_sample import MultiTaskSample
 from easyai.data_loader.multi_task.det2d_seg_data_augment import Det2dSegDataAugment
@@ -18,9 +17,10 @@ from easyai.data_loader.seg.segment_dataset_process import SegmentDatasetProcess
 class Det2dSegTrainDataloader(DataLoader):
 
     def __init__(self, train_path, det2d_class_name, seg_class_name,
+                 resize_type, normalize_type, mean=0, std=1,
                  batch_size=1, image_size=(768, 320), data_channel=3,
                  multi_scale=False, is_augment=False, balanced_sample=False):
-        super().__init__()
+        super().__init__(data_channel)
         self.det2d_class_name = det2d_class_name
         self.seg_number_class = len(seg_class_name)
         self.multi_scale = multi_scale
@@ -28,7 +28,6 @@ class Det2dSegTrainDataloader(DataLoader):
         self.balanced_sample = balanced_sample
         self.batch_size = batch_size
         self.image_size = image_size
-        self.data_channel = data_channel
         self.image_pad_color = (0, 0, 0)
 
         self.multi_task_sample = MultiTaskSample(train_path,
@@ -36,10 +35,11 @@ class Det2dSegTrainDataloader(DataLoader):
                                                  balanced_sample)
         self.multi_task_sample.read_sample()
         self.json_process = JsonProcess()
-        self.image_process = ImageProcess()
         self.image_dataset_process = ImageDataSetProcess()
-        self.det2d_dataset_process = DetectionDataSetProcess(self.image_pad_color)
-        self.seg_dataset_process = SegmentDatasetProcess(self.image_pad_color)
+        self.det2d_dataset_process = DetectionDataSetProcess(resize_type, normalize_type,
+                                                             mean, std, self.get_pad_color())
+        self.seg_dataset_process = SegmentDatasetProcess(resize_type, normalize_type,
+                                                         mean, std, self.get_pad_color())
         self.dataset_augment = Det2dSegDataAugment()
 
         self.nF = self.multi_task_sample.get_sample_count()
@@ -69,14 +69,14 @@ class Det2dSegTrainDataloader(DataLoader):
         for temp_index in range(start_index, stop_index):
             img_path, label_path, segment_path = self.multi_task_sample.get_sample_path(temp_index,
                                                                                         class_index)
-            src_image = self.read_src_image(img_path)
+            _, src_image = self.read_src_image(img_path)
             _, boxes = self.json_process.parse_rect_data(label_path)
             segment_label = self.image_process.read_gray_image(segment_path)
 
             src_size = (src_image.shape[1], src_image.shape[0])  # [width, height]
             ratio, pad_size = self.image_dataset_process.get_square_size(src_size, (width, height))
             image = self.image_dataset_process.image_resize_square(src_image, ratio, pad_size,
-                                                                   color=self.image_pad_color)
+                                                                   pad_color=self.image_pad_color)
             boxes = self.det2d_dataset_process.resize_labels(boxes, self.det2d_class_name, ratio, pad_size)
             segment_label = self.seg_dataset_process.resize_lable(segment_label, ratio, pad_size)
             if self.is_augment:
@@ -122,12 +122,22 @@ class Det2dSegTrainDataloader(DataLoader):
             height = self.image_size[1]
         return width, height
 
-    def read_src_image(self, image_path):
-        src_image = None
-        if self.data_channel == 1:
-            src_image = self.image_process.read_gray_image(image_path)
-        elif self.data_channel == 3:
-            _, src_image = self.image_process.readRgbImage(image_path)
-        else:
-            print("det2d_seg read src image error!")
-        return src_image
+
+def get_det2d_seg_train_dataloader(train_path, data_config):
+    det2d_class_name = data_config.detect2d_class
+    seg_class_name = data_config.segment_class
+    image_size = data_config.image_size
+    data_channel = data_config.image_channel
+    resize_type = data_config.resize_type
+    normalize_type = data_config.normalize_type
+    mean = data_config.data_mean
+    std = data_config.data_std
+    batch_size = data_config.train_batch_size
+    dataloader = Det2dSegTrainDataloader(train_path, det2d_class_name, seg_class_name,
+                                         resize_type, normalize_type, mean, std,
+                                         batch_size, image_size, data_channel,
+                                         multi_scale=data_config.train_multi_scale,
+                                         is_augment=data_config.train_data_augment,
+                                         balanced_sample=data_config.balanced_sample)
+
+    return dataloader

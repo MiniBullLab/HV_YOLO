@@ -45,22 +45,24 @@ class BaseInference(BaseTask):
         self.model = self.torchModelProcess.modelTestInit(self.model)
         self.model.eval()
 
-    def get_image_data_lodaer(self, input_path, normalize_type):
+    def get_image_data_lodaer(self, input_path):
         if not os.path.exists(input_path):
             return None
-        image_size = self.task_config.image_size,
-        data_channel = self.task_config.image_channel
+        image_size = self.task_config.image_size
+        data_channel = self.task_config.data_channel
         mean = self.task_config.data_mean
         std = self.task_config.data_std
+        normalize_type = self.task_config.self.normalize_type
+        resize_type = self.task_config.resize_type
         if Path(input_path).is_dir():
             dataloader = ImagesLoader(input_path, image_size, data_channel,
-                                      normalize_type, mean, std)
+                                      resize_type, normalize_type, mean, std)
         elif Path(input_path).suffix in ['.txt', '.text']:
             dataloader = TextDataLoader(input_path, image_size, data_channel,
-                                        normalize_type, mean, std)
+                                        resize_type, normalize_type, mean, std)
         else:
             dataloader = VideoLoader(input_path, image_size, data_channel,
-                                     normalize_type, mean, std)
+                                     resize_type, normalize_type, mean, std)
         return dataloader
 
     def set_src_size(self, src_data):

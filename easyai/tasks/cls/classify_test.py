@@ -7,8 +7,10 @@ from easyai.data_loader.cls.classify_dataloader import get_classify_val_dataload
 from easyai.tasks.cls.classify import Classify
 from easyai.evaluation.classify_accuracy import ClassifyAccuracy
 from easyai.base_name.task_name import TaskName
+from easyai.tasks.utility.registry import REGISTERED_TEST_TASK
 
 
+@REGISTERED_TEST_TASK.register_module(TaskName.Classify_Task)
 class ClassifyTest(BaseTest):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
@@ -21,12 +23,7 @@ class ClassifyTest(BaseTest):
         self.classify_inference.load_weights(weights_path)
 
     def test(self, val_path):
-        dataloader = get_classify_val_dataloader(val_path,
-                                                 self.test_task_config.data_mean,
-                                                 self.test_task_config.data_std,
-                                                 self.test_task_config.image_size,
-                                                 self.test_task_config.image_channel,
-                                                 self.test_task_config.test_batch_size)
+        dataloader = get_classify_val_dataloader(val_path, self.test_task_config)
         self.evaluation.clean_data()
         for index, (images, labels) in enumerate(dataloader):
             output = self.classify_inference.infer(images)
@@ -36,16 +33,15 @@ class ClassifyTest(BaseTest):
 
     def save_test_value(self, epoch):
         # Write epoch results
-        save_result_path = self.test_task_config.test_result_path
         if max(self.topK) > 1:
-            with open(save_result_path, 'a') as file:
+            with open(self.test_task_config.evaluation_result_path, 'a') as file:
                 file.write("Epoch: {} | prec{}: {:.3f} | prec{}: {:.3f}\n".format(epoch,
                                                                                   self.topK[0],
                                                                                   self.topK[1],
                                                                                   self.evaluation.get_top1(),
                                                                                   self.evaluation.get_topK()))
         else:
-            with open(save_result_path, 'a') as file:
+            with open(self.test_task_config.evaluation_result_path, 'a') as file:
                 file.write("Epoch: {} | prec1: {:.3f}\n".format(epoch, self.evaluation.get_top1()))
 
     def print_evaluation(self):

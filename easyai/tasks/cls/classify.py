@@ -7,8 +7,10 @@ import torch
 from easyai.tasks.utility.base_inference import BaseInference
 from easyai.visualization.task_show.classify_show import ClassifyShow
 from easyai.base_name.task_name import TaskName
+from easyai.tasks.utility.registry import REGISTERED_INFERENCE_TASK
 
 
+@REGISTERED_INFERENCE_TASK.register_module(TaskName.Classify_Task)
 class Classify(BaseInference):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
@@ -20,7 +22,7 @@ class Classify(BaseInference):
 
     def process(self, input_path, is_show=False):
         os.system('rm -rf ' + self.task_config.save_result_path)
-        dataloader = self.get_image_data_lodaer(input_path, 1)
+        dataloader = self.get_image_data_lodaer(input_path)
         for index, (file_path, src_image, image) in enumerate(dataloader):
             self.timer.tic()
             prediction = self.infer(image)

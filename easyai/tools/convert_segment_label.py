@@ -89,7 +89,7 @@ def main():
     config_factory = ConfigFactory()
     task_config = config_factory.get_config(TaskName.Segment_Task, config_path=options.config_path)
     test.convert_segment_label(options.inputPath,
-                               task_config.label_type,
+                               task_config.seg_label_type,
                                task_config.class_name)
     print("End of game, have a nice day!")
 

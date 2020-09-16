@@ -3,14 +3,16 @@
 # Author:
 
 import os
-from easyai.data_loader.multi_task.det2d_seg_train_dataloader import Det2dSegTrainDataloader
+from easyai.data_loader.multi_task.det2d_seg_train_dataloader import get_det2d_seg_train_dataloader
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.solver.lr_factory import LrSchedulerFactory
 from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.multi_task.det2d_seg_task_test import Det2dSegTaskTest
 from easyai.base_name.task_name import TaskName
+from easyai.tasks.utility.registry import REGISTERED_TRAIN_TASK
 
 
+@REGISTERED_TRAIN_TASK.register_module(TaskName.Det2d_Seg_Task)
 class Det2dSegTaskTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
@@ -46,14 +48,7 @@ class Det2dSegTaskTrain(BaseTrain):
         self.optimizer = self.torchOptimizer.getLatestModelOptimizer(checkpoint)
 
     def train(self, train_path, val_path):
-        dataloader = Det2dSegTrainDataloader(train_path, self.train_task_config.detect_name,
-                                             self.train_task_config.segment_name,
-                                             self.train_task_config.train_batch_size,
-                                             self.train_task_config.image_size,
-                                             self.train_task_config.image_channel,
-                                             multi_scale=self.train_task_config.train_multi_scale,
-                                             is_augment=self.train_task_config.train_data_augment,
-                                             balanced_sample=self.train_task_config.balanced_sample)
+        dataloader = get_det2d_seg_train_dataloader(train_path, self.train_task_config)
         self.total_images = len(dataloader)
 
         lr_factory = LrSchedulerFactory(self.train_task_config.base_lr,
@@ -61,7 +56,7 @@ class Det2dSegTaskTrain(BaseTrain):
                                         self.total_images)
         lr_scheduler = lr_factory.get_lr_scheduler(self.train_task_config.lr_scheduler_config)
 
-        self.load_latest_param(self.train_task_config.latest_weights_file)
+        self.load_latest_param(self.train_task_config.latest_weights_path)
 
         self.train_task_config.save_config()
         self.timer.tic()
@@ -145,7 +140,7 @@ class Det2dSegTaskTrain(BaseTrain):
             save_model_path = os.path.join(self.train_task_config.snapshot_path,
                                            "multi_task_model_epoch_%d.pt" % epoch)
         else:
-            save_model_path = self.train_task_config.latest_weights_file
+            save_model_path = self.train_task_config.latest_weights_path
         # wrong !!! how to save best_iou
         self.torchModelProcess.saveLatestModel(save_model_path, self.model,
                                                self.optimizer, epoch, self.best_mAP)
@@ -159,6 +154,6 @@ class Det2dSegTaskTrain(BaseTrain):
             # wrong !!! how to use best_iou
             # save best model
             self.best_mAP = self.torchModelProcess.saveBestModel(mAP, save_model_path,
-                                                                 self.train_task_config.best_weights_file)
+                                                                 self.train_task_config.best_weights_path)
         else:
             print("no test!")

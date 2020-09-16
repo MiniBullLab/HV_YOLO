@@ -10,8 +10,10 @@ from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.seg.segment_result_process import SegmentResultProcess
 from easyai.tasks.seg.segment_test import SegmentionTest
 from easyai.base_name.task_name import TaskName
+from easyai.tasks.utility.registry import REGISTERED_TRAIN_TASK
 
 
+@REGISTERED_TRAIN_TASK.register_module(TaskName.Segment_Task)
 class SegmentionTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
@@ -19,7 +21,7 @@ class SegmentionTrain(BaseTrain):
 
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
 
-        self.model_args['class_number'] = len(self.train_task_config.class_name)
+        self.model_args['class_number'] = len(self.train_task_config.segment_class)
         self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
@@ -48,14 +50,9 @@ class SegmentionTrain(BaseTrain):
         self.optimizer = self.torchOptimizer.getLatestModelOptimizer(checkpoint)
 
     def train(self, train_path, val_path):
-        dataloader = get_segment_train_dataloader(train_path, self.train_task_config.class_name,
-                                                  self.train_task_config.label_type,
-                                                  self.train_task_config.image_size,
-                                                  self.train_task_config.image_channel,
-                                                  self.train_task_config.train_batch_size,
-                                                  is_augment=self.train_task_config.train_data_augment)
+        dataloader = get_segment_train_dataloader(train_path, self.train_task_config)
         self.total_images = len(dataloader)
-        self.load_latest_param(self.train_task_config.latest_weights_file)
+        self.load_latest_param(self.train_task_config.latest_weights_path)
 
         lr_factory = LrSchedulerFactory(self.train_task_config.base_lr,
                                         self.train_task_config.max_epochs,
@@ -129,7 +126,7 @@ class SegmentionTrain(BaseTrain):
             save_model_path = os.path.join(self.train_task_config.snapshot_path,
                                            "seg_model_epoch_%d.pt" % epoch)
         else:
-            save_model_path = self.train_task_config.latest_weights_file
+            save_model_path = self.train_task_config.latest_weights_path
         self.torchModelProcess.saveLatestModel(save_model_path, self.model,
                                                self.optimizer, epoch, self.bestmIoU)
         return save_model_path
@@ -151,7 +148,7 @@ class SegmentionTrain(BaseTrain):
             # save best model
             self.bestmIoU = self.torchModelProcess.saveBestModel(score['Mean IoU : \t'],
                                                                  save_model_path,
-                                                                 self.train_task_config.best_weights_file)
+                                                                 self.train_task_config.best_weights_path)
         else:
             print("no test!")
 

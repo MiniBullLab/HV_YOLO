@@ -14,19 +14,28 @@ class ImageDataSetProcess(BaseDataSetProcess):
     def __init__(self):
         super().__init__()
 
+    def resize(self, src_image, dst_size, resize_type, **param):
+        result = None
+        if resize_type == 0:
+            result = self.cv_image_resize(src_image, dst_size)
+        elif resize_type == 1:
+            pad_color = int(param['pad_color'])
+            src_size = (src_image.shape[1], src_image.shape[0])  # [width, height]
+            ratio, pad_size = self.get_square_size(src_size, dst_size)
+            result = self.image_resize_square(src_image, ratio, pad_size,
+                                              pad_color=pad_color)
+        return result
+
     def normalize(self, input_data, normalize_type, **param):
         result = None
         if normalize_type == 0:
             result = self.image_normalize(input_data)
         elif normalize_type == 1:
-            result = self.numpy_normalize(input_data, **param)
+            mean = float(param['mean'])
+            std = float(param['std'])
+            normaliza_image = self.image_normalize(input_data)
+            result = self.standard_normalize(normaliza_image, mean, std)
         return result
-
-    def image_normalize(self, image):
-        return image / 255.0
-
-    def numpy_normalize(self, input_data, mean, std):
-        return (input_data - mean) / std
 
     def numpy_transpose(self, images, dtype=np.float32):
         result = None
@@ -42,6 +51,12 @@ class ImageDataSetProcess(BaseDataSetProcess):
             result = np.ascontiguousarray(img_all, dtype=dtype)
         return result
 
+    def image_normalize(self, image):
+        return image / 255.0
+
+    def standard_normalize(self, input_data, mean, std):
+        return (input_data - mean) / std
+
     def cv_image_resize(self, src_image, image_size):
         image = cv2.resize(src_image, image_size, interpolation=cv2.INTER_NEAREST)
         return image
@@ -54,7 +69,7 @@ class ImageDataSetProcess(BaseDataSetProcess):
             result = cv2.cvtColor(src_image, cv2.COLOR_BGR2RGB)
         return result
 
-    def image_resize_square(self, src_image, ratio, pad_size, color=(0, 0, 0)):
+    def image_resize_square(self, src_image, ratio, pad_size, pad_color=(0, 0, 0)):
         shape = src_image.shape[:2]  # shape = [height, width]
         new_shape = (round(shape[0] * ratio), round(shape[1] * ratio))
         top = pad_size[1] // 2
@@ -64,7 +79,7 @@ class ImageDataSetProcess(BaseDataSetProcess):
         new_size = (new_shape[1], new_shape[0])
         image = self.cv_image_resize(src_image, new_size)
         image = cv2.copyMakeBorder(image, top, bottom, left, right,
-                                   cv2.BORDER_CONSTANT, value=color)
+                                   cv2.BORDER_CONSTANT, value=pad_color)
         return image
 
     def get_square_size(self, src_size, dst_size):

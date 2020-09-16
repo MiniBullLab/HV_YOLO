@@ -4,19 +4,20 @@
 
 
 import numpy as np
-from easyai.data_loader.utility.base_dataset_process import BaseDataSetProcess
-from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
+from easyai.data_loader.utility.task_dataset_process import TaskDataSetProcess
 
 
-class SegmentDatasetProcess(BaseDataSetProcess):
-    def __init__(self, image_pad_color=(0, 0, 0)):
-        super().__init__()
-        self.dataset_process = ImageDataSetProcess()
-        self.image_pad_color = image_pad_color
+class SegmentDatasetProcess(TaskDataSetProcess):
+    def __init__(self, resize_type, normalize_type,
+                 mean=0, std=1, pad_color=0):
+        super().__init__(resize_type, normalize_type, mean, std, pad_color)
         self.label_pad_color = 250
 
     def normalize_dataset(self, src_image):
-        image = self.dataset_process.image_normalize(src_image)
+        image = self.dataset_process.normalize(input_data=src_image,
+                                               normalize_type=self.normalize_type,
+                                               mean=self.mean,
+                                               std=self.std)
         image = self.dataset_process.numpy_transpose(image)
         return image
 
@@ -24,7 +25,7 @@ class SegmentDatasetProcess(BaseDataSetProcess):
         src_size = (src_image.shape[1], src_image.shape[0])  # [width, height]
         ratio, pad_size = self.dataset_process.get_square_size(src_size, image_size)
         image = self.dataset_process.image_resize_square(src_image, ratio, pad_size,
-                                                         color=self.image_pad_color)
+                                                         pad_color=self.pad_color)
         target = self.resize_lable(label, ratio, pad_size)
         return image, target
 

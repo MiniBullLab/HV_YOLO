@@ -10,14 +10,16 @@ from easyai.tasks.seg.segment_result_process import SegmentResultProcess
 from easyai.visualization.task_show.segment_show import SegmentionShow
 from easyai.helper.imageProcess import ImageProcess
 from easyai.base_name.task_name import TaskName
+from easyai.tasks.utility.registry import REGISTERED_INFERENCE_TASK
 
 
+@REGISTERED_INFERENCE_TASK.register_module(TaskName.Segment_Task)
 class Segmentation(BaseInference):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
         super().__init__(cfg_path, config_path, TaskName.Segment_Task)
 
-        self.model_args['class_number'] = len(self.task_config.class_name)
+        self.model_args['class_number'] = len(self.task_config.segment_class)
         self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
@@ -33,7 +35,7 @@ class Segmentation(BaseInference):
         os.system('rm -rf ' + self.task_config.save_result_dir)
         os.makedirs(self.task_config.save_result_dir, exist_ok=True)
 
-        dataloader = self.get_image_data_lodaer(input_path, 0)
+        dataloader = self.get_image_data_lodaer(input_path)
         for index, (file_path, src_image, image) in enumerate(dataloader):
             self.timer.tic()
             self.set_src_size(src_image)

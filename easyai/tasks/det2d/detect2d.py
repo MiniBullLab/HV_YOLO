@@ -9,8 +9,10 @@ from easyai.tasks.det2d.detect2d_result_process import Detect2dResultProcess
 from easyai.base_algorithm.fast_non_max_suppression import FastNonMaxSuppression
 from easyai.visualization.task_show.detect2d_show import DetectionShow
 from easyai.base_name.task_name import TaskName
+from easyai.tasks.utility.registry import REGISTERED_INFERENCE_TASK
 
 
+@REGISTERED_INFERENCE_TASK.register_module(TaskName.Detect2d_Task)
 class Detection2d(BaseInference):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
@@ -20,13 +22,13 @@ class Detection2d(BaseInference):
         self.nms_process = FastNonMaxSuppression()
         self.result_show = DetectionShow()
 
-        self.model_args['class_number'] = len(self.task_config.class_name)
+        self.model_args['class_number'] = len(self.task_config.detect2d_class)
         self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
     def process(self, input_path, is_show=False):
         os.system('rm -rf ' + self.task_config.save_result_path)
-        dataloader = self.get_image_data_lodaer(input_path, 0)
+        dataloader = self.get_image_data_lodaer(input_path)
         for i, (file_path, src_image, img) in enumerate(dataloader):
             print('%g/%g' % (i + 1, len(dataloader)), end=' ')
             self.set_src_size(src_image)
@@ -84,17 +86,28 @@ class Detection2d(BaseInference):
         detection_objects = self.result_process.resize_detection_objects(self.src_size,
                                                                          self.task_config.image_size,
                                                                          detection_objects,
-                                                                         self.task_config.class_name)
+                                                                         self.task_config.detect2d_class)
         return detection_objects
 
     def compute_output(self, output_list):
         count = len(output_list)
-        preds = []
-        for i in range(0, count):
-            temp = self.model.lossList[i](output_list[i])
-            preds.append(temp)
-        prediction = torch.cat(preds, 1)
-        prediction = prediction.squeeze(0)
+        loss_count = len(self.model.lossList)
+        output_count = len(output_list)
+        prediction = None
+        if loss_count == 1 and output_count == 1:
+            prediction = self.model.lossList[0](output_list[0])
+        elif loss_count == 1 and output_count > 1:
+            prediction = self.model.lossList[0](output_list)
+        elif loss_count > 1 and loss_count == output_count:
+            preds = []
+            for i in range(0, count):
+                temp = self.model.lossList[i](output_list[i])
+                preds.append(temp)
+            prediction = torch.cat(preds, 1)
+        else:
+            print("compute loss error")
+        if prediction is not None:
+            prediction = prediction.squeeze(0)
         return prediction
 
 

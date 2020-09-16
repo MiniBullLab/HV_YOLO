@@ -3,15 +3,17 @@
 # Author:
 
 import os
-from easyai.data_loader.det2d.det2d_train_dataloader import DetectionTrainDataloader
+from easyai.data_loader.det2d.det2d_train_dataloader import get_detect2d_train_dataloader
 from easyai.solver.torch_optimizer import TorchOptimizer
 from easyai.solver.lr_factory import LrSchedulerFactory
 from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.det2d.detect2d_test import Detection2dTest
 from easyai.base_name.task_name import TaskName
 from easyai.tools.detection_sample_process import DetectionSampleProcess
+from easyai.tasks.utility.registry import REGISTERED_TRAIN_TASK
 
 
+@REGISTERED_TRAIN_TASK.register_module(TaskName.Detect2d_Task)
 class Detection2dTrain(BaseTrain):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
@@ -19,7 +21,7 @@ class Detection2dTrain(BaseTrain):
 
         self.torchOptimizer = TorchOptimizer(self.train_task_config.optimizer_config)
 
-        self.model_args['class_number'] = len(self.train_task_config.class_name)
+        self.model_args['class_number'] = len(self.train_task_config.detect2d_class)
         self.model = self.torchModelProcess.initModel(self.model_args, gpu_id)
         self.device = self.torchModelProcess.getDevice()
 
@@ -49,14 +51,7 @@ class Detection2dTrain(BaseTrain):
         self.optimizer = self.torchOptimizer.getLatestModelOptimizer(checkpoint)
 
     def train(self, train_path, val_path):
-
-        dataloader = DetectionTrainDataloader(train_path, self.train_task_config.class_name,
-                                              self.train_task_config.train_batch_size,
-                                              self.train_task_config.image_size,
-                                              self.train_task_config.image_channel,
-                                              multi_scale=self.train_task_config.train_multi_scale,
-                                              is_augment=self.train_task_config.train_data_augment,
-                                              balanced_sample=self.train_task_config.balanced_sample)
+        dataloader = get_detect2d_train_dataloader(train_path, self.train_task_config)
         self.total_images = len(dataloader)
 
         lr_factory = LrSchedulerFactory(self.train_task_config.base_lr,
@@ -64,7 +59,7 @@ class Detection2dTrain(BaseTrain):
                                         self.total_images)
         lr_scheduler = lr_factory.get_lr_scheduler(self.train_task_config.lr_scheduler_config)
 
-        self.load_latest_param(self.train_task_config.latest_weights_file)
+        self.load_latest_param(self.train_task_config.latest_weights_path)
 
         self.train_task_config.save_config()
         self.timer.tic()
@@ -140,7 +135,7 @@ class Detection2dTrain(BaseTrain):
             save_model_path = os.path.join(self.train_task_config.snapshot_path,
                                            "det2d_model_epoch_%d.pt" % epoch)
         else:
-            save_model_path = self.train_task_config.latest_weights_file
+            save_model_path = self.train_task_config.latest_weights_path
         self.torchModelProcess.saveLatestModel(save_model_path, self.model,
                                                self.optimizer, epoch, self.best_mAP)
         return save_model_path
@@ -152,6 +147,6 @@ class Detection2dTrain(BaseTrain):
             self.detect_test.save_test_value(epoch, mAP, aps)
             # save best model
             self.best_mAP = self.torchModelProcess.saveBestModel(mAP, save_model_path,
-                                                                 self.train_task_config.best_weights_file)
+                                                                 self.train_task_config.best_weights_path)
         else:
             print("no test!")

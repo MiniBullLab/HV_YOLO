@@ -7,8 +7,10 @@ from easyai.tasks.utility.base_inference import BaseInference
 from easyai.tasks.key_points2d.key_points2d_result_process import KeyPoints2dResultProcess
 from easyai.visualization.task_show.key_points2d_show import KeyPointsShow
 from easyai.base_name.task_name import TaskName
+from easyai.tasks.utility.registry import REGISTERED_INFERENCE_TASK
 
 
+@REGISTERED_INFERENCE_TASK.register_module(TaskName.KeyPoints2d_Task)
 class KeyPoints2d(BaseInference):
 
     def __init__(self, cfg_path, gpu_id, config_path=None):
@@ -21,7 +23,7 @@ class KeyPoints2d(BaseInference):
         self.device = self.torchModelProcess.getDevice()
 
     def process(self, input_path, is_show=False):
-        dataloader = self.get_image_data_lodaer(input_path, 0)
+        dataloader = self.get_image_data_lodaer(input_path)
         for i, (file_path, src_image, img) in enumerate(dataloader):
             print('%g/%g' % (i + 1, len(dataloader)), end=' ')
             self.set_src_size(src_image)
@@ -46,7 +48,7 @@ class KeyPoints2d(BaseInference):
         result_objects = self.result_process.resize_keypoints_objects(self.src_size,
                                                                       self.task_config.image_size,
                                                                       result,
-                                                                      self.task_config.class_name)
+                                                                      self.task_config.points_class)
         return result_objects
 
     def compute_output(self, output_list):

@@ -17,7 +17,7 @@ class MultiBoxLoss(BaseLoss):
         self.class_number = class_number
         self.iou_threshold = iou_threshold
         self.input_size = input_size
-        self.anchor_counts = anchor_counts
+        self.anchor_counts = tuple(anchor_counts)
         self.anchor_sizes = anchor_sizes
         self.aspect_ratio_list = aspect_ratio_list
         self.variances = (0.1, 0.2)
@@ -97,8 +97,8 @@ class MultiBoxLoss(BaseLoss):
                 loc = torch.zeros_like(prior_boxes)
                 cls_conf = torch.zeros((prior_boxes.size(0),)).long()
             else:
-                tem_boxes = torch_box2d_rect_corner(prior_boxes)
-                iou = torch_corners_box2d_ious(gt_boxes, tem_boxes)
+                temp_boxes = torch_box2d_rect_corner(prior_boxes)
+                iou = torch_corners_box2d_ious(gt_boxes, temp_boxes)
                 prior_box_iou, max_idx = iou.max(0, keepdim=False)  # [1,8732]
                 boxes = gt_boxes[max_idx]  # [8732,4]
                 labels = gt_labels[max_idx]  # [8732,],
@@ -163,7 +163,7 @@ class MultiBoxLoss(BaseLoss):
             loc_loss = F.smooth_l1_loss(pos_loc_preds, pos_loc_targets, reduction='sum')
 
             # cls_loss
-            cls_loss = self.cross_entropy_loss(cls_preds.view(-1, self.num_classes),
+            cls_loss = self.cross_entropy_loss(cls_preds.view(-1, self.class_number),
                                                cls_targets.view(-1))  # [N*8732,]
             neg = self.hard_negative_mining(cls_loss, pos)  # [N,8732]
             pos_mask = pos.unsqueeze(2).expand_as(cls_preds)  # [N,8732,21]

@@ -21,3 +21,4 @@ class BaseDataSetProcess():
             transform = self.torchvision_process.torch_normalize(flag=1)
             result = transform(data)
         return result
+

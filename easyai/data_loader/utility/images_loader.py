@@ -2,7 +2,6 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-from easyai.helper import ImageProcess
 from easyai.helper import DirProcess
 from easyai.data_loader.utility.data_loader import *
 from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
@@ -11,13 +10,13 @@ from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
 class ImagesLoader(DataLoader):
 
     def __init__(self, input_dir, image_size=(416, 416), data_channel=3,
-                 normalize_type=0, mean=0, std=1):
-        super().__init__()
+                 resize_type=0, normalize_type=0, mean=0, std=1):
+        super().__init__(data_channel)
         self.image_size = image_size
-        self.data_channel = data_channel
         self.normalize_type = normalize_type
         self.mean = mean
         self.std = std
+        self.resize_type = resize_type
         self.image_process = ImageProcess()
         self.dirProcess = DirProcess()
         self.dataset_process = ImageDataSetProcess()
@@ -36,11 +35,8 @@ class ImagesLoader(DataLoader):
             raise StopIteration
         image_path = self.files[self.index]
         cv_image, src_image = self.read_src_image(image_path)
-        shape = src_image.shape[:2]  # shape = [height, width]
-        src_size = (shape[1], shape[0])
-        ratio, pad_size = self.dataset_process.get_square_size(src_size, self.image_size)
-        image = self.dataset_process.image_resize_square(src_image, ratio, pad_size,
-                                                         color=self.image_pad_color)
+        image = self.dataset_process.resize(src_image, self.image_size, self.resize_type,
+                                            pad_color=self.image_pad_color)
         image = self.dataset_process.normalize(input_data=image,
                                                normalize_type=self.normalize_type,
                                                mean=self.mean, std=self.std)
@@ -50,15 +46,3 @@ class ImagesLoader(DataLoader):
 
     def __len__(self):
         return self.count
-
-    def read_src_image(self, image_path):
-        src_image = None
-        cv_image = None
-        if self.data_channel == 1:
-            src_image = self.image_process.read_gray_image(image_path)
-            cv_image = src_image[:]
-        elif self.data_channel == 3:
-            cv_image, src_image = self.image_process.readRgbImage(image_path)
-        else:
-            print("read src image error!")
-        return cv_image, src_image

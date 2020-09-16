@@ -4,20 +4,22 @@
 
 import numpy as np
 from easyai.helper.dataType import Rect2D
-from easyai.data_loader.utility.base_dataset_process import BaseDataSetProcess
-from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
+from easyai.data_loader.utility.task_dataset_process import TaskDataSetProcess
 
 
-class KeyPoint2dDataSetProcess(BaseDataSetProcess):
+class KeyPoint2dDataSetProcess(TaskDataSetProcess):
 
-    def __init__(self, points_count):
-        super().__init__()
+    def __init__(self, points_count,
+                 resize_type, normalize_type,
+                 mean=0, std=1, pad_color=0):
+        super().__init__(resize_type, normalize_type, mean, std, pad_color)
         self.points_count = points_count
-        self.dataset_process = ImageDataSetProcess()
-        self.image_pad_color = (0, 0, 0)
 
     def normalize_image(self, src_image):
-        image = self.dataset_process.image_normalize(src_image)
+        image = self.dataset_process.normalize(input_data=src_image,
+                                               normalize_type=self.normalize_type,
+                                               mean=self.mean,
+                                               std=self.std)
         image = self.dataset_process.numpy_transpose(image)
         return image
 
@@ -41,7 +43,7 @@ class KeyPoint2dDataSetProcess(BaseDataSetProcess):
         src_size = (src_image.shape[1], src_image.shape[0])  # [width, height]
         ratio, pad_size = self.dataset_process.get_square_size(src_size, image_size)
         image = self.dataset_process.image_resize_square(src_image, ratio, pad_size,
-                                                         color=self.image_pad_color)
+                                                         pad_color=self.pad_color)
         labels = self.resize_labels(boxes, class_name, ratio, pad_size)
         return image, labels
 
@@ -49,7 +51,7 @@ class KeyPoint2dDataSetProcess(BaseDataSetProcess):
         src_size = (src_image.shape[1], src_image.shape[0])  # [width, height]
         ratio, pad_size = self.dataset_process.get_square_size(src_size, image_size)
         image, = self.dataset_process.image_resize_square(src_image, ratio, pad_size,
-                                                          color=self.image_pad_color)
+                                                          pad_color=self.pad_color)
         return image
 
     def resize_labels(self, boxes, class_name, ratio, pad_size):
