@@ -44,8 +44,8 @@ class DetectionDataSetProcess(TaskDataSetProcess):
     def resize_src_image(self, src_image, image_size):
         src_size = (src_image.shape[1], src_image.shape[0])  # [width, height]
         ratio, pad_size = self.dataset_process.get_square_size(src_size, image_size)
-        image, = self.dataset_process.image_resize_square(src_image, ratio, pad_size,
-                                                          pad_color=self.pad_color)
+        image = self.dataset_process.image_resize_square(src_image, ratio, pad_size,
+                                                         pad_color=self.pad_color)
         return image
 
     def resize_labels(self, boxes, class_name, ratio, pad_size):

@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 # Author:
 
+import numpy as np
 from easyai.helper import VideoProcess
 from easyai.data_loader.utility.data_loader import *
 from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
@@ -20,8 +21,8 @@ class VideoLoader(DataLoader):
         self.video_path = video_path
         self.image_size = image_size
         self.normalize_type = normalize_type
-        self.mean = mean
-        self.std = std
+        self.mean = np.array(mean, dtype=np.float32)
+        self.std = np.array(std, dtype=np.float32)
         self.resize_type = resize_type
         self.count = int(self.video_process.getFrameCount())
         self.image_pad_color = (0, 0, 0)

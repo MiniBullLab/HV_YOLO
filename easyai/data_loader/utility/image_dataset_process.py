@@ -31,8 +31,8 @@ class ImageDataSetProcess(BaseDataSetProcess):
         if normalize_type == 0:
             result = self.image_normalize(input_data)
         elif normalize_type == 1:
-            mean = float(param['mean'])
-            std = float(param['std'])
+            mean = param['mean']
+            std = param['std']
             normaliza_image = self.image_normalize(input_data)
             result = self.standard_normalize(normaliza_image, mean, std)
         return result

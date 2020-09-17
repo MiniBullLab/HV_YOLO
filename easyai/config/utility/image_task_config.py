@@ -17,8 +17,8 @@ class ImageTaskConfig(BaseConfig):
         self.data_channel = 3
         self.resize_type = 0
         self.normalize_type = 0
-        self.data_mean = 0
-        self.data_std = 1
+        self.data_mean = (0, 0, 0)
+        self.data_std = (1, 1, 1)
         self.save_result_name = None
         self.save_result_path = None
         # test

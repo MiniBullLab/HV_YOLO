@@ -3,6 +3,7 @@
 # Author:
 
 import os
+import numpy as np
 from pathlib import Path
 from easyai.helper import DirProcess
 from easyai.data_loader.utility.data_loader import *
@@ -18,8 +19,8 @@ class TextDataLoader(DataLoader):
             raise Exception("Invalid path!", input_path)
         self.image_size = image_size
         self.normalize_type = normalize_type
-        self.mean = mean
-        self.std = std
+        self.mean = np.array(mean, dtype=np.float32)
+        self.std = np.array(std, dtype=np.float32)
         self.resize_type = resize_type
         self.image_process = ImageProcess()
         self.dirProcess = DirProcess()

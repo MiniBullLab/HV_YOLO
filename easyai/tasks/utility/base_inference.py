@@ -25,7 +25,7 @@ class BaseInference(BaseTask):
         self.src_size = (0, 0)
         self.task_config = self.config_factory.get_config(self.task_name, self.config_path)
         self.model_args = {"type": model_name,
-                           "data_channel": self.task_config.image_channel
+                           "data_channel": self.task_config.data_channel
                            }
 
     @abc.abstractmethod
@@ -52,7 +52,7 @@ class BaseInference(BaseTask):
         data_channel = self.task_config.data_channel
         mean = self.task_config.data_mean
         std = self.task_config.data_std
-        normalize_type = self.task_config.self.normalize_type
+        normalize_type = self.task_config.normalize_type
         resize_type = self.task_config.resize_type
         if Path(input_path).is_dir():
             dataloader = ImagesLoader(input_path, image_size, data_channel,
