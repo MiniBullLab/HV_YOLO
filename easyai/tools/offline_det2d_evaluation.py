@@ -24,7 +24,7 @@ def main():
     options = ToolArgumentsParse.test_path_parse()
     config_factory = ConfigFactory()
     task_config = config_factory.get_config(TaskName.Detect2d_Task, config_path=options.config_path)
-    test = OfflineDet2dEvaluation(task_config.class_name)
+    test = OfflineDet2dEvaluation(task_config.detect2d_class)
     mAP, _ = test.process(options.inputPath, options.targetPath)
     print("End of game, have a nice day!")
 

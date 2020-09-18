@@ -47,7 +47,7 @@ class SegmentionConfig(ImageTrainConfig):
             self.train_data_augment = bool(config_dict['train_data_augment'])
 
     def save_train_value(self, config_dict):
-        self.load_image_train_value(config_dict)
+        self.save_image_train_value(config_dict)
         config_dict['train_data_augment'] = self.train_data_augment
 
     def get_data_default_value(self):

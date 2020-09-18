@@ -28,10 +28,10 @@ class CreateDetectionAnchors():
         self.image_process = ImageProcess()
 
         self.detection_sample = DetectionSample(train_path,
-                                                self.task_config.class_name)
+                                                self.task_config.detect2d_class)
         self.detection_sample.read_sample()
 
-        self.dataset_process = DetectionDataSetProcess()
+        self.dataset_process = DetectionDataSetProcess(1, 0)
 
     def get_anchors(self, number):
         wh_numpy = self.get_width_height()
