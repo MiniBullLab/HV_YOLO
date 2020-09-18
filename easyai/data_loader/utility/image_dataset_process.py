@@ -19,7 +19,7 @@ class ImageDataSetProcess(BaseDataSetProcess):
         if resize_type == 0:
             result = self.cv_image_resize(src_image, dst_size)
         elif resize_type == 1:
-            pad_color = int(param['pad_color'])
+            pad_color = param['pad_color']
             src_size = (src_image.shape[1], src_image.shape[0])  # [width, height]
             ratio, pad_size = self.get_square_size(src_size, dst_size)
             result = self.image_resize_square(src_image, ratio, pad_size,

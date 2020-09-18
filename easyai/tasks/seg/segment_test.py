@@ -55,7 +55,7 @@ class SegmentionTest(BaseTest):
         with open(self.test_task_config.evaluation_result_path, 'a') as file:
             file.write("Epoch: {} | mIoU: {:.3f} | ".format(epoch, score['Mean IoU : \t']))
             for i, iou in class_score.items():
-                file.write(self.test_task_config.class_name[i][0] + ": {:.3f} ".format(iou))
+                file.write(self.test_task_config.segment_class[i][0] + ": {:.3f} ".format(iou))
             file.write("\n")
 
     def compute_loss(self, output_list, targets):

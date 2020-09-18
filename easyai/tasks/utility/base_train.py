@@ -29,7 +29,7 @@ class BaseTrain(BaseTask):
                                         self.train_task_config.root_save_dir)
 
         self.model_args = {"type": model_name,
-                           "data_channel": self.train_task_config.image_channel
+                           "data_channel": self.train_task_config.data_channel
                            }
 
     @abc.abstractmethod

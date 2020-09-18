@@ -31,6 +31,6 @@ class DetectionSampleProcess():
 
     def create_class_names(self, train_path, task_name=TaskName.Detect2d_Task):
         train_task_config = self.config_factory.get_config(task_name)
-        train_task_config.class_name = self.get_detection_class(train_path)
+        train_task_config.detect2d_class = self.get_detection_class(train_path)
         train_task_config.save_config()
-        return train_task_config.class_name
+        return train_task_config.detect2d_class
