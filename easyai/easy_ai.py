@@ -65,7 +65,7 @@ def train_main():
     elif options.task_name.strip() == "DeNET":
         pretrain_model_path = os.path.join(dir_name, "./data/detnet.pt")
         train_task = TrainTask(TaskName.Detect2d_Task, options.trainPath, options.valPath, True)
-        train_task.train("YoloV3Det2d", options.gpu_id, options.config_path, pretrain_model_path)
+        train_task.train("detnet", options.gpu_id, options.config_path, pretrain_model_path)
         # easy_model_convert(options.task_name, train_task.save_onnx_path)
         save_image_dir = os.path.join(config.root_save_dir, "det_img")
         copy_process.copy(options.trainPath, save_image_dir)
