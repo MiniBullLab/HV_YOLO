@@ -25,8 +25,8 @@ class Region2dLoss(YoloLoss):
 
         self.anchor_sizes = self.anchor_sizes / float(self.reduction)
 
-        self.mse = nn.MSELoss()
-        self.ce = nn.CrossEntropyLoss()
+        self.mse = nn.MSELoss(size_average=False)
+        self.ce = nn.CrossEntropyLoss(size_average=False)
 
         self.info = {'object_count': 0, 'average_iou': 0, 'recall50': 0, 'recall75': 0,
                      'coord_loss': 0.0, 'conf_loss': 0.0, 'cls_loss': 0.0}
