@@ -2,9 +2,10 @@
 # -*- coding:utf-8 -*-
 # Author:
 
-import numpy as np
+import os
 import math
 import random
+import numpy as np
 from easyai.helper.json_process import JsonProcess
 from easyai.data_loader.utility.data_loader import DataLoader
 from easyai.data_loader.multi_task.multi_task_sample import MultiTaskSample
@@ -12,16 +13,17 @@ from easyai.data_loader.multi_task.det2d_seg_data_augment import Det2dSegDataAug
 from easyai.data_loader.utility.image_dataset_process import ImageDataSetProcess
 from easyai.data_loader.det2d.det2d_dataset_process import DetectionDataSetProcess
 from easyai.data_loader.seg.segment_dataset_process import SegmentDatasetProcess
+from easyai.tools.create_detection_sample import CreateDetectionSample
 
 
 class Det2dSegTrainDataloader(DataLoader):
 
-    def __init__(self, train_path, det2d_class_name, seg_class_name,
+    def __init__(self, train_path, detect2d_class, seg_class_name,
                  resize_type, normalize_type, mean=0, std=1,
                  batch_size=1, image_size=(768, 320), data_channel=3,
                  multi_scale=False, is_augment=False, balanced_sample=False):
         super().__init__(data_channel)
-        self.det2d_class_name = det2d_class_name
+        self.detect2d_class = detect2d_class
         self.seg_number_class = len(seg_class_name)
         self.multi_scale = multi_scale
         self.is_augment = is_augment
@@ -30,8 +32,14 @@ class Det2dSegTrainDataloader(DataLoader):
         self.image_size = image_size
         self.image_pad_color = (0, 0, 0)
 
+        if balanced_sample:
+            create_sample = CreateDetectionSample()
+            save_sample_dir, _ = os.path.split(train_path)
+            create_sample.createBalanceSample(train_path,
+                                              save_sample_dir,
+                                              detect2d_class)
         self.multi_task_sample = MultiTaskSample(train_path,
-                                                 det2d_class_name,
+                                                 detect2d_class,
                                                  balanced_sample)
         self.multi_task_sample.read_sample()
         self.json_process = JsonProcess()
@@ -77,7 +85,7 @@ class Det2dSegTrainDataloader(DataLoader):
             ratio, pad_size = self.image_dataset_process.get_square_size(src_size, (width, height))
             image = self.image_dataset_process.image_resize_square(src_image, ratio, pad_size,
                                                                    pad_color=self.image_pad_color)
-            boxes = self.det2d_dataset_process.resize_labels(boxes, self.det2d_class_name, ratio, pad_size)
+            boxes = self.det2d_dataset_process.resize_labels(boxes, self.detect2d_class, ratio, pad_size)
             segment_label = self.seg_dataset_process.resize_lable(segment_label, ratio, pad_size)
             if self.is_augment:
                 image, boxes, segments = self.dataset_augment.augment(image, boxes, segment_label)
@@ -105,8 +113,8 @@ class Det2dSegTrainDataloader(DataLoader):
     def get_random_class(self):
         class_index = None
         if self.balanced_sample:
-            class_index = np.random.randint(0, len(self.det2d_class_name))
-            print("loading labels {}".format(self.det2d_class_name[class_index]))
+            class_index = np.random.randint(0, len(self.detect2d_class))
+            print("loading labels {}".format(self.detect2d_class[class_index]))
         return class_index
 
     def get_image_size(self):
@@ -124,7 +132,7 @@ class Det2dSegTrainDataloader(DataLoader):
 
 
 def get_det2d_seg_train_dataloader(train_path, data_config):
-    det2d_class_name = data_config.detect2d_class
+    detect2d_class = data_config.detect2d_class
     seg_class_name = data_config.segment_class
     image_size = data_config.image_size
     data_channel = data_config.image_channel
@@ -133,7 +141,7 @@ def get_det2d_seg_train_dataloader(train_path, data_config):
     mean = data_config.data_mean
     std = data_config.data_std
     batch_size = data_config.train_batch_size
-    dataloader = Det2dSegTrainDataloader(train_path, det2d_class_name, seg_class_name,
+    dataloader = Det2dSegTrainDataloader(train_path, detect2d_class, seg_class_name,
                                          resize_type, normalize_type, mean, std,
                                          batch_size, image_size, data_channel,
                                          multi_scale=data_config.train_multi_scale,

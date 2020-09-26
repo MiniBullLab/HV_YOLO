@@ -48,6 +48,8 @@ if __name__ == '__main__':
     task_config = config_factory.get_config(options.task_name, config_path=None)
     converter = ModelConverter(task_config.image_size)
     if options.model is not None:
-        converter.model_convert(options.model, options.weight_path, options.save_dir)
+        model_config = {"type": options.model,
+                        "data_channel": 3}
+        converter.model_convert(model_config, options.weight_path, options.save_dir)
     elif options.base_model is not None:
         converter.base_model_convert(options.backbone, options.weight_path, options.save_dir)

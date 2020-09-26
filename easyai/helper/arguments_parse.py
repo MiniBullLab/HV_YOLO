@@ -250,6 +250,18 @@ class ToolArgumentsParse():
         return options
 
     @classmethod
+    def model_parse(cls):
+        parser = OptionParser()
+        parser.description = "This program show model net"
+
+        parser.add_option("-m", "--model", dest="model",
+                          action="store", type="string", default=None,
+                          help="model name or cfg file path")
+
+        (options, args) = parser.parse_args()
+        return options
+
+    @classmethod
     def model_convert_parse(cls):
         parser = OptionParser()
         parser.description = "This program convert model to onnx"

@@ -10,13 +10,13 @@ from easyai.data_loader.det2d.det2d_dataset_process import DetectionDataSetProce
 
 class DetectionValDataLoader(TorchDataLoader):
 
-    def __init__(self, val_path, class_name,
+    def __init__(self, val_path, detect2d_class,
                  resize_type, normalize_type, mean=0, std=1,
                  image_size=(416, 416), data_channel=3):
         super().__init__(data_channel)
         self.image_size = image_size
         self.detection_sample = DetectionSample(val_path,
-                                                class_name,
+                                                detect2d_class,
                                                 False)
         self.detection_sample.read_sample()
         self.dataset_process = DetectionDataSetProcess(resize_type, normalize_type,
@@ -36,7 +36,7 @@ class DetectionValDataLoader(TorchDataLoader):
 
 
 def get_detection_val_dataloader(val_path, data_config, num_workers=8):
-    class_name = data_config.detect2d_class
+    detect2d_class = data_config.detect2d_class
     resize_type = data_config.resize_type
     normalize_type = data_config.normalize_type
     mean = data_config.data_mean
@@ -44,7 +44,7 @@ def get_detection_val_dataloader(val_path, data_config, num_workers=8):
     image_size = data_config.image_size
     data_channel = data_config.data_channel
     batch_size = 1
-    dataloader = DetectionValDataLoader(val_path, class_name,
+    dataloader = DetectionValDataLoader(val_path, detect2d_class,
                                         resize_type, normalize_type, mean, std,
                                         image_size, data_channel)
     result = data.DataLoader(dataset=dataloader, num_workers=num_workers,
