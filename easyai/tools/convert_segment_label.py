@@ -74,7 +74,7 @@ class ConvertSegmentionLable():
         shape = mask.shape[:2]  # shape = [height, width]
         result = np.full(shape, 250, dtype=np.uint8)
         for index, value in enumerate(class_list):
-            value_list = [int(x) for x in value[1].spilt(',') if x.strip()]
+            value_list = [int(x) for x in value[1].split(',') if x.strip()]
             color_value = np.array(value_list, dtype=np.uint8)
             temp1 = mask[:, :] == color_value
             temp2 = np.sum(temp1, axis=2)

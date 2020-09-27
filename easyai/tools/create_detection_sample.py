@@ -8,6 +8,7 @@ from easyai.helper import DirProcess
 from easyai.helper.json_process import JsonProcess
 from easyai.config.utility.config_factory import ConfigFactory
 from easyai.base_name.task_name import TaskName
+from easyai.helper.arguments_parse import ToolArgumentsParse
 
 
 class CreateDetectionSample():
@@ -73,14 +74,15 @@ class CreateDetectionSample():
 
 def test():
     print("start...")
-    config_factory = ConfigFactory()
-    task_config = config_factory.get_config(TaskName.Det2d_Seg_Task)
+    options = ToolArgumentsParse.process_sample_parse()
     test = CreateDetectionSample()
-    test.createBalanceSample("/home/lpj/github/data/Berkeley/ImageSets/train.txt",
-                "/home/lpj/github/data/Berkeley/ImageSets", task_config.class_name)
+    test.createTrainAndTest(options.inputPath,
+                            options.outputPath,
+                            options.probability)
     print("End of game, have a nice day!")
 
 
 if __name__ == "__main__":
    test()
+
 

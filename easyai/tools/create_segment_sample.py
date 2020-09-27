@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 from easyai.helper import DirProcess
 from easyai.helper import ImageProcess
+from easyai.helper.arguments_parse import ToolArgumentsParse
 
 
 class CreateSegmentionSample():
@@ -42,7 +43,11 @@ class CreateSegmentionSample():
 
 def test():
     print("start...")
+    options = ToolArgumentsParse.process_sample_parse()
     test = CreateSegmentionSample()
+    test.create_train_and_test(options.inputPath,
+                               options.outputPath,
+                               options.probability)
     print("End of game, have a nice day!")
 
 

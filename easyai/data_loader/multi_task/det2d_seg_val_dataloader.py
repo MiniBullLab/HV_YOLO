@@ -12,17 +12,17 @@ from easyai.data_loader.seg.segment_dataset_process import SegmentDatasetProcess
 
 class Det2dSegValDataloader(TorchDataLoader):
 
-    def __init__(self, val_path, det2d_class_name, seg_class_name,
+    def __init__(self, val_path, detect2d_class, seg_class_name,
                  resize_type, normalize_type, mean=0, std=1,
                  image_size=(416, 416), data_channel=3):
         super().__init__(data_channel)
-        self.det2d_class_name = det2d_class_name
+        self.detect2d_class = detect2d_class
         self.seg_number_class = len(seg_class_name)
         self.image_size = image_size
         self.image_pad_color = (0, 0, 0)
 
         self.multi_task_sample = MultiTaskSample(val_path,
-                                                 det2d_class_name,
+                                                 detect2d_class,
                                                  False)
         self.multi_task_sample.read_sample()
 
@@ -55,7 +55,7 @@ class Det2dSegValDataloader(TorchDataLoader):
 
 
 def get_det2d_seg_val_dataloader(val_path, data_config, num_workers=8):
-    det2d_class_name = data_config.detect2d_class
+    detect2d_class = data_config.detect2d_class
     seg_class_name = data_config.segment_class
     image_size = data_config.image_size
     data_channel = data_config.image_channel
@@ -64,7 +64,7 @@ def get_det2d_seg_val_dataloader(val_path, data_config, num_workers=8):
     mean = data_config.data_mean
     std = data_config.data_std
     batch_size = 1
-    dataloader = Det2dSegValDataloader(val_path, det2d_class_name, seg_class_name,
+    dataloader = Det2dSegValDataloader(val_path, detect2d_class, seg_class_name,
                                        resize_type, normalize_type, mean, std,
                                        image_size, data_channel)
     result = data.DataLoader(dataset=dataloader, num_workers=num_workers,
