@@ -13,10 +13,12 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.cls.xception_block import EntryFlow, ExitFLow
 from easyai.model.base_block.cls.xception_block import MiddleFLowBlock
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-__all__ = ['xception']
+__all__ = ['Xception']
 
 
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Xception)
 class Xception(BaseBackbone):
 
     def __init__(self, data_channel=3,
@@ -56,9 +58,5 @@ class Xception(BaseBackbone):
             output_list.append(x)
         return output_list
 
-
-def xception(data_channel):
-    return Xception(data_channel=data_channel,
-                    block=MiddleFLowBlock)
 
 

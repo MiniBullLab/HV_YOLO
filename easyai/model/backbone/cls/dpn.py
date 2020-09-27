@@ -8,8 +8,9 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.dpn_block import Bottleneck
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-__all__ = ['dpn26', 'dpn92']
+__all__ = ['DPN26', 'DPN92']
 
 
 class DPN(BaseBackbone):
@@ -68,21 +69,26 @@ class DPN(BaseBackbone):
         return output_list
 
 
-def dpn26(data_channel):
-    model = DPN(data_channel=data_channel,
-                in_planes=(96, 192, 384, 768),
-                out_channels=(256, 512, 1024, 2048),
-                num_blocks=(2, 2, 2, 2),
-                dense_depths=(16, 32, 24, 128))
-    model.set_name(BackboneName.DPN26)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.DPN26)
+class DPN26(DPN):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         in_planes=(96, 192, 384, 768),
+                         out_channels=(256, 512, 1024, 2048),
+                         num_blocks=(2, 2, 2, 2),
+                         dense_depths=(16, 32, 24, 128))
+        self.set_name(BackboneName.DPN26)
 
 
-def dpn92(data_channel):
-    model = DPN(data_channel=data_channel,
-                in_planes=(96, 192, 384, 768),
-                out_channels=(256, 512, 1024, 2048),
-                num_blocks=(3, 4, 20, 3),
-                dense_depths=(16, 32, 24, 128))
-    model.set_name(BackboneName.DPN92)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.DPN92)
+class DPN92(DPN):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         in_planes=(96, 192, 384, 768),
+                         out_channels=(256, 512, 1024, 2048),
+                         num_blocks=(3, 4, 20, 3),
+                         dense_depths=(16, 32, 24, 128))
+        self.set_name(BackboneName.DPN92)
+

@@ -14,7 +14,8 @@ from easyai.helper.arguments_parse import ToolArgumentsParse
 def backbone_model_print(model_name):
     backbone_factory = BackboneFactory()
     input_x = torch.randn(1, 3, 224, 224)
-    backbone = backbone_factory.get_base_model(model_name)
+    model_config = {"type": model_name}
+    backbone = backbone_factory.get_backbone_model(model_config)
     if backbone is not None:
         backbone.print_block_name()
         # for k, value in backbone.named_parameters():

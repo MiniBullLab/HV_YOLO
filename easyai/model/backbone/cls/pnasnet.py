@@ -10,8 +10,9 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.pnasnet_block import CellA, CellB
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-__all__ = ['pnasnet_A', 'pnasnet_B']
+__all__ = ['PNASNetA', 'PNASNetB']
 
 
 class PNASNet(BaseBackbone):
@@ -74,18 +75,23 @@ class PNASNet(BaseBackbone):
         return output_list
 
 
-def pnasnet_A(data_channel):
-    model = PNASNet(data_channel=data_channel,
-                    num_cells=6,
-                    num_planes=44,
-                    block=CellA)
-    model.set_name(BackboneName.PNASNetA)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.PNASNetA)
+class PNASNetA(PNASNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_cells=6,
+                         num_planes=44,
+                         block=CellA)
+        self.set_name(BackboneName.PNASNetA)
 
 
-def pnasnet_B(data_channel):
-    model = PNASNet(data_channel=data_channel,
-                    num_cells=6, num_planes=32,
-                    block=CellB)
-    model.set_name(BackboneName.PNASNetB)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.PNASNetB)
+class PNASNetB(PNASNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_cells=6, num_planes=32,
+                         block=CellB)
+        self.set_name(BackboneName.PNASNetB)
+

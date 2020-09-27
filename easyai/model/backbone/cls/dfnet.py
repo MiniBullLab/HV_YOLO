@@ -7,8 +7,9 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.dfnet_block import BasicBlock
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-__all__ = ['dfnetv1', 'dfnetv2']
+__all__ = ['DFNetV1', 'DFNetV2']
 
 
 class DFNet(BaseBackbone):
@@ -84,20 +85,25 @@ class DFNet(BaseBackbone):
         return output_list
 
 
-def dfnetv1(data_channel):
-    model = DFNet(data_channel=data_channel,
-                  num_blocks=(3, 3, 3, 1),
-                  out_channels=(64, 128, 256, 512),
-                  strides=(2, 2, 2, 1))
-    model.set_name(BackboneName.DFNetV1)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.DFNetV1)
+class DFNetV1(DFNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(3, 3, 3, 1),
+                         out_channels=(64, 128, 256, 512),
+                         strides=(2, 2, 2, 1))
+        self.set_name(BackboneName.DFNetV1)
 
 
-def dfnetv2(data_channel):
-    model = DFNet(data_channel=data_channel,
-                  num_blocks=(2, 1, 10, 1, 4, 2),
-                  out_channels=(64, 128, 128, 256, 256, 512),
-                  strides=(2, 1, 2, 1, 2, 1))
-    model.set_name(BackboneName.DFNetV2)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.DFNetV2)
+class DFNetV2(DFNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(2, 1, 10, 1, 4, 2),
+                         out_channels=(64, 128, 128, 256, 256, 512),
+                         strides=(2, 1, 2, 1, 2, 1))
+        self.set_name(BackboneName.DFNetV2)
+
 

@@ -15,8 +15,10 @@ from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.preact_resnet_block import PreActBasic
 from easyai.model.base_block.cls.preact_resnet_block import PreActBottleNeck
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-__all__ = ['preactresnet18', 'preactresnet34', 'preactresnet50', 'preactresnet101', 'preactresnet152']
+__all__ = ['PreActResNet18', 'PreActResNet34', 'PreActResNet50',
+           'PreActResNet101', 'PreActResNet152']
 
 
 class PreActResNet(BaseBackbone):
@@ -75,42 +77,53 @@ class PreActResNet(BaseBackbone):
         return output_list
 
 
-def preactresnet18(data_channel):
-    model = PreActResNet(data_channel=data_channel,
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.PreActResNet18)
+class PreActResNet18(PreActResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
                          block=PreActBasic,
                          num_blocks=(2, 2, 2, 2))
-    model.set_name(BackboneName.PreActResNet18)
-    return model
+        self.set_name(BackboneName.PreActResNet18)
 
 
-def preactresnet34(data_channel):
-    model = PreActResNet(data_channel=data_channel,
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.PreActResNet34)
+class PreActResNet34(PreActResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
                          block=PreActBasic,
                          num_blocks=(3, 4, 6, 3))
-    model.set_name(BackboneName.PreActResNet34)
-    return model
+        self.set_name(BackboneName.PreActResNet34)
 
 
-def preactresnet50(data_channel):
-    model = PreActResNet(data_channel=data_channel,
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.PreActResNet50)
+class PreActResNet50(PreActResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
                          block=PreActBottleNeck,
                          num_blocks=(3, 4, 6, 3))
-    model.set_name(BackboneName.PreActResNet50)
-    return model
+        self.set_name(BackboneName.PreActResNet50)
 
 
-def preactresnet101(data_channel):
-    model = PreActResNet(data_channel=data_channel,
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.PreActResNet101)
+class PreActResNet101(PreActResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
                          block=PreActBottleNeck,
                          num_blocks=(3, 4, 23, 3))
-    model.set_name(BackboneName.PreActResNet101)
-    return model
+        self.set_name(BackboneName.PreActResNet101)
 
 
-def preactresnet152(data_channel):
-    model = PreActResNet(data_channel=data_channel,
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.PreActResNet152)
+class PreActResNet152(PreActResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
                          block=PreActBottleNeck,
                          num_blocks=(3, 8, 36, 3))
-    model.set_name(BackboneName.PreActResNet152)
-    return model
+        self.set_name(BackboneName.PreActResNet152)
+
 

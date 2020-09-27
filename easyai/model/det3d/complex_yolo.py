@@ -21,6 +21,8 @@ class ComplexYOLO(BaseDetectionModel):
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
 
+        self.model_args['type'] = backbone_path
+
         self.factory = BackboneFactory()
         self.create_block_list()
 
@@ -28,7 +30,7 @@ class ComplexYOLO(BaseDetectionModel):
         self.block_out_channels = []
         self.index = 0
 
-        basic_model = self.factory.get_base_model(self.backbone_path)
+        basic_model = self.factory.get_backbone_model(self.model_args)
         base_out_channels = basic_model.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, basic_model, base_out_channels[-1])
 

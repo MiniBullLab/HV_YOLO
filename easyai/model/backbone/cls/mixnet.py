@@ -7,8 +7,9 @@ from easyai.base_name.block_name import NormalizationType, ActivationType
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.mixnet_block import MixNetBlock
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-__all__ = ['mixnet_s', 'mixnet_m', 'mixnet_l']
+__all__ = ['MixNetSmall', 'MixNetMiddle', 'MixNetLarge']
 
 
 class MixNet(BaseBackbone):
@@ -103,7 +104,8 @@ class MixNet(BaseBackbone):
         return output_list
 
 
-def mixnet_s(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.mixnet_s)
+class MixNetSmall(MixNet):
     cfgs = [(16, 16, [3], [1], [1], 1, 1, ActivationType.ReLU, 0),
             (16, 24, [3], [1, 1], [1, 1], 2, 6, ActivationType.ReLU, 0),
             (24, 24, [3], [1, 1], [1, 1], 1, 3, ActivationType.ReLU, 0),
@@ -120,56 +122,62 @@ def mixnet_s(data_channel):
             (120, 200, [3, 5, 7, 9, 11], [1], [1], 2, 6, ActivationType.Swish, 2),
             (200, 200, [3, 5, 7, 9], [1], [1, 1], 1, 6, ActivationType.Swish, 2),
             (200, 200, [3, 5, 7, 9], [1], [1, 1], 1, 6, ActivationType.Swish, 2)]
-    model = MixNet(cfgs, 'mixnet_s', data_channel)
-    model.set_name(BackboneName.mixnet_l)
-    return model
+
+    def __init__(self, data_channel):
+        super().__init__(MixNetSmall.cfgs, 'mixnet_s', data_channel)
+        self.set_name(BackboneName.mixnet_s)
 
 
-def mixnet_m(data_channel):
-    cfgs = [(24,  24,  [3],          [1],    [1],    1, 1, ActivationType.ReLU,  0),
-            (24,  32,  [3, 5, 7],    [1, 1], [1, 1], 2, 6, ActivationType.ReLU,  0),
-            (32,  32,  [3],          [1, 1], [1, 1], 1, 3, ActivationType.ReLU,  0),
-            (32,  40,  [3, 5, 7, 9], [1],    [1],    2, 6, ActivationType.Swish, 2),
-            (40,  40,  [3, 5],       [1, 1], [1, 1], 1, 6, ActivationType.Swish, 2),
-            (40,  40,  [3, 5],       [1, 1], [1, 1], 1, 6, ActivationType.Swish, 2),
-            (40,  40,  [3, 5],       [1, 1], [1, 1], 1, 6, ActivationType.Swish, 2),
-            (40,  80,  [3, 5, 7],    [1],    [1],    2, 6, ActivationType.Swish, 4),
-            (80,  80,  [3, 5, 7, 9], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 4),
-            (80,  80,  [3, 5, 7, 9], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 4),
-            (80,  80,  [3, 5, 7, 9], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 4),
-            (80,  120, [3],          [1],    [1],    1, 6, ActivationType.Swish, 2),
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.mixnet_m)
+class MixNetMiddle(MixNet):
+    cfgs = [(24, 24, [3], [1], [1], 1, 1, ActivationType.ReLU, 0),
+            (24, 32, [3, 5, 7], [1, 1], [1, 1], 2, 6, ActivationType.ReLU, 0),
+            (32, 32, [3], [1, 1], [1, 1], 1, 3, ActivationType.ReLU, 0),
+            (32, 40, [3, 5, 7, 9], [1], [1], 2, 6, ActivationType.Swish, 2),
+            (40, 40, [3, 5], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 2),
+            (40, 40, [3, 5], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 2),
+            (40, 40, [3, 5], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 2),
+            (40, 80, [3, 5, 7], [1], [1], 2, 6, ActivationType.Swish, 4),
+            (80, 80, [3, 5, 7, 9], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 4),
+            (80, 80, [3, 5, 7, 9], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 4),
+            (80, 80, [3, 5, 7, 9], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 4),
+            (80, 120, [3], [1], [1], 1, 6, ActivationType.Swish, 2),
             (120, 120, [3, 5, 7, 9], [1, 1], [1, 1], 1, 3, ActivationType.Swish, 2),
             (120, 120, [3, 5, 7, 9], [1, 1], [1, 1], 1, 3, ActivationType.Swish, 2),
             (120, 120, [3, 5, 7, 9], [1, 1], [1, 1], 1, 3, ActivationType.Swish, 2),
-            (120, 200, [3, 5, 7, 9], [1],    [1], 2, 6, ActivationType.Swish, 2),
-            (200, 200, [3, 5, 7, 9], [1],    [1, 1], 1, 6, ActivationType.Swish, 2),
-            (200, 200, [3, 5, 7, 9], [1],    [1, 1], 1, 6, ActivationType.Swish, 2),
-            (200, 200, [3, 5, 7, 9], [1],    [1, 1], 1, 6, ActivationType.Swish, 2)]
-    model = MixNet(cfgs, 'mixnet_m', data_channel)
-    model.set_name(BackboneName.mixnet_m)
-    return model
+            (120, 200, [3, 5, 7, 9], [1], [1], 2, 6, ActivationType.Swish, 2),
+            (200, 200, [3, 5, 7, 9], [1], [1, 1], 1, 6, ActivationType.Swish, 2),
+            (200, 200, [3, 5, 7, 9], [1], [1, 1], 1, 6, ActivationType.Swish, 2),
+            (200, 200, [3, 5, 7, 9], [1], [1, 1], 1, 6, ActivationType.Swish, 2)]
+
+    def __init__(self, data_channel):
+        super().__init__(MixNetMiddle.cfgs, 'mixnet_m', data_channel)
+        self.set_name(BackboneName.mixnet_m)
 
 
-def mixnet_l(data_channel):
-    cfgs = [(24,  24,  [3],          [1],    [1],    1, 1, ActivationType.ReLU,  0),
-            (24,  32,  [3, 5, 7],    [1, 1], [1, 1], 2, 6, ActivationType.ReLU,  0),
-            (32,  32,  [3],          [1, 1], [1, 1], 1, 3, ActivationType.ReLU,  0),
-            (32,  40,  [3, 5, 7, 9], [1],    [1],    2, 6, ActivationType.Swish, 2),
-            (40,  40,  [3, 5],       [1, 1], [1, 1], 1, 6, ActivationType.Swish, 2),
-            (40,  40,  [3, 5],       [1, 1], [1, 1], 1, 6, ActivationType.Swish, 2),
-            (40,  40,  [3, 5],       [1, 1], [1, 1], 1, 6, ActivationType.Swish, 2),
-            (40,  80,  [3, 5, 7],    [1],    [1],    2, 6, ActivationType.Swish, 4),
-            (80,  80,  [3, 5, 7, 9], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 4),
-            (80,  80,  [3, 5, 7, 9], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 4),
-            (80,  80,  [3, 5, 7, 9], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 4),
-            (80,  120, [3],          [1],    [1],    1, 6, ActivationType.Swish, 2),
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.mixnet_l)
+class MixNetLarge(MixNet):
+    cfgs = [(24, 24, [3], [1], [1], 1, 1, ActivationType.ReLU, 0),
+            (24, 32, [3, 5, 7], [1, 1], [1, 1], 2, 6, ActivationType.ReLU, 0),
+            (32, 32, [3], [1, 1], [1, 1], 1, 3, ActivationType.ReLU, 0),
+            (32, 40, [3, 5, 7, 9], [1], [1], 2, 6, ActivationType.Swish, 2),
+            (40, 40, [3, 5], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 2),
+            (40, 40, [3, 5], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 2),
+            (40, 40, [3, 5], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 2),
+            (40, 80, [3, 5, 7], [1], [1], 2, 6, ActivationType.Swish, 4),
+            (80, 80, [3, 5, 7, 9], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 4),
+            (80, 80, [3, 5, 7, 9], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 4),
+            (80, 80, [3, 5, 7, 9], [1, 1], [1, 1], 1, 6, ActivationType.Swish, 4),
+            (80, 120, [3], [1], [1], 1, 6, ActivationType.Swish, 2),
             (120, 120, [3, 5, 7, 9], [1, 1], [1, 1], 1, 3, ActivationType.Swish, 2),
             (120, 120, [3, 5, 7, 9], [1, 1], [1, 1], 1, 3, ActivationType.Swish, 2),
             (120, 120, [3, 5, 7, 9], [1, 1], [1, 1], 1, 3, ActivationType.Swish, 2),
-            (120, 200, [3, 5, 7, 9], [1],    [1], 2, 6, ActivationType.Swish, 2),
-            (200, 200, [3, 5, 7, 9], [1],    [1, 1], 1, 6, ActivationType.Swish, 2),
-            (200, 200, [3, 5, 7, 9], [1],    [1, 1], 1, 6, ActivationType.Swish, 2),
-            (200, 200, [3, 5, 7, 9], [1],    [1, 1], 1, 6, ActivationType.Swish, 2)]
-    model = MixNet(cfgs, 'mixnet_l', data_channel)
-    model.set_name(BackboneName.mixnet_l)
-    return model
+            (120, 200, [3, 5, 7, 9], [1], [1], 2, 6, ActivationType.Swish, 2),
+            (200, 200, [3, 5, 7, 9], [1], [1, 1], 1, 6, ActivationType.Swish, 2),
+            (200, 200, [3, 5, 7, 9], [1], [1, 1], 1, 6, ActivationType.Swish, 2),
+            (200, 200, [3, 5, 7, 9], [1], [1, 1], 1, 6, ActivationType.Swish, 2)]
+
+    def __init__(self, data_channel):
+        super().__init__(MixNetLarge.cfgs, 'mixnet_l', data_channel)
+        self.set_name(BackboneName.mixnet_l)
+

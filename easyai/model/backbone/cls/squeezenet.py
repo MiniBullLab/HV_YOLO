@@ -8,16 +8,17 @@ from easyai.base_name.block_name import LayerType
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvActivationBlock
 from easyai.model.base_block.cls.squeezenet_block import FireBlock
-
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
 __all__ = ['SqueezeNet', 'DilatedSqueezeNet']
 
 
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.SqueezeNet)
 class SqueezeNet(BaseBackbone):
 
     def __init__(self, data_channel=3, bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-        super(SqueezeNet, self).__init__(data_channel)
+        super().__init__(data_channel)
         self.set_name(BackboneName.SqueezeNet)
         self.activationName = activationName
         self.bnName = bnName
@@ -94,12 +95,12 @@ class SqueezeNet(BaseBackbone):
         return output_list
 
 
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.DilatedSqueezeNet)
 class DilatedSqueezeNet(BaseBackbone):
     def __init__(self, data_channel=3, bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.DilatedSqueezeNet)
-        self.data_channel = data_channel
         self.activationName = activationName
         self.bnName = bnName
         self.first_output = 64

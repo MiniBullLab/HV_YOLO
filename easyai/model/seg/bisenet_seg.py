@@ -32,6 +32,7 @@ class BiSeNet(BaseClassifyModel):
         self.set_name(ModelName.BiSeNet)
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
+        self.model_args['type'] = BackboneName.ResNet18
         self.factory = BackboneFactory()
         self.create_block_list()
 
@@ -42,7 +43,7 @@ class BiSeNet(BaseClassifyModel):
                                    bn_name=self.bn_name, activation_name=self.activation_name)
         self.add_block_list(spatial_path.get_name(), spatial_path, 128)
 
-        backbone = self.factory.get_base_model(BackboneName.ResNet18, self.model_args)
+        backbone = self.factory.get_backbone_model(self.model_args)
         base_out_channels = backbone.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])
 

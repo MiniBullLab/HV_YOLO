@@ -15,10 +15,12 @@ from easyai.model.base_block.utility.utility_layer import ActivationLayer
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.nasnet_block import NasNetBlockName
 from easyai.model.base_block.cls.nasnet_block import NormalCell, ReductionCell
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-__all__ = ['nasnet']
+__all__ = ['NasNet']
 
 
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.NasNet)
 class NasNet(BaseBackbone):
 
     def __init__(self, data_channel=3,
@@ -71,7 +73,7 @@ class NasNet(BaseBackbone):
     def make_reduction(self, block, output):
         reduction = block(self.x_filters, self.prev_filters, output)
         self.prev_filters = self.x_filters
-        self.x_filters = output * 4 #stack for 4 branches
+        self.x_filters = output * 4  # stack for 4 branches
         self.add_block_list(reduction.get_name(), reduction, self.x_filters)
 
     def forward(self, x):
@@ -86,12 +88,6 @@ class NasNet(BaseBackbone):
                 x = block(x)
             output_list.append(x)
         return output_list
-        
-        
-def nasnet(data_channel):
-    # stem filters must be 44, it's a pytorch workaround, cant change to other number
-    return NasNet(data_channel=data_channel,
-                  repeat_cell_num=4,
-                  reduction_num=2,
-                  filters=44)
+
+
 

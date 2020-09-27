@@ -19,11 +19,12 @@ from easyai.model.base_block.cls.inception_block import InceptionA, InceptionB, 
 from easyai.model.base_block.cls.inception_block import ReductionA, ReductionB
 from easyai.model.base_block.cls.inception_block import InceptionResNetA, InceptionResNetB, InceptionResNetC
 from easyai.model.base_block.cls.inception_block import InceptionResNetReductionA, InceptionResNetReductionB
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
+
+__all__ = ['InceptionV4', 'InceptionResNetV2']
 
 
-__all__ = ['inceptionv4', 'inception_resnetv2']
-
-
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.InceptionV4)
 class InceptionV4(BaseBackbone):
 
     def __init__(self, data_channel=3, num_blocks=(4, 7, 3),
@@ -84,15 +85,15 @@ class InceptionV4(BaseBackbone):
         return output_list
 
 
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.InceptionResNetV2)
 class InceptionResNetV2(BaseBackbone):
 
     def __init__(self, data_channel=3, num_blocks=(5, 10, 5),
                  out_channels=(256, 256, 384, 384),
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.InceptionResNetV2)
-        self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.out_channels = out_channels
         self.activation_name = activationName
@@ -147,16 +148,3 @@ class InceptionResNetV2(BaseBackbone):
             output_list.append(x)
         return output_list
 
-
-def inceptionv4(data_channel):
-    model = InceptionV4(data_channel=data_channel,
-                        num_blocks=(4, 7, 3))
-    model.set_name(BackboneName.InceptionV4)
-    return model
-
-
-def inception_resnetv2(data_channel):
-    model = InceptionResNetV2(data_channel=data_channel,
-                              num_blocks=(5, 10, 5))
-    model.set_name(BackboneName.InceptionResNetV2)
-    return model

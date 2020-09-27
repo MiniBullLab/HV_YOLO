@@ -165,7 +165,7 @@ class Detection2dTrainWindow(QWidget):
 
     def kill_process(self):
         if self.process is not None:
-            self.text_browser.append("det kill pid: %d" % self.process.processId())
+            self.text_browser.append("det2d kill pid: %d" % self.process.processId())
             self.process.kill()
             self.process.waitForFinished(-1)
 

@@ -7,11 +7,12 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.darknet_block import BasicBlock
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
 
-__all__ = ['darknet21', 'darknet53',
-           'darknet21_dilated8', 'darknet21_dilated16',
-           'darknet53_dilated8', 'darknet53_dilated16']
+__all__ = ['Darknet21', 'Darknet53',
+           'Darknet21Dilated8', 'Darknet21Dilated16',
+           'Darknet53Dilated8', 'Darknet53Dilated16']
 
 
 class DarkNet(BaseBackbone):
@@ -83,47 +84,61 @@ class DarkNet(BaseBackbone):
         return output_list
 
 
-def darknet21(data_channel):
-    model = DarkNet(data_channel=data_channel,
-                    num_blocks=[1, 1, 2, 2, 1])
-    model.set_name(BackboneName.Darknet21)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Darknet21)
+class Darknet21(DarkNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=[1, 1, 2, 2, 1])
+        self.set_name(BackboneName.Darknet21)
 
 
-def darknet21_dilated8(data_channel):
-    model = DarkNet(data_channel=data_channel,
-                    num_blocks=[1, 1, 2, 2, 1],
-                    dilations=[1, 1, 1, 2, 4])
-    model.set_name(BackboneName.Darknet21_Dilated8)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Darknet21_Dilated8)
+class Darknet21Dilated8(DarkNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=[1, 1, 2, 2, 1],
+                         dilations=[1, 1, 1, 2, 4])
+        self.set_name(BackboneName.Darknet21_Dilated8)
 
 
-def darknet21_dilated16(data_channel):
-    model = DarkNet(data_channel=data_channel,
-                    num_blocks=[1, 1, 2, 2, 1],
-                    dilations=[1, 1, 1, 1, 2])
-    model.set_name(BackboneName.Darknet21_Dilated16)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Darknet21_Dilated16)
+class Darknet21Dilated16(DarkNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=[1, 1, 2, 2, 1],
+                         dilations=[1, 1, 1, 1, 2])
+        self.set_name(BackboneName.Darknet21_Dilated16)
 
 
-def darknet53(data_channel):
-    model = DarkNet(data_channel=data_channel,
-                    num_blocks=[1, 2, 8, 8, 4])
-    model.set_name(BackboneName.Darknet53)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Darknet53)
+class Darknet53(DarkNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=[1, 2, 8, 8, 4])
+        self.set_name(BackboneName.Darknet53)
 
 
-def darknet53_dilated8(data_channel):
-    model = DarkNet(data_channel=data_channel,
-                    num_blocks=[1, 2, 8, 8, 4],
-                    dilations=[1, 1, 1, 2, 4])
-    model.set_name(BackboneName.Darknet53_Dilated8)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Darknet53_Dilated8)
+class Darknet53Dilated8(DarkNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=[1, 2, 8, 8, 4],
+                         dilations=[1, 1, 1, 2, 4])
+        self.set_name(BackboneName.Darknet53_Dilated8)
 
 
-def darknet53_dilated16(data_channel):
-    model = DarkNet(data_channel=data_channel,
-                    num_blocks=[1, 2, 8, 8, 4],
-                    dilations=[1, 1, 1, 1, 2])
-    model.set_name(BackboneName.Darknet53_Dilated16)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Darknet53_Dilated16)
+class Darknet53Dilated16(DarkNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=[1, 2, 8, 8, 4],
+                         dilations=[1, 1, 1, 1, 2])
+        self.set_name(BackboneName.Darknet53_Dilated16)
+
+

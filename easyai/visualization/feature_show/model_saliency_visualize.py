@@ -24,12 +24,14 @@ class ModelSaliencyVisualize():
 
     def show_saliency_maps(self, image_path, model_name, weight_path):
         if self.is_backbone:
-            model = self.backbone_factory.get_base_model(model_name,
-                                                         default_args={"data_channel": self.data_channel})
+            model_config = {'type': model_name,
+                            'data_channel': self.data_channel}
+            model = self.backbone_factory.get_backbone_model(model_config)
             self.model_process.loadLatestModelWeight(weight_path, model)
         else:
-            model = self.model_factory.get_model(model_name,
-                                                 default_args={"data_channel": self.data_channel})
+            model_config = {'type': model_name,
+                            'data_channel': self.data_channel}
+            model = self.model_factory.get_model(model_config)
             self.model_process.loadLatestModelWeight(weight_path, model)
 
         image = load_image(image_path)

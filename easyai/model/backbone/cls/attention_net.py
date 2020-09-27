@@ -16,8 +16,9 @@ from easyai.model.base_block.cls.preact_resnet_block import PreActBottleNeck
 from easyai.model.base_block.cls.attention_net_block import AttentionModule1
 from easyai.model.base_block.cls.attention_net_block import AttentionModule2
 from easyai.model.base_block.cls.attention_net_block import AttentionModule3
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-__all__ = ['attention_net56', 'attention_net92']
+__all__ = ['AttentionNet56', 'AttentionNet92']
 
 
 class AttentionNet(BaseBackbone):
@@ -81,16 +82,21 @@ class AttentionNet(BaseBackbone):
         return output_list
 
 
-def attention_net56(data_channel):
-    model = AttentionNet(data_channel=data_channel,
-                      num_blocks=(1, 1, 1))
-    model.set_name(BackboneName.AttentionNet56)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.AttentionNet56)
+class AttentionNet56(AttentionNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(1, 1, 1))
+        self.set_name(BackboneName.AttentionNet56)
 
 
-def attention_net92(data_channel):
-    model = AttentionNet(data_channel=data_channel,
-                      num_blocks=(1, 2, 3))
-    model.set_name(BackboneName.AttentionNet92)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.AttentionNet92)
+class AttentionNet92(AttentionNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(1, 2, 3))
+        self.set_name(BackboneName.AttentionNet92)
+
 

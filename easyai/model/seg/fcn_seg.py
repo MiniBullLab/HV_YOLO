@@ -26,6 +26,8 @@ class FCN8sSeg(BaseClassifyModel):
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
 
+        self.model_args['type'] = BackboneName.Vgg16
+
         self.factory = BackboneFactory()
         self.create_block_list()
 
@@ -33,7 +35,7 @@ class FCN8sSeg(BaseClassifyModel):
         self.block_out_channels = []
         self.index = 0
 
-        backbone = self.factory.get_base_model(BackboneName.Vgg16, self.model_args)
+        backbone = self.factory.get_backbone_model(self.model_args)
         base_out_channels = backbone.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])
 

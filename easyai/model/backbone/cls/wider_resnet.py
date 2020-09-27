@@ -9,9 +9,10 @@ from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.wider_resnet_block import IdentityResidualBlock
 from functools import partial
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-__all__ = ['wider_resnet16', 'wider_resnet20', 'wider_resnet38',
-           'wider_resnet16_a2', 'wider_resnet20_a2', 'wider_resnet38_a2']
+__all__ = ['WiderResNet16', 'WiderResNet20', 'WiderResNet38',
+           'WiderResNet16A2', 'WiderResNet20A2', 'WiderResNet38A2']
 
 
 class WiderResNet(BaseBackbone):
@@ -87,9 +88,8 @@ class WiderResNetA2(BaseBackbone):
     def __init__(self, data_channel=3, num_blocks=(1, 1, 1, 1, 1, 1),
                  bn_name=NormalizationType.BatchNormalize2d,
                  activation_name=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.wider_resnet16_a2)
-        self.data_channel = data_channel
         self.num_blocks = num_blocks
         self.out_channels = [(128, 128), (256, 256), (512, 512),
                              (512, 1024), (512, 1024, 2048), (1024, 2048, 4096)]
@@ -159,43 +159,56 @@ class WiderResNetA2(BaseBackbone):
         return output_list
 
 
-def wider_resnet16(data_channel):
-    model = WiderResNet(data_channel=data_channel,
-                        num_blocks=[1, 1, 1, 1, 1, 1])
-    model.set_name(BackboneName.wider_resnet16)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.wider_resnet16)
+class WiderResNet16(WiderResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(1, 1, 1, 1, 1, 1))
+        self.set_name(BackboneName.wider_resnet16)
 
 
-def wider_resnet20(data_channel):
-    model = WiderResNet(data_channel=data_channel,
-                        num_blocks=[1, 1, 1, 3, 1, 1])
-    model.set_name(BackboneName.wider_resnet20)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.wider_resnet20)
+class WiderResNet20(WiderResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(1, 1, 1, 3, 1, 1))
+        self.set_name(BackboneName.wider_resnet20)
 
 
-def wider_resnet38(data_channel):
-    model = WiderResNet(data_channel=data_channel,
-                        num_blocks=[3, 3, 6, 3, 1, 1])
-    model.set_name(BackboneName.wider_resnet38)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.wider_resnet38)
+class WiderResNet38(WiderResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(3, 3, 6, 3, 1, 1))
+        self.set_name(BackboneName.wider_resnet38)
 
 
-def wider_resnet16_a2(data_channel):
-    model = WiderResNetA2(data_channel=data_channel,
-                          num_blocks=[1, 1, 1, 1, 1, 1])
-    model.set_name(BackboneName.wider_resnet16_a2)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.wider_resnet16_a2)
+class WiderResNet16A2(WiderResNetA2):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(1, 1, 1, 1, 1, 1))
+        self.set_name(BackboneName.wider_resnet16_a2)
 
 
-def wider_resnet20_a2(data_channel):
-    model = WiderResNetA2(data_channel=data_channel,
-                          num_blocks=[1, 1, 1, 3, 1, 1])
-    model.set_name(BackboneName.wider_resnet20_a2)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.wider_resnet20_a2)
+class WiderResNet20A2(WiderResNetA2):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(1, 1, 1, 3, 1, 1))
+        self.set_name(BackboneName.wider_resnet20_a2)
 
 
-def wider_resnet38_a2(data_channel):
-    model = WiderResNetA2(data_channel=data_channel,
-                          num_blocks=[3, 3, 6, 3, 1, 1])
-    model.set_name(BackboneName.wider_resnet38_a2)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.wider_resnet38_a2)
+class WiderResNet38A2(WiderResNetA2):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=[3, 3, 6, 3, 1, 1])
+        self.set_name(BackboneName.wider_resnet38_a2)
+

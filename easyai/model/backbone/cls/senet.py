@@ -14,8 +14,9 @@ from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.senet_block import BasicResidualSEBlock
 from easyai.model.base_block.cls.senet_block import BottleneckResidualSEBlock
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-__all__ = ['se_resnet18', 'se_resnet34', 'se_resnet50', 'se_resnet101', 'se_resnet152']
+__all__ = ['SEResNet18', 'SEResNet34', 'SEResNet50', 'SEResNet101', 'SEResNet152']
 
 
 class SEResNet(BaseBackbone):
@@ -74,41 +75,52 @@ class SEResNet(BaseBackbone):
         return output_list
 
 
-def se_resnet18(data_channel):
-    model = SEResNet(data_channel=data_channel,
-                     block=BasicResidualSEBlock,
-                     num_blocks=(2, 2, 2, 2))
-    model.set_name(BackboneName.SEResNet18)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.SEResNet18)
+class SEResNet18(SEResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         block=BasicResidualSEBlock,
+                         num_blocks=(2, 2, 2, 2))
+        self.set_name(BackboneName.SEResNet18)
 
 
-def se_resnet34(data_channel):
-    model = SEResNet(data_channel=data_channel,
-                     block=BasicResidualSEBlock,
-                     num_blocks=(3, 4, 6, 3))
-    model.set_name(BackboneName.SEResNet34)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.SEResNet34)
+class SEResNet34(SEResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         block=BasicResidualSEBlock,
+                         num_blocks=(3, 4, 6, 3))
+        self.set_name(BackboneName.SEResNet34)
 
 
-def se_resnet50(data_channel):
-    model = SEResNet(data_channel=data_channel,
-                     block=BottleneckResidualSEBlock,
-                     num_blocks=(3, 4, 6, 3))
-    model.set_name(BackboneName.SEResNet50)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.SEResNet50)
+class SEResNet50(SEResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         block=BottleneckResidualSEBlock,
+                         num_blocks=(3, 4, 6, 3))
+        self.set_name(BackboneName.SEResNet50)
 
 
-def se_resnet101(data_channel):
-    model = SEResNet(data_channel=data_channel,
-                     block=BottleneckResidualSEBlock,
-                     num_blocks=(3, 4, 23, 3))
-    model.set_name(BackboneName.SEResNet101)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.SEResNet101)
+class SEResNet101(SEResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         block=BottleneckResidualSEBlock,
+                         num_blocks=(3, 4, 23, 3))
+        self.set_name(BackboneName.SEResNet101)
 
 
-def se_resnet152(data_channel):
-    model = SEResNet(data_channel=data_channel,
-                     block=BottleneckResidualSEBlock,
-                     num_blocks=(3, 8, 36, 3))
-    model.set_name(BackboneName.SEResNet152)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.SEResNet152)
+class SEResNet152(SEResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         block=BottleneckResidualSEBlock,
+                         num_blocks=(3, 8, 36, 3))
+        self.set_name(BackboneName.SEResNet152)
+

@@ -29,6 +29,7 @@ class ICNet(BaseClassifyModel):
         self.set_name(ModelName.ICNet)
         self.bn_name = NormalizationType.BatchNormalize2d
         self.activation_name = ActivationType.ReLU
+        self.model_args['type'] = BackboneName.ResNet50
         self.factory = BackboneFactory()
         self.create_block_list()
 
@@ -68,7 +69,7 @@ class ICNet(BaseClassifyModel):
                                       activationName=self.activation_name)
         self.add_block_list(conv3.get_name(), conv3, 64)
 
-        backbone1 = self.factory.get_base_model(BackboneName.ResNet50, self.model_args)
+        backbone1 = self.factory.get_backbone_model(self.model_args)
         base_out_channels1 = backbone1.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone1, base_out_channels1[-1])
 
@@ -77,7 +78,7 @@ class ICNet(BaseClassifyModel):
                               else self.block_out_channels[i] for i in layer1.layers])
         self.add_block_list(layer1.get_name(), layer1, output_channel)
 
-        backbone2 = self.factory.get_base_model(BackboneName.ResNet50, self.model_args)
+        backbone2 = self.factory.get_backbone_model(self.model_args)
         base_out_channels2 = backbone2.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone2, base_out_channels2[-1])
 

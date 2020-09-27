@@ -14,9 +14,9 @@ from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.utility.attention_block import SEBlock
 from easyai.model.base_block.cls.mobilenet_block import InvertedResidual
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-
-__all__ = ['mobilenetv3_large', 'mobilenetv3_small']
+__all__ = ['MobileNetV3Large', 'MobileNetV3Small']
 
 
 class MobileNetV3(BaseBackbone):
@@ -111,10 +111,11 @@ class MobileNetV3(BaseBackbone):
         return output_list
 
 
-def mobilenetv3_large(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.MobileNetv3_large)
+class MobileNetV3Large(MobileNetV3):
     """
-        Constructs a MobileNetV3-Large model
-    """
+            Constructs a MobileNetV3-Large model
+        """
     cfgs = [
         # k, t, c, SE, NL, s
         [3, 16, 16, 0, 0, 1],
@@ -133,12 +134,15 @@ def mobilenetv3_large(data_channel):
         [5, 672, 160, 1, 1, 2],
         [5, 960, 160, 1, 1, 1]
     ]
-    model = MobileNetV3(cfgs, mode='large', data_channel=data_channel)
-    model.set_name(BackboneName.MobileNetv3_large)
-    return model
+
+    def __init__(self, data_channel):
+        super().__init__(MobileNetV3Large.cfgs,
+                         mode='large', data_channel=data_channel)
+        self.set_name(BackboneName.MobileNetv3_large)
 
 
-def mobilenetv3_small(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.MobileNetv3_small)
+class MobileNetV3Small(MobileNetV3):
     """
         Constructs a MobileNetV3-Small model
     """
@@ -156,9 +160,11 @@ def mobilenetv3_small(data_channel):
         [5, 576, 96, 1, 1, 1],
         [5, 576, 96, 1, 1, 1],
     ]
-    model = MobileNetV3(cfgs, mode='small', data_channel=data_channel)
-    model.set_name(BackboneName.MobileNetv3_small)
-    return model
+
+    def __init__(self, data_channel):
+        super().__init__(MobileNetV3Small.cfgs,
+                         mode='small', data_channel=data_channel)
+        self.set_name(BackboneName.MobileNetv3_small)
 
 
 
