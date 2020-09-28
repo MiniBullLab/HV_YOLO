@@ -7,7 +7,7 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 
-from easyai.tools.create_detection_anchors import CreateDetectionAnchors
+from easyai.tools.parameter.create_detection_anchors import CreateDetectionAnchors
 
 
 def test(train_path, config_path, num_anchors):

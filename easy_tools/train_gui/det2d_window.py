@@ -7,7 +7,7 @@ import inspect
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from easy_tools.train_gui.process_status import ProcessStatus
-from easyai.tools.detection_sample_process import DetectionSampleProcess
+from easyai.tools.sample.detection_sample_process import DetectionSampleProcess
 
 
 class Detection2dTrainWindow(QWidget):

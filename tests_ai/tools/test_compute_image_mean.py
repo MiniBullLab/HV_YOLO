@@ -7,7 +7,7 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 
-from easyai.tools.compute_images_mean import ComputeImagesMean
+from easyai.tools.parameter.compute_images_mean import ComputeImagesMean
 from easyai.config.utility.config_factory import ConfigFactory
 
 

@@ -40,7 +40,7 @@ class EasyAiTrainWindow(QTabWidget):
         self.setMinimumSize(QSize(600, 500))
         # self.setMaximumSize(QSize(600, 500))
         self.setWindowTitle('easyai train')
-        self.setWindowIcon(QIcon('logo.png'))
+        self.setWindowIcon(QIcon('./logo.png'))
 
 
 def test():

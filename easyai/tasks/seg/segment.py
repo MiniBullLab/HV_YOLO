@@ -44,7 +44,7 @@ class Segmentation(BaseInference):
             print('Batch %d... Done. (%.3fs)' % (index, self.timer.toc()))
             if is_show:
                 if not self.result_show.show(src_image, result,
-                                             self.task_config.class_name):
+                                             self.task_config.segment_class):
                     break
             else:
                 self.save_result(file_path, result)

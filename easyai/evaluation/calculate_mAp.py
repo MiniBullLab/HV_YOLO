@@ -42,7 +42,6 @@ class CalculateMeanAp():
             else:
                 recall, precision, ap = self.calculate_ap(gt_boxes, detect_boxes, 0.5)
                 aps += [ap]
-        self.print_evaluation(aps)
         return np.mean(aps), aps
 
     def print_evaluation(self, aps):
@@ -52,7 +51,6 @@ class CalculateMeanAp():
         for i, ap in enumerate(aps):
             print(self.class_names[i] + ': ' + '{:.3f}'.format(ap))
             # print(self.className[i] + '_iou: ' + '{:.3f}'.format(ious[aps.index(ap)]))
-        print('mAP: ' + '{:.3f}'.format(np.mean(aps)))
         # print('Iou acc: ' + '{:.3f}'.format(np.mean(ious)))
         print('~~~~~~~~')
 

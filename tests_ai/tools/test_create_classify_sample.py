@@ -7,7 +7,7 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 
-from easyai.tools.create_classify_sample import CreateClassifySample
+from easyai.tools.sample.create_classify_sample import CreateClassifySample
 
 def test(input_dir, output_dir, flag, probability):
     print("start...")

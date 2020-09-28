@@ -20,7 +20,7 @@ outNetName=classnet
 
 inputColorFormat=1
 outputShape=1,3,224,224
-outputLayerName="o:192|ot:0,1,2,3|odf:fp32"
+outputLayerName="o:199|ot:0,1,2,3|odf:fp32"
 inputDataFormat=0,0,0,0
 
 mean=129.3041,124.0699,112.4340

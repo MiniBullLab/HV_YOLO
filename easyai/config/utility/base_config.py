@@ -33,7 +33,7 @@ class BaseConfig():
         return self.task_name
 
     def get_base_default_value(self):
-        self.root_save_dir = "./.log"
+        self.root_save_dir = "./log"
         self.model_save_dir_name = "snapshot"
         self.config_save_dir_name = "config"
 

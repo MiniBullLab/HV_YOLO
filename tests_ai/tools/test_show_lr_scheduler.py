@@ -7,7 +7,7 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 
-from easyai.tools.show_lr_scheduler import ShowLrScheduler
+from easyai.tools.model_tool.show_lr_scheduler import ShowLrScheduler
 
 
 def test(task_name, config_path, epoch_iteration):

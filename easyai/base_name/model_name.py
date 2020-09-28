@@ -32,8 +32,10 @@ class ModelName():
     Inceptionv4Cls = "Inceptionv4Cls"
     SENetCls = "SENetCls"
     GhostNetCls = "GhostNetCls"
+    ClassNet = "classnet"
 
-    YoloV3Det2d = "detnet"
+    YoloV3Det2d = "yolov3"
+    DetNet = "detnet"
 
     MSRResNet = "MSRResNet"
     SmallSRNet = "SmallSRNet"

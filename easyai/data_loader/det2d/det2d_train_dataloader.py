@@ -11,7 +11,7 @@ from easyai.data_loader.utility.data_loader import DataLoader
 from easyai.data_loader.det2d.det2d_sample import DetectionSample
 from easyai.data_loader.det2d.det2d_dataset_process import DetectionDataSetProcess
 from easyai.data_loader.det2d.det2d_data_augment import DetectionDataAugment
-from easyai.tools.create_detection_sample import CreateDetectionSample
+from easyai.tools.sample.create_detection_sample import CreateDetectionSample
 
 
 class DetectionTrainDataloader(DataLoader):

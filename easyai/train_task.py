@@ -22,7 +22,8 @@ class TrainTask():
                      'cfg_path': cfg_path,
                      'gpu_id': gpu_id,
                      'config_path': config_path}
-        if REGISTERED_TRAIN_TASK.has_class(self.task_name):
+        if self.task_name is not None and \
+                REGISTERED_TRAIN_TASK.has_class(self.task_name):
             task = build_from_cfg(task_args, REGISTERED_TRAIN_TASK)
             task.load_pretrain_model(pretrain_model_path)
             task.train(self.train_path, self.val_path)
@@ -32,7 +33,7 @@ class TrainTask():
 
     def image_model_convert(self, train_task, model_args):
         if self.is_convert:
-            from easyai.tools.model_to_onnx import ModelConverter
+            from easyai.tools.model_tool.model_to_onnx import ModelConverter
             converter = ModelConverter(train_task.train_task_config.image_size)
             self.save_onnx_path = converter.model_convert(model_args,
                                                           train_task.train_task_config.best_weights_path,

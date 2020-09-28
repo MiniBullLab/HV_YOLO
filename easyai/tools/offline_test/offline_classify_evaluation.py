@@ -4,12 +4,17 @@
 
 from easyai.helper import DirProcess
 from easyai.evaluation.classify_accuracy import ClassifyAccuracy
+from easyai.tools.offline_test.base_offline_evaluation import BaseOfflineEvaluation
 from easyai.helper.arguments_parse import ToolArgumentsParse
+from easyai.base_name.task_name import TaskName
+from easyai.tools.utility.registry import REGISTERED_OFFLINE_EVALUATION
 
 
-class OfflineClassifyEvaluation():
+@REGISTERED_OFFLINE_EVALUATION.register_module(TaskName.Classify_Task)
+class OfflineClassifyEvaluation(BaseOfflineEvaluation):
 
     def __init__(self):
+        super().__init__()
         self.dirProcess = DirProcess()
         self.evaluation = ClassifyAccuracy()
 
@@ -42,17 +47,23 @@ class OfflineClassifyEvaluation():
                 result.append((data_list[0], int(data_list[1])))
         return result
 
+    def print_evaluation(self, value):
+        print_str = "Classify Accuracy: {:.3f}%".format(value * 100)
+        print(print_str)
+        return print_str
+
 
 def main():
     print("start...")
     options = ToolArgumentsParse.test_path_parse()
     test = OfflineClassifyEvaluation()
     value = test.process(options.inputPath, options.targetPath)
-    print("Classify Accuracy: {:.3f}%".format(value * 100))
+    test.print_evaluation(value)
     print("End of game, have a nice day!")
 
 
 if __name__ == "__main__":
    main()
+
 
 

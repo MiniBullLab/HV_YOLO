@@ -7,7 +7,7 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 
-from easyai.tools.create_segment_sample import CreateSegmentionSample
+from easyai.tools.sample.create_segment_sample import CreateSegmentionSample
 
 
 def test(input_dir, output_path, probability):
