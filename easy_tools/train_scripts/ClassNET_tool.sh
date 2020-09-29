@@ -8,7 +8,7 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 export PYTHONPATH=/opt/caffe/python:$PYTHONPATH
 
 rm -rf ./.log/classify*
-CUDA_VISIBLE_DEVICES=0 python3 -m easy_tools.easy_ai --task ClassNet --gpu 0 --trainPath /home/lpj/github/data/animals_detect/ImageSets/train.txt --valPath /home/lpj/github/data/animals_detect/ImageSets/val.txt
+CUDA_VISIBLE_DEVICES=0 python3 -m easy_tools.easy_ai --task ClassNet --gpu 0 --trainPath $1 --valPath $2
 
 set -v
 root_path=$(pwd)
