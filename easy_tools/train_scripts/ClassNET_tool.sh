@@ -7,14 +7,14 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 #caffe
 export PYTHONPATH=/opt/caffe/python:$PYTHONPATH
 
-rm -rf ./.log/classify*
+rm -rf ./log/classify*
 CUDA_VISIBLE_DEVICES=0 python3 -m easy_tools.easy_ai --task ClassNet --gpu 0 --trainPath $1 --valPath $2
 
 set -v
 root_path=$(pwd)
-modelDir="./.log/snapshot"
-imageDir="./.log/cls_img"
-outDir="${root_path}/.log/out"
+modelDir="./log/snapshot"
+imageDir="./log/cls_img"
+outDir="${root_path}/log/out"
 modelName=classnet
 outNetName=classnet
 
