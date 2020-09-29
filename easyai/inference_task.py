@@ -9,7 +9,7 @@ from easyai.helper.arguments_parse import TaskArgumentsParse
 
 class InferenceTask():
 
-    def __init__(self, task_name, input_path, is_show=False):
+    def __init__(self, task_name, input_path, is_show=True):
         self.task_name = task_name
         self.input_path = input_path
         self.is_show = is_show
@@ -19,7 +19,8 @@ class InferenceTask():
                      'cfg_path': cfg_path,
                      'gpu_id': gpu_id,
                      'config_path': config_path}
-        if REGISTERED_INFERENCE_TASK.has_class(self.task_name):
+        if self.task_name is not None and \
+                REGISTERED_INFERENCE_TASK.has_class(self.task_name):
             task = build_from_cfg(task_args, REGISTERED_INFERENCE_TASK)
             task.load_weights(weight_path)
             task.process(self.input_path, self.is_show)

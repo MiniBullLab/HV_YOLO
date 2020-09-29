@@ -9,7 +9,7 @@ from easyai.solver.lr_factory import LrSchedulerFactory
 from easyai.tasks.utility.base_train import BaseTrain
 from easyai.tasks.det2d.detect2d_test import Detection2dTest
 from easyai.base_name.task_name import TaskName
-from easyai.tools.detection_sample_process import DetectionSampleProcess
+from easyai.tools.sample.detection_sample_process import DetectionSampleProcess
 from easyai.tasks.utility.registry import REGISTERED_TRAIN_TASK
 
 

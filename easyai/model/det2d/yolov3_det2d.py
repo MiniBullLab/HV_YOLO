@@ -29,6 +29,8 @@ class YoloV3Det2d(BaseDetectionModel):
                              [26.36, 58.52], [36.09, 25.55], [64.42, 42.90],
                              [96.44, 79.10], [158.37, 115.59], [218.65, 192.90]]
 
+        self.model_args['type'] = BackboneName.Darknet53
+
         self.factory = BackboneFactory()
         self.create_block_list()
 
@@ -36,7 +38,7 @@ class YoloV3Det2d(BaseDetectionModel):
         self.clear_list()
         self.lossList = []
 
-        backbone = self.factory.get_base_model(BackboneName.Darknet53, self.model_args)
+        backbone = self.factory.get_backbone_model(self.model_args)
         base_out_channels = backbone.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])
 

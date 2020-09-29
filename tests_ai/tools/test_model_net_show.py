@@ -7,7 +7,7 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 
-from easyai.tools.model_net_show import ModelNetShow
+from easyai.tools.model_tool.model_net_show import ModelNetShow
 
 
 def test_model_show(model):

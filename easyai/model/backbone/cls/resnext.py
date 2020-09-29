@@ -13,8 +13,9 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.resnext_block import ResNextBottleNeck
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-__all__ = ['resnext50', 'resnext101', 'resnext152']
+__all__ = ['ResNext50', 'ResNext101', 'ResNext152']
 
 
 class ResNext(BaseBackbone):
@@ -72,31 +73,35 @@ class ResNext(BaseBackbone):
         return output_list
 
 
-def resnext50(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.ResNext50)
+class ResNext50(ResNext):
     """ return a resnext50(c32x4d) network
     """
-    model = ResNext(data_channel=data_channel,
-                    num_blocks=(3, 4, 6, 3))
-    model.set_name(BackboneName.ResNext50)
-    return model
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(3, 4, 6, 3))
+        self.set_name(BackboneName.ResNext50)
 
 
-def resnext101(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.ResNext101)
+class ResNext101(ResNext):
     """ return a resnext101(c32x4d) network
     """
-    model = ResNext(data_channel=data_channel,
-                    num_blocks=(3, 4, 23, 3))
-    model.set_name(BackboneName.ResNext101)
-    return model
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(3, 4, 23, 3))
+        self.set_name(BackboneName.ResNext101)
 
 
-def resnext152(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.ResNext152)
+class ResNext152(ResNext):
     """ return a resnext152(c32x4d) network
     """
-    model = ResNext(data_channel=data_channel,
-                    num_blocks=(3, 4, 36, 3))
-    model.set_name(BackboneName.ResNext152)
-    return model
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(3, 4, 36, 3))
+        self.set_name(BackboneName.ResNext152)
+
 
 
 

@@ -12,10 +12,12 @@ from easyai.model.base_block.utility.separable_conv_block import SeparableConv2d
 from easyai.model.base_block.cls.xception_block import DoubleSeparableConv2dBlock
 from easyai.model.base_block.cls.xception_block import XceptionSumBlock, XceptionConvBlock
 from easyai.model.base_block.cls.xception_block import BlockA, FCAttention
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
 __all__ = ['Xception65', 'XceptionA']
 
 
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Xception65)
 class Xception65(BaseBackbone):
 
     def __init__(self, data_channel=3, output_stride=16,
@@ -188,13 +190,13 @@ class Xception65(BaseBackbone):
         return layer_outputs
 
 
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.XceptionA)
 class XceptionA(BaseBackbone):
     def __init__(self, data_channel=3,
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
-        super().__init__()
+        super().__init__(data_channel)
         self.set_name(BackboneName.XceptionA)
-        self.data_channel = data_channel
         self.activation_name = activationName
         self.bn_name = bnName
 

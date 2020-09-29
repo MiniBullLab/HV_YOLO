@@ -7,7 +7,7 @@ from easyai.data_loader.utility.torch_data_loader import TorchDataLoader
 from easyai.data_loader.seg.segment_sample import SegmentSample
 from easyai.data_loader.seg.segment_dataset_process import SegmentDatasetProcess
 from easyai.data_loader.seg.segment_data_augment import SegmentDataAugment
-from easyai.tools.convert_segment_label import ConvertSegmentionLable
+from easyai.tools.sample.convert_segment_label import ConvertSegmentionLable
 
 
 class SegmentDataLoader(TorchDataLoader):

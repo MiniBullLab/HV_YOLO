@@ -3,7 +3,7 @@
 
 #### easyai包打包
 1. ``` cp -r ../easyai . ```
-2. ``` python3 py2sec.py -d easyai -m __init__.py,setup.py,easy_ai.py```（该步骤执行时间会比较长几分钟）
+2. ``` python3 py2sec.py -d easyai -m __init__.py,setup.py```（该步骤执行时间会比较长几分钟）
 3. ``` cd result```
 4. 将ai_build目录中的全部文件拷贝到result目录中，如果需要打包对应版本的库，可以将最外层中的requirements_xxx文件的文件名修改为requirements，替换当前requirements文件。
 5. ``` python3 setup.py bdist_wheel```
@@ -12,7 +12,7 @@
 
 #### easy_convert包打包
 1. ``` cp -r ../easy_converter . ```
-2. ``` python3 py2sec.py -d easy_converter -m __init__.py,setup.py,easy_convert.py ```（该步骤执行时间会比较长几分钟）
+2. ``` python3 py2sec.py -d easy_converter -m __init__.py,setup.py```（该步骤执行时间会比较长几分钟）
 3. ``` cd result```
 4. 将convert_build目录中的全部文件拷贝到result目录中，如果需要打包对应版本的库，可以将最外层中的requirements_xxx文件的文件名修改为requirements，替换当前requirements文件。
 5. ``` python3 setup.py bdist_wheel```

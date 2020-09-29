@@ -9,9 +9,9 @@ from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_layer import RouteLayer
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.darknet_block import ResBlock
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-
-__all__ = ['csp_darknet53']
+__all__ = ['CSPDarknet53']
 
 
 class CSPDarkNet(BaseBackbone):
@@ -119,8 +119,11 @@ class CSPDarkNet(BaseBackbone):
         return output_list
 
 
-def csp_darknet53(data_channel):
-    model = CSPDarkNet(data_channel=data_channel,
-                       num_blocks=[1, 2, 8, 8, 4])
-    model.set_name(BackboneName.CSPDarknet53)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.CSPDarknet53)
+class CSPDarknet53(CSPDarkNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=[1, 2, 8, 8, 4])
+        self.set_name(BackboneName.CSPDarknet53)
+

@@ -9,9 +9,10 @@ from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.pooling_layer import MyMaxPool2d
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.utility.utility_block import ConvActivationBlock
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
 
-__all__ = ['vgg11', 'vgg13', 'vgg16', 'vgg19']
+__all__ = ['VGG11', 'VGG13', 'VGG16', 'VGG19']
 
 
 class VGG(BaseBackbone):
@@ -86,30 +87,37 @@ class VGG(BaseBackbone):
         return output_list
 
 
-def vgg11(data_channel):
-    model = VGG(data_channel=data_channel,
-                vgg_name=BackboneName.Vgg11)
-    model.set_name(BackboneName.Vgg11)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Vgg11)
+class VGG11(VGG):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         vgg_name=BackboneName.Vgg11)
+        self.set_name(BackboneName.Vgg11)
 
 
-def vgg13(data_channel):
-    model = VGG(data_channel=data_channel,
-                vgg_name=BackboneName.Vgg13)
-    model.set_name(BackboneName.Vgg13)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Vgg13)
+class VGG13(VGG):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         vgg_name=BackboneName.Vgg13)
+        self.set_name(BackboneName.Vgg13)
 
 
-def vgg16(data_channel):
-    model = VGG(data_channel=data_channel,
-                vgg_name=BackboneName.Vgg16)
-    model.set_name(BackboneName.Vgg16)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Vgg16)
+class VGG16(VGG):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         vgg_name=BackboneName.Vgg16)
+        self.set_name(BackboneName.Vgg16)
 
 
-def vgg19(data_channel):
-    model = VGG(data_channel=data_channel,
-                vgg_name=BackboneName.Vgg19)
-    model.set_name(BackboneName.Vgg19)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Vgg19)
+class VGG19(VGG):
 
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         vgg_name=BackboneName.Vgg19)
+        self.set_name(BackboneName.Vgg19)

@@ -7,7 +7,7 @@ import inspect
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from easy_tools.train_gui.process_status import ProcessStatus
-from easyai.tools.detection_sample_process import DetectionSampleProcess
+from easyai.tools.sample.detection_sample_process import DetectionSampleProcess
 
 
 class Detection2dTrainWindow(QWidget):
@@ -165,7 +165,7 @@ class Detection2dTrainWindow(QWidget):
 
     def kill_process(self):
         if self.process is not None:
-            self.text_browser.append("det kill pid: %d" % self.process.processId())
+            self.text_browser.append("det2d kill pid: %d" % self.process.processId())
             self.process.kill()
             self.process.waitForFinished(-1)
 

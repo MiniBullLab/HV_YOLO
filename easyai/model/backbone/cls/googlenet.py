@@ -8,11 +8,13 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.utility.multi_path_conv_block import InceptionBlock
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
 
 __all__ = ['GoogleNet']
 
 
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.GoogleNet)
 class GoogleNet(BaseBackbone):
 
     def __init__(self, data_channel=3, bnName=NormalizationType.BatchNormalize2d,

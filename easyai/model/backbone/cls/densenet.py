@@ -9,10 +9,12 @@ from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_layer import NormalizeLayer, ActivationLayer
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.densenet_block import DenseBlock, TransitionBlock
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
 
-__all__ = ['densenet121', 'densenet169', 'densenet201', 'densenet161',
-           'densenet121_dilated8', 'densenet121_dilated16']
+__all__ = ['Densenet121', 'Densenet169', 'Densenet201', 'Densenet161',
+           'Densenet121Dilated8', 'Densenet121Dilated16',
+           'Densenet169Dilated8', 'Densenet169Dilated16']
 
 
 class DenseNet(BaseBackbone):
@@ -108,69 +110,89 @@ class DenseNet(BaseBackbone):
         return output_list
 
 
-def densenet121(data_channel):
-    model = DenseNet(data_channel=data_channel,
-                     num_init_features=64, growth_rate=32,
-                     num_blocks=(6, 12, 24, 16))
-    model.set_name(BackboneName.Densenet121)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Densenet121)
+class Densenet121(DenseNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_init_features=64, growth_rate=32,
+                         num_blocks=(6, 12, 24, 16))
+        self.set_name(BackboneName.Densenet121)
 
 
-def densenet121_dilated8(data_channel):
-    model = DenseNet(data_channel=data_channel,
-                     num_init_features=64, growth_rate=32,
-                     num_blocks=(6, 12, 24, 16),
-                     dilations=(1, 1, 2, 4))
-    model.set_name(BackboneName.Densenet121_Dilated8)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Densenet121_Dilated8)
+class Densenet121Dilated8(DenseNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_init_features=64, growth_rate=32,
+                         num_blocks=(6, 12, 24, 16),
+                         dilations=(1, 1, 2, 4))
+        self.set_name(BackboneName.Densenet121_Dilated8)
 
 
-def densenet121_dilated16(data_channel):
-    model = DenseNet(data_channel=data_channel,
-                     num_init_features=64, growth_rate=32,
-                     num_blocks=(6, 12, 24, 16),
-                     dilations=(1, 1, 1, 2))
-    model.set_name(BackboneName.Densenet121_Dilated16)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Densenet121_Dilated16)
+class Densenet121Dilated16(DenseNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_init_features=64, growth_rate=32,
+                         num_blocks=(6, 12, 24, 16),
+                         dilations=(1, 1, 1, 2))
+        self.set_name(BackboneName.Densenet121_Dilated16)
 
 
-def densenet169(data_channel):
-    model = DenseNet(data_channel=data_channel,
-                     num_init_features=64, growth_rate=32,
-                     num_blocks=(6, 12, 32, 32))
-    model.set_name(BackboneName.Densenet169)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Densenet169)
+class Densenet169(DenseNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_init_features=64, growth_rate=32,
+                         num_blocks=(6, 12, 32, 32))
+        self.set_name(BackboneName.Densenet169)
 
 
-def densenet169_dilated8(data_channel):
-    model = DenseNet(data_channel=data_channel,
-                     num_init_features=64, growth_rate=32,
-                     num_blocks=(6, 12, 32, 32),
-                     dilations=(1, 1, 2, 4))
-    model.set_name(BackboneName.Densenet169)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Densenet169Dilated8)
+class Densenet169Dilated8(DenseNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_init_features=64, growth_rate=32,
+                         num_blocks=(6, 12, 32, 32),
+                         dilations=(1, 1, 2, 4))
+        self.set_name(BackboneName.Densenet169Dilated8)
 
 
-def densenet169_dilated16(data_channel):
-    model = DenseNet(data_channel=data_channel,
-                     num_init_features=64, growth_rate=32,
-                     num_blocks=(6, 12, 32, 32),
-                     dilations=(1, 1, 1, 2))
-    model.set_name(BackboneName.Densenet169)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Densenet169Dilated16)
+class Densenet169Dilated16(DenseNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_init_features=64, growth_rate=32,
+                         num_blocks=(6, 12, 32, 32),
+                         dilations=(1, 1, 1, 2))
+        self.set_name(BackboneName.Densenet169Dilated16)
 
 
-def densenet201(data_channel):
-    model = DenseNet(data_channel=data_channel,
-                     num_init_features=64, growth_rate=32,
-                     num_blocks=(6, 12, 48, 32))
-    model.set_name(BackboneName.Densenet201)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Densenet161)
+class Densenet161(DenseNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_init_features=96, growth_rate=48,
+                         num_blocks=(6, 12, 36, 24))
+        self.set_name(BackboneName.Densenet161)
 
 
-def densenet161(data_channel):
-    model = DenseNet(data_channel=data_channel,
-                     num_init_features=96, growth_rate=48,
-                     num_blocks=(6, 12, 36, 24))
-    model.set_name(BackboneName.Densenet161)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Densenet201)
+class Densenet201(DenseNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_init_features=64, growth_rate=32,
+                         num_blocks=(6, 12, 48, 32))
+        self.set_name(BackboneName.Densenet201)
+
+
+
+

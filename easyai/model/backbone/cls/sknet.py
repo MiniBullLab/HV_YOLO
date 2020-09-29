@@ -15,8 +15,9 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.sknet_block import SKBlock
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-__all__ = ['sknet50', 'sknet101']
+__all__ = ['SKNet50', 'SKNet101']
 
 
 class SKNet(BaseBackbone):
@@ -88,15 +89,20 @@ class SKNet(BaseBackbone):
         return output_list
 
 
-def sknet50(data_channel):
-    model = SKNet(data_channel=data_channel,
-                  num_blocks=(3, 4, 6, 3))
-    model.set_name(BackboneName.SKNet50)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.SKNet50)
+class SKNet50(SKNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(3, 4, 6, 3))
+        self.set_name(BackboneName.SKNet50)
 
 
-def sknet101(data_channel):
-    model = SKNet(data_channel=data_channel,
-                  num_blocks=(3, 4, 23, 3))
-    model.set_name(BackboneName.SKNet101)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.SKNet101)
+class SKNet101(SKNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(3, 4, 23, 3))
+        self.set_name(BackboneName.SKNet101)
+

@@ -20,4 +20,3 @@ netron
 absl-py
 pathlib
 future
-cython

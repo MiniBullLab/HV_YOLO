@@ -67,9 +67,11 @@ class MyModel(BaseModel):
             input_name = input_name.strip()
             if input_name.endswith("cfg"):
                 input_cfg_path = os.path.join(self.cfg_dir, input_name)
-                result = self.backbone_factory.get_base_model(input_cfg_path, self.default_args)
+                self.default_args['type'] = input_cfg_path
+                result = self.backbone_factory.get_backbone_model(self.default_args)
             else:
-                result = self.backbone_factory.get_base_model(input_name, self.default_args)
+                self.default_args['type'] = input_name
+                result = self.backbone_factory.get_backbone_model(self.default_args)
         return result, input_name
 
     def create_task(self, base_out_channels):

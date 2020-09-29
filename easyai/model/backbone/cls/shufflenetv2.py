@@ -11,9 +11,10 @@ from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.pooling_layer import MyMaxPool2d
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.shufflenet_block import DownBlock, BasicBlock
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
 
-__all__ = ['shufflenetv2_1_0']
+__all__ = ['ShuffleNetV2V10', 'ShuffleNetV2V05']
 
 
 class ShuffleNetV2(BaseBackbone):
@@ -75,16 +76,21 @@ class ShuffleNetV2(BaseBackbone):
         return output_list
 
 
-def shufflenetv2_1_0(data_channel):
-    model = ShuffleNetV2(data_channel=data_channel, num_blocks=[3, 7, 3])
-    model.set_name(BackboneName.ShuffleNetV2_1_0)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.ShuffleNetV2_1_0)
+class ShuffleNetV2V10(ShuffleNetV2):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel, num_blocks=[3, 7, 3])
+        self.set_name(BackboneName.ShuffleNetV2_1_0)
 
 
-def shufflenet_v2_x0_5(data_channel):
-    model = ShuffleNetV2(data_channel=data_channel, num_blocks=[3, 7, 3], out_channels=(48, 96, 192))
-    model.set_name(BackboneName.ShuffleNetV2_1_0)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.ShuffleNetV2V05)
+class ShuffleNetV2V05(ShuffleNetV2):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel, num_blocks=[3, 7, 3],
+                         out_channels=(48, 96, 192))
+        self.set_name(BackboneName.ShuffleNetV2V05)
 
 
 def shufflenet_v2_x1_0(data_channel):

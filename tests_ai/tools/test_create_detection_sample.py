@@ -7,7 +7,7 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 
-from easyai.tools.create_detection_sample import CreateDetectionSample
+from easyai.tools.sample.create_detection_sample import CreateDetectionSample
 
 
 def test_balance_sample(config_path, train_path, output_dir):

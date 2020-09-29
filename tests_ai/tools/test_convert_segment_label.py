@@ -7,7 +7,7 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 
-from easyai.tools.convert_segment_label import ConvertSegmentionLable
+from easyai.tools.sample.convert_segment_label import ConvertSegmentionLable
 from easyai.config.utility.config_factory import ConfigFactory
 
 

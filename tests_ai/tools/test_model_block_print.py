@@ -7,7 +7,7 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 
-from easyai.tools.model_block_print import model_print, backbone_model_print
+from easyai.tools.model_tool.model_block_print import model_print, backbone_model_print
 
 
 def test_model_print(model):

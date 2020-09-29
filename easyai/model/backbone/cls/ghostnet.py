@@ -14,12 +14,13 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.ghostnet_block import GhostBottleneck
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
 
-__all__ = ['ghost_net']
+__all__ = ['GhostNet']
 
 
-class GhostNet(BaseBackbone):
+class BaseGhostNet(BaseBackbone):
     def __init__(self, cfgs, data_channel=3, width_mult=1.,
                  bnName=NormalizationType.BatchNormalize2d,
                  activationName=ActivationType.ReLU):
@@ -96,7 +97,8 @@ class GhostNet(BaseBackbone):
         return output_list
 
 
-def ghost_net(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.GhostNet)
+class GhostNet(BaseGhostNet):
     cfgs = [
         # k, t, c, SE, s
         [3, 16, 16, 0, 1],
@@ -116,6 +118,7 @@ def ghost_net(data_channel):
         [5, 960, 160, 0, 1],
         [5, 960, 160, 1, 1]
     ]
-    model = GhostNet(cfgs=cfgs, data_channel=data_channel)
-    model.set_name(BackboneName.GhostNet)
-    return model
+
+    def __init__(self, data_channel):
+        super().__init__(cfgs=GhostNet.cfgs, data_channel=data_channel)
+        self.set_name(BackboneName.GhostNet)

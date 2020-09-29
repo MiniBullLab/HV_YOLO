@@ -201,6 +201,53 @@ class ToolArgumentsParse():
         return options
 
     @classmethod
+    def offline_test_path_parse(cls):
+        parser = OptionParser()
+        parser.description = "This program offline test"
+
+        parser.add_option("-t", "--task", dest="task_name",
+                          type="string", default=None,
+                          help="task name")
+
+        parser.add_option("-f", "--flag", dest="flag",
+                          action="store", type="int", default=0,
+                          help="flag = 0, test pc accuracy \n"
+                               "flag = 1, test arm accuracy \n"
+                               "flag = 2, test pc and arm accuracy \n")
+
+        parser.add_option("-i", "--target", dest="targetPath",
+                          metavar="PATH", type="string", default=None,
+                          help="txt images path")
+
+        parser.add_option("-a", "--arm", dest="armResultPath",
+                          metavar="PATH", type="string", default=None,
+                          help="txt result path")
+
+        parser.add_option("-m", "--model", dest="model",
+                          metavar="PATH", type="string", default="cfg/conv_block.cfg",
+                          help="cfg file path or model name")
+
+        parser.add_option("-w", "--weights", dest="weights",
+                          metavar="PATH", type="string", default="weights/latest.pt",
+                          help="path to store weights")
+
+        parser.add_option("-c", "--config", dest="config_path",
+                          metavar="PATH", type="string", default=None,
+                          help="config path")
+
+        (options, args) = parser.parse_args()
+
+        if options.targetPath:
+            if not os.path.exists(options.targetPath):
+                parser.error("Could not find the input file")
+            else:
+                options.targetPath = os.path.normpath(options.targetPath)
+        else:
+            parser.error("'target' option is required to run this program")
+
+        return options
+
+    @classmethod
     def images_path_parse(cls):
         parser = OptionParser()
         parser.description = "This program"

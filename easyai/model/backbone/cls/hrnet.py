@@ -9,10 +9,11 @@ from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.hrnet_block import HRNetBlockName
 from easyai.model.base_block.cls.hrnet_block import BasicBlock, Bottleneck, TransitionBlock
 from easyai.model.base_block.cls.hrnet_block import HighResolutionBlock, ClassificationHeadBlock
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-__all__ = ['hrnet_w18_small', 'hrnet_w18_small_v2', 'hrnet_w18',
-           'hrnet_w30', 'hrnet_w32', 'hrnet_w40', 'hrnet_w44',
-           'hrnet_w48', 'hrnet_w64']
+__all__ = ['HRnetW18Samll', 'HRnetW18SamllV2', 'HRnetW18',
+           'HRnetW30', 'HRnetW32', 'HRnetW40', 'HRnetW44',
+           'HRnetW48', 'HRnetW64']
 
 
 class HighResolutionNet(BaseBackbone):
@@ -183,7 +184,8 @@ class HighResolutionNet(BaseBackbone):
         return output_list
 
 
-def hrnet_w18_small(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.HRnet_w18_small)
+class HRnetW18Samll(HighResolutionNet):
     cfgs = dict(
         STEM_WIDTH=64,
         STAGE1=dict(
@@ -219,12 +221,14 @@ def hrnet_w18_small(data_channel):
             FUSE_METHOD='SUM',
         ),
     )
-    model = HighResolutionNet(cfgs, data_channel)
-    model.set_name(BackboneName.HRnet_w18_small)
-    return model
+
+    def __init__(self, data_channel):
+        super().__init__(HRnetW18Samll.cfgs, data_channel)
+        self.set_name(BackboneName.HRnet_w18_small)
 
 
-def hrnet_w18_small_v2(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.HRnet_w18_small_v2)
+class HRnetW18SamllV2(HighResolutionNet):
     cfgs = dict(
         STEM_WIDTH=64,
         STAGE1=dict(
@@ -260,12 +264,14 @@ def hrnet_w18_small_v2(data_channel):
             FUSE_METHOD='SUM',
         ),
     )
-    model = HighResolutionNet(cfgs, data_channel)
-    model.set_name(BackboneName.HRnet_w18_small_v2)
-    return model
+
+    def __init__(self, data_channel):
+        super().__init__(HRnetW18SamllV2.cfgs, data_channel)
+        self.set_name(BackboneName.HRnet_w18_small_v2)
 
 
-def hrnet_w18(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.HRnet_w18)
+class HRnetW18(HighResolutionNet):
     cfgs = dict(
         STEM_WIDTH=64,
         STAGE1=dict(
@@ -301,12 +307,14 @@ def hrnet_w18(data_channel):
             FUSE_METHOD='SUM',
         ),
     )
-    model = HighResolutionNet(cfgs, data_channel)
-    model.set_name(BackboneName.HRnet_w18)
-    return model
+
+    def __init__(self, data_channel):
+        super().__init__(HRnetW18.cfgs, data_channel)
+        self.set_name(BackboneName.HRnet_w18)
 
 
-def hrnet_w30(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.HRnet_w30)
+class HRnetW30(HighResolutionNet):
     cfgs = dict(
         STEM_WIDTH=64,
         STAGE1=dict(
@@ -342,12 +350,14 @@ def hrnet_w30(data_channel):
             FUSE_METHOD='SUM',
         ),
     )
-    model = HighResolutionNet(cfgs, data_channel)
-    model.set_name(BackboneName.HRnet_w30)
-    return model
+
+    def __init__(self, data_channel):
+        super().__init__(HRnetW30.cfgs, data_channel)
+        self.set_name(BackboneName.HRnet_w30)
 
 
-def hrnet_w32(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.HRnet_w32)
+class HRnetW32(HighResolutionNet):
     cfgs = dict(
         STEM_WIDTH=64,
         STAGE1=dict(
@@ -383,12 +393,14 @@ def hrnet_w32(data_channel):
             FUSE_METHOD='SUM',
         ),
     )
-    model = HighResolutionNet(cfgs, data_channel)
-    model.set_name(BackboneName.HRnet_w32)
-    return model
+
+    def __init__(self, data_channel):
+        super().__init__(HRnetW32.cfgs, data_channel)
+        self.set_name(BackboneName.HRnet_w32)
 
 
-def hrnet_w40(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.HRnet_w40)
+class HRnetW40(HighResolutionNet):
     cfgs = dict(
         STEM_WIDTH=64,
         STAGE1=dict(
@@ -424,12 +436,14 @@ def hrnet_w40(data_channel):
             FUSE_METHOD='SUM',
         ),
     )
-    model = HighResolutionNet(cfgs, data_channel)
-    model.set_name(BackboneName.HRnet_w40)
-    return model
+
+    def __init__(self, data_channel):
+        super().__init__(HRnetW40.cfgs, data_channel)
+        self.set_name(BackboneName.HRnet_w40)
 
 
-def hrnet_w44(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.HRnet_w44)
+class HRnetW44(HighResolutionNet):
     cfgs = dict(
         STEM_WIDTH=64,
         STAGE1=dict(
@@ -465,12 +479,14 @@ def hrnet_w44(data_channel):
             FUSE_METHOD='SUM',
         ),
     )
-    model = HighResolutionNet(cfgs, data_channel)
-    model.set_name(BackboneName.HRnet_w44)
-    return model
+
+    def __init__(self, data_channel):
+        super().__init__(HRnetW44.cfgs, data_channel)
+        self.set_name(BackboneName.HRnet_w44)
 
 
-def hrnet_w48(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.HRnet_w48)
+class HRnetW48(HighResolutionNet):
     cfgs = dict(
         STEM_WIDTH=64,
         STAGE1=dict(
@@ -506,12 +522,14 @@ def hrnet_w48(data_channel):
             FUSE_METHOD='SUM',
         ),
     )
-    model = HighResolutionNet(cfgs, data_channel)
-    model.set_name(BackboneName.HRnet_w48)
-    return model
+
+    def __init__(self, data_channel):
+        super().__init__(HRnetW48.cfgs, data_channel)
+        self.set_name(BackboneName.HRnet_w48)
 
 
-def hrnet_w64(data_channel):
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.HRnet_w64)
+class HRnetW64(HighResolutionNet):
     cfgs = dict(
         STEM_WIDTH=64,
         STAGE1=dict(
@@ -547,6 +565,8 @@ def hrnet_w64(data_channel):
             FUSE_METHOD='SUM',
         ),
     )
-    model = HighResolutionNet(cfgs, data_channel)
-    model.set_name(BackboneName.HRnet_w64)
-    return model
+
+    def __init__(self, data_channel):
+        super().__init__(HRnetW64.cfgs, data_channel)
+        self.set_name(BackboneName.HRnet_w64)
+

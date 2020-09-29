@@ -8,9 +8,10 @@ from easyai.base_name.block_name import LayerType
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.utility.residual_block import ResidualBlock
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
 
-__all__ = ['resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152']
+__all__ = ['ResNet18', 'ResNet34', 'ResNet50', 'ResNet101', 'ResNet152']
 
 
 class ResNet(BaseBackbone):
@@ -119,41 +120,52 @@ class ResNet(BaseBackbone):
         return output_list
 
 
-def resnet18(data_channel):
-    model = ResNet(data_channel=data_channel,
-                   num_blocks=[2, 2, 2, 2],
-                   block_flag=0)
-    model.set_name(BackboneName.ResNet18)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.ResNet18)
+class ResNet18(ResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=[2, 2, 2, 2],
+                         block_flag=0)
+        self.set_name(BackboneName.ResNet18)
 
 
-def resnet34(data_channel):
-    model = ResNet(data_channel=data_channel,
-                   num_blocks=[3, 4, 6, 3],
-                   block_flag=0)
-    model.set_name(BackboneName.ResNet34)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.ResNet34)
+class ResNet34(ResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=[3, 4, 6, 3],
+                         block_flag=0)
+        self.set_name(BackboneName.ResNet34)
 
 
-def resnet50(data_channel):
-    model = ResNet(data_channel=data_channel,
-                   num_blocks=[3, 4, 6, 3],
-                   block_flag=1)
-    model.set_name(BackboneName.ResNet50)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.ResNet50)
+class ResNet50(ResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=[3, 4, 6, 3],
+                         block_flag=1)
+        self.set_name(BackboneName.ResNet50)
 
 
-def resnet101(data_channel):
-    model = ResNet(data_channel=data_channel,
-                   num_blocks=[3, 4, 23, 3],
-                   block_flag=1)
-    model.set_name(BackboneName.ResNet101)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.ResNet101)
+class ResNet101(ResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=[3, 4, 23, 3],
+                         block_flag=1)
+        self.set_name(BackboneName.ResNet101)
 
 
-def resnet152(data_channel):
-    model = ResNet(data_channel=data_channel,
-                   num_blocks=[3, 8, 36, 3],
-                   block_flag=1)
-    model.set_name(BackboneName.ResNet152)
-    return model
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.ResNet152)
+class ResNet152(ResNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=[3, 8, 36, 3],
+                         block_flag=1)
+        self.set_name(BackboneName.ResNet152)
+

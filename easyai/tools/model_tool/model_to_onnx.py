@@ -29,11 +29,11 @@ class ModelConverter():
         save_onnx_path = self.converter.torch2onnx(model, weight_path)
         return save_onnx_path
 
-    def base_model_convert(self, base_model_path, weight_path, save_dir):
+    def base_model_convert(self, model_config, weight_path, save_dir):
         input_x = torch.randn(1, 3, self.input_size[1], self.input_size[0])
         self.converter.set_input(input_x)
         self.converter.set_save_dir(save_dir)
-        model = self.backbone_factory.get_base_model(base_model_path)
+        model = self.backbone_factory.get_backbone_model(model_config)
         save_onnx_path = self.converter.torch2onnx(model, weight_path)
         return save_onnx_path
 
@@ -52,4 +52,6 @@ if __name__ == '__main__':
                         "data_channel": 3}
         converter.model_convert(model_config, options.weight_path, options.save_dir)
     elif options.base_model is not None:
-        converter.base_model_convert(options.backbone, options.weight_path, options.save_dir)
+         model_config = {"type": options.backbone,
+                        "data_channel": 3}
+        converter.base_model_convert(model_config, options.weight_path, options.save_dir)

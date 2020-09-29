@@ -43,7 +43,7 @@ class SegmentionMetric():
         return {'Overall Acc: \t': acc,
                 'Mean Acc : \t': acc_cls,
                 'FreqW Acc : \t': fwavacc,
-                'Mean IoU : \t': mean_iu,}, cls_iu
+                'Mean IoU : \t': mean_iu}, cls_iu
 
     def fast_hist(self, gt, pred, n_class):
         mask = (gt >= 0) & (gt < n_class)

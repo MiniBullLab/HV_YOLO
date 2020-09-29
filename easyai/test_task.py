@@ -18,7 +18,8 @@ class TestTask():
                      'cfg_path': cfg_path,
                      'gpu_id': gpu_id,
                      'config_path': config_path}
-        if REGISTERED_TEST_TASK.has_class(self.task_name):
+        if self.task_name is not None and \
+                REGISTERED_TEST_TASK.has_class(self.task_name):
             task = build_from_cfg(task_args, REGISTERED_TEST_TASK)
             task.load_weights(weight_path)
             task.test(self.val_path)

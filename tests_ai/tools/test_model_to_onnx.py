@@ -7,7 +7,7 @@ import os
 import sys
 sys.path.insert(0, os.getcwd() + "/..")
 
-from easyai.tools.model_to_onnx import ModelConverter
+from easyai.tools.model_tool.model_to_onnx import ModelConverter
 from easyai.config.utility.config_factory import ConfigFactory
 
 

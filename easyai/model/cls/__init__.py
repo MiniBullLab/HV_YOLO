@@ -1,3 +1,4 @@
+from . import classnet
 from . import ghostnet_cls
 from . import inceptionv4_cls
 from . import senet_cls

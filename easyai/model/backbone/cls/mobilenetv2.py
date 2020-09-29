@@ -7,9 +7,10 @@ from easyai.base_name.backbone_name import BackboneName
 from easyai.model.backbone.utility.base_backbone import *
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.utility.residual_block import InvertedResidual
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
 
-__all__ = ['mobilenetv2_1_0', 'MobileNetV2']
+__all__ = ['MobileNetV2V10', 'MobileNetV2V10Dilated8']
 
 
 class MobileNetV2(BaseBackbone):
@@ -74,18 +75,19 @@ class MobileNetV2(BaseBackbone):
         return output_list
 
 
-def mobilenetv2_1_0(data_channel):
-    model = MobileNetV2(data_channel=data_channel,
-                        num_blocks=(1, 2, 3, 4, 3, 3, 1))
-    model.set_name(BackboneName.MobileNetV2_1_0)
-    return model
+class MobileNetV2V10(MobileNetV2):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(1, 2, 3, 4, 3, 3, 1))
+        self.set_name(BackboneName.MobileNetV2_1_0)
 
 
-def mobilenetv2_1_0_dilated8(data_channel):
-    model = MobileNetV2(data_channel=data_channel,
-                        num_blocks=(1, 2, 3, 4, 3, 3, 1),
-                        dilations=(1, 1, 1, 2, 2, 4, 4))
-    model.set_name(BackboneName.MobileNetV2_1_0)
-    return model
+class MobileNetV2V10Dilated8(MobileNetV2):
 
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel,
+                         num_blocks=(1, 2, 3, 4, 3, 3, 1),
+                         dilations=(1, 1, 1, 2, 2, 4, 4))
+        self.set_name(BackboneName.MobileNetV2V10Dilated8)
 

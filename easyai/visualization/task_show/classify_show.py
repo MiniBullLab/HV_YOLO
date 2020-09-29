@@ -15,7 +15,7 @@ class ClassifyShow():
              class_name, scale=1.0):
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(src_image, class_name[result],
-                    (src_image.shape[0] * 0.1, src_image.shape[1] * 0.1),
+                    (int(src_image.shape[0] * 0.1), int(src_image.shape[1] * 0.1)),
                     font, 0.5, (0, 255, 0), 2)
         cv2.namedWindow("image", 0)
         cv2.resizeWindow("image", int(src_image.shape[1] * scale), int(src_image.shape[0] * scale))

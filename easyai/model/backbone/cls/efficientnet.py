@@ -12,10 +12,11 @@ from easyai.model.base_block.utility.upsample_layer import Upsample
 from easyai.model.base_block.utility.utility_layer import ActivationLayer
 from easyai.model.base_block.utility.utility_block import ConvBNActivationBlock
 from easyai.model.base_block.cls.efficientnet_block import MBConvBlock
+from easyai.model.backbone.utility.registry import REGISTERED_CLS_BACKBONE
 
-__all__ = ['efficientnet_b0', 'efficientnet_b1', 'efficientnet_b2',
-           'efficientnet_b3', 'efficientnet_b4', 'efficientnet_b5',
-           'efficientnet_b6', 'efficientnet_b7']
+__all__ = ['EfficientNetB0', 'EfficientNetB1', 'EfficientNetB2',
+           'EfficientNetB3', 'EfficientNetB4', 'EfficientNetB5',
+           'EfficientNetB6', 'EfficientNetB7']
 
 
 class EfficientNet(BaseBackbone):
@@ -93,57 +94,74 @@ class EfficientNet(BaseBackbone):
         return output_list
 
 
-def efficientnet_b0(data_channel):
-    model = EfficientNet(data_channel=data_channel, width_coef=1.0, depth_coef=1.0,
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Efficientnet_b0)
+class EfficientNetB0(EfficientNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel, width_coef=1.0, depth_coef=1.0,
                          scale=1.0, dropout_ratio=0.2)
-    model.set_name(BackboneName.Efficientnet_b0)
-    return model
+        self.set_name(BackboneName.Efficientnet_b0)
 
 
-def efficientnet_b1(data_channel):
-    model = EfficientNet(data_channel=data_channel, width_coef=1.0, depth_coef=1.1,
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Efficientnet_b1)
+class EfficientNetB1(EfficientNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel, width_coef=1.0, depth_coef=1.1,
                          scale=240/224.0, dropout_ratio=0.2)
-    model.set_name(BackboneName.Efficientnet_b1)
-    return model
+        self.set_name(BackboneName.Efficientnet_b1)
 
 
-def efficientnet_b2(data_channel):
-    model = EfficientNet(data_channel=data_channel, width_coef=1.1, depth_coef=1.2,
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Efficientnet_b2)
+class EfficientNetB2(EfficientNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel, width_coef=1.1, depth_coef=1.2,
                          scale=260/224.0, dropout_ratio=0.3)
-    model.set_name(BackboneName.Efficientnet_b2)
-    return model
+        self.set_name(BackboneName.Efficientnet_b2)
 
 
-def efficientnet_b3(data_channel):
-    model = EfficientNet(data_channel=data_channel, width_coef=1.2, depth_coef=1.4,
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Efficientnet_b3)
+class EfficientNetB3(EfficientNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel, width_coef=1.2, depth_coef=1.4,
                          scale=300/224, dropout_ratio=0.3)
-    model.set_name(BackboneName.Efficientnet_b3)
-    return model
+        self.set_name(BackboneName.Efficientnet_b3)
 
 
-def efficientnet_b4(data_channel):
-    model = EfficientNet(data_channel=data_channel, width_coef=1.4, depth_coef=1.8,
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Efficientnet_b4)
+class EfficientNetB4(EfficientNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel, width_coef=1.4, depth_coef=1.8,
                          scale=380/224, dropout_ratio=0.4)
-    model.set_name(BackboneName.Efficientnet_b4)
-    return model
+        self.set_name(BackboneName.Efficientnet_b4)
 
 
-def efficientnet_b5(data_channel):
-    model = EfficientNet(data_channel=data_channel, width_coef=1.6, depth_coef=2.2,
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Efficientnet_b5)
+class EfficientNetB5(EfficientNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel, width_coef=1.6, depth_coef=2.2,
                          scale=456/224, dropout_ratio=0.4)
-    model.set_name(BackboneName.Efficientnet_b5)
-    return model
+        self.set_name(BackboneName.Efficientnet_b5)
 
 
-def efficientnet_b6(data_channel):
-    model = EfficientNet(data_channel=data_channel, width_coef=1.8, depth_coef=2.6,
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Efficientnet_b6)
+class EfficientNetB6(EfficientNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel, width_coef=1.8, depth_coef=2.6,
                          scale=528/224, dropout_ratio=0.5)
-    model.set_name(BackboneName.Efficientnet_b6)
-    return model
+        self.set_name(BackboneName.Efficientnet_b6)
 
 
-def efficientnet_b7(data_channel):
-    model = EfficientNet(data_channel=data_channel, width_coef=2.0, depth_coef=3.1,
+@REGISTERED_CLS_BACKBONE.register_module(BackboneName.Efficientnet_b7)
+class EfficientNetB7(EfficientNet):
+
+    def __init__(self, data_channel):
+        super().__init__(data_channel=data_channel, width_coef=2.0, depth_coef=3.1,
                          scale=600/224, dropout_ratio=0.5)
-    model.set_name(BackboneName.Efficientnet_b7)
-    return model
+        self.set_name(BackboneName.Efficientnet_b7)
+
