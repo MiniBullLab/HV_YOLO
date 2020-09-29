@@ -58,7 +58,7 @@ def train_main():
     if options.task_name.strip() == "ClassNet":
         pretrain_model_path = os.path.join(dir_name, "./data/classnet.pt")
         train_task = TrainTask(TaskName.Classify_Task, options.trainPath, options.valPath, True)
-        train_task.train("classnet", options.gpu_id, options.config_path, pretrain_model_path)
+        train_task.train('classnet', options.gpu_id, options.config_path, pretrain_model_path)
         save_image_dir = os.path.join(config.root_save_dir, "cls_img")
         copy_process.copy(options.trainPath, save_image_dir)
     elif options.task_name.strip() == "DeNET":

@@ -8,7 +8,7 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 export PYTHONPATH=/opt/caffe/python:$PYTHONPATH
 
 rm -rf ./.log/segment*
-CUDA_VISIBLE_DEVICES=0 python3 -m easyai.easy_ai --task SegNET --gpu 0 --trainPath $1 --valPath $2
+CUDA_VISIBLE_DEVICES=0 python3 -m easy_tools.easy_ai --task SegNET --gpu 0 --trainPath $1 --valPath $2
 
 set -v
 root_path=$(pwd)

@@ -9,8 +9,8 @@ export PYTHONPATH=/opt/caffe/python:$PYTHONPATH
 
 rm -rf ./.log/detect2d*
 
-CUDA_VISIBLE_DEVICES=0 python3 -m easyai.easy_ai --task DeNET --gpu 0 --trainPath $1 --valPath $2
-python3 -m easy_converter.easy_convert --task DeNET --input ./.log/snapshot/detnet.onnx
+CUDA_VISIBLE_DEVICES=0 python3 -m easy_tools.easy_ai --task DeNET --gpu 0 --trainPath $1 --valPath $2
+python3 -m easy_tools.easy_convert --task DeNET --input ./.log/snapshot/detnet.onnx
 
 set -v
 root_path=$(pwd)
