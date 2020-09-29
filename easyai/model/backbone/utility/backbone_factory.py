@@ -34,10 +34,11 @@ class BackboneFactory():
         return model
 
     def get_backbone_from_name(self, model_config):
+        input_name = model_config['type'].strip()
         if model_config.get('data_channel') is None:
             model_config['data_channel'] = 3
         result = None
-        if REGISTERED_CLS_BACKBONE.has_class(model_config):
+        if REGISTERED_CLS_BACKBONE.has_class(input_name):
             result = build_from_cfg(model_config, REGISTERED_CLS_BACKBONE)
         return result
 

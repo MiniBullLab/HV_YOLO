@@ -49,7 +49,7 @@ class Registry(object):
                 "{} is already registered in {}".format(cls_name, self.name)
             )
         self._module_dict[cls_name] = module_class
-        print(module_class, "register name: %s" % cls_name)
+        # print(module_class, "register name: %s" % cls_name)
 
     def register_module(self, cls_name=None):
         def deco(cls):
