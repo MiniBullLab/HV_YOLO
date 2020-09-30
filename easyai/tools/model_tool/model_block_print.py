@@ -29,8 +29,8 @@ def model_print(model_name):
     model = model_factory.get_model(model_config)
     if model is not None:
         model.print_block_name()
-        for k, value in model.named_children():
-            print(k, value)
+        # for k, value in model.named_children():
+        #     print(k, value)
 
 
 if __name__ == '__main__':
