@@ -10,3 +10,5 @@ class ProcessStatus():
     CONTINUE_TRAIN = 1
     STOP_TRAIN = 2
     THREAD_STOP = 3
+
+    LOG_ROOT = "./log"

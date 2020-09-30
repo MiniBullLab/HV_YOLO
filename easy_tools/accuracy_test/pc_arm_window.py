@@ -18,12 +18,14 @@ class PCAndArmTestWindow(QWidget):
         self.init_ui()
         self.test_process = AccuracyTestThread()
         self.test_process.signal_finish[str].connect(self.process_finished)
+        self.dir_path = "."
 
     def open_val_dataset(self, pressed):
         txt_path, _ = QFileDialog.getOpenFileName(self, "open val dataset", self.dir_path, "txt files(*.txt)")
         if txt_path.strip():
             self.val_data_txt.setText(txt_path.strip())
             self.start_button.setEnabled(True)
+            self.dir_path, _ = os.path.split(txt_path)
         else:
             print("%s error" % txt_path)
             return
@@ -32,6 +34,7 @@ class PCAndArmTestWindow(QWidget):
         txt_path, _ = QFileDialog.getOpenFileName(self, "open arm result", self.dir_path, "txt files(*.txt)")
         if txt_path.strip():
             self.arm_data_txt.setText(txt_path.strip())
+            self.dir_path, _ = os.path.split(txt_path)
         else:
             print("%s error" % txt_path)
             return
@@ -40,6 +43,7 @@ class PCAndArmTestWindow(QWidget):
         txt_path, _ = QFileDialog.getOpenFileName(self, "open weight file", self.dir_path, "pt files(*.pt)")
         if txt_path.strip():
             self.weight_txt.setText(txt_path.strip())
+            self.dir_path, _ = os.path.split(txt_path)
         else:
             print("%s error" % txt_path)
             return
@@ -48,6 +52,7 @@ class PCAndArmTestWindow(QWidget):
         txt_path, _ = QFileDialog.getOpenFileName(self, "open config file", self.dir_path, "json files(*.json)")
         if txt_path.strip():
             self.config_txt.setText(txt_path.strip())
+            self.dir_path, _ = os.path.split(txt_path)
         else:
             print("%s error" % txt_path)
             return
@@ -66,7 +71,8 @@ class PCAndArmTestWindow(QWidget):
             elif task_name == TaskName.Detect2d_Task:
                 model_name = 'detnet'
             elif task_name == TaskName.Segment_Task:
-                model_name = '"./data/segnet.cfg'
+                cfg_path = os.path.join(dir_name, "./data/segnet.cfg")
+                model_name = cfg_path
         if flag == 0:
             if self.weight_txt.text():
                 self.test_process.set_param(flag=flag, task_name=task_name,
