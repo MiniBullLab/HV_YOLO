@@ -75,8 +75,8 @@ class Detection2dTrainWindow(QWidget):
             print(reply)
 
     def start_train(self, pressed):
-        os.system("rm -rf ./.log/snapshot/det2d_latest.pt")
-        os.system("rm -rf ./.log/snapshot/det2d_best.pt")
+        os.system("rm -rf %s/snapshot/det2d_latest.pt" % ProcessStatus.LOG_ROOT)
+        os.system("rm -rf %s/snapshot/det2d_best.pt" % ProcessStatus.LOG_ROOT)
         os.system("rm -rf %s" % self.save_log)
         arguments = [self.train_data_txt.text(), self.val_data_txt.text()]
         env = QProcessEnvironment.systemEnvironment()

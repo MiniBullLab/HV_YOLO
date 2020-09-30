@@ -37,13 +37,13 @@ class ClassNet(BaseClassifyModel):
         base_out_channels = backbone.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone, base_out_channels[-1])
 
-        layer1 = ConvBNActivationBlock(in_channels=base_out_channels[-1],
-                                       out_channels=1280,
-                                       kernel_size=1,
-                                       padding=0,
-                                       bnName=self.bn_name,
-                                       activationName=self.activation_name)
-        self.add_block_list(layer1.get_name(), layer1, 1280)
+        # layer1 = ConvBNActivationBlock(in_channels=base_out_channels[-1],
+        #                                out_channels=1280,
+        #                                kernel_size=1,
+        #                                padding=0,
+        #                                bnName=self.bn_name,
+        #                                activationName=self.activation_name)
+        # self.add_block_list(layer1.get_name(), layer1, 1280)
 
         avgpool = GlobalAvgPool2d()
         self.add_block_list(avgpool.get_name(), avgpool, self.block_out_channels[-1])

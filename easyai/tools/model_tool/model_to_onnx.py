@@ -52,6 +52,6 @@ if __name__ == '__main__':
                         "data_channel": 3}
         converter.model_convert(model_config, options.weight_path, options.save_dir)
     elif options.base_model is not None:
-         model_config = {"type": options.backbone,
+        model_config = {"type": options.backbone,
                         "data_channel": 3}
         converter.base_model_convert(model_config, options.weight_path, options.save_dir)
