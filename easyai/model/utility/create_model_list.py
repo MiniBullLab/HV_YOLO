@@ -36,6 +36,9 @@ class CreateModuleList():
         self.filters = 0
         self.input_channels = 0
 
+    def set_start_index(self, index=0):
+        self.index = index
+
     def getBlockList(self):
         return self.blockDict
 
@@ -43,7 +46,6 @@ class CreateModuleList():
         return self.outChannelList
 
     def createOrderedDict(self, model_define, input_channels):
-        self.index = 0
         self.blockDict.clear()
         self.outChannelList.clear()
         self.filters = 0
@@ -102,16 +104,16 @@ class CreateModuleList():
             self.input_channels = self.filters
         elif module_def['type'] == LayerType.MultiplyLayer:
             block = MultiplyLayer(module_def['layers'])
-            index = block.layers[0]
-            self.filters = input_channels[index] if index >= 0 \
-                else self.outChannelList[index]
+            mult_index = block.layers[0]
+            self.filters = input_channels[mult_index] if mult_index >= 0 \
+                else self.outChannelList[mult_index]
             self.add_block_list(LayerType.MultiplyLayer, block, self.filters)
             self.input_channels = self.filters
         elif module_def['type'] == LayerType.AddLayer:
             block = AddLayer(module_def['layers'])
-            index = block.layers[0]
-            self.filters = input_channels[index] if index >= 0 \
-                else self.outChannelList[index]
+            add_index = block.layers[0]
+            self.filters = input_channels[add_index] if add_index >= 0 \
+                else self.outChannelList[add_index]
             self.add_block_list(LayerType.AddLayer, block, self.filters)
             self.input_channels = self.filters
         elif module_def['type'] == LayerType.RouteLayer:

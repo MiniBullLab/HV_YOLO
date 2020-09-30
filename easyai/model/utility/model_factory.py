@@ -25,7 +25,8 @@ class ModelFactory():
         model_args = model_config.copy()
         if input_name.endswith("cfg"):
             model_args.pop("type")
-            model_args.pop("class_number")
+            if model_args.get('class_number'):
+                model_args.pop("class_number")
             result = self.get_model_from_cfg(input_name, model_args)
         else:
             result = self.get_model_from_name(model_args)

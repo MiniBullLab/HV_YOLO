@@ -19,6 +19,7 @@ class MyBackbone(BaseBackbone):
         self.clear_list()
 
         base_out_channels = []
+        self.createTaskList.set_start_index(0)
         self.createTaskList.createOrderedDict(self.model_defines, base_out_channels)
         block_dict = self.createTaskList.getBlockList()
 
