@@ -29,7 +29,7 @@ class MyModel(BaseModel):
         backbone_block, self.backbone_name = self.creat_backbone()
         base_out_channels = backbone_block.get_outchannel_list()
         self.add_block_list(BlockType.BaseNet, backbone_block,
-                            base_out_channels[-1], flag=1)
+                            base_out_channels[-1])
         if backbone_block is not None:
             task_block_dict, task_out_channels = self.create_task(base_out_channels)
             for index, (key, block) in enumerate(task_block_dict.items()):
@@ -75,6 +75,7 @@ class MyModel(BaseModel):
         return result, input_name
 
     def create_task(self, base_out_channels):
+        self.createTaskList.set_start_index(1)
         self.createTaskList.createOrderedDict(self.model_defines, base_out_channels)
         block_dict = self.createTaskList.getBlockList()
         task_out_channels = self.createTaskList.getOutChannelList()
