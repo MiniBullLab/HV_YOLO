@@ -20,7 +20,7 @@ class TorchFreezeLayer():
         elif flag == 2:
             layer_name = layer_name.strip()
             for key, block in model._modules.items():
-                if key == BlockType.BaseNet:
+                if key.startswith(BlockType.BaseNet):
                     self.freeze_front_layer(block, layer_name)
                     break
         elif flag == 3:
@@ -29,7 +29,7 @@ class TorchFreezeLayer():
         elif flag == 4:
             layer_names = [x.strip() for x in layer_name.split(',') if x.strip()]
             for key, block in model._modules.items():
-                if key == BlockType.BaseNet:
+                if key.startswith(BlockType.BaseNet):
                     self.freeze_layers(block, layer_names)
                     break
         elif flag == 5:
@@ -38,7 +38,7 @@ class TorchFreezeLayer():
         elif flag == 6:
             layer_name = layer_name.strip()
             for key, block in model._modules.items():
-                if key == BlockType.BaseNet:
+                if key.startswith(BlockType.BaseNet):
                     self.freeze_layer_from_name(block, layer_name)
                     break
         else:
