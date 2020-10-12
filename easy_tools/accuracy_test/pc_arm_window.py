@@ -71,7 +71,7 @@ class PCAndArmTestWindow(QWidget):
             elif task_name == TaskName.Detect2d_Task:
                 model_name = 'detnet'
             elif task_name == TaskName.Segment_Task:
-                cfg_path = os.path.join(dir_name, "./data/segnet.cfg")
+                cfg_path = os.path.join(dir_name, "../data/segnet.cfg")
                 model_name = cfg_path
         if flag == 0:
             if self.weight_txt.text():
