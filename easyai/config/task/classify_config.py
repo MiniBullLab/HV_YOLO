@@ -55,7 +55,17 @@ class ClassifyConfig(ImageTrainConfig):
     def get_data_default_value(self):
         self.image_size = (224, 224)
         self.data_channel = 3
-        self.class_name = ('cls1', 'cls2')
+        self.class_name = ('cls1', 'cls2', 'cls3', 'cls4', 'cls5', 'cls6', 'cls7', 'cls8', 'cls9', 'cls10',
+                           'cls11', 'cls12', 'cls13', 'cls14', 'cls15', 'cls16', 'cls17', 'cls18', 'cls19', 'cls20',
+                           'cls21', 'cls22', 'cls23', 'cls24', 'cls25', 'cls26', 'cls27', 'cls28', 'cls29', 'cls30',
+                           'cls31', 'cls32', 'cls33', 'cls34', 'cls35', 'cls36', 'cls37', 'cls38', 'cls39', 'cls40',
+                           'cls41', 'cls42', 'cls43', 'cls44', 'cls45', 'cls46', 'cls47', 'cls48', 'cls49', 'cls50',
+                           'cls51', 'cls52', 'cls53', 'cls54', 'cls55', 'cls56', 'cls57', 'cls58', 'cls59', 'cls60',
+                           'cls61', 'cls62', 'cls63', 'cls64', 'cls65', 'cls66', 'cls67', 'cls68', 'cls69', 'cls70',
+                           'cls71', 'cls72', 'cls73', 'cls74', 'cls75', 'cls76', 'cls77', 'cls78', 'cls79', 'cls80',
+                           'cls81', 'cls82', 'cls83', 'cls84', 'cls85', 'cls86', 'cls87', 'cls88', 'cls89', 'cls90',
+                           'cls91', 'cls92', 'cls93', 'cls94', 'cls95', 'cls96', 'cls97', 'cls98', 'cls99', 'cls100',
+                           )
         self.data_mean = (0.5070751592371323, 0.48654887331495095, 0.4409178433670343)
         self.data_std = (0.2666410733740041, 0.2666410733740041, 0.2666410733740041)
         self.resize_type = 0
