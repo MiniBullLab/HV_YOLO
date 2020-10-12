@@ -27,7 +27,7 @@ class OfflineDet2dEvaluation(BaseOfflineEvaluation):
         print_str = "Mean AP = {:.4f}\n".format(value[0])
         print_str += "Results:\n"
         for i, ap in enumerate(value[1]):
-            temp_str = self.class_names[i] + ': ' + '{:.3f}'.format(ap) + '\n'
+            temp_str = self.detect2d_class[i] + ': ' + '{:.3f}'.format(ap) + '\n'
             print_str += temp_str
         print(print_str)
         return print_str

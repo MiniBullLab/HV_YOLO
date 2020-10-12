@@ -31,7 +31,11 @@ class PCAndArmTestWindow(QWidget):
             return
 
     def open_arm_dataset(self, pressed):
-        txt_path, _ = QFileDialog.getOpenFileName(self, "open arm result", self.dir_path, "txt files(*.txt)")
+        task_name = self.task_name_box.currentText()
+        if task_name == TaskName.Segment_Task:
+            txt_path, _ = QFileDialog.getExistingDirectory(self, "open arm result", self.dir_path)
+        else:
+            txt_path, _ = QFileDialog.getOpenFileName(self, "open arm result", self.dir_path, "txt files(*.txt)")
         if txt_path.strip():
             self.arm_data_txt.setText(txt_path.strip())
             self.dir_path, _ = os.path.split(txt_path)

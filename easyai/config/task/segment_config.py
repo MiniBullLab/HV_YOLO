@@ -17,7 +17,8 @@ class SegmentionConfig(ImageTrainConfig):
         # data
         self.seg_label_type = None
         self.segment_class = None
-        self.save_result_dir = os.path.join(self.root_save_dir, 'segment_results')
+        self.save_result_dir_name = "segment_results"
+        self.save_result_path = os.path.join(self.root_save_dir, self.save_result_dir_name)
         # test
         # train
         self.log_name = "segment"

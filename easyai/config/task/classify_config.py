@@ -16,6 +16,7 @@ class ClassifyConfig(ImageTrainConfig):
         self.set_task_name(TaskName.Classify_Task)
         # data
         self.class_name = None
+        self.save_result_name = None
         # test
         # train
         self.log_name = "classify"

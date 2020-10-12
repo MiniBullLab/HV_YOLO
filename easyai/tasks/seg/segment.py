@@ -32,8 +32,8 @@ class Segmentation(BaseInference):
         self.threshold = 0.5  # binary class threshold
 
     def process(self, input_path, is_show=False):
-        os.system('rm -rf ' + self.task_config.save_result_dir)
-        os.makedirs(self.task_config.save_result_dir, exist_ok=True)
+        os.system('rm -rf ' + self.task_config.save_result_path)
+        os.makedirs(self.task_config.save_result_path, exist_ok=True)
 
         dataloader = self.get_image_data_lodaer(input_path)
         for index, (file_path, src_image, image) in enumerate(dataloader):
@@ -52,7 +52,7 @@ class Segmentation(BaseInference):
     def save_result(self, file_path, prediction):
         path, filename_post = os.path.split(file_path)
         filename, post = os.path.splitext(filename_post)
-        save_result_path = os.path.join(self.task_config.save_result_dir, "%s.png" % filename)
+        save_result_path = os.path.join(self.task_config.save_result_path, "%s.png" % filename)
         self.image_process.opencv_save_image(save_result_path, prediction)
 
     def infer(self, input_data, threshold=0.0):
